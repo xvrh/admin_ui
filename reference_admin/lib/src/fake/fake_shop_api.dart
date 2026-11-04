@@ -229,7 +229,7 @@ class FakeShopApi implements ShopApi {
   /// a day still under way would read as a drop on every trend.
   (DateTime, DateTime) rangeBounds(DashboardRange range, {int back = 0}) {
     final now = _now;
-    final end = DateTime(now.year, now.month, now.day);
+    final end = startOfDay(now);
     final to = end.subtract(Duration(days: range.days * back));
     return (to.subtract(Duration(days: range.days)), to);
   }

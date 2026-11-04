@@ -127,6 +127,12 @@ class FakeShopDb {
   };
 }
 
+/// Midnight of [now]'s day, in [now]'s zone: a UTC clock (the tests', the
+/// scenarios') gives the same shop on every machine, whatever its time zone.
+DateTime startOfDay(DateTime now) => now.isUtc
+    ? DateTime.utc(now.year, now.month, now.day)
+    : DateTime(now.year, now.month, now.day);
+
 /// Builds the shop for [seed], every date placed relative to [now].
 ///
 /// Deterministic: one `Random(20260101)`, sequential ids, and iteration over
@@ -705,7 +711,7 @@ void _seedOrders(FakeShopDb db, Random random, DateTime now) {
 /// [days] days: a shop that sells about twice as much a day now as at the
 /// start, a little more at weekends, and no day like the one before.
 List<DateTime> _orderTimes(int total, int days, DateTime now, Random random) {
-  final today = DateTime(now.year, now.month, now.day);
+  final today = startOfDay(now);
   final weights = [
     for (var age = 0; age < days; age++)
       (2 - age / days) *
