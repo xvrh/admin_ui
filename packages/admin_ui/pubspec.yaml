@@ -1,0 +1,40 @@
+name: admin_ui
+description: A generic Flutter admin UI kit — themes, widgets, app shell, collections, forms, fields, assets and auth screens.
+# Released as git tags, not on pub.dev: README.md, "Install".
+publish_to: 'none'
+version: 0.1.0
+repository: https://github.com/xvrh/admin_ui
+
+resolution: workspace
+
+# material_ui 1.4 sets the floor: Flutter 3.47 and Dart 3.13. The kit
+# analyzes clean against Flutter 3.47.0-0.4.pre, so it needs no later API.
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.47.0'
+
+dependencies:
+  collection: ^1.19.1
+  common_locale_data: ^2.3.0
+  desktop_drop: ^0.8.4
+  file_picker: ^13.1.0
+  flutter:
+    sdk: flutter
+  intl: ^0.20.3
+  material_ui: ^1.4.0
+  mime: ^2.0.0
+  pointer_interceptor: ^0.10.1+2
+  two_dimensional_scrollables: ^0.5.2
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # For the README's font resolver sample, test/readme/font_resolver.dart.
+  google_fonts: '>=8.1.0 <10.0.0'
+  analyzer: ^13.0.0
+  dart_style: ^3.1.9
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

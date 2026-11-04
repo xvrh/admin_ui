@@ -1,0 +1,434 @@
+# Why each admin_ui symbol this app does not use is left out. Grouped as the
+# spec asks; tool/kit_coverage.dart reads it into KIT_COVERAGE.md, and
+# test/unit/guards_test.dart fails on an unused symbol with no reason here,
+# and on a symbol listed here that the app has come to use.
+
+editor_vocabulary:
+  reason: "(a) block, canvas and comment-annotation vocabulary: for an app with a block editor of its own, which a shop has no use for"
+  symbols:
+    - BlockChange
+    - BlockDiff
+    - BlockQuickDiff
+    - ChangeScope
+    - ChangeScopeHost
+    - CommentAnnotationPin
+    - CommentAnnotationRegistry
+    - CommentEntry
+    - CommentFieldButton
+    - CommentSelectionAnchor
+    - CommentsButton
+    - CommentsScope
+    - DocumentPresenceRoster
+    - InheritModeDropdown
+    - InheritedBody
+    - InsertPicker
+    - InsertPickerEntry
+    - LaneLanguage
+    - LaneMode
+    - LaneStack
+    - SourceTargetPair
+    - TextLane
+    - TranslatableField
+    - modifiedLocalesDetail
+
+theme_internals:
+  reason: "(c) theme-construction internals: the app builds one theme through AdminTheme.from and reads tokens through context getters"
+  symbols:
+    - AdminBreakpoints
+    - AdminButtonInsets
+    - AdminButtonMinWidth
+    - AdminButtonPadding
+    - AdminButtonStyle
+    - AdminControlSizes
+    - AdminElevation
+    - AdminFieldStyle
+    - AdminFocusSpec
+    - AdminIconSizes
+    - AdminMotion
+    - AdminOverlayStyle
+    - AdminPalette
+    - AdminShellStyle
+    - AdminStateLayer
+    - AdminStroke
+    - AdminSyntaxColors
+    - AdminTableMetrics
+    - AdminTypeRamp
+    - AdminTypeStep
+    - ButtonDisabledStyle
+    - ButtonIconPlacement
+    - ButtonLabelAlignment
+    - FieldBorder
+    - FieldChromeSpec
+    - FieldFocusIndicator
+    - FieldOutlineBorder
+    - FieldRequiredMark
+    - FieldVariant
+    - NavIndicator
+    - TableHeaderText
+    - antDarkPalette
+    - antPalette
+    - antSiderPalette
+    - buildInputDecorationTheme
+    - carbonDarkPalette
+    - carbonPalette
+    - carbonShellPalette
+    - contrastRatio
+    - defaultControlSizes
+    - defaultDarkElevation
+    - defaultElevation
+    - defaultMotion
+    - defaultRadii
+    - defaultTableMetrics
+    - defaultTokens
+    - defaultTypeRamp
+    - fieldBorderSide
+    - fieldDecoration
+    - fieldFillColor
+    - fieldFocusHalo
+    - fieldForegroundDecoration
+    - fieldPaddingY
+    - fluentDarkPalette
+    - fluentPalette
+    - materialDarkPalette
+    - materialPalette
+    - resolveFieldChrome
+    - shadcnDarkPalette
+    - shadcnPalette
+
+context_extensions:
+  reason: "(d) extensions used through their getters (context.colors, context.adminL10n, …), which name no type"
+  symbols:
+    - AdminFormatsContext
+    - AdminLocalizationsContext
+    - AdminThemeContext
+    - AdminTokensContext
+
+deferred:
+  reason: "(e) deferred features (spec §13): categories tree, promotions calendar, integrations, the stock provider and upload"
+  symbols:
+    - AdminModule
+    - AssetDropTarget
+    - AssetRefusal
+    - AssetRefusalReason
+    - AssetUploadController
+    - Calendar
+    - CalendarMode
+    - CodeBody
+    - CodeError
+    - CodeLanguage
+    - DateRangePicker
+    - DateRangePreset
+    - DropChildBuilder
+    - DroppedAsset
+    - ExternalAssetProvider
+    - ExternalProviderScope
+    - JsonTokenKind
+    - JsonView
+    - ProviderBrowser
+    - ProviderFilters
+    - ProviderImageType
+    - ProviderItem
+    - ProviderOrientation
+    - ProviderSearchResult
+    - ProviderSize
+    - SplitAxis
+    - SplitView
+    - Tree
+    - TreeDrop
+    - TreeEditor
+    - TreeEditorEntry
+    - TreeEditorLayout
+    - TreeEntryBadge
+    - TreeFlatNode
+    - TreeNode
+    - TreeRowBuilder
+    - TreeRowInfo
+    - UploadItem
+    - UploadStatus
+    - UploadZone
+    - showAssetRefusals
+    - showProviderImport
+
+building_blocks:
+  reason: "(b) kit-author building blocks: the app uses the higher-level widget that composes them (AssetLibrary, showCropDialog, AssetListField, the auth forms, Collection, Tappable, the field presets, DiffView, FormSaveBar, FormWizard, CommandTrigger, NotificationCenter, AppearancePicker, Shell, SavedViewsBar, MentionField, the FieldDiff factories, …)"
+  symbols:
+    - AddRowButton
+    - adminAccents
+    - AspectPreset
+    - AssetBody
+    - AssetDetailView
+    - AssetMediaCanvas
+    - AttentionTile
+    - AuthField
+    - AuthFieldError
+    - BooleanBody
+    - BulkActionBar
+    - Choice
+    - ChoiceOption
+    - ChoiceStyle
+    - ChromelessFieldScope
+    - CircleButton
+    - ClearButton
+    - CollectionCards
+    - CollectionTable
+    - ColorBody
+    - ColumnChooser
+    - CommandPalette
+    - CommandPaletteController
+    - CommandScope
+    - CommandSubscription
+    - CountBadge
+    - CropHandle
+    - CropMode
+    - CursorRegion
+    - DateBody
+    - DiffMoveHint
+    - DiffOp
+    - DiffOpStyle
+    - DiffOpTag
+    - DiffRestoreButton
+    - DiffSegment
+    - EditSession
+    - FieldBinder
+    - FieldBinderScope
+    - FieldBinding
+    - FieldBodyScope
+    - FieldChevron
+    - FieldChrome
+    - FieldDescription
+    - FieldErrorsScope
+    - FieldErrorText
+    - FieldFeedbackScope
+    - FieldFocusScope
+    - FieldMessage
+    - FieldPresenceRing
+    - FieldQuickDiff
+    - FieldRequiredMarker
+    - FieldShell
+    - FieldState
+    - FieldToken
+    - FieldTrigger
+    - FocusRing
+    - FormController
+    - FormErrorsScope
+    - FormFieldEntry
+    - FormFieldRegistry
+    - FormFieldScope
+    - FormShortcuts
+    - Glyph
+    - HighlightedText
+    - ImageCropper
+    - InlineDiff
+    - KeyValueBody
+    - LanguagePill
+    - LeaveGuardEntry
+    - Listbox
+    - ListboxController
+    - ListboxOption
+    - LocaleDiff
+    - MatchCell
+    - matchMentionCandidates
+    - MediaGrid
+    - MediaListTile
+    - MediaThumb
+    - MediaTile
+    - MediaTileCheck
+    - mentionQueryAt
+    - MultiSelectBody
+    - NewPasswordFields
+    - NewPasswordFieldsState
+    - NotchedLabelBox
+    - PageHeader
+    - Pager
+    - PasswordStrengthMeter
+    - Popover
+    - PopoverController
+    - PopoverMenuSurface
+    - PresencePeer
+    - QuickDiffSurface
+    - ReferenceBody
+    - ReferenceTile
+    - RelationChip
+    - SaveBar
+    - SaveBarAction
+    - SaveCluster
+    - SaveFlow
+    - SaveState
+    - SearchField
+    - SelectBody
+    - SelectionFooter
+    - showAssetEditor
+    - showAssetPicker
+    - showNavigationDrawer
+    - showSaveViewDialog
+    - StepItem
+    - Steps
+    - SwatchOption
+    - SwatchRow
+    - TabScope
+    - TagsBody
+    - TextBody
+    - TextCell
+    - TextCellBody
+    - TextDiff
+    - ThumbnailImage
+    - ValueFormScope
+
+implicit_types:
+  reason: "(d) types, typedefs and pure helpers the app meets without naming them: callback and value types inferred from a closure or a getter, filter conditions built by the FilterBar fields, the per-area message classes read through s.kit and context.adminL10n, and helpers the kit's widgets call"
+  symbols:
+    - AdminFormats
+    - AdminMessages
+    - AssetAccept
+    - assetGlyph
+    - AssetSelectionMode
+    - AssetsMessages
+    - AssetsMessagesAr
+    - AssetsMessagesEn
+    - AssetsMessagesFr
+    - AssetView
+    - AsyncFieldValidator
+    - BooleanAppearance
+    - Cell
+    - ChangePasswordCallback
+    - CollectionFetcher
+    - CollectionMessages
+    - CollectionMessagesAr
+    - CollectionMessagesEn
+    - CollectionMessagesFr
+    - DateEditorStyle
+    - DateGranularity
+    - DateRangeFilter
+    - detokenizeMentions
+    - DiffLayout
+    - DisplayMessages
+    - DisplayMessagesAr
+    - DisplayMessagesEn
+    - DisplayMessagesFr
+    - FieldChangeIndex
+    - FieldChangeSummary
+    - FieldId
+    - fieldInputDecoration
+    - FieldsMessages
+    - FieldsMessagesAr
+    - FieldsMessagesEn
+    - FieldsMessagesFr
+    - fieldTextStyle
+    - FieldValidator
+    - filterConditionFromJson
+    - FilterConditionJson
+    - focalCrop
+    - FuzzyMatch
+    - InputsMessages
+    - InputsMessagesAr
+    - InputsMessagesEn
+    - InputsMessagesFr
+    - languageNameOf
+    - lineHeightOf
+    - localeStatusMeta
+    - maxFramedRect
+    - MentionRun
+    - mentionToken
+    - ModalAnchorController
+    - motionDuration
+    - motionReduced
+    - MultiSelectAppearance
+    - NumberAppearance
+    - NumberRangeFilter
+    - PasswordStrength
+    - passwordStrength
+    - peersOnField
+    - pickerSurface
+    - PopoverPlacement
+    - readOnlyEmpty
+    - RecordChange
+    - ReferenceResolver
+    - ReferenceSearch
+    - RestoreTarget
+    - SavedViewsLayout
+    - saveStateFor
+    - SelectAppearance
+    - SeverityStyle
+    - severityStyleOf
+    - ShellMessages
+    - ShellMessagesAr
+    - ShellMessagesEn
+    - ShellMessagesFr
+    - shortcutLabel
+    - SignInCallback
+    - spinnerValue
+    - TableSort
+    - TabsAlignment
+    - TabSelection
+    - TabsVariant
+    - TextFilter
+    - textGrowthOf
+    - ToastHandle
+    - ToastPosition
+    - ToastScopeState
+    - ValidationMode
+
+kit_themes:
+  reason: "(c) the kit's themes, which the app reaches through adminThemes (and the gallery by name), never as constants"
+  symbols:
+    - antTheme
+    - carbonTheme
+    - fluentTheme
+    - materialTheme
+    - shadcnTheme
+
+font_resolver:
+  reason: "(e) the app bundles its fonts, so it hands the kit no resolver"
+  symbols:
+    - AdminFonts
+
+not_needed:
+  reason: "(e) features no screen of this shop calls for in v1: a second reference app, or this one's next PR, would try them"
+  symbols:
+    - Accordion
+    - AccordionSection
+    - AssetField
+    - AssetRefField
+    - BarChart
+    - BarSparkline
+    - ChartSeries
+    - Combobox
+    - ComboboxOption
+    - DashedBorder
+    - DateField
+    - DelayedLoading
+    - HelpButton
+    - InMemorySavedViewsStore
+    - ListboxMenu
+    - LoadingOverlay
+    - MaskedBody
+    - MaskedDateField
+    - MaskedField
+    - MaskFormatter
+    - Masks
+    - MediaBody
+    - MediaItem
+    - MediaKind
+    - MediaStatus
+    - OptionalBooleanField
+    - OptionalField
+    - OptionalNumberField
+    - Pagination
+    - PasswordField
+    - ProgressBar
+    - ProgressRing
+    - Repeater
+    - SidebarAccount
+    - StatusDot
+    - StillLinearProgress
+    - ValueSlider
+
+test_support:
+  reason: "(d) the test-support library, package:admin_ui/testing.dart, which tests import and lib/ never does: test/support/fonts.dart calls loadAdminFonts; the rest serve a catalog's sweep harness, which the scenarios stand in for"
+  symbols:
+    - loadAdminFonts
+    - loadTestFontFamily
+    - testFontFamilies
+    - testPlatformFamily
+    - textWithoutFont
+    - withTestFontFallback

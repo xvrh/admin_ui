@@ -1,0 +1,76 @@
+name: admin_ui_example
+description: "Component catalog for admin_ui, the generic admin UI kit."
+publish_to: 'none'
+version: 1.0.0+1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.14.0-0
+  flutter: 3.48.0-0.5.pre
+
+dependencies:
+  admin_ui:
+    path: ..
+  collection:
+  flutter:
+    sdk: flutter
+  flutterware:
+    git:
+      url: https://github.com/xvrh/flutterware.git
+      ref: e9962fbf68b22beb0d1acd8394268681a51b9c83
+  intl:
+  logging:
+  material_ui: ^1.4.0
+  two_dimensional_scrollables:
+
+dev_dependencies:
+  flutter_lints:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/sample.jpg
+  # The themes' families, bundled so the catalog draws them as an app that
+  # bundles them does: Iris and shadcn in Inter, Material in Roboto, Carbon in
+  # IBM Plex Sans. Their OFL licences are in assets/fonts/licenses/.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Inter-ExtraBold.ttf
+          weight: 800
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto-ExtraBold.ttf
+          weight: 800
+    - family: IBM Plex Sans
+      fonts:
+        - asset: assets/fonts/IBMPlexSans-Regular.ttf
+        - asset: assets/fonts/IBMPlexSans-Italic.ttf
+          style: italic
+        - asset: assets/fonts/IBMPlexSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSans-Bold.ttf
+          weight: 700

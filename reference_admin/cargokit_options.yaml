@@ -1,0 +1,5 @@
+# Rust-backed plugins (super_native_extensions, through block_editor) use
+# their signed precompiled binaries instead of building from source, so a
+# native build needs no Rust toolchain. Cargokit verifies each download
+# against the crate's public key and builds from source when none matches.
+use_precompiled_binaries: true

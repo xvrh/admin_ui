@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# flutter-version and channel mirror .fvmrc.
+env:
+  FLUTTER_VERSION: 3.48.0-0.5.pre
+  FLUTTER_CHANNEL: beta
+
+jobs:
+  checks:
+    name: Format, analyze, dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+      - name: Resolve the workspace
+        id: setup
+        run: flutter pub get
+
+      - name: Check formatting
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run tool/format.dart --check
+
+      # Runs even when formatting failed, so one run reports both.
+      - name: Analyze
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart analyze --fatal-infos .
+
+      - name: The kit admits the latest release of every dependency
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run tool/check_constraints.dart
+
+      - name: Known vulnerabilities
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: |
+          curl -fsSL -o osv-scanner \
+            https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64
+          echo "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  osv-scanner" | sha256sum -c -
+          chmod +x osv-scanner
+          ./osv-scanner scan source --lockfile=pubspec.lock
+
+  test:
+    name: Tests · ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - packages/admin_ui
+          - packages/admin_ui/example
+          - reference_admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+      - run: flutter pub get
+      - name: flutter test
+        working-directory: ${{ matrix.package }}
+        run: flutter test

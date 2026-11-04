@@ -1,0 +1,47 @@
+# The template admin's rules, plus the kit boundary as errors: an app built
+# on admin_ui reaches it through its public barrels only.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - web/**
+    - macos/**
+  errors:
+    implementation_imports: error
+    depend_on_referenced_packages: error
+
+linter:
+  rules:
+    always_declare_return_types: true
+    avoid_dynamic_calls: true
+    avoid_escaping_inner_quotes: true
+    avoid_final_parameters: true
+    avoid_setters_without_getters: true
+    cast_nullable_to_non_nullable: true
+    close_sinks: true
+    conditional_uri_does_not_exist: true
+    depend_on_referenced_packages: true
+    # FRICTION(T-005): scenario files are numbered (01_access_test.dart) so
+    # the shots export reads in story order.
+    file_names: false
+    implementation_imports: true
+    no_adjacent_strings_in_list: true
+    no_default_cases: true
+    no_leading_underscores_for_local_identifiers: true
+    omit_local_variable_types: true
+    only_throw_errors: true
+    prefer_interpolation_to_compose_strings: true
+    prefer_single_quotes: true
+    sort_child_properties_last: true
+    sort_pub_dependencies: true
+    test_types_in_equals: true
+    unawaited_futures: true
+    unnecessary_late: true
+    unnecessary_parenthesis: true
+    unnecessary_statements: true
+    use_raw_strings: true
+
+    prefer_const_constructors: false
+    prefer_const_literals_to_create_immutables: false
+    prefer_const_constructors_in_immutables: false

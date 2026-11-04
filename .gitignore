@@ -1,0 +1,12 @@
+# Pub and build output.
+.dart_tool/
+build/
+.flutter-plugins-dependencies
+
+# Editors and the OS.
+*.iml
+.idea/
+.DS_Store
+
+# fvm's SDK link; .fvmrc is the pin.
+.fvm/
