@@ -215,7 +215,6 @@ class _PageButton extends StatelessWidget {
 
     Widget button = Tappable.states(
       onTap: onTap,
-      cursor: current ? SystemMouseCursors.basic : null,
       semanticLabel: label,
       excludeSemantics: true,
       selected: number == null ? null : current,

@@ -1321,6 +1321,7 @@ class _AspectChip extends StatelessWidget {
         borderRadius: radius,
         child: InkWell(
           onTap: onTap,
+          mouseCursor: WidgetStateMouseCursor.clickable,
           borderRadius: radius,
           child: Container(
             padding: const EdgeInsets.symmetric(

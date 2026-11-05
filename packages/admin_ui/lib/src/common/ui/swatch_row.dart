@@ -58,7 +58,6 @@ class SwatchRow<T> extends StatelessWidget {
             : () {
                 if (!selected) onChanged!(option.value);
               },
-        cursor: selected ? SystemMouseCursors.basic : null,
         semanticLabel: option.label,
         excludeSemantics: true,
         selected: selected,

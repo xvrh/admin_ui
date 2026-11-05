@@ -18,8 +18,22 @@ import 'focus_ring.dart';
 /// Ripple-free tap target — the house alternative to [InkWell]. Components paint
 /// their own borders and fills for hover/selected state, so Material's ink would
 /// only muddy them. A [GestureDetector] (opaque hit test) wrapped in a
-/// [MouseRegion] that shows the click cursor when [onTap] is set and
-/// [disabledCursor] (default basic) otherwise.
+/// [MouseRegion] that shows [cursor] (default the hand,
+/// [SystemMouseCursors.click]) when [onTap] is set and [disabledCursor]
+/// (default the arrow) otherwise.
+///
+/// **Cursor.** The hand says what is under the pointer, a control, not
+/// whether this click changes anything: a selected option, the current page
+/// and the current tab show it like their neighbours. It shows on every
+/// platform, as the web does, so a development build on the desktop looks
+/// like the shipped web app; Material's own buttons switch to the arrow off
+/// the web (`WidgetStateMouseCursor.adaptiveClickable`), so an [InkWell] in
+/// the kit passes `mouseCursor: WidgetStateMouseCursor.clickable`
+/// (`test/selection_cursor_test.dart` checks every one). A link shows the
+/// hand too; a disabled target the arrow; a target a double click or a long
+/// press acts on, and a field's label, the arrow through [CursorRegion]; a
+/// drag handle the open hand; a splitter the resize arrows; text input, and
+/// text in a read-only place, the I-beam.
 ///
 /// A tap target is no place to select text: under an ancestor [SelectionArea]
 /// the label is left out of the selection and shows the tap cursor, not the

@@ -870,6 +870,7 @@ class _CaretState extends State<_Caret> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: widget.onTap,
+      mouseCursor: WidgetStateMouseCursor.clickable,
       borderRadius: BorderRadius.circular(context.radii.radiusSmall),
       focusColor: Colors.transparent,
       onFocusChange: (focused) => setState(() => _focused = focused),

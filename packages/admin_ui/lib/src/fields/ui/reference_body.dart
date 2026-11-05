@@ -885,6 +885,7 @@ class _ReferencePickerState<T, K extends Object>
       color: selected ? context.colors.primaryFaint : Colors.transparent,
       child: InkWell(
         onTap: inert ? null : () => _tap(item),
+        mouseCursor: WidgetStateMouseCursor.clickable,
         hoverColor: context.colors.hoverOverlay,
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -942,6 +943,7 @@ class _ReferencePickerState<T, K extends Object>
     }
     return InkWell(
       onTap: () => _run(reset: false),
+      mouseCursor: WidgetStateMouseCursor.clickable,
       hoverColor: context.colors.background,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AdminSpacing.lg),

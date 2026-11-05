@@ -17,7 +17,9 @@ import 'package:material_ui/material_ui.dart';
 /// together (`Text.build`), so the kit takes a target's text out of the
 /// selection ([CursorRegion], and the `InkWell` sites) rather than hand the
 /// click cursor down and leave the text selectable, as [InkWell] does. What a
-/// drag selects is the measure; the cursor follows from it.
+/// drag selects is the measure; the cursor follows from it. The cursor over a
+/// control is the hand on every platform, which Material's own buttons give
+/// up off the web; the kit's `InkWell` sites are held to it here too.
 
 /// Pumps [child] centred in a [SelectionArea].
 Future<void> _pumpInArea(
@@ -176,8 +178,8 @@ void main() {
     });
 
     testWidgets('InkWell shows the click cursor (reference)', (tester) async {
-      // Explicit cursor to sidestep `adaptiveClickable`, which defers on the
-      // mobile target platform tests default to.
+      // Explicit cursor: InkWell's own default is platform-adaptive, the arrow
+      // off the web (the rule below has every InkWell in the kit name one).
       final cursor = await cursorOverLabel(
         tester,
         InkWell(
@@ -248,36 +250,51 @@ void main() {
     });
   });
 
+  group('the cursor over a control', () {
+    // The hand on every platform, so a development build on the desktop
+    // looks like the shipped web app. Material's buttons switch to the arrow
+    // off the web; the kit's InkWell sites override that (see Tappable).
+    testWidgets('Button shows the hand', (tester) async {
+      final cursor = await cursorOverLabel(
+        tester,
+        Button('Label', onPressed: () {}),
+      );
+      expect(cursor, SystemMouseCursors.click);
+    });
+
+    testWidgets('a disabled Button shows the arrow', (tester) async {
+      final cursor = await cursorOverLabel(tester, const Button('Label'));
+      expect(cursor, SystemMouseCursors.basic);
+    });
+
+    testWidgets('a disabled Tappable shows the arrow', (tester) async {
+      final cursor = await cursorOverLabel(
+        tester,
+        const Tappable(onTap: null, child: Text('Label')),
+      );
+      expect(cursor, SystemMouseCursors.basic);
+    });
+  });
+
   test('a click cursor goes through CursorRegion across the kit', () {
     // A MouseRegion given the click cursor leaves its label selectable, with
     // the text I-beam, under a host's SelectionArea. This was fixed one
     // widget at a time before, and the table's cells came back with it.
     // CursorRegion (or Tappable, which uses it) takes the text out of the
-    // selection. The kit's lib and its example's are scanned.
-    final root = Directory.current.absolute.uri.normalizePath().toFilePath();
-    final offenders = <String>[];
-    for (final top in ['lib', 'example/lib']) {
-      final dir = Directory('$root$top');
-      if (!dir.existsSync()) continue;
-      for (final entity in dir.listSync(recursive: true, followLinks: false)) {
-        if (entity is! File || !entity.path.endsWith('.dart')) continue;
-        final path = entity.path.replaceAll(r'\', '/').substring(root.length);
-        if (path == 'lib/src/common/ui/tappable.dart') continue;
-        final source = entity.readAsStringSync();
-        if (!source.contains('MouseRegion')) continue;
-        final unit = parseString(
-          content: source,
-          featureSet: FeatureSet.latestLanguageVersion(),
-          throwIfDiagnostics: false,
-        ).unit;
-        final visitor = _ClickMouseRegions();
-        unit.accept(visitor);
-        for (final node in visitor.found) {
-          final line = unit.lineInfo.getLocation(node.offset).lineNumber;
-          offenders.add('$path:$line');
-        }
-      }
-    }
+    // selection.
+    final offenders = _scan(
+      () => _Constructions(
+        const ['MouseRegion'],
+        (arguments) => arguments.any(
+          (a) =>
+              a.name.lexeme == 'cursor' &&
+              a.argumentExpression.toSource().contains(
+                'SystemMouseCursors.click',
+              ),
+        ),
+      ),
+      skip: const {'lib/src/common/ui/tappable.dart'},
+    );
 
     expect(
       offenders,
@@ -289,15 +306,76 @@ void main() {
           '${offenders.join('\n  ')}',
     );
   });
+
+  test('an InkWell names its cursor across the kit', () {
+    // InkWell's default cursor is platform-adaptive: the hand on the web, the
+    // arrow off it. Left to it, a Button showed the arrow in a desktop build
+    // while the Tappable beside it showed the hand. The kit's hand is the
+    // same on every platform (see Tappable).
+    final offenders = _scan(
+      () => _Constructions(const [
+        'InkWell',
+        'InkResponse',
+      ], (arguments) => !arguments.any((a) => a.name.lexeme == 'mouseCursor')),
+    );
+
+    expect(
+      offenders,
+      isEmpty,
+      reason:
+          'An InkWell left to its default cursor shows the arrow off the web '
+          'and the hand on it. Pass mouseCursor: '
+          'WidgetStateMouseCursor.clickable, or use Tappable:\n  '
+          '${offenders.join('\n  ')}',
+    );
+  });
 }
 
-/// Every `MouseRegion(...)` whose `cursor:` names the click cursor.
-class _ClickMouseRegions extends RecursiveAstVisitor<void> {
+/// `path:line` of every construction in the kit's lib, and its example's,
+/// that a fresh [visitor] flags; files in [skip] are left out.
+List<String> _scan(
+  _Constructions Function() visitor, {
+  Set<String> skip = const {},
+}) {
+  final root = Directory.current.absolute.uri.normalizePath().toFilePath();
+  final offenders = <String>[];
+  for (final top in ['lib', 'example/lib']) {
+    final dir = Directory('$root$top');
+    if (!dir.existsSync()) continue;
+    for (final entity in dir.listSync(recursive: true, followLinks: false)) {
+      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+      final path = entity.path.replaceAll(r'\', '/').substring(root.length);
+      if (skip.contains(path)) continue;
+      final source = entity.readAsStringSync();
+      final constructions = visitor();
+      if (!constructions.names.any(source.contains)) continue;
+      final unit = parseString(
+        content: source,
+        featureSet: FeatureSet.latestLanguageVersion(),
+        throwIfDiagnostics: false,
+      ).unit;
+      unit.accept(constructions);
+      for (final node in constructions.found) {
+        final line = unit.lineInfo.getLocation(node.offset).lineNumber;
+        offenders.add('$path:$line');
+      }
+    }
+  }
+  return offenders;
+}
+
+/// Every construction of a widget in [names] whose named arguments [flag]
+/// accepts.
+class _Constructions extends RecursiveAstVisitor<void> {
+  final List<String> names;
+  final bool Function(Iterable<NamedArgument> arguments) flag;
   final found = <AstNode>[];
+
+  _Constructions(this.names, this.flag);
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    if (node.constructorName.type.toSource() == 'MouseRegion') {
+    if (names.contains(node.constructorName.type.toSource())) {
       _check(node, node.argumentList);
     }
     super.visitInstanceCreationExpression(node);
@@ -305,20 +383,13 @@ class _ClickMouseRegions extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.target == null && node.methodName.name == 'MouseRegion') {
+    if (node.target == null && names.contains(node.methodName.name)) {
       _check(node, node.argumentList);
     }
     super.visitMethodInvocation(node);
   }
 
   void _check(AstNode node, ArgumentList arguments) {
-    for (final argument in arguments.arguments.whereType<NamedArgument>()) {
-      if (argument.name.lexeme == 'cursor' &&
-          argument.argumentExpression.toSource().contains(
-            'SystemMouseCursors.click',
-          )) {
-        found.add(node);
-      }
-    }
+    if (flag(arguments.arguments.whereType<NamedArgument>())) found.add(node);
   }
 }
