@@ -41,6 +41,10 @@ class RenderConfig {
   /// (`MediaQuery.reduceMotion`).
   final bool disableAnimations;
 
+  /// Mounted under a `SelectionArea`, as a page an app lets its users select
+  /// text on.
+  final bool selectable;
+
   const RenderConfig({
     required this.theme,
     this.mode = ThemeMode.light,
@@ -50,6 +54,7 @@ class RenderConfig {
     this.direction,
     this.textScale = 1,
     this.disableAnimations = false,
+    this.selectable = false,
   }) : assert(brand == null || brandName != null, 'A brand needs a name');
 
   /// [theme] in [mode], English, no brand.
@@ -72,6 +77,7 @@ class RenderConfig {
       direction: direction,
       textScale: textScale,
       disableAnimations: disableAnimations,
+      selectable: selectable,
     );
   }
 
@@ -84,6 +90,7 @@ class RenderConfig {
     TextDirection? direction,
     double? textScale,
     bool? disableAnimations,
+    bool? selectable,
   }) => RenderConfig(
     theme: theme ?? this.theme,
     mode: mode ?? this.mode,
@@ -93,6 +100,7 @@ class RenderConfig {
     direction: direction ?? this.direction,
     textScale: textScale ?? this.textScale,
     disableAnimations: disableAnimations ?? this.disableAnimations,
+    selectable: selectable ?? this.selectable,
   );
 
   /// The light or dark token set, rebranded when [brand] is set. A light-only
@@ -114,6 +122,7 @@ class RenderConfig {
     if (direction case final direction?) direction.name,
     if (textScale != 1) 'x${_scale(textScale)}',
     if (disableAnimations) 'reduced motion',
+    if (selectable) 'selectable',
   ].join(' · ');
 }
 

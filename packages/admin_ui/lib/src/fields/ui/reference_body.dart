@@ -898,7 +898,9 @@ class _ReferencePickerState<T, K extends Object>
                   opacity: inert
                       ? context.colors.stateLayer.disabledContent
                       : 1,
-                  child: widget.tile(context, item),
+                  child: SelectionContainer.disabled(
+                    child: widget.tile(context, item),
+                  ),
                 ),
               ),
               const Gap(AdminSpacing.md),
@@ -944,13 +946,15 @@ class _ReferencePickerState<T, K extends Object>
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AdminSpacing.lg),
         child: Center(
-          child: Text(
-            context.adminL10n.loadMore,
-            style: context.type.weighted(
-              context.type.bodySmall.copyWith(
-                color: context.colors.primaryText,
+          child: SelectionContainer.disabled(
+            child: Text(
+              context.adminL10n.loadMore,
+              style: context.type.weighted(
+                context.type.bodySmall.copyWith(
+                  color: context.colors.primaryText,
+                ),
+                FontWeight.w600,
               ),
-              FontWeight.w600,
             ),
           ),
         ),

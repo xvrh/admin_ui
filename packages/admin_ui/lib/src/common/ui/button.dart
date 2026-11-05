@@ -456,7 +456,9 @@ class _ButtonState extends State<Button> {
             overlayColor: const WidgetStatePropertyAll(Colors.transparent),
             splashFactory: NoSplash.splashFactory,
             mouseCursor: widget.loading ? SystemMouseCursors.progress : null,
-            child: box,
+            // The InkWell leaves its label selectable under a SelectionArea;
+            // a tap target is no place for that (see CursorRegion).
+            child: SelectionContainer.disabled(child: box),
           );
           final border = outlined ? palette.borderFor(states) : null;
           final surface = Material(

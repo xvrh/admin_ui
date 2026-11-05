@@ -457,30 +457,35 @@ class _FieldShellState extends State<FieldShell> {
       label: Row(
         children: [
           // Pointer-only, like an HTML label: the text is read with the
-          // body below, and the body is the Tab stop.
+          // body below, and the body is the Tab stop. A tap target, so no
+          // selection reaches the text, under the arrow cursor a browser
+          // gives a label.
           Flexible(
             child: ExcludeSemantics(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: _focusBody,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    if (markLeads) mark,
-                    Flexible(
-                      child: Text(
-                        context.type.fieldLabelText(widget.label),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.type.fieldLabel.copyWith(
-                          color: labelColor,
+              child: CursorRegion(
+                cursor: SystemMouseCursors.basic,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _focusBody,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      if (markLeads) mark,
+                      Flexible(
+                        child: Text(
+                          context.type.fieldLabelText(widget.label),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.type.fieldLabel.copyWith(
+                            color: labelColor,
+                          ),
                         ),
                       ),
-                    ),
-                    if (!markLeads) mark,
-                  ],
+                      if (!markLeads) mark,
+                    ],
+                  ),
                 ),
               ),
             ),

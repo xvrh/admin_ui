@@ -130,7 +130,9 @@ Future<void> _mount(
           themeMode: config.mode,
           locale: config.locale,
           textDirection: config.direction,
-          child: entry.build(),
+          child: config.selectable
+              ? SelectionArea(child: entry.build())
+              : entry.build(),
         ),
       ),
     );

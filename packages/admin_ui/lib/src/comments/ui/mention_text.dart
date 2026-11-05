@@ -1,3 +1,6 @@
+/// @docImport '../../common/ui/tappable.dart';
+library;
+
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
@@ -16,8 +19,9 @@ import '../mentions.dart';
 ///
 /// The text can be selected and copied, mentions by their names. Under a
 /// [SelectionArea] it takes part in that one, so a selection can run on
-/// past it; elsewhere it is its own, unless [selectable] is false — for a
-/// body inside a row that takes taps.
+/// past it; under a tap target ([Tappable], [CursorRegion]) it is left out,
+/// as every label there is; elsewhere it is a selection area of its own,
+/// unless [selectable] is false.
 class MentionText extends StatelessWidget {
   /// The body, mentions as tokens ([tokenizeMentions]).
   final String body;
@@ -29,7 +33,8 @@ class MentionText extends StatelessWidget {
   final int? maxLines;
   final TextOverflow? overflow;
 
-  /// Whether the text can be selected where no [SelectionArea] is above it.
+  /// Whether the text is a selection area of its own where neither a
+  /// [SelectionArea] nor a tap target is above it.
   final bool selectable;
 
   const MentionText(
@@ -80,7 +85,11 @@ class MentionText extends StatelessWidget {
         child: text,
       );
     }
-    if (!selectable || SelectionContainer.maybeOf(context) != null) {
+    // Any scope, live or disabled by a tap target above: the text joins it or
+    // stays plain, and opens no area of its own.
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<SelectionRegistrarScope>();
+    if (!selectable || scope != null) {
       return text;
     }
     return SelectionArea(child: text);

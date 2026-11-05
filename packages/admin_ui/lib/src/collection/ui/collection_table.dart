@@ -1627,10 +1627,13 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
       ],
     );
     if (widget.onTap != null || widget.onDoubleTap != null) {
+      // A cell edited on a double tap takes no selection either (a double
+      // click there would select a word instead), under the arrow, as a
+      // spreadsheet's cells.
       child = CursorRegion(
         cursor: widget.onTap != null
             ? SystemMouseCursors.click
-            : MouseCursor.defer,
+            : SystemMouseCursors.basic,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           excludeFromSemantics: !widget.tapSemantics,
@@ -2297,7 +2300,12 @@ class _HeaderCellState extends State<_HeaderCell>
               label: _sortName(strings),
               excludeSemantics: true,
               customSemanticsActions: actions,
-              child: content,
+              // A header is chrome, not prose: no selection from above
+              // reaches its label, under the arrow.
+              child: CursorRegion(
+                cursor: SystemMouseCursors.basic,
+                child: content,
+              ),
             )
           : Tappable(
               onTap: widget.onSort,

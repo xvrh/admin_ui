@@ -124,8 +124,10 @@ class _TagsBodyState extends State<TagsBody> {
     final gap = AdminSpacing.xs;
 
     // Pointer-only: a click on the box's free space lands in the input, which
-    // is itself the Tab stop and the node assistive technology reads.
-    return MouseRegion(
+    // is itself the Tab stop and the node assistive technology reads. An
+    // input's chips and hint are no place for a selection from above; the
+    // input selects its own text.
+    return CursorRegion(
       cursor: editable ? SystemMouseCursors.text : MouseCursor.defer,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
