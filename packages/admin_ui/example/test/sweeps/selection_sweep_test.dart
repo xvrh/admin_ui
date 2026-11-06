@@ -7,7 +7,14 @@ import 'sweep.dart';
 
 /// Entries this sweep does not pump, by id, each with the reason and the line
 /// a fix starts from.
-const _skipped = <String, String>{};
+const _skipped = <String, String>{
+  'Foundations / Stock Material':
+      "Flutter's own buttons, tabs and list tiles, which the kit styles but "
+      'does not build: under a SelectionArea their labels stay selectable, '
+      "as in any Flutter app, and no theme setting changes that. The kit's "
+      'own targets opt out through CursorRegion '
+      '(lib/src/common/ui/tappable.dart).',
+};
 
 /// Every demo under a `SelectionArea`, as a page an app lets its users select
 /// text on: no [Text] under a tap target may take part in the selection. A

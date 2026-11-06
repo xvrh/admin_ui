@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1
+## 0.2.0
 
 - A refresh the user did not ask for can run in the background:
   `AsyncValueController.refresh(background: true)` and
@@ -53,6 +53,19 @@
   a selected swatch and the current page number show the hand like a selected
   tab (they showed the arrow), and a kanban card that opens shows the hand
   even when it can also be moved (it showed the open hand).
+
+### Looks
+
+- Stock Material widgets under `buildAppTheme` draw the accent the way the
+  kit's own controls do, at its contrast target. The label of an
+  `OutlinedButton` or an `ElevatedButton`, and a selected `ListTile`, take
+  `primaryText`; a checked `Checkbox`, a selected `Radio`, a `Switch` that is
+  on and a `TabBar`'s indicator take `controlAccent`, their check and thumb
+  `onControlAccent`. They took `primary`, which a light brand accent leaves
+  under 4.5:1 as text and under 3:1 as a control. Among the shipped themes,
+  the labels move in Iris Dark, Ant, Fluent Dark and Carbon Dark, and the
+  controls in Fluent Dark only. The catalog's Foundations / Stock Material
+  page shows them under the theme's accent and under a light one.
 
 ## 0.1.0
 

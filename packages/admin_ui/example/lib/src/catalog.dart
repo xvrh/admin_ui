@@ -57,6 +57,7 @@ import 'ui/foundations/appearance.dart';
 import 'ui/foundations/control_sizes.dart';
 import 'ui/foundations/localization.dart';
 import 'ui/foundations/status_pill.dart';
+import 'ui/foundations/stock_material.dart';
 import 'ui/foundations/tokens.dart';
 import 'ui/primitives/accordion.dart';
 import 'ui/primitives/announcement_bar.dart';
@@ -134,6 +135,7 @@ Map<String, dynamic> genericCatalog() => {
     'Appearance picker': const AppearanceDemo(),
     'Status pill': const StatusPillDemo(),
     'Localization': const LocalizationDemo(),
+    'Stock Material': const StockMaterialDemo(),
   },
   'Primitives': {
     'Button': const ButtonDemo(),
