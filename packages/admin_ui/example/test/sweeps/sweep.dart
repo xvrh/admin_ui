@@ -1,5 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../support/entries.dart';
 import '../support/harness/harness.dart';
@@ -46,6 +48,23 @@ void sweep({
       );
     }
   }
+}
+
+/// Where [element]'s widget is written: it or the first widget up from it
+/// created in `packages/admin_ui`, as `lib/src/…/file.dart:line` or
+/// `example/lib/src/…/file.dart:line`; failing that, its creator chain.
+String siteOf(Element element) {
+  var site = element.debugGetCreatorChain(4);
+  bool at(Element candidate) {
+    final location = CreationLocation.of(candidate.widget);
+    final file = location?.file;
+    if (file == null || !file.contains('packages/admin_ui/')) return false;
+    site = '${file.split('packages/admin_ui/').last}:${location!.line}';
+    return true;
+  }
+
+  if (!at(element)) element.visitAncestorElements((a) => !at(a));
+  return site;
 }
 
 /// Pumps [entry] as `pumpEntry` does, and fails with the first error it

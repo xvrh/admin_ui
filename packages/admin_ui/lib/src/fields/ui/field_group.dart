@@ -204,8 +204,9 @@ class _FieldGroupState extends State<FieldGroup> {
       expanded: _expanded,
       child: InkWell(
         onTap: _toggle,
+        mouseCursor: WidgetStateMouseCursor.clickable,
         borderRadius: BorderRadius.circular(context.radii.radiusSmall),
-        child: row,
+        child: SelectionContainer.disabled(child: row),
       ),
     );
   }

@@ -455,8 +455,16 @@ class _ButtonState extends State<Button> {
             autofocus: widget.autofocus,
             overlayColor: const WidgetStatePropertyAll(Colors.transparent),
             splashFactory: NoSplash.splashFactory,
-            mouseCursor: widget.loading ? SystemMouseCursors.progress : null,
-            child: box,
+            // Material's own default is platform-adaptive: the hand on the
+            // web, the arrow off it. The kit shows the hand on every platform,
+            // so a development build on the desktop looks like the shipped web
+            // app (see Tappable).
+            mouseCursor: widget.loading
+                ? SystemMouseCursors.progress
+                : WidgetStateMouseCursor.clickable,
+            // The InkWell leaves its label selectable under a SelectionArea;
+            // a tap target is no place for that (see CursorRegion).
+            child: SelectionContainer.disabled(child: box),
           );
           final border = outlined ? palette.borderFor(states) : null;
           final surface = Material(

@@ -1321,6 +1321,7 @@ class _AspectChip extends StatelessWidget {
         borderRadius: radius,
         child: InkWell(
           onTap: onTap,
+          mouseCursor: WidgetStateMouseCursor.clickable,
           borderRadius: radius,
           child: Container(
             padding: const EdgeInsets.symmetric(
@@ -1331,14 +1332,16 @@ class _AspectChip extends StatelessWidget {
               borderRadius: radius,
               border: Border.all(color: border),
             ),
-            child: Text(
-              label,
-              style: context.type
-                  .weighted(
-                    context.type.bodySmall,
-                    active ? FontWeight.w600 : FontWeight.w500,
-                  )
-                  .copyWith(color: text),
+            child: SelectionContainer.disabled(
+              child: Text(
+                label,
+                style: context.type
+                    .weighted(
+                      context.type.bodySmall,
+                      active ? FontWeight.w600 : FontWeight.w500,
+                    )
+                    .copyWith(color: text),
+              ),
             ),
           ),
         ),

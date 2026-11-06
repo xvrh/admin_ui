@@ -342,14 +342,17 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
         ),
       );
     }
-    final cursor = onMove == null ? null : SystemMouseCursors.grab;
     if (onCardTap == null) {
-      tile = MouseRegion(cursor: cursor ?? MouseCursor.defer, child: tile);
+      // Nothing to open: the open hand says the card can be moved.
+      tile = MouseRegion(
+        cursor: onMove == null ? MouseCursor.defer : SystemMouseCursors.grab,
+        child: tile,
+      );
     } else {
-      // A Tab stop that Enter opens; with onMove, Alt+arrows move it.
+      // A Tab stop that Enter opens; with onMove, Alt+arrows move it. A card
+      // that opens is a control and shows the hand, movable or not.
       tile = Tappable(
         onTap: () => onCardTap(item),
-        cursor: cursor,
         focusRadius: context.radii.radiusLarge,
         child: tile,
       );

@@ -1,4 +1,6 @@
+/// @docImport '../../comments/ui/mention_text.dart';
 /// @docImport 'button.dart';
+/// @docImport 'copy_button.dart';
 library;
 
 import 'package:flutter/foundation.dart';
@@ -16,13 +18,27 @@ import 'focus_ring.dart';
 /// Ripple-free tap target — the house alternative to [InkWell]. Components paint
 /// their own borders and fills for hover/selected state, so Material's ink would
 /// only muddy them. A [GestureDetector] (opaque hit test) wrapped in a
-/// [MouseRegion] that shows the click cursor when [onTap] is set and
-/// [disabledCursor] (default basic) otherwise.
+/// [MouseRegion] that shows [cursor] (default the hand,
+/// [SystemMouseCursors.click]) when [onTap] is set and [disabledCursor]
+/// (default the arrow) otherwise.
 ///
-/// Like [InkWell], the cursor reaches the label: under an ancestor
-/// [SelectionArea] a label shows the tap cursor rather than the text I-beam,
-/// as Material buttons do (see [CursorRegion]). The label stays selectable;
-/// only the cursor over it changes.
+/// **Cursor.** The hand says what is under the pointer, a control, not
+/// whether this click changes anything: a selected option, the current page
+/// and the current tab show it like their neighbours. It shows on every
+/// platform, as the web does, so a development build on the desktop looks
+/// like the shipped web app; Material's own buttons switch to the arrow off
+/// the web (`WidgetStateMouseCursor.adaptiveClickable`), so an [InkWell] in
+/// the kit passes `mouseCursor: WidgetStateMouseCursor.clickable`
+/// (`test/selection_cursor_test.dart` checks every one). A link shows the
+/// hand too; a disabled target the arrow; a target a double click or a long
+/// press acts on, and a field's label, the arrow through [CursorRegion]; a
+/// drag handle the open hand; a splitter the resize arrows; text input, and
+/// text in a read-only place, the I-beam.
+///
+/// A tap target is no place to select text: under an ancestor [SelectionArea]
+/// the label is left out of the selection and shows the tap cursor, not the
+/// text I-beam (see [CursorRegion]). A value a user may want to copy out of
+/// one gets a [CopyButton].
 ///
 /// Use the default constructor for a static child. Use [Tappable.builder] when
 /// the child depends on hover — the ubiquitous "tint a Container on hover" row —
@@ -591,22 +607,29 @@ class _TappableState extends State<Tappable> {
   }
 }
 
-/// A [MouseRegion] whose [cursor] reaches the text inside it.
+/// A [MouseRegion] that marks a pointer target, where no text is selected.
 ///
 /// Under an ancestor [SelectionArea] every [Text] is selectable and puts up a
-/// mouse region of its own, which sits inside this one and so wins: a bare
-/// MouseRegion with the click cursor shows the text I-beam over its label. A
-/// selectable [Text] takes its cursor from the ambient [DefaultSelectionStyle]
-/// (see `Text.build`), so this hands [cursor] down through one, as [InkWell]
-/// does. The text stays selectable by dragging; only the cursor over it
-/// changes. [MouseCursor.defer] hands nothing down, so text in a region that
-/// is not a target keeps its I-beam.
+/// mouse region of its own, with the text I-beam, which sits inside this one
+/// and so wins: a bare MouseRegion with the click cursor shows the I-beam
+/// over its label, and a drag across the label selects it. Flutter ties the
+/// two together (see `Text.build`), so this takes the text out of the
+/// selection with [SelectionContainer.disabled], and the I-beam goes with
+/// it: [cursor] shows over the whole region. [InkWell] instead hands its
+/// cursor down through [DefaultSelectionStyle] and leaves its label
+/// selectable, which a tap target must not be. [MouseCursor.defer] marks no
+/// target, so text in such a region keeps its I-beam and selects.
+///
+/// The container is put up whether or not a [SelectionArea] is above, so a
+/// widget that opens a selection area of its own where none is above it
+/// ([MentionText]) can see it is under a target and stay plain.
 ///
 /// The pointer half of a tap target whose keyboard and assistive-technology
 /// path is elsewhere (a table cell, a listbox option, a popover's anchor):
 /// wrap its [GestureDetector] in this. A target that is a control of its own
 /// is a [Tappable], which uses this. `test/selection_cursor_test.dart` refuses
-/// a MouseRegion given the click cursor anywhere else in the repo.
+/// a MouseRegion given the click cursor anywhere else in the repo, and checks
+/// what a drag selects; the example's selection sweep checks every demo.
 class CursorRegion extends StatelessWidget {
   final MouseCursor cursor;
   final PointerEnterEventListener? onEnter;
@@ -636,6 +659,6 @@ class CursorRegion extends StatelessWidget {
     opaque: opaque,
     child: cursor == MouseCursor.defer
         ? child
-        : DefaultSelectionStyle.merge(mouseCursor: cursor, child: child),
+        : SelectionContainer.disabled(child: child),
   );
 }

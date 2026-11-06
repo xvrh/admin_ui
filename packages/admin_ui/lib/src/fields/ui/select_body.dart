@@ -370,7 +370,6 @@ class _Segmented extends StatelessWidget {
               if (!selected) onChanged!(o.value);
             }
           : null,
-      cursor: selected ? SystemMouseCursors.basic : null,
       selected: selected,
       focusRadius: context.radii.radius,
       child: Container(
@@ -529,7 +528,6 @@ class _RadioListState extends State<_RadioList> {
               if (!selected) onChanged!(o.value);
             }
           : null,
-      cursor: selected ? SystemMouseCursors.basic : null,
       focusNode: node,
       focusRadius: context.radii.radius,
       checked: selected,

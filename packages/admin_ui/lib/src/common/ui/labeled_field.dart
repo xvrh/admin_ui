@@ -15,6 +15,7 @@ import 'field_chrome.dart';
 import 'field_feedback_scope.dart';
 import 'icon_action.dart';
 import 'spinner.dart';
+import 'tappable.dart';
 
 /// A [label] (with an optional [trailing] affordance, a [FieldRequiredMarker]
 /// and a muted [description]) above a control, and a validation [errorText]
@@ -157,30 +158,35 @@ class _LabeledFieldState extends State<LabeledField> {
               children: [
                 Expanded(
                   // Pointer-only, like an HTML label: the control carries
-                  // the name, and is the Tab stop.
+                  // the name, and is the Tab stop. A tap target, so no
+                  // selection reaches the text, under the arrow cursor a
+                  // browser gives a label.
                   child: ExcludeSemantics(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _focusControl,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          if (markLeads) mark,
-                          Flexible(
-                            child: Text(
-                              type.fieldLabelText(widget.label),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: enabled
-                                  ? type.fieldLabel
-                                  : type.fieldLabel.copyWith(
-                                      color: context.colors.foregroundSubtle,
-                                    ),
+                    child: CursorRegion(
+                      cursor: SystemMouseCursors.basic,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _focusControl,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            if (markLeads) mark,
+                            Flexible(
+                              child: Text(
+                                type.fieldLabelText(widget.label),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: enabled
+                                    ? type.fieldLabel
+                                    : type.fieldLabel.copyWith(
+                                        color: context.colors.foregroundSubtle,
+                                      ),
+                              ),
                             ),
-                          ),
-                          if (!markLeads) mark,
-                        ],
+                            if (!markLeads) mark,
+                          ],
+                        ),
                       ),
                     ),
                   ),

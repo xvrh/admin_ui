@@ -1,8 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'sweep.dart';
 
 /// A run of text drawn in a box shorter than its lines: the paragraph clips
 /// the ink below its box.
@@ -74,13 +74,5 @@ List<ClippedText> clippedText(WidgetTester tester) {
 String _siteOf(RenderParagraph paragraph) {
   final creator = paragraph.debugCreator;
   if (creator is! DebugCreator) return '${paragraph.runtimeType}';
-  var site = creator.element.debugGetCreatorChain(4);
-  creator.element.visitAncestorElements((ancestor) {
-    final location = CreationLocation.of(ancestor.widget);
-    final file = location?.file;
-    if (file == null || !file.contains('packages/admin_ui/')) return true;
-    site = '${file.split('packages/admin_ui/').last}:${location!.line}';
-    return false;
-  });
-  return site;
+  return siteOf(creator.element);
 }
