@@ -19,6 +19,9 @@ class ErrorState extends StatelessWidget {
 
   /// The retry button's label; the localized "Retry" when null.
   final String? retryLabel;
+
+  /// The key of the retry button, to find it by in a test.
+  final Key? retryKey;
   final IconData icon;
   final double minHeight;
 
@@ -28,6 +31,7 @@ class ErrorState extends StatelessWidget {
     this.message,
     this.onRetry,
     this.retryLabel,
+    this.retryKey,
     this.icon = Icons.error_outline_rounded,
     this.minHeight = 160,
   });
@@ -66,6 +70,7 @@ class ErrorState extends StatelessWidget {
                 const Gap(AdminSpacing.lg),
                 Button(
                   retryLabel ?? l10n.retry,
+                  key: retryKey,
                   icon: Icons.refresh_rounded,
                   onPressed: onRetry,
                 ),

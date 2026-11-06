@@ -27,9 +27,13 @@ class ChoiceOption<T> {
   /// — e.g. to pin a state in a catalog. Created internally when null.
   final WidgetStatesController? statesController;
 
+  /// The key of the option built for this choice, to find it by in a test.
+  final Key? key;
+
   const ChoiceOption(
     this.value,
     this.label, {
+    this.key,
     this.description,
     this.icon,
     this.enabled = true,
@@ -277,6 +281,7 @@ class _Option<T> extends StatelessWidget {
     // The selected option stays enabled and focusable (it holds the Tab
     // stop); tapping it again changes nothing.
     final option = Tappable.states(
+      key: this.option.key,
       onTap: enabled ? onTap : null,
       readOnly: readOnly,
       checked: selected,

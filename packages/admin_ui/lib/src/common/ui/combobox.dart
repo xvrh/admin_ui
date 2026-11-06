@@ -28,7 +28,16 @@ class ComboboxOption<T> {
   final String? description;
   final IconData? icon;
 
-  const ComboboxOption(this.value, this.label, {this.description, this.icon});
+  /// The key of the row built for this option, to find it by in a test.
+  final Key? key;
+
+  const ComboboxOption(
+    this.value,
+    this.label, {
+    this.key,
+    this.description,
+    this.icon,
+  });
 }
 
 /// A searchable single-select: a text field that filters [options] into a
@@ -552,6 +561,7 @@ class _ComboboxState<T> extends State<Combobox<T>> {
         itemBuilder: (context, i) {
           final o = _results[i];
           return ListboxOption(
+            key: o.key,
             controller: _listbox,
             index: i,
             label: o.label,

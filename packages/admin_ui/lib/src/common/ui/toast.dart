@@ -40,6 +40,9 @@ class Toast {
   final String? actionLabel;
   final VoidCallback? onAction;
 
+  /// The key of the action button, to find it by in a test.
+  final Key? actionKey;
+
   /// Replaces the severity's leading glyph.
   final IconData? icon;
 
@@ -62,6 +65,7 @@ class Toast {
     this.severity = Severity.info,
     this.actionLabel,
     this.onAction,
+    this.actionKey,
     this.icon,
     this.showIcon = true,
     this._duration = _automatic,
@@ -75,6 +79,7 @@ class Toast {
     : severity = Severity.info,
       actionLabel = null,
       onAction = null,
+      actionKey = null,
       icon = null,
       showIcon = true,
       loading = true,
@@ -87,6 +92,7 @@ class Toast {
     required this.severity,
     required this.actionLabel,
     required this.onAction,
+    required this.actionKey,
     required this.icon,
     required this.showIcon,
     required this.loading,
@@ -119,6 +125,7 @@ class Toast {
     severity: severity,
     actionLabel: label,
     onAction: onAction,
+    actionKey: actionKey,
     icon: icon,
     showIcon: showIcon,
     loading: loading,
@@ -1083,6 +1090,7 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
               padding: EdgeInsets.only(top: centre(action)),
               child: Button.ghost(
                 toast.actionLabel!,
+                key: toast.actionKey,
                 size: ControlSize.small,
                 onPressed: () {
                   toast.onAction?.call();

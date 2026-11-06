@@ -37,7 +37,12 @@ class SelectOption {
   final Color? swatch;
   final String? description;
 
+  /// The key of the row, radio or card built for this option, to find it by in
+  /// a test.
+  final Key? key;
+
   const SelectOption({
+    this.key,
     required this.value,
     required this.label,
     this.icon,
@@ -291,6 +296,7 @@ class _DropdownState extends State<_Dropdown> {
       itemBuilder: (context, i) {
         final o = items[i];
         return ListboxOption(
+          key: o.key,
           controller: _listbox,
           index: i,
           label: o.label,
@@ -365,6 +371,7 @@ class _Segmented extends StatelessWidget {
       fg = selected ? colors.primaryText : colors.foregroundMuted;
     }
     return Tappable(
+      key: o.key,
       onTap: editable
           ? () {
               if (!selected) onChanged!(o.value);
@@ -523,6 +530,7 @@ class _RadioListState extends State<_RadioList> {
         : context.stroke.control;
     final line = context.type.fieldText;
     return Tappable(
+      key: o.key,
       onTap: editable
           ? () {
               if (!selected) onChanged!(o.value);

@@ -13,7 +13,12 @@ class AccordionSection {
   final IconData? icon;
   final Widget child;
 
+  /// The key of the header built for this section, which opens and closes it,
+  /// to find it by in a test.
+  final Key? key;
+
   const AccordionSection({
+    this.key,
     required this.title,
     this.subtitle,
     this.icon,
@@ -211,6 +216,7 @@ class _Section extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Tappable.states(
+          key: s.key,
           onTap: onTap,
           focusNode: focusNode,
           expanded: open,

@@ -1705,6 +1705,7 @@ name kept as a deprecated alias for one release (see
 | One enum per concept | `ControlSize` for size, `Severity` for tone, `LocaleStatus` for a language's status. | `ProgressBar(severity:)` |
 | Context getters | The kit's services are `admin`-prefixed getters. The token shorthands are the one unprefixed extension, which an app can hide (see [Name clashes](#name-clashes)). Classes are `Admin*`. | `context.adminTokens`, `context.adminL10n`, `AdminLocalizations` |
 | Functions and widgets | A top-level function is named for what it does, with a verb. Widgets keep their short names. | `showConfirmDialog`, `Gap`, `Toast` |
+| Keys | Every control the kit builds takes a key from the app, so a test finds it without its words. A data object that describes a control takes `key`, which the kit puts on the control it builds for it, or on its row when a narrow layout folds it into a menu. A widget or a function that builds a control of its own takes `<part>Key` for it. A widget that is one control takes its own `key`, as any widget does. | `NavItem(key:)`, `MenuItem(key:)`, `showConfirmDialog(confirmKey:)`, `ErrorState(retryKey:)`, `SaveBar(discardKey:)` |
 
 ## The preview catalog
 
@@ -1816,5 +1817,35 @@ scripts its font lacks. `textWithoutFont()` lists the text on screen still
 drawn in the box font, empty when every run is in one of
 `testFontFamilies`. The example's sweep harness
 (`example/test/support/harness/`) is built on these.
+
+### Finding the kit's controls
+
+The kit's controls carry its own words, in the app's language, so a test that
+finds them by text breaks with a translation. Give them keys instead (see
+[API conventions](#api-conventions)):
+
+```dart
+const ordersKey = ValueKey('nav.orders');
+const confirmDeleteKey = ValueKey('dialog.confirm');
+
+NavItem ordersItem(VoidCallback openOrders) => NavItem(
+  'Orders',
+  key: ordersKey,
+  icon: Icons.receipt_long_outlined,
+  onTap: openOrders,
+);
+
+Future<bool> confirmDelete(BuildContext context) => showConfirmDialog(
+  context,
+  title: 'Delete the order?',
+  message: 'It cannot be restored.',
+  danger: true,
+  confirmKey: confirmDeleteKey,
+);
+```
+
+A test then taps `find.byKey(ordersKey)` in every language, on the rail as
+in the drawer. An input takes its key on the field, and
+`tester.enterText` reaches its text inside it.
 
 See [CHANGELOG.md](CHANGELOG.md) for what changed in each release.

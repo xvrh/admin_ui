@@ -101,6 +101,12 @@ class Collection<T> extends StatelessWidget {
   /// [CollectionTable.onColumnResizeEnd].
   final void Function(String key, double width)? onColumnResizeEnd;
 
+  /// The key of the pager's previous-page arrow, to find it by in a test.
+  final Key? previousPageKey;
+
+  /// The key of the pager's next-page arrow, to find it by in a test.
+  final Key? nextPageKey;
+
   const Collection({
     super.key,
     required this.controller,
@@ -124,6 +130,8 @@ class Collection<T> extends StatelessWidget {
     this.columnWidths,
     this.onColumnResize,
     this.onColumnResizeEnd,
+    this.previousPageKey,
+    this.nextPageKey,
   }) : assert(
          viewMode != CollectionViewMode.cards || cardBuilder != null,
          'CollectionViewMode.cards requires a cardBuilder',
@@ -211,6 +219,8 @@ class Collection<T> extends StatelessWidget {
                 pageSize: c.pageSize,
                 pageSizes: pageSizes,
                 onPageSize: showPageSize ? c.setPageSize : null,
+                previousKey: previousPageKey,
+                nextKey: nextPageKey,
               ),
           ],
         );

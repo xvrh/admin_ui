@@ -53,8 +53,12 @@ class NavItem extends NavEntry {
   /// e.g. to pin a hover in a catalog. Created internally when null.
   final WidgetStatesController? statesController;
 
+  /// The key of the row built for this item, to find it by in a test.
+  final Key? key;
+
   const NavItem(
     this.label, {
+    this.key,
     required this.icon,
     this.badge,
     this.selected = false,
@@ -450,6 +454,7 @@ class _NavTile extends StatelessWidget {
     final contentWidth = _contentWidth(context);
 
     Widget tile = Tappable.states(
+      key: item.key,
       onTap: enabled ? () => _open(context) : null,
       focusNode: focusNode,
       statesController: item.statesController,

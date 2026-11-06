@@ -124,6 +124,16 @@ class SaveCluster extends StatelessWidget {
   /// other widget among [actions].
   final bool foldActions;
 
+  /// The key of the Save button, to find it by in a test.
+  final Key? saveKey;
+
+  /// The key of the commit button, to find it by in a test.
+  final Key? commitKey;
+
+  /// The key of the Discard button, or of its row when a narrow bar folds it
+  /// into its menu, to find it by in a test.
+  final Key? discardKey;
+
   const SaveCluster({
     super.key,
     this.state = SaveState.clean,
@@ -149,6 +159,9 @@ class SaveCluster extends StatelessWidget {
     this.flow = SaveFlow.save,
     this.compact = false,
     this.foldActions = false,
+    this.saveKey,
+    this.commitKey,
+    this.discardKey,
   });
 
   bool get _saving => state == SaveState.saving;
@@ -173,6 +186,7 @@ class SaveCluster extends StatelessWidget {
       if (foldActions && action is IconAction && _isCommand(action)) {
         folded.add(
           SaveBarAction(
+            key: action.key,
             label: action.label!,
             icon: action.icon,
             onPressed: action.onPressed,
@@ -188,6 +202,7 @@ class SaveCluster extends StatelessWidget {
       if (foldDiscard)
         [
           SaveBarAction(
+            key: discardKey,
             label: discardLabel,
             icon: Icons.undo_rounded,
             onPressed: discard,
@@ -197,6 +212,7 @@ class SaveCluster extends StatelessWidget {
         [
           for (final a in commitMenu)
             SaveBarAction(
+              key: a.key,
               label: a.label,
               icon: a.icon,
               danger: a.danger,
@@ -223,7 +239,7 @@ class SaveCluster extends StatelessWidget {
         : _commit(context, invalidText, split: !foldCommitMenu);
     final primary = [
       if (onDiscard != null && !foldDiscard)
-        Button.ghost(discardLabel, onPressed: discard),
+        Button.ghost(discardLabel, key: discardKey, onPressed: discard),
       ?save,
       ?commit,
     ];
@@ -280,6 +296,7 @@ class SaveCluster extends StatelessWidget {
     final live = _saving || (!_busy && _dirty && invalidText == null);
     return Button(
       saveLabel ?? MaterialLocalizations.of(context).saveButtonLabel,
+      key: saveKey,
       onPressed: live ? onSave : null,
       loading: _saving,
       disabledHint: invalidText,
@@ -301,6 +318,7 @@ class SaveCluster extends StatelessWidget {
         : (invalidText ?? (commitEnabled ? null : commitDisabledHint));
     if (split && commitMenu.isNotEmpty) {
       return SplitButton(
+        key: commitKey,
         label: commitLabel,
         onPressed: onPressed,
         loading: committing,
@@ -310,6 +328,7 @@ class SaveCluster extends StatelessWidget {
           for (final a in commitMenu)
             MenuItem(
               a.label,
+              key: a.key,
               icon: a.icon,
               danger: a.danger,
               onSelect: _commitMenuLive ? a.onPressed : null,
@@ -319,6 +338,7 @@ class SaveCluster extends StatelessWidget {
     }
     return Button.primary(
       commitLabel,
+      key: commitKey,
       onPressed: onPressed,
       loading: committing,
       disabledHint: hint,
@@ -351,6 +371,7 @@ class _OverflowMenu extends StatelessWidget {
           else
             MenuItem(
               a.label,
+              key: a.key,
               icon: a.icon,
               danger: a.danger,
               onSelect: a.onPressed,

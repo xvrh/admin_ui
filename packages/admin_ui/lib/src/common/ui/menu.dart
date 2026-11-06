@@ -56,8 +56,12 @@ class MenuItem extends MenuEntry {
   /// action.
   final bool? checked;
 
+  /// The key of the row built for this item, to find it by in a test.
+  final Key? key;
+
   const MenuItem(
     this.label, {
+    this.key,
     this.description,
     this.icon,
     this.shortcut,
@@ -92,8 +96,12 @@ class MenuCheckboxItem extends MenuEntry {
 
   final bool keepOpen;
 
+  /// The key of the row built for this item, to find it by in a test.
+  final Key? key;
+
   const MenuCheckboxItem(
     this.label, {
+    this.key,
     required this.checked,
     required this.onChanged,
     this.icon,
@@ -126,8 +134,12 @@ class MenuSubmenu extends MenuEntry {
   final List<MenuEntry> entries;
   final bool enabled;
 
+  /// The key of the row that opens this submenu, to find it by in a test.
+  final Key? key;
+
   const MenuSubmenu(
     this.label, {
+    this.key,
     this.icon,
     this.description,
     required this.entries,
@@ -1195,6 +1207,12 @@ class _MenuRowState extends State<_MenuRow> {
     );
 
     return Tappable.states(
+      key: switch (entry) {
+        MenuItem(:final key) ||
+        MenuCheckboxItem(:final key) ||
+        MenuSubmenu(:final key) => key,
+        _ => null,
+      },
       onTap: enabled ? onTap : null,
       focusNode: widget.focusNode,
       showFocusRing: false,

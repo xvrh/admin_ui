@@ -229,12 +229,17 @@ class _RenderModalMargin extends RenderPadding {
 /// null, since a raw exception is rarely fit for the user. Without
 /// [onConfirm] the dialog just resolves the boolean and the caller does the
 /// work afterwards.
+///
+/// [confirmKey] and [cancelKey] are the keys of the two buttons, to find
+/// them by in a test.
 Future<bool> showConfirmDialog(
   BuildContext context, {
   required String title,
   required String message,
   String? confirmLabel,
   String? cancelLabel,
+  Key? confirmKey,
+  Key? cancelKey,
   bool danger = false,
   Future<void> Function()? onConfirm,
   String Function(Object error)? errorText,
@@ -250,6 +255,8 @@ Future<bool> showConfirmDialog(
         confirmLabel: confirmLabel ?? l10n.inputs.confirm,
         cancelLabel:
             cancelLabel ?? MaterialLocalizations.of(ctx).cancelButtonLabel,
+        confirmKey: confirmKey,
+        cancelKey: cancelKey,
         danger: danger,
         onConfirm: onConfirm,
         errorText: errorText ?? (_) => l10n.somethingWentWrongTryAgain,
@@ -264,6 +271,8 @@ class _ConfirmDialog extends StatefulWidget {
   final String message;
   final String confirmLabel;
   final String cancelLabel;
+  final Key? confirmKey;
+  final Key? cancelKey;
   final bool danger;
   final Future<void> Function()? onConfirm;
   final String Function(Object error) errorText;
@@ -273,6 +282,8 @@ class _ConfirmDialog extends StatefulWidget {
     required this.message,
     required this.confirmLabel,
     required this.cancelLabel,
+    required this.confirmKey,
+    required this.cancelKey,
     required this.danger,
     required this.onConfirm,
     required this.errorText,
@@ -342,11 +353,13 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
     final confirmButton = widget.danger
         ? Button.danger(
             widget.confirmLabel,
+            key: widget.confirmKey,
             loading: _busy,
             onPressed: _onConfirm,
           )
         : Button.primary(
             widget.confirmLabel,
+            key: widget.confirmKey,
             loading: _busy,
             onPressed: _onConfirm,
           );
@@ -383,6 +396,7 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
           actions: [
             Button.ghost(
               widget.cancelLabel,
+              key: widget.cancelKey,
               onPressed: _busy ? null : _dismiss,
               focusNode: _cancel,
             ),
@@ -460,6 +474,9 @@ class Modal extends StatefulWidget {
   /// leave guard around the content can then hold the dialog open.
   final VoidCallback? onDismiss;
 
+  /// The key of the close button [onDismiss] shows, to find it by in a test.
+  final Key? closeKey;
+
   /// Announces the surface as an alert dialog — a confirmation that
   /// interrupts the user — rather than a plain dialog.
   final bool alert;
@@ -474,6 +491,7 @@ class Modal extends StatefulWidget {
     this.size = ModalSize.medium,
     this.maxWidth,
     this.onDismiss,
+    this.closeKey,
     this.alert = false,
   }) : assert(
          maxWidth == null || size != ModalSize.fullscreen,
@@ -576,7 +594,11 @@ class _ModalState extends State<Modal> {
               padding: EdgeInsets.only(
                 top: math.max(0, (line - close.box) / 2),
               ),
-              child: IconAction.close(size: close, onPressed: dismiss),
+              child: IconAction.close(
+                key: widget.closeKey,
+                size: close,
+                onPressed: dismiss,
+              ),
             ),
           ],
         ],

@@ -35,9 +35,13 @@ class SegmentOption<T> {
   /// — e.g. to pin a state in a catalog. Created internally when null.
   final WidgetStatesController? statesController;
 
+  /// The key of the segment built for this option, to find it by in a test.
+  final Key? key;
+
   const SegmentOption(
     this.value,
     this.label, {
+    this.key,
     this.icon,
     this.showLabel = true,
     this.statesController,
@@ -306,6 +310,7 @@ class _SegmentedState<T> extends State<Segmented<T>> {
     final iconOnly = seg._iconOnly;
 
     Widget segment = Tappable.states(
+      key: seg.key,
       onTap: editable ? () => _select(i) : null,
       readOnly: widget.readOnly,
       focusNode: _nodes[i],

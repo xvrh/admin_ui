@@ -41,6 +41,18 @@ class ChangePasswordForm extends StatefulWidget {
   /// when null.
   final String? confirmLabel;
 
+  /// The key of the current-password input, to find it by in a test.
+  final Key? currentKey;
+
+  /// The key of the new-password input, to find it by in a test.
+  final Key? newKey;
+
+  /// The key of the confirmation input, to find it by in a test.
+  final Key? confirmKey;
+
+  /// The key of the submit button, to find it by in a test.
+  final Key? submitKey;
+
   const ChangePasswordForm({
     super.key,
     required this.onSubmit,
@@ -52,6 +64,10 @@ class ChangePasswordForm extends StatefulWidget {
     this.currentLabel,
     this.newLabel,
     this.confirmLabel,
+    this.currentKey,
+    this.newKey,
+    this.confirmKey,
+    this.submitKey,
   });
 
   @override
@@ -110,6 +126,7 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
           const Gap(AdminSpacing.lg),
         ],
         PasswordField(
+          key: widget.currentKey,
           label: currentLabel,
           controller: _current,
           focusNode: _currentFocus,
@@ -130,6 +147,8 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
           showStrength: widget.showStrength,
           newLabel: widget.newLabel,
           confirmLabel: widget.confirmLabel ?? shell.confirmNewPassword,
+          newKey: widget.newKey,
+          confirmKey: widget.confirmKey,
           onChanged: (value) => setState(() => _password = value),
           onSubmit: _submit,
         ),
@@ -138,6 +157,7 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
           alignment: AlignmentDirectional.centerStart,
           child: Button.primary(
             widget.submitLabel ?? shell.changePassword,
+            key: widget.submitKey,
             loading: widget.submitting,
             onPressed: _submit,
           ),

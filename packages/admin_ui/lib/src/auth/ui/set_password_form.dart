@@ -34,6 +34,15 @@ class SetPasswordForm extends StatefulWidget {
   /// See [NewPasswordFields.confirmLabel].
   final String? confirmLabel;
 
+  /// The key of the new-password input, to find it by in a test.
+  final Key? newKey;
+
+  /// The key of the confirmation input, to find it by in a test.
+  final Key? confirmKey;
+
+  /// The key of the submit button, to find it by in a test.
+  final Key? submitKey;
+
   const SetPasswordForm({
     super.key,
     required this.onSubmit,
@@ -44,6 +53,9 @@ class SetPasswordForm extends StatefulWidget {
     this.submitLabel,
     this.newLabel,
     this.confirmLabel,
+    this.newKey,
+    this.confirmKey,
+    this.submitKey,
   });
 
   @override
@@ -80,12 +92,15 @@ class _SetPasswordFormState extends State<SetPasswordForm> {
           showStrength: widget.showStrength,
           newLabel: widget.newLabel,
           confirmLabel: widget.confirmLabel,
+          newKey: widget.newKey,
+          confirmKey: widget.confirmKey,
           onChanged: (value) => setState(() => _password = value),
           onSubmit: _submit,
         ),
         const Gap(AdminSpacing.xl),
         Button.primary(
           widget.submitLabel ?? context.adminL10n.shell.setPassword,
+          key: widget.submitKey,
           expand: true,
           loading: widget.submitting,
           onPressed: _submit,

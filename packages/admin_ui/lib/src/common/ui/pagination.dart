@@ -44,6 +44,12 @@ class Pagination extends StatelessWidget {
 
   final ControlSize size;
 
+  /// The key of the previous-page arrow, to find it by in a test.
+  final Key? previousKey;
+
+  /// The key of the next-page arrow, to find it by in a test.
+  final Key? nextKey;
+
   const Pagination({
     super.key,
     required this.page,
@@ -52,6 +58,8 @@ class Pagination extends StatelessWidget {
     this.hasNext = false,
     this.siblings = 1,
     this.size = ControlSize.medium,
+    this.previousKey,
+    this.nextKey,
   });
 
   /// The page slots to render; null marks a collapsed (ellipsis) gap.
@@ -138,6 +146,7 @@ class Pagination extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _PageButton.arrow(
+          key: previousKey,
           icon: Icons.chevron_left_rounded,
           label: material.previousPageTooltip,
           size: size,
@@ -157,6 +166,7 @@ class Pagination extends StatelessWidget {
           const Gap(AdminSpacing.xs),
         ],
         _PageButton.arrow(
+          key: nextKey,
           icon: Icons.chevron_right_rounded,
           label: material.nextPageTooltip,
           size: size,
@@ -198,6 +208,7 @@ class _PageButton extends StatelessWidget {
        label = null;
 
   const _PageButton.arrow({
+    super.key,
     required IconData this.icon,
     required String this.label,
     required this.size,

@@ -20,8 +20,13 @@ class BulkAction {
   final bool primary;
   final bool danger;
 
+  /// The key of the button built for this action, or of its row when the bar
+  /// folds it into its menu, to find it by in a test.
+  final Key? key;
+
   const BulkAction(
     this.label, {
+    this.key,
     this.icon,
     this.onPressed,
     this.primary = false,
@@ -73,6 +78,9 @@ class BulkActionBar extends StatelessWidget {
   /// whole-query mode. The Screen wires it to its own bulk-by-query path.
   final VoidCallback? onSelectAllMatching;
 
+  /// The key of the button that clears the selection, to find it by in a test.
+  final Key? clearKey;
+
   const BulkActionBar({
     super.key,
     required this.count,
@@ -83,6 +91,7 @@ class BulkActionBar extends StatelessWidget {
     this.matchingTotal,
     this.allMatchingSelected = false,
     this.onSelectAllMatching,
+    this.clearKey,
   });
 
   static const _padX = AdminSpacing.md;
@@ -138,6 +147,7 @@ class BulkActionBar extends StatelessWidget {
       children: [
         Button.ghost(
           context.adminL10n.collection.clear,
+          key: clearKey,
           icon: Icons.close,
           size: ControlSize.medium,
           onPressed: onClear,
@@ -177,6 +187,7 @@ class BulkActionBar extends StatelessWidget {
       for (final a in actions)
         MenuItem(
           a.label,
+          key: a.key,
           icon: a.icon,
           danger: a.danger,
           onSelect: a.onPressed,
@@ -186,6 +197,7 @@ class BulkActionBar extends StatelessWidget {
       children: [
         IconAction(
           Icons.close,
+          key: clearKey,
           label: strings.clearSelection,
           size: IconActionSize.medium,
           onPressed: onClear,
@@ -259,6 +271,7 @@ class BulkActionBar extends StatelessWidget {
     if (a.danger) {
       return Button.danger(
         a.label,
+        key: a.key,
         icon: a.icon,
         size: ControlSize.medium,
         onPressed: a.onPressed,
@@ -267,6 +280,7 @@ class BulkActionBar extends StatelessWidget {
     if (a.primary) {
       return Button.primary(
         a.label,
+        key: a.key,
         icon: a.icon,
         size: ControlSize.medium,
         onPressed: a.onPressed,
@@ -274,6 +288,7 @@ class BulkActionBar extends StatelessWidget {
     }
     return Button(
       a.label,
+      key: a.key,
       icon: a.icon,
       size: ControlSize.medium,
       onPressed: a.onPressed,
