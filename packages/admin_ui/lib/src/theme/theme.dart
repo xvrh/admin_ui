@@ -21,7 +21,12 @@ import 'typography.dart';
 /// dropped into the admin tracks the theme: a bare `Text` is set in
 /// [AdminTypography.body], and a stock [TextField] in
 /// [AdminTypography.fieldText], as tall as a kit input of the medium size and
-/// drawn in the theme's field anatomy ([buildInputDecorationTheme]).
+/// drawn in the theme's field anatomy ([buildInputDecorationTheme]). The
+/// accent is drawn as the kit's own controls draw it, at its contrast
+/// target: a button's or a selected list tile's text in
+/// [AdminPalette.primaryText], a checked, selected or on control and a tab
+/// indicator in [AdminPalette.controlAccent]. Under a light brand accent,
+/// [AdminPalette.primary] itself is too faint for either.
 /// Density is pinned to [VisualDensity.standard] with shrink-wrapped tap
 /// targets, so control heights don't change by platform.
 ThemeData buildAppTheme(AdminTokens tokens) {
@@ -94,6 +99,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
     ),
     tabBarTheme: base.tabBarTheme.copyWith(
       labelColor: palette.foreground,
+      indicatorColor: palette.controlAccent,
       indicatorSize: TabBarIndicatorSize.label,
     ),
     inputDecorationTheme: inputTheme,
@@ -102,16 +108,23 @@ ThemeData buildAppTheme(AdminTokens tokens) {
         elevation: 0,
         minimumSize: Size(10, tokens.sizes.medium),
         shape: buttonShape,
+        foregroundColor: palette.primaryText,
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(shape: buttonShape),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(shape: buttonShape),
+      style: OutlinedButton.styleFrom(
+        shape: buttonShape,
+        foregroundColor: palette.primaryText,
+      ),
     ),
     textButtonTheme: TextButtonThemeData(style: quietButtonStyle),
     iconButtonTheme: IconButtonThemeData(style: quietButtonStyle),
+    listTileTheme: base.listTileTheme.copyWith(
+      selectedColor: palette.primaryText,
+    ),
     dividerTheme: DividerThemeData(
       color: palette.border,
       thickness: tokens.stroke.hairline,
@@ -140,9 +153,10 @@ ThemeData buildAppTheme(AdminTokens tokens) {
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.primary) ?? const Color(0x00000000),
+            whenSelected(states, palette.controlAccent) ??
+            const Color(0x00000000),
       ),
-      checkColor: WidgetStatePropertyAll(palette.onPrimary),
+      checkColor: WidgetStatePropertyAll(palette.onControlAccent),
       side: BorderSide(
         color: palette.controlBorder,
         width: tokens.stroke.controlStrong,
@@ -151,20 +165,24 @@ ThemeData buildAppTheme(AdminTokens tokens) {
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.primary) ?? palette.controlBorder,
+            whenSelected(states, palette.controlAccent) ??
+            palette.controlBorder,
       ),
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.onPrimary) ?? palette.controlBorder,
+            whenSelected(states, palette.onControlAccent) ??
+            palette.controlBorder,
       ),
       trackColor: WidgetStateProperty.resolveWith(
-        (states) => whenSelected(states, palette.primary) ?? palette.border,
+        (states) =>
+            whenSelected(states, palette.controlAccent) ?? palette.border,
       ),
       trackOutlineColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.primary) ?? palette.controlBorder,
+            whenSelected(states, palette.controlAccent) ??
+            palette.controlBorder,
       ),
     ),
     scrollbarTheme: ScrollbarThemeData(

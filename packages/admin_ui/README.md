@@ -280,9 +280,11 @@ class HomePage extends StatelessWidget {
 
 `buildAppTheme(tokens)` returns a material_ui `ThemeData` that carries the
 tokens and styles the stock Material widgets (inputs, menus, dialogs, snack
-bars, selection controls) from them. `buildAppTheme(defaultTokens)` is Iris
-light in the platform's font; `buildAppTheme(irisTheme.tokens)` is Iris in
-Inter.
+bars, selection controls) from them. Their accent is drawn as the kit's own
+controls draw it: a button's label in `primaryText`, a checked or selected
+control in `controlAccent`, so a light brand accent stays legible.
+`buildAppTheme(defaultTokens)` is Iris light in the platform's font;
+`buildAppTheme(irisTheme.tokens)` is Iris in Inter.
 
 `AdminScope` mounts the scopes the kit's widgets reach for: the command
 registry, the anchor that modals open on, and a `ToastScope` when the app
