@@ -5,7 +5,7 @@ collections, forms and field bodies, overlays, media and asset pickers,
 charts, and sign-in screens, themed from one set of design tokens.
 
 The package is [`packages/admin_ui`](packages/admin_ui): its
-[README](packages/admin_ui/README.md) covers installing it from a tag, the
+[README](packages/admin_ui/README.md) covers pinning it to a commit, the
 themes, and every part of the kit.
 
 | Directory | What it is |
