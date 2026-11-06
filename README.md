@@ -65,7 +65,9 @@ lists token.actions.githubusercontent.com; CloudFront takes a few minutes):
 ```sh
 aws cloudformation deploy --region <region> --stack-name admin-ui-comparisons \
   --template-file .github/aws/comparisons.yaml --capabilities CAPABILITY_IAM \
-  --parameter-overrides Repository=<owner>/admin_ui AlertEmail=<email>
+  --parameter-overrides Repository=<owner>/admin_ui AlertEmail=<email> \
+  SubjectPrefix="$(gh api repos/<owner>/admin_ui/actions/oidc/customization/sub \
+    --jq '.sub_claim_prefix // ""')"
 for pair in BUCKET:Bucket REGION:Region ROLE_ARN:RoleArn URL:Url; do
   gh variable set "COMPARISON_${pair%%:*}" --body "$(aws cloudformation describe-stacks \
     --region <region> --stack-name admin-ui-comparisons --output text \

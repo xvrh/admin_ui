@@ -10,6 +10,16 @@ Parameters:
     Type: String
     Description: The GitHub repository whose pull requests publish, owner/name.
     AllowedPattern: '[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+'
+  SubjectPrefix:
+    Type: String
+    Default: ''
+    Description: >-
+      The prefix of the subject in the repository's OIDC tokens, as
+      `gh api repos/<owner>/<name>/actions/oidc/customization/sub --jq
+      .sub_claim_prefix` prints it; empty for repo:<Repository>. A
+      repository with immutable subject claims has its owner's and its own
+      IDs in it, repo:<owner>@<id>/<name>@<id>, so a repository recreated
+      under the same name cannot assume the role.
   CreateOidcProvider:
     Type: String
     AllowedValues: ['true', 'false']
@@ -39,6 +49,7 @@ Parameters:
 Conditions:
   CreateProvider: !Equals [!Ref CreateOidcProvider, 'true']
   HasAlertEmail: !Not [!Equals [!Ref AlertEmail, '']]
+  HasSubjectPrefix: !Not [!Equals [!Ref SubjectPrefix, '']]
 
 Resources:
   GitHubOidcProvider:
@@ -160,7 +171,10 @@ Resources:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
                 # A pull_request run of this repository. GitHub gives a fork's
                 # pull request no ID token at all.
-                token.actions.githubusercontent.com:sub: !Sub 'repo:${Repository}:pull_request'
+                token.actions.githubusercontent.com:sub: !If
+                  - HasSubjectPrefix
+                  - !Sub '${SubjectPrefix}:pull_request'
+                  - !Sub 'repo:${Repository}:pull_request'
       Policies:
         - PolicyName: publish-reports
           PolicyDocument:
