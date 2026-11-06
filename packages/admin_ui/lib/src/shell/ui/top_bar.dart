@@ -32,10 +32,12 @@ import 'shell.dart';
 /// [IconAction] calling [onSearch] (without [onSearch] the slot is simply
 /// left out).
 ///
-/// In a compact [Shell] the bar leads with [menuButton], which opens the
-/// shell's navigation drawer, its glyph at [Shell.inset] like the page's
-/// title below it. On a device with insets the bar runs under the status
-/// bar and keeps its content below it.
+/// In a compact [Shell], and between its breakpoints beside a collapsed
+/// rail, the bar leads
+/// with [menuButton], which opens the shell's navigation drawer, its glyph
+/// at [Shell.inset] like the page's title below it ([Shell.hasDrawer]). On a
+/// device with insets the bar runs under the status bar and keeps its
+/// content below it.
 class TopBar extends StatelessWidget {
   /// The logo or sidebar toggle at the start. Drawn in the bar's palette,
   /// which a theme may set apart from the page's: a widget that reads the
@@ -55,8 +57,8 @@ class TopBar extends StatelessWidget {
 
   final List<Widget> actions;
 
-  /// Leads the bar while its [Shell] is compact, and opens the shell's
-  /// navigation drawer: a [ShellMenuButton] when null. Pass one to key it,
+  /// Leads the bar while its [Shell] has a drawer ([Shell.hasDrawer]), and
+  /// opens it: a [ShellMenuButton] when null. Pass one to key it,
   /// or a trigger of your own calling [Shell.openDrawer], as large as a
   /// medium [IconAction].
   final Widget? menuButton;
@@ -97,7 +99,7 @@ class TopBar extends StatelessWidget {
 
   Widget _bar(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
-    final menu = Shell.isCompact(context)
+    final menu = Shell.hasDrawer(context)
         ? menuButton ?? const ShellMenuButton()
         : null;
     return Container(

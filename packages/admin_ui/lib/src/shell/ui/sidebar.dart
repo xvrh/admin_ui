@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' show SemanticsRole;
+import 'dart:ui' show PointerDeviceKind, SemanticsRole;
 
+import 'package:flutter/gestures.dart' show GestureBinding;
 import 'package:flutter/rendering.dart' show OverflowBoxFit;
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../common/text_metrics.dart';
 import '../../common/ui/avatar.dart';
@@ -86,6 +89,15 @@ class NavSection extends NavEntry {
 /// the page, on the right in a left-to-right layout and on the left in a
 /// right-to-left one.
 ///
+/// The rail opens over the page, expanded, with a shadow on its edge, and the
+/// page does not move. It opens when the pointer rests on it for
+/// [railOpenDelay], and when keyboard focus enters it. It closes when the
+/// pointer leaves it, when focus leaves it, on Escape, and as an item opens.
+/// While a menu opened from it (a [SidebarAccount]'s) holds focus, it stays
+/// open. A click on the rail before it opens keeps it shut until the pointer
+/// leaves. Between a [Shell]'s breakpoints the rail also gives the top bar
+/// its menu button, which opens the navigation drawer, for a touch screen.
+///
 /// The current item is the one whose [NavItem.value] equals [selected], so
 /// a router that knows which destination a route belongs to passes that,
 /// and builds the items once. An item can also mark itself
@@ -159,6 +171,12 @@ class Sidebar extends StatefulWidget {
   /// squeezing the page.
   static const maxWindowShare = 0.4;
 
+  /// How long the pointer rests on a [collapsed] rail before it opens over
+  /// the page: short of an item's tooltip, so the rail opens rather than the
+  /// tooltip, and long enough that a pointer crossing it on its way to the
+  /// page leaves it shut.
+  static const railOpenDelay = Duration(milliseconds: 200);
+
   /// The sidebar's width in [context]'s theme: its style's `sidebarWidth`,
   /// or its `railWidth` when [collapsed]. Expanded, it keeps to
   /// [maxWindowShare] of the window (`MediaQuery.sizeOf`), down to
@@ -193,10 +211,30 @@ class Sidebar extends StatefulWidget {
 class _SidebarScope extends InheritedWidget {
   final bool collapsed;
 
-  const _SidebarScope({required this.collapsed, required super.child});
+  /// Called as an item opens, before its `onTap`.
+  final VoidCallback onItemOpen;
+
+  const _SidebarScope({
+    required this.collapsed,
+    required this.onItemOpen,
+    required super.child,
+  });
 
   @override
   bool updateShouldNotify(_SidebarScope old) => collapsed != old.collapsed;
+}
+
+/// Where a collapsed rail is.
+enum _Rail {
+  /// In its place beside the page.
+  shut,
+
+  /// Expanded over the page.
+  open,
+
+  /// Folding back to the rail's width over the page, before it returns to
+  /// its place.
+  closing,
 }
 
 class _SidebarState extends State<Sidebar> {
@@ -204,17 +242,186 @@ class _SidebarState extends State<Sidebar> {
   /// them.
   final _nodes = <FocusNode>[];
 
+  /// The column, which moves to the overlay while the rail is open and back
+  /// to its place after, keeping its scroll, focus and hover.
+  final _column = GlobalKey(debugLabel: 'Sidebar column');
+  final _portal = OverlayPortalController(debugLabel: 'Sidebar rail');
+
+  /// Has focus while focus is anywhere in the column, or in a menu opened
+  /// from it.
+  final _focus = FocusNode(
+    debugLabel: 'Sidebar',
+    canRequestFocus: false,
+    skipTraversal: true,
+  );
+
+  var _rail = _Rail.shut;
+
+  /// Whether the sidebar draws as a collapsed rail, as of its last build.
+  var _isRail = false;
+
+  /// Runs while the pointer rests on the shut rail, until it opens it.
+  Timer? _rest;
+
+  /// The pointer is over the rail in its place.
+  var _overRail = false;
+
+  /// The pointer is over the rail opened over the page.
+  var _overOpen = false;
+
+  /// The rail stays shut under the pointer that clicked it or opened an item
+  /// from it, until that pointer leaves.
+  var _held = false;
+
+  /// The last input was a key, not a press: focus moving in the column is
+  /// the keyboard's. Flutter's own highlight mode cannot say, since a
+  /// desktop starts in its keyboard mode and a mouse never leaves it.
+  var _byKeyboard = false;
+
   List<NavItem> get _items => [
     for (final entry in widget.entries)
       if (entry is NavItem) entry,
   ];
 
   @override
+  void initState() {
+    super.initState();
+    FocusManager.instance.addListener(_onFocus);
+    HardwareKeyboard.instance.addHandler(_onKey);
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_onPointer);
+  }
+
+  @override
   void dispose() {
+    _rest?.cancel();
+    HardwareKeyboard.instance.removeHandler(_onKey);
+    GestureBinding.instance.pointerRouter.removeGlobalRoute(_onPointer);
+    FocusManager.instance.removeListener(_onFocus);
+    _focus.dispose();
     for (final node in _nodes) {
       node.dispose();
     }
     super.dispose();
+  }
+
+  bool _onKey(KeyEvent event) {
+    if (event is KeyDownEvent) _byKeyboard = true;
+    return false;
+  }
+
+  void _onPointer(PointerEvent event) {
+    if (event is PointerDownEvent) _byKeyboard = false;
+  }
+
+  void _onRailEnter(PointerEnterEvent _) {
+    _overRail = true;
+    if (!_isRail || _held || _rail != _Rail.shut) return;
+    _rest?.cancel();
+    _rest = Timer(Sidebar.railOpenDelay, _open);
+  }
+
+  void _onRailExit(PointerExitEvent _) {
+    _overRail = false;
+    _held = false;
+    _rest?.cancel();
+    _rest = null;
+  }
+
+  /// A click on the shut rail keeps it shut: the click is on its icon.
+  void _onRailDown(PointerDownEvent event) {
+    if (event.kind != PointerDeviceKind.mouse) return;
+    _rest?.cancel();
+    _rest = null;
+    if (_rail == _Rail.shut) _held = true;
+  }
+
+  void _onOpenEnter(PointerEnterEvent _) {
+    _overOpen = true;
+    if (_rail == _Rail.closing && !_held) _open();
+  }
+
+  void _onOpenExit(PointerExitEvent _) {
+    _overOpen = false;
+    _held = false;
+    if (!_keptOpen) _close();
+  }
+
+  /// Focus moving into or within the column by keyboard opens the rail;
+  /// focus leaving it, or coming back from a menu with the pointer
+  /// elsewhere, closes it.
+  void _onFocus() {
+    if (!mounted || !_isRail) return;
+    if (_focus.hasFocus && _byKeyboard) {
+      _open();
+    } else if (!_overOpen && !_keptOpen) {
+      _close();
+    }
+  }
+
+  /// Whether focus holds the open rail with the pointer gone: a keyboard
+  /// user moving through it, or a menu opened from it.
+  bool get _keptOpen {
+    if (!_focus.hasFocus) return false;
+    return _byKeyboard || _focusInMenu;
+  }
+
+  /// Whether focus is in a menu opened from the column: focused through the
+  /// column, but drawn outside it, in the overlay.
+  bool get _focusInMenu {
+    final focused = FocusManager.instance.primaryFocus?.context
+        ?.findRenderObject();
+    final column = _column.currentContext?.findRenderObject();
+    if (focused == null || column == null) return false;
+    for (RenderObject? o = focused; o != null; o = o.parent) {
+      if (identical(o, column)) return false;
+    }
+    return true;
+  }
+
+  void _open() {
+    _rest?.cancel();
+    _rest = null;
+    if (!mounted || !_isRail || _rail == _Rail.open) return;
+    if (Overlay.maybeOf(context) == null) return;
+    setState(() => _rail = _Rail.open);
+    _portal.show();
+  }
+
+  /// Folds the open rail back; with [held], it then stays shut under the
+  /// pointer until the pointer leaves.
+  void _close({bool held = false}) {
+    if (_rail != _Rail.open) return;
+    if (held) _held = _overOpen || _overRail;
+    final animates =
+        context.motion.medium > Duration.zero &&
+        Sidebar.widthOf(context) != Sidebar.widthOf(context, collapsed: true);
+    if (animates) {
+      setState(() => _rail = _Rail.closing);
+    } else {
+      _shut();
+    }
+  }
+
+  /// Puts the column back in its place.
+  void _shut() {
+    if (!mounted) return;
+    setState(() => _rail = _Rail.shut);
+    _overOpen = false;
+    _portal.hide();
+  }
+
+  void _onWidthEnd() {
+    if (_rail == _Rail.closing) _shut();
+  }
+
+  void _onItemOpen() {
+    _rest?.cancel();
+    _rest = null;
+    if (_rail == _Rail.open) {
+      _close(held: true);
+    } else if (_overRail) {
+      _held = true;
+    }
   }
 
   void _syncNodes(int count) {
@@ -252,16 +459,112 @@ class _SidebarState extends State<Sidebar> {
   Widget build(BuildContext context) {
     _syncNodes(_items.length);
     final palette = context.shellStyle.sidebarPalette;
-    final column = Builder(builder: _column);
+    final framed = Builder(builder: _framed);
     return palette == null
-        ? column
-        : ChromeTheme(palette: palette, child: column);
+        ? framed
+        : ChromeTheme(palette: palette, child: framed);
   }
 
-  Widget _column(BuildContext context) {
+  /// The column in its place, or, while the rail is open, a gap as wide as
+  /// the rail with the column over the page in the overlay.
+  Widget _framed(BuildContext context) {
+    final drawer = NavigationDrawerScope.maybeOf(context);
+    final rail = drawer == null && widget.collapsed;
+    _isRail = rail;
+    if (drawer == null) Shell.reportRail(context, rail: rail);
+    if (!rail) {
+      if (_rail != _Rail.shut) {
+        // No longer a rail, so the column is back in its place, expanded.
+        _rest?.cancel();
+        _rest = null;
+        _rail = _Rail.shut;
+        _overOpen = false;
+        _portal.hide();
+      }
+      return _keyedColumn(collapsed: false);
+    }
+    return MouseRegion(
+      onEnter: _onRailEnter,
+      onExit: _onRailExit,
+      child: Listener(
+        onPointerDown: _onRailDown,
+        child: OverlayPortal.overlayChildLayoutBuilder(
+          controller: _portal,
+          overlayChildBuilder: _overlay,
+          child: _rail == _Rail.shut
+              ? _keyedColumn(collapsed: true)
+              : SizedBox(
+                  width: Sidebar.widthOf(context, collapsed: true),
+                  height: double.infinity,
+                ),
+        ),
+      ),
+    );
+  }
+
+  /// The open rail, over the gap it left: as tall, from the same edge.
+  Widget _overlay(BuildContext context, OverlayChildLayoutInfo info) {
+    if (_rail == _Rail.shut) return const SizedBox.shrink();
+    final gap = MatrixUtils.transformRect(
+      info.childPaintTransform,
+      Offset.zero & info.childSize,
+    );
+    final start = switch (Directionality.of(context)) {
+      // Physical: the overlay's coordinates, turned into the gap's start.
+      TextDirection.ltr => gap.left,
+      TextDirection.rtl => info.overlaySize.width - gap.right,
+    };
+    return Stack(
+      children: [
+        PositionedDirectional(
+          top: gap.top,
+          height: gap.height,
+          start: start,
+          child: MouseRegion(
+            onEnter: _onOpenEnter,
+            onExit: _onOpenExit,
+            child: CallbackShortcuts(
+              bindings: {
+                const SingleActivator(LogicalKeyboardKey.escape): () =>
+                    _close(held: true),
+              },
+              // A platform view under the page (an embedded frame) would
+              // otherwise take the clicks meant for the rail's items.
+              child: PointerInterceptor(
+                child: _keyedColumn(
+                  collapsed: _rail == _Rail.closing,
+                  raised: true,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _keyedColumn({required bool collapsed, bool raised = false}) =>
+      KeyedSubtree(
+        key: _column,
+        child: Focus(
+          focusNode: _focus,
+          includeSemantics: false,
+          child: Builder(
+            builder: (context) =>
+                _buildColumn(context, collapsed: collapsed, raised: raised),
+          ),
+        ),
+      );
+
+  /// The column, [collapsed] to the rail or expanded, and [raised] over the
+  /// page with a shadow while the rail is open.
+  Widget _buildColumn(
+    BuildContext context, {
+    required bool collapsed,
+    required bool raised,
+  }) {
     final colors = context.colors;
     final drawer = NavigationDrawerScope.maybeOf(context);
-    final collapsed = drawer == null && widget.collapsed;
     var itemIndex = 0;
 
     final column = Semantics(
@@ -273,6 +576,7 @@ class _SidebarState extends State<Sidebar> {
         child: AnimatedContainer(
           duration: context.motion.medium,
           curve: context.motion.standard,
+          onEnd: _onWidthEnd,
           width: Sidebar.widthOf(context, collapsed: collapsed),
           decoration: BoxDecoration(
             color: colors.background,
@@ -282,6 +586,7 @@ class _SidebarState extends State<Sidebar> {
                 width: context.stroke.hairline,
               ),
             ),
+            boxShadow: raised && !collapsed ? context.elevation.md : null,
           ),
           // The column's colour runs under the insets; its content keeps
           // clear of them.
@@ -340,7 +645,11 @@ class _SidebarState extends State<Sidebar> {
         ),
       ),
     );
-    return _SidebarScope(collapsed: collapsed, child: column);
+    return _SidebarScope(
+      collapsed: collapsed,
+      onItemOpen: _onItemOpen,
+      child: column,
+    );
   }
 }
 
@@ -360,6 +669,7 @@ class _NavSectionLabel extends StatelessWidget {
     }
     final colors = context.colors;
     final padX = context.shellStyle.itemPaddingX;
+    final width = _NavTile._contentWidth(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
         padX,
@@ -367,13 +677,23 @@ class _NavSectionLabel extends StatelessWidget {
         padX,
         AdminSpacing.xs,
       ),
-      child: Text(
-        section.label.toUpperCase(),
-        style: context.type.micro.copyWith(
-          // The micro caption is small text: it needs 4.5:1 on the rail.
-          color: colors.readableOn(
-            colors.foregroundMuted,
-            surfaces: [colors.background],
+      // Laid out at the expanded width and revealed as the rail opens, as an
+      // item's row is, rather than wrapped to the opening width.
+      child: ClipRect(
+        child: OverflowBox(
+          alignment: AlignmentDirectional.centerStart,
+          fit: OverflowBoxFit.deferToChild,
+          minWidth: width,
+          maxWidth: width,
+          child: Text(
+            section.label.toUpperCase(),
+            style: context.type.micro.copyWith(
+              // The micro caption is small text: it needs 4.5:1 on the rail.
+              color: colors.readableOn(
+                colors.foregroundMuted,
+                surfaces: [colors.background],
+              ),
+            ),
           ),
         ),
       ),
@@ -437,6 +757,7 @@ class _NavTile extends StatelessWidget {
     if (item.guarded && !await LeaveGuardScope.confirmLeave(context)) return;
     if (!context.mounted) return;
     context.getInheritedWidgetOfExactType<NavigationDrawerScope>()?.close();
+    context.getInheritedWidgetOfExactType<_SidebarScope>()?.onItemOpen();
     item.onTap?.call();
   }
 

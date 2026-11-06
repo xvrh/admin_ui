@@ -320,6 +320,23 @@ part of them with the short getters of the `AdminTokensContext` extension:
   that wants the rail between the breakpoints passes
   `Sidebar(collapsed: AdminBreakpoint.of(context).isMedium)`.
 
+The rail keeps its labels within reach:
+
+- **Pointer**: resting on the rail for `Sidebar.railOpenDelay` opens it
+  over the page, expanded, and the page does not move. It closes as the
+  pointer leaves or an item opens. A click on the rail opens the item and
+  keeps the rail shut until the pointer leaves.
+- **Keyboard**: focus moving into the rail, or within it, by a key opens
+  it the same way. Escape and focus leaving it close it.
+- **Touch**: between the breakpoints, beside a collapsed rail, the
+  `TopBar` leads with its menu button as it does when compact, and opens
+  the same drawer. `Shell.hasDrawer(context)` says whether the frame has
+  that drawer, so a top bar of the app's own knows when to show its menu
+  button.
+
+A menu opened from the rail, such as a `SidebarAccount`'s, keeps it open
+while it is.
+
 A sidebar's `header` and `footer` fit the rail by reading
 `Sidebar.isCollapsed(context)`, which is false in the drawer. The
 signed-in account goes in the footer as a `SidebarAccount`, which does
