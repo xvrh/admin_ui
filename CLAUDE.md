@@ -45,8 +45,12 @@ Every demo in `packages/admin_ui/example` has a `@Preview` wrapped in
 fw run previews entries --package=packages/admin_ui/example
 fw run previews screenshot --entry='lib/src/ui/primitives/button.dart#ButtonDemo.new'
 fw run previews audit --package=packages/admin_ui/example
+fw compare   # this branch's previews and scenarios against its merge base
 ```
 
 No pixel goldens: the sweeps in `packages/admin_ui/example/test/sweeps` pump
-every demo and fail on an exception or an overflow. A pull request that
-changes a look on purpose shows before/after `fw run previews screenshot`s.
+every demo and fail on an exception or an overflow. The Compare workflow runs
+`fw compare` on every pull request and keeps one comment on it with the
+pictures that moved, base beside head. Read it once the run is done: the
+description says why each finding is meant, and a moved look is recorded in
+`CHANGELOG.md`.

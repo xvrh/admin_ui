@@ -34,6 +34,24 @@ review their diff: `fvm dart run tool/gen_barrels.dart` writes `api.txt`,
 `packages/admin_ui`). The README's "Versions" says which bump a change
 needs, and the CHANGELOG records it.
 
+## Pull requests
+
+CI runs the checks above and every package's tests. The Compare workflow
+runs flutterware's `fw compare`: every preview and scenario rendered on the
+pull request's head and on its merge base with `main`, and one comment on the
+pull request with what moved, edited in place on each push. Run
+`fvm dart run flutterware compare` to see the same before pushing.
+
+The reports live on the `comparison-artifacts` branch, `pr-<number>/<sha>/`
+for each open pull request's latest push, as one commit with no history, so
+an app's clone of the kit stays small; a closed pull request's report is
+removed. Every update force-pushes that branch, so a ruleset must leave it
+out. GitHub Pages serves the viewer from it, once switched on: Settings →
+Pages → Deploy from a branch → `comparison-artifacts`, `/ (root)`. Until
+then the comment's links lead to the run, whose artifact is the report. A
+pull request from a fork or from Dependabot has a read-only token, so its
+report is only the artifact, and the run's summary says so.
+
 ## Licence
 
 BSD 3-Clause; see [LICENSE](LICENSE).
