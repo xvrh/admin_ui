@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# The comparison reports of open pull requests, on an orphan branch that
-# GitHub Pages and raw.githubusercontent.com serve: pr-<number>/<sha>/ holds
-# what `fw compare --report` wrote for that push.
+# The comparison reports of open pull requests, on a branch of the repository
+# that GitHub Pages and raw.githubusercontent.com serve them from:
+# pr-<number>/<sha>/ holds what `fw compare --report` wrote for that push.
 #
 #   comparison_site.sh publish <pr> <sha> <report-dir>
 #   comparison_site.sh remove <pr>
 #
 # Every update is one commit with no parent, pushed with a lease, so the branch
-# holds the open pull requests' latest reports and no history: pub clones every
-# branch of a git dependency, and a branch that kept its pictures would grow
-# every app's copy of the kit. A push that loses a race fetches and redoes it.
+# holds the open pull requests' latest reports and no history. A push that
+# loses a race fetches and redoes it.
 #
-# SITE_REMOTE is the repository to push to; SITE_BRANCH defaults to
-# comparison-artifacts.
+# SITE_REMOTE is the repository to push to; SITE_BRANCH defaults to main.
+# With SITE_DEPLOY_KEY, git reaches github.com over SSH
+# with that private key, checking GitHub's host keys as its API lists them.
 set -euo pipefail
 
 usage() {
@@ -34,18 +34,35 @@ case $mode in
 esac
 
 remote=${SITE_REMOTE:?SITE_REMOTE names the repository to push to}
-branch=${SITE_BRANCH:-comparison-artifacts}
+branch=${SITE_BRANCH:-main}
 
 work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
+ssh_dir=$(mktemp -d)
+trap 'rm -rf "$work" "$ssh_dir"' EXIT
 git -C "$work" init -q
+
+if [[ -n ${SITE_DEPLOY_KEY:-} ]]; then
+  printf '%s\n' "$SITE_DEPLOY_KEY" >"$ssh_dir/key"
+  chmod 600 "$ssh_dir/key"
+  curl -fsSL https://api.github.com/meta \
+    | jq -r '.ssh_keys[] | "github.com " + .' >"$ssh_dir/known_hosts"
+  export GIT_SSH_COMMAND="ssh -F /dev/null -i $ssh_dir/key -o IdentitiesOnly=yes \
+-o UserKnownHostsFile=$ssh_dir/known_hosts -o StrictHostKeyChecking=yes"
+fi
 
 for attempt in $(seq 10); do
   rm -rf "$work/.git/index" "$work/pr-$pr"
-  if git -C "$work" fetch -q --depth=1 "$remote" "refs/heads/$branch" 2>/dev/null; then
+  if git -C "$work" ls-remote -q --exit-code "$remote" "refs/heads/$branch" >/dev/null; then
+    git -C "$work" fetch -q --depth=1 "$remote" "refs/heads/$branch"
     lease=$(git -C "$work" rev-parse FETCH_HEAD)
     git -C "$work" read-tree FETCH_HEAD
   else
+    # 2 is "no such ref"; anything else is git failing to reach the remote.
+    status=$?
+    if [[ $status -ne 2 ]]; then
+      echo "Cannot read $remote." >&2
+      exit 1
+    fi
     # No branch yet. The empty lease makes the push fail if one appeared.
     lease=
   fi

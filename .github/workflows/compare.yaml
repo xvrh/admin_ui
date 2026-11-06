@@ -6,11 +6,15 @@ name: Compare
 # failure: the comment is for the reviewer. The check fails only when a side
 # could not be compared.
 #
-# The reports live on the comparison-artifacts branch (see
-# .github/scripts/comparison_site.sh), served by raw.githubusercontent.com for
-# the comment's picture and by GitHub Pages for the viewer. A pull request
-# from a fork or from Dependabot gets a read-only token, so its report stays
-# an artifact of the run and the job summary says so.
+# The reports live in a repository of their own, not on a branch of this one:
+# pub's cache of a git dependency mirrors every branch, so a report here would
+# land in every app's copy of the kit. .github/scripts/comparison_site.sh
+# keeps them there; raw.githubusercontent.com serves the comment's picture and
+# GitHub Pages the viewer. Until the COMPARISON_DEPLOY_KEY secret exists
+# (README.md, "Pull requests"), the comment carries the table without the
+# picture and links to the run. A pull request from a fork or from Dependabot
+# gets no secrets and a read-only token, so its report stays an artifact of
+# the run and the job summary says so.
 #
 # A push to main compares it with its parent, which fills the shot cache that
 # every pull request then restores its base side from.
@@ -33,7 +37,8 @@ permissions:
 env:
   FLUTTER_VERSION: 3.48.0-0.5.pre
   FLUTTER_CHANNEL: beta
-  SITE_BRANCH: comparison-artifacts
+  SITE_REPOSITORY: ${{ vars.COMPARISON_REPOSITORY || format('{0}-comparisons', github.repository) }}
+  SITE_BRANCH: main
 
 jobs:
   compare:
@@ -122,9 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: write # the comparison-artifacts branch
       pull-requests: write # the comment
-      pages: read # where the viewer is served
     env:
       GH_TOKEN: ${{ github.token }}
       PR: ${{ github.event.pull_request.number }}
@@ -142,29 +145,46 @@ jobs:
           path: ${{ runner.temp }}/comparison-report
 
       - name: Host the report
+        id: host
         env:
-          SITE_REMOTE: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+          SITE_REMOTE: git@github.com:${{ env.SITE_REPOSITORY }}.git
+          SITE_DEPLOY_KEY: ${{ secrets.COMPARISON_DEPLOY_KEY }}
         run: |
+          if [ -z "$SITE_DEPLOY_KEY" ]; then
+            echo "No COMPARISON_DEPLOY_KEY secret, so nothing is hosted and the"
+            echo "comment links to this run (README.md, \"Pull requests\")."
+            exit 0
+          fi
           bash .github/scripts/comparison_site.sh publish \
             "$PR" "${HEAD_SHA:0:12}" "$RUNNER_TEMP/comparison-report"
+          echo "hosted=true" >> "$GITHUB_OUTPUT"
 
       - name: Comment
         env:
+          HOSTED: ${{ steps.host.outputs.hosted }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          dir="pr-$PR/${HEAD_SHA:0:12}"
-          raw="https://raw.githubusercontent.com/$REPO/$SITE_BRANCH/$dir"
-          # Pages is switched on once, by hand (see README.md); until then the
-          # viewer links lead to this run, whose artifact is the report.
-          if pages=$(gh api "repos/$REPO/pages" --jq '.html_url' 2>/dev/null); then
-            viewer="${pages%/}/$dir/web/"
+          comment=$RUNNER_TEMP/comment.md
+          report=$RUNNER_TEMP/comparison-report/comment.md
+          if [ "$HOSTED" = true ]; then
+            dir="pr-$PR/${HEAD_SHA:0:12}"
+            owner=${SITE_REPOSITORY%%/*}
+            raw="https://raw.githubusercontent.com/$SITE_REPOSITORY/$SITE_BRANCH/$dir"
+            viewer="https://${owner,,}.github.io/${SITE_REPOSITORY#*/}/$dir/web/"
+            # `g`: a scenario row carries two viewer links on one line.
+            sed -e "s|__MOSAIC_URL__|$raw/mosaic.png|g" \
+                -e "s|__VIEWER_URL__|$viewer|g" "$report" > "$comment"
           else
-            viewer=$RUN
+            grep -v '__MOSAIC_URL__' "$report" \
+              | sed -e "s|__VIEWER_URL__|$RUN|g" > "$comment"
           fi
-          # `g`: a scenario row carries two viewer links on one line.
-          sed -e "s|__MOSAIC_URL__|$raw/mosaic.png|g" \
-              -e "s|__VIEWER_URL__|$viewer|g" \
-              "$RUNNER_TEMP/comparison-report/comment.md" > "$RUNNER_TEMP/comment.md"
+          # A comment holds 65536 characters; the viewer has every row.
+          if [ "$(wc -c < "$comment")" -gt 64000 ]; then
+            head -c 64000 "$comment" > "$comment.cut"
+            printf '\n\n</details>\n\nThe table is cut here; the viewer lists every row.\n' \
+              >> "$comment.cut"
+            mv "$comment.cut" "$comment"
+          fi
 
           # One comment per pull request, edited in place: this workflow's own,
           # found by the marker fw writes on its first line.
@@ -174,10 +194,9 @@ jobs:
           id=${ids%%$'\n'*}
           if [ -n "$id" ]; then
             gh api -X PATCH "repos/$REPO/issues/comments/$id" \
-              -F "body=@$RUNNER_TEMP/comment.md" > /dev/null
+              -F "body=@$comment" > /dev/null
           else
-            gh api "repos/$REPO/issues/$PR/comments" \
-              -F "body=@$RUNNER_TEMP/comment.md" > /dev/null
+            gh api "repos/$REPO/issues/$PR/comments" -F "body=@$comment" > /dev/null
           fi
 
   prune:
@@ -188,8 +207,6 @@ jobs:
       github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -198,6 +215,12 @@ jobs:
           persist-credentials: false
       - name: Remove pr-${{ github.event.pull_request.number }}
         env:
-          SITE_REMOTE: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+          SITE_REMOTE: git@github.com:${{ env.SITE_REPOSITORY }}.git
+          SITE_DEPLOY_KEY: ${{ secrets.COMPARISON_DEPLOY_KEY }}
           PR: ${{ github.event.pull_request.number }}
-        run: bash .github/scripts/comparison_site.sh remove "$PR"
+        run: |
+          if [ -z "$SITE_DEPLOY_KEY" ]; then
+            echo "No COMPARISON_DEPLOY_KEY secret: nothing was hosted."
+            exit 0
+          fi
+          bash .github/scripts/comparison_site.sh remove "$PR"

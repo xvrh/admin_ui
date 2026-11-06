@@ -96,8 +96,9 @@ void main() => Flutterware.configure((fw) {
 
   fw.use(
     Scenarios(
+      // Not the example: it has no scenarios, and a declared package with
+      // none leaves `fw compare` without a scenario verdict.
       packages: [
-        .new(adminUiExample),
         // test/scenarios only: the unit tests and the layout sweep beside it
         // are plain tests, not scenarios.
         .new(

@@ -42,15 +42,29 @@ pull request's head and on its merge base with `main`, and one comment on the
 pull request with what moved, edited in place on each push. Run
 `fvm dart run flutterware compare` to see the same before pushing.
 
-The reports live on the `comparison-artifacts` branch, `pr-<number>/<sha>/`
-for each open pull request's latest push, as one commit with no history, so
-an app's clone of the kit stays small; a closed pull request's report is
-removed. Every update force-pushes that branch, so a ruleset must leave it
-out. GitHub Pages serves the viewer from it, once switched on: Settings →
-Pages → Deploy from a branch → `comparison-artifacts`, `/ (root)`. Until
-then the comment's links lead to the run, whose artifact is the report. A
-pull request from a fork or from Dependabot has a read-only token, so its
-report is only the artifact, and the run's summary says so.
+The reports live in a repository of their own, `<this repository>-comparisons`
+(or the `COMPARISON_REPOSITORY` variable), never on a branch of this one: pub
+caches a git dependency as a mirror of every branch, and a report runs to
+100 MB. Its `main` holds `pr-<number>/<sha>/` for each open pull request's
+latest push, as one commit with no history; a closed pull request's report is
+removed. raw.githubusercontent.com serves the comment's picture and GitHub
+Pages the viewer. Setting it up, once, with a deploy key that can write to
+that repository alone:
+
+```sh
+gh repo create <owner>/admin_ui-comparisons --public
+ssh-keygen -t ed25519 -N '' -C fw-compare -f comparison_key
+gh repo deploy-key add comparison_key.pub --repo <owner>/admin_ui-comparisons --allow-write --title fw-compare
+gh secret set COMPARISON_DEPLOY_KEY --repo <owner>/admin_ui < comparison_key
+rm comparison_key comparison_key.pub
+```
+
+After the first report lands, switch on Pages for that repository: Settings →
+Pages → Deploy from a branch → `main`, `/ (root)`. Without the secret the
+comment still comes, with the table and no picture, and its links lead to the
+run, whose artifact is the report. A pull request from a fork or from
+Dependabot gets no secrets and a read-only token, so its report is only the
+artifact, and the run's summary says so.
 
 ## Licence
 
