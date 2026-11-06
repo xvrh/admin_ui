@@ -250,6 +250,7 @@ const previewOnly = <PreviewOnlyDemo>[
     'Shell (narrow window)',
     ShellDemo.narrow,
   ),
+  PreviewOnlyDemo('ShellDemo.tablet', 'Shell (tablet width)', ShellDemo.tablet),
   PreviewOnlyDemo('ShellDemo.phone', 'Shell (phone width)', ShellDemo.phone),
   PreviewOnlyDemo(
     'ShellDrawerDemo',

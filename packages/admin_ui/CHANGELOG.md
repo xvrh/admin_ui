@@ -53,6 +53,19 @@
   a selected swatch and the current page number show the hand like a selected
   tab (they showed the arrow), and a kanban card that opens shows the hand
   even when it can also be moved (it showed the open hand).
+- A collapsed `Sidebar` rail opens over the page, expanded, so its labels
+  are within reach: when the pointer rests on it for
+  `Sidebar.railOpenDelay`, and when focus moves into or within it by a key.
+  The page does not move. It closes as the pointer or focus leaves, on
+  Escape, and as an item opens; a menu opened from it, such as a
+  `SidebarAccount`'s, keeps it open. A click on the shut rail opens the item
+  and keeps the rail shut until the pointer leaves. The column moves to the
+  overlay while it is open, keeping its scroll, focus and keys, so a test
+  finds one row per item, open or shut.
+- `Shell.hasDrawer(context)` says whether the frame opens its navigation as
+  a drawer from the top bar's menu button: compact, and now also between
+  the breakpoints beside a collapsed rail. `Shell.openDrawer` opens it in
+  both. A top bar of the app's own shows its menu button by it.
 
 ### Looks
 
@@ -66,6 +79,13 @@
   the labels move in Iris Dark, Ant, Fluent Dark and Carbon Dark, and the
   controls in Fluent Dark only. The catalog's Foundations / Stock Material
   page shows them under the theme's accent and under a light one.
+- Between the breakpoints, beside a collapsed rail, the `TopBar` leads with
+  its menu button, as it does when compact, and its `leading` moves after
+  it. The rail opened over the page carries the theme's medium shadow on its
+  edge. A section label is laid out at the sidebar's width and revealed as
+  the sidebar widens, as an item's row is, rather than wrapped to the
+  widening width. The catalog's shell demo folds to the rail between the
+  breakpoints, and has a tablet-width preview.
 
 ## 0.1.0
 

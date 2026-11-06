@@ -43,6 +43,15 @@ class ShellDemo extends StatefulWidget {
       collapsed = false,
       drawerOpen = false;
 
+  /// The frame in a 900px window, between the breakpoints: the rail, which
+  /// opens over the page under the pointer, and the menu button, which
+  /// opens the drawer.
+  @Preview(name: 'Shell (tablet width)', wrapper: adminUiPreview)
+  const ShellDemo.tablet({super.key})
+    : windowWidth = 900,
+      collapsed = false,
+      drawerOpen = false;
+
   /// The frame at a phone's 360px, compact, its navigation in the drawer.
   @Preview(name: 'Shell (phone width)', wrapper: adminUiPreview)
   const ShellDemo.phone({super.key})
@@ -162,8 +171,10 @@ class _ShellDemoState extends State<ShellDemo> {
             child: Shell(
               // The footer and the leading are built below the sidebar and
               // the top bar, in the palette each draws with.
+              // Between the breakpoints the rail, as the README's recipe
+              // has it; wider, the toggle's choice.
               sidebar: Sidebar(
-                collapsed: _collapsed,
+                collapsed: _collapsed || AdminBreakpoint.of(context).isMedium,
                 footer: SidebarAccount(
                   name: 'Jane Doe',
                   detail: 'jane@example.com',
@@ -228,11 +239,12 @@ class _ShellDemoState extends State<ShellDemo> {
 
   /// The workspace and the sidebar toggle, moved over a collapsed rail in
   /// step with the rail's own width. A narrow rail centres the mark short of
-  /// [Shell.inset], so the move is a shift rather than a padding. A compact
-  /// frame has no rail to toggle: the workspace alone, after the shell's
-  /// menu button (and in its drawer, after the close button).
+  /// [Shell.inset], so the move is a shift rather than a padding. A frame
+  /// with a drawer, compact or beside the rail between the breakpoints, has
+  /// nothing to toggle: the workspace alone, after the shell's menu button
+  /// (and in its drawer, after the close button).
   Widget _leading(BuildContext context) {
-    if (Shell.isCompact(context)) return _workspace(context);
+    if (Shell.hasDrawer(context)) return _workspace(context);
     return TweenAnimationBuilder<double>(
       tween: Tween(end: _collapsed ? _railInset(context) : 0),
       duration: context.motion.medium,

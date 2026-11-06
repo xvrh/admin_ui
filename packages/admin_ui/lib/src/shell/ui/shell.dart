@@ -53,7 +53,9 @@ import 'top_bar.dart';
 /// the shell ([AdminScope] mounts one), so its items ask the page's
 /// [LeaveGuardScope] before they leave, and it closes as the shell widens
 /// again. Between the breakpoints the app keeps its rail
-/// ([Sidebar.collapsed]).
+/// ([Sidebar.collapsed]), which opens over the page under the pointer or
+/// keyboard focus. Beside that rail the top bar leads with the menu button
+/// too, and the same drawer opens from it, for a touch screen.
 ///
 /// On a device with insets, the top bar runs under the status bar in its
 /// own colour and keeps its content below it, and the sidebar keeps the
@@ -97,12 +99,30 @@ class Shell extends StatefulWidget {
     return NavigationDrawerScope.maybeOf(context) != null;
   }
 
-  /// Opens the navigation drawer of the compact [Shell] around [context],
-  /// resolving once it has closed. Does nothing while the shell is not
-  /// compact, or outside a shell.
+  /// Whether the [Shell] around [context] opens its navigation as a drawer
+  /// from its top bar's menu button: while it is compact, and between the
+  /// breakpoints beside a collapsed rail ([Sidebar.collapsed]). False
+  /// outside a shell. [context] rebuilds as it changes. A top bar of the
+  /// app's own shows its menu button by it.
+  static bool hasDrawer(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<_ShellScope>();
+    return scope != null && (scope.compact || scope.rail);
+  }
+
+  /// Opens the navigation drawer of the [Shell] around [context], resolving
+  /// once it has closed. Does nothing while the shell has no drawer
+  /// ([hasDrawer]), or outside a shell.
   static Future<void> openDrawer(BuildContext context) =>
       context.getInheritedWidgetOfExactType<_ShellScope>()?.state._open() ??
       Future.value();
+
+  /// Tells the [Shell] around [context] whether its sidebar is a collapsed
+  /// rail, which gives the top bar its menu button.
+  @internal
+  static void reportRail(BuildContext context, {required bool rail}) => context
+      .getInheritedWidgetOfExactType<_ShellScope>()
+      ?.state
+      ._reportRail(rail);
 
   @override
   State<Shell> createState() => _ShellState();
@@ -115,6 +135,25 @@ class _ShellState extends State<Shell> {
   /// The anchor the drawer is open on, while it is.
   ModalAnchorController? _anchor;
   bool _compact = false;
+
+  /// Whether the sidebar beside the page is a collapsed rail. It says so
+  /// as it builds, after the top bar has, so the top bar reads it a frame
+  /// later.
+  bool _rail = false;
+
+  /// What the sidebar last said, while it waits for that frame.
+  bool _railSaid = false;
+
+  /// Whether the drawer opens beside the rail, between the breakpoints.
+  bool _railDrawer = false;
+
+  void _reportRail(bool rail) {
+    if (rail == _railSaid) return;
+    _railSaid = rail;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _rail != _railSaid) setState(() => _rail = _railSaid);
+    });
+  }
 
   NavigationDrawerContent get _content => (
     sidebar: widget.drawer ?? widget.sidebar,
@@ -150,7 +189,7 @@ class _ShellState extends State<Shell> {
   }
 
   Future<void> _open() async {
-    if (!_compact || _anchor != null) return;
+    if (!(_compact || _railDrawer) || _anchor != null) return;
     _drawer.value = _content;
     final anchor = _anchor = ModalAnchor.of(context);
     try {
@@ -165,13 +204,18 @@ class _ShellState extends State<Shell> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = AdminBreakpoint.forWidth(
+        final breakpoint = AdminBreakpoint.forWidth(
           constraints.maxWidth,
           context.breakpoints,
-        ).isCompact;
+        );
+        final compact = breakpoint.isCompact;
         _compact = compact;
-        if (!compact && _anchor != null) {
-          // Wide again: the sidebar is back beside the page.
+        // An expanded window's rail is the user's choice, with a toggle of
+        // the app's own.
+        final rail = breakpoint.isMedium && _rail;
+        _railDrawer = rail;
+        if (!compact && !rail && _anchor != null) {
+          // Wide again: the whole sidebar is back beside the page.
           final anchor = _anchor!;
           SchedulerBinding.instance.addPostFrameCallback((_) => anchor.close());
         }
@@ -185,6 +229,7 @@ class _ShellState extends State<Shell> {
         return _ShellScope(
           state: this,
           compact: compact,
+          rail: rail,
           child: Scaffold(
             backgroundColor: context.colors.background,
             body: Column(
@@ -216,15 +261,19 @@ class _ShellScope extends InheritedWidget {
   final _ShellState state;
   final bool compact;
 
+  /// The sidebar beside the page is a collapsed rail.
+  final bool rail;
+
   const _ShellScope({
     required this.state,
     required this.compact,
+    required this.rail,
     required super.child,
   });
 
   @override
   bool updateShouldNotify(_ShellScope old) =>
-      compact != old.compact || state != old.state;
+      compact != old.compact || rail != old.rail || state != old.state;
 }
 
 /// Draws [child] in [palette] in place of the page's, for a part of the frame

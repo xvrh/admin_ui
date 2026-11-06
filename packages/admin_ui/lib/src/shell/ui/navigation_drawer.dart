@@ -171,10 +171,10 @@ class _DrawerHead extends StatelessWidget {
   }
 }
 
-/// The button that opens the compact [Shell]'s navigation drawer: a menu
+/// The button that opens the [Shell]'s navigation drawer: a menu
 /// [IconAction] named "Open navigation" in the app's language. A [TopBar]
-/// in a compact shell leads with one; pass one as [TopBar.menuButton] to
-/// key it.
+/// leads with one while the shell has a drawer ([Shell.hasDrawer]); pass one
+/// as [TopBar.menuButton] to key it.
 class ShellMenuButton extends StatelessWidget {
   const ShellMenuButton({super.key});
 
