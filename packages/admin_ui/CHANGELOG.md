@@ -2,6 +2,15 @@
 
 ## 0.1.1
 
+- A refresh the user did not ask for can run in the background:
+  `AsyncValueController.refresh(background: true)` and
+  `CollectionController.refresh(background: true)`. Nothing on screen says it
+  runs: `loading` keeps its value and no progress bar shows. The value or the
+  rows change in place when the answer lands, and a failure still shows as the
+  error. Use it after an edit, on a push or on a timer.
+  `CollectionRealtime.bind(background: true)` refetches that way. A local
+  change that settles while a background refresh runs is kept on the page it
+  lands, as it is for any other load.
 - Every control the kit builds can be found by a key the app gives it, so a
   test reaches it without its words, in any language. A data object that
   describes a control takes `key`, put on the control built for it, or on its

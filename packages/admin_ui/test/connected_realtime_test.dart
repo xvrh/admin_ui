@@ -50,6 +50,26 @@ void main() {
     expect(fetches, 2);
   });
 
+  test('a background binding refetches with loading left false', () async {
+    final binding = CollectionRealtime.bind(
+      controller,
+      onChanged: changes.stream,
+      onConnected: connected.stream,
+      coalesce: _coalesce,
+      background: true,
+    );
+    addTearDown(binding.dispose);
+    addTearDown(controller.dispose);
+    await _wait();
+    final seen = <bool>[];
+    controller.addListener(() => seen.add(controller.loading));
+    changes.add(null);
+    await _wait();
+    expect(fetches, 2);
+    expect(seen, isNotEmpty);
+    expect(seen, everyElement(isFalse));
+  });
+
   test('each reconnect refetches; staying up does not', () async {
     final binding = CollectionRealtime.bind(
       controller,

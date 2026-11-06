@@ -16,7 +16,7 @@ import 'async_value_controller.dart';
 /// - Until the first value lands, [placeholder]; by default a
 ///   [LoadingPanel], once the load has run 150ms.
 /// - A refresh keeps the value on screen, with a progress bar along its top
-///   edge once it runs past 150ms.
+///   edge once it runs past 150ms. A background refresh shows none.
 /// - A failed load shows an [ErrorState] in place of the value, with the
 ///   error put in words by [ErrorTextScope.describe] and a Retry, so a
 ///   value that failed to refresh does not pass for current.

@@ -56,8 +56,15 @@ class AsyncValueController<T> extends ChangeNotifier with LatestLoad {
   bool get hasValue => _hasValue;
 
   /// Loads the value again; the one loaded stays until the new one lands.
-  Future<void> refresh() => runLoad(fetcher, (value) {
+  ///
+  /// A [background] refresh is one the user did not ask for: after an
+  /// edit saved elsewhere, on a push, on a timer. Nothing on screen says it
+  /// runs, as [loading] stays as it was, and the new value replaces the old
+  /// one when it lands. A failure still shows as the [error]: the value on
+  /// screen was known to be out of date, or it would not have been
+  /// refreshed.
+  Future<void> refresh({bool background = false}) => runLoad(fetcher, (value) {
     _value = value;
     _hasValue = true;
-  });
+  }, background: background);
 }

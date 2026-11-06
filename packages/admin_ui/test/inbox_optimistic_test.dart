@@ -329,6 +329,34 @@ void main() {
       expect(controller.total, 4);
     });
 
+    test('a page read by a background refresh before a local removal lands '
+        'without the row', () async {
+      final gate = server.gate = Completer<void>();
+      final refresh = controller.refresh(background: true);
+      server.gate = null;
+      expect(controller.loading, isFalse);
+      server.rows.removeWhere((r) => r.id == 2);
+      controller.removeLocal((r) => r.id == 2);
+      gate.complete();
+      await refresh;
+      expect(_ids(controller), [0, 1, 3, 4]);
+      expect(controller.total, 4);
+    });
+
+    test('a page read by a background refresh before a commit keeps the '
+        'change', () async {
+      final gate = server.gate = Completer<void>();
+      final refresh = controller.refresh(background: true);
+      server.gate = null;
+      await controller.optimistic(
+        update: _without(2),
+        commit: () async => server.rows.removeWhere((r) => r.id == 2),
+      );
+      gate.complete();
+      await refresh;
+      expect(_ids(controller), [0, 1, 3, 4]);
+    });
+
     test('a page read before a local patch lands with the patch', () async {
       final gate = server.gate = Completer<void>();
       final refresh = controller.refresh();

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admin_ui/src/collection/collection_controller.dart';
 import 'package:admin_ui/src/collection/filter.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -126,6 +128,65 @@ void main() {
       expect(c.query.filters.length, 1); // inactive dropped
     },
   );
+
+  test('a background refresh keeps loading false and swaps the rows when '
+      'they land', () async {
+    var rows = [1, 2, 3];
+    final gate = Completer<void>();
+    var gated = false;
+    final c = CollectionController<int>(
+      fetcher: (q) async {
+        final snapshot = rows;
+        if (gated) await gate.future;
+        return CollectionPage(items: snapshot, total: snapshot.length);
+      },
+    );
+    addTearDown(c.dispose);
+    await _settle();
+    var notified = 0;
+    c.addListener(() => notified++);
+
+    gated = true;
+    rows = [1, 2, 3, 4];
+    final refresh = c.refresh(background: true);
+    await _settle();
+    expect(c.loading, isFalse);
+    expect(c.items, [1, 2, 3]);
+    expect(notified, 0);
+
+    gate.complete();
+    await refresh;
+    expect(c.loading, isFalse);
+    expect(c.items, [1, 2, 3, 4]);
+    expect(c.total, 4);
+  });
+
+  test('a background refresh past the last page reloads it in the '
+      'background too', () async {
+    var rows = List.generate(25, (i) => i);
+    final c = CollectionController<int>(
+      initialQuery: const CollectionQuery(pageSize: 10, pageIndex: 2),
+      fetcher: (q) async {
+        final start = q.pageIndex * q.pageSize;
+        return CollectionPage(
+          items: rows.skip(start).take(q.pageSize).toList(),
+          total: rows.length,
+        );
+      },
+    );
+    addTearDown(c.dispose);
+    await _settle();
+    expect(c.pageIndex, 2);
+    final seen = <bool>[];
+    c.addListener(() => seen.add(c.loading));
+
+    rows = List.generate(15, (i) => i);
+    await c.refresh(background: true);
+    await _settle();
+    expect(c.pageIndex, 1);
+    expect(c.items.first, 10);
+    expect(seen, everyElement(isFalse));
+  });
 
   test('captures fetch errors', () async {
     final c = CollectionController<int>(

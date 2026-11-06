@@ -230,15 +230,18 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
   /// 1-based index of the last row on this page.
   int get to => _query.pageIndex * _query.pageSize + items.length;
 
-  Future<void> load() {
+  /// Fetches the current query's page. A [background] load is a
+  /// [refresh]'s.
+  Future<void> load({bool background = false}) {
     _settledDuringLoad.clear();
     return runLoad(() => fetcher(_query), (result) {
       if (_pastTheEnd(result) case final last?) {
         // The rows of the last page went (a delete, a realtime refresh):
-        // show the page that now holds the last rows instead of an empty one.
+        // show the page that now holds the last rows instead of an empty
+        // one.
         _query = _query.copyWith(pageIndex: last);
         if (result.total != 0) {
-          unawaited(load());
+          unawaited(load(background: background));
           return;
         }
       }
@@ -248,7 +251,7 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
       );
       _settledDuringLoad.clear();
       _rebuildPage();
-    });
+    }, background: background);
   }
 
   /// The index of the last page when [page] came back empty past it, else
@@ -274,7 +277,15 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
     }
   }
 
-  Future<void> refresh() => load();
+  /// Fetches the current page again; its rows stay until the new ones land.
+  ///
+  /// A [background] refresh is one the user did not ask for: after an
+  /// edit, on a push, on a timer. Nothing on screen says it runs, as
+  /// [loading] stays as it was, and the new rows replace the old ones when
+  /// they land. A failure still shows as the [error]. The selection and
+  /// the local changes still pending are kept, as on any load.
+  Future<void> refresh({bool background = false}) =>
+      load(background: background);
 
   /// Applies [update] to the loaded rows at once and notifies, then awaits
   /// [commit], the server call that makes the change stick. When [commit]
@@ -382,7 +393,9 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
   void _edit(List<T> Function(List<T> items) update) {
     final before = items;
     if (_base case final base?) _base = _applied(base, update);
-    if (loading) _settledDuringLoad.add(_LocalChange(update, _selectionEpoch));
+    if (loadInFlight) {
+      _settledDuringLoad.add(_LocalChange(update, _selectionEpoch));
+    }
     _rebuildPage();
     _deselectGone(before, null);
     notifyListeners();
@@ -419,7 +432,7 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
   void _settle(_LocalChange<T> change) {
     if (!_pending.remove(change)) return;
     if (_base case final base?) _base = _applied(base, change.update);
-    if (loading) _settledDuringLoad.add(change);
+    if (loadInFlight) _settledDuringLoad.add(change);
     _rebuildPage();
     notifyListeners();
   }
