@@ -1,8 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
   Where the Compare workflow keeps the fw compare reports of pull requests: a
-  bucket anyone can read, and a role that only the repository's pull request
-  workflows can assume, to write under pr-* and nowhere else.
+  private bucket that CloudFront serves, and a role that only the
+  repository's pull request workflows can assume, to write under pr-* and
+  nowhere else.
 
 Parameters:
   Repository:
@@ -21,11 +22,23 @@ Parameters:
     Default: 30
     MinValue: 1
     Description: >-
-      Days a report is kept. A closed pull request's report is deleted at once;
-      this is for the ones that never close.
+      Days a report is kept. A closed pull request's report is deleted at once,
+      and a new push replaces the last one; this is for the rest.
+  AlertEmail:
+    Type: String
+    Default: ''
+    Description: >-
+      Where to send a budget alert; empty for no budget. The budget counts the
+      account's whole S3 and CloudFront spend, not this stack's alone.
+  MonthlyBudgetUsd:
+    Type: Number
+    Default: 5
+    MinValue: 1
+    Description: The monthly S3 and CloudFront spend the alert is measured against.
 
 Conditions:
   CreateProvider: !Equals [!Ref CreateOidcProvider, 'true']
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, '']]
 
 Resources:
   GitHubOidcProvider:
@@ -40,25 +53,63 @@ Resources:
         - 6938fd4d98bab03faadb97b34396831e3780aea1
         - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
 
+  # Private: CloudFront reads it, nobody else. Versioning stays off, so a
+  # delete or an expiry frees the space at once.
   Bucket:
     Type: AWS::S3::Bucket
     Properties:
       OwnershipControls:
         Rules:
           - ObjectOwnership: BucketOwnerEnforced
-      # Public through the policy below, never through object ACLs.
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         IgnorePublicAcls: true
-        BlockPublicPolicy: false
-        RestrictPublicBuckets: false
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
       LifecycleConfiguration:
         Rules:
           - Id: expire-reports
             Status: Enabled
             ExpirationInDays: !Ref RetentionDays
+            # Only bites if someone turns versioning on.
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 1
             AbortIncompleteMultipartUpload:
               DaysAfterInitiation: 1
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${AWS::StackName}-reports'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # Every report lives under its own pr-<number>/<sha>/, so nothing it serves
+  # ever changes and the managed caching-optimized policy is safe.
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub 'fw compare reports of ${Repository}'
+        PriceClass: PriceClass_100
+        HttpVersion: http2and3
+        Origins:
+          - Id: reports
+            DomainName: !GetAtt Bucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: reports
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          # Managed-CachingOptimized.
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
 
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -67,11 +118,15 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: AnyoneReadsReports
+          - Sid: CloudFrontReadsReports
             Effect: Allow
-            Principal: '*'
+            Principal:
+              Service: cloudfront.amazonaws.com
             Action: s3:GetObject
             Resource: !Sub '${Bucket.Arn}/pr-*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
           - Sid: HttpsOnly
             Effect: Deny
             Principal: '*'
@@ -123,6 +178,41 @@ Resources:
                   StringLike:
                     s3:prefix: 'pr-*'
 
+  # Monitoring and its notifications are free; it alerts, it does not stop
+  # anything.
+  Budget:
+    Type: AWS::Budgets::Budget
+    Condition: HasAlertEmail
+    Properties:
+      Budget:
+        BudgetName: !Sub '${AWS::StackName}-s3-cloudfront'
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit:
+          Amount: !Ref MonthlyBudgetUsd
+          Unit: USD
+        CostFilters:
+          Service:
+            - Amazon Simple Storage Service
+            - Amazon CloudFront
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref AlertEmail
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref AlertEmail
+
 Outputs:
   Bucket:
     Description: The COMPARISON_BUCKET repository variable.
@@ -133,3 +223,6 @@ Outputs:
   RoleArn:
     Description: The COMPARISON_ROLE_ARN repository variable.
     Value: !GetAtt PublishRole.Arn
+  Url:
+    Description: The COMPARISON_URL repository variable.
+    Value: !Sub 'https://${Distribution.DomainName}'

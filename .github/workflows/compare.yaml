@@ -6,10 +6,11 @@ name: Compare
 # failure: the comment is for the reviewer. The check fails only when a side
 # could not be compared.
 #
-# The reports live in an S3 bucket, pr-<number>/<sha>/, which also serves
-# the comment's picture and the viewer. .github/aws/comparisons.yaml makes the
-# bucket and the role the publish job assumes through GitHub's OIDC token, so
-# no key is stored anywhere; README.md ("Pull requests") sets it up. Until the
+# The reports live in a private S3 bucket, pr-<number>/<sha>/, and CloudFront
+# serves the comment's picture and the viewer from it.
+# .github/aws/comparisons.yaml makes both, and the role the publish job
+# assumes through GitHub's OIDC token, so no key is stored anywhere;
+# README.md ("Pull requests") sets it up. Until the
 # COMPARISON_* repository variables exist, the comment carries the table
 # without the picture and links to the run. A pull request from a fork or
 # from Dependabot gets a read-only token and no OIDC token, so its report
@@ -133,6 +134,7 @@ jobs:
       SHA: ${{ github.event.pull_request.head.sha }}
       REPO: ${{ github.repository }}
       BUCKET: ${{ vars.COMPARISON_BUCKET }}
+      SITE_URL: ${{ vars.COMPARISON_URL }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -154,8 +156,7 @@ jobs:
           # The comment links to this push's report alone.
           aws s3 rm --only-show-errors --recursive "s3://$BUCKET/pr-$PR/" \
             --exclude "$sha/*"
-          echo "url=https://$BUCKET.s3.$AWS_REGION.amazonaws.com/pr-$PR/$sha" \
-            >> "$GITHUB_OUTPUT"
+          echo "url=$SITE_URL/pr-$PR/$sha" >> "$GITHUB_OUTPUT"
 
       - name: Comment
         env:
@@ -165,7 +166,7 @@ jobs:
           comment=$RUNNER_TEMP/comment.md
           report=$RUNNER_TEMP/comparison-report/comment.md
           if [ -n "$SITE" ]; then
-            # S3 serves no index for a directory, so the viewer is its file.
+            # Nothing serves an index for a directory, so the viewer is its file.
             # `g`: a scenario row carries two viewer links on one line.
             sed -e "s|__MOSAIC_URL__|$SITE/mosaic.png|g" \
                 -e "s|__VIEWER_URL__|$SITE/web/index.html|g" "$report" > "$comment"
