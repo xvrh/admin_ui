@@ -91,6 +91,9 @@ class _SignInPageState extends State<SignInPage> {
           errorText: _errorText(strings),
           initialEmail: picked ?? '',
           initialPassword: picked == null ? '' : demo?.password ?? '',
+          emailKey: AccessKeys.signInEmail,
+          passwordKey: AccessKeys.signInPassword,
+          submitKey: AccessKeys.signInSubmit,
         ),
       ),
     );

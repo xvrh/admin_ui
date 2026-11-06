@@ -11,7 +11,10 @@ class SwatchOption<T> {
   final Color color;
   final String label;
 
-  const SwatchOption(this.value, this.color, this.label);
+  /// The key of the swatch built for this option, to find it by in a test.
+  final Key? key;
+
+  const SwatchOption(this.value, this.color, this.label, {this.key});
 }
 
 /// A row of color dots for enum props whose values *are* colors (a section's
@@ -53,6 +56,7 @@ class SwatchRow<T> extends StatelessWidget {
       message: option.label,
       excludeFromSemantics: true,
       child: Tappable(
+        key: option.key,
         onTap: onChanged == null
             ? null
             : () {

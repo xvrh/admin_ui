@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:admin_ui/l10n.dart';
-import 'package:admin_ui/shell.dart';
 import 'package:admin_ui/theme.dart' show AdminBreakpoint;
-import 'package:admin_ui/widgets.dart' show Tip;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +11,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:reference_admin/src/api/shop_api.dart';
 import 'package:reference_admin/src/app.dart';
 import 'package:reference_admin/src/fake/fake_shop_api.dart';
-import 'package:reference_admin/src/frame/navigation.dart';
 import 'package:reference_admin/src/keys/shell_keys.dart';
 import 'package:reference_admin/src/l10n/ref_strings.dart';
 import 'package:reference_admin/src/routing/router_delegate.dart';
@@ -120,47 +117,16 @@ extension ShopScenario on ScenarioTester {
 
 /// Opens [nav]'s page the way a person would at this width: the sidebar's
 /// row, the rail's icon, or the phone's drawer.
-///
-/// `NavItem` takes no key, so the row is found by its label in the app's
-/// language (F-016).
 Future<void> navTo(
   ScenarioTester s,
   Nav nav, {
   Shot? shot,
   Settle? settle,
 }) async {
-  final label = navLabel(s.strings.shell, nav);
-  switch (s.breakpoint) {
-    case AdminBreakpoint.compact:
-      await s.tap(ShellKeys.menu, shot: Shot.skip);
-      await s.tap(
-        find.descendant(
-          of: find.byKey(ShellKeys.drawer),
-          matching: find.text(label),
-        ),
-        shot: shot,
-        settle: settle,
-      );
-    case AdminBreakpoint.medium:
-      await s.tap(
-        find.descendant(
-          of: find.byType(Sidebar),
-          // FRICTION(F-016): the rail shows each label in a kit Tip, which
-          // find.byTooltip does not see.
-          matching: find.byWidgetPredicate(
-            (w) => w is Tip && w.message == label,
-          ),
-        ),
-        shot: shot,
-        settle: settle,
-      );
-    case AdminBreakpoint.expanded:
-      await s.tap(
-        find.descendant(of: find.byType(Sidebar), matching: find.text(label)),
-        shot: shot,
-        settle: settle,
-      );
+  if (s.breakpoint == AdminBreakpoint.compact) {
+    await s.tap(ShellKeys.menu, shot: Shot.skip);
   }
+  await s.tap(ShellKeys.nav(nav), shot: shot, settle: settle);
 }
 
 // FRICTION(T-001): no hover, click, secondary-click or key-chord verbs; the

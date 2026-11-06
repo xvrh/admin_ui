@@ -48,6 +48,18 @@ class SignInForm extends StatefulWidget {
   /// Label on the "or" separator between credentials and providers.
   final String? dividerLabel;
 
+  /// The key of the email input, to find it by in a test.
+  final Key? emailKey;
+
+  /// The key of the password input, to find it by in a test.
+  final Key? passwordKey;
+
+  /// The key of the submit button, to find it by in a test.
+  final Key? submitKey;
+
+  /// The key of the forgot-password link, to find it by in a test.
+  final Key? forgotKey;
+
   const SignInForm({
     super.key,
     this.onSignIn,
@@ -62,6 +74,10 @@ class SignInForm extends StatefulWidget {
     this.submitLabel,
     this.forgotLabel,
     this.dividerLabel,
+    this.emailKey,
+    this.passwordKey,
+    this.submitKey,
+    this.forgotKey,
   });
 
   @override
@@ -134,6 +150,7 @@ class _SignInFormState extends State<SignInForm> {
           ],
           if (hasCredentials) ...[
             InputField(
+              key: widget.emailKey,
               label: emailLabel,
               controller: _email,
               focusNode: _emailFocus,
@@ -149,11 +166,13 @@ class _SignInFormState extends State<SignInForm> {
             ),
             const Gap(AdminSpacing.lg),
             PasswordField(
+              key: widget.passwordKey,
               label: passwordLabel,
               labelTrailing: widget.onForgotPassword == null
                   ? null
                   : _LinkText(
                       widget.forgotLabel ?? shell.forgotPassword,
+                      key: widget.forgotKey,
                       onTap: widget.submitting ? null : widget.onForgotPassword,
                     ),
               controller: _password,
@@ -167,6 +186,7 @@ class _SignInFormState extends State<SignInForm> {
             const Gap(AdminSpacing.xl),
             Button.primary(
               widget.submitLabel ?? shell.signIn,
+              key: widget.submitKey,
               expand: true,
               loading: widget.submitting,
               onPressed: _submit,
@@ -216,7 +236,7 @@ class _LinkText extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
 
-  const _LinkText(this.label, {this.onTap});
+  const _LinkText(this.label, {super.key, this.onTap});
 
   /// The link's target height, WCAG 2.5.8's minimum.
   static const _height = 24.0;

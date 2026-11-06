@@ -2,6 +2,29 @@
 
 ## 0.1.1
 
+- Every control the kit builds can be found by a key the app gives it, so a
+  test reaches it without its words, in any language. A data object that
+  describes a control takes `key`, put on the control built for it, or on its
+  row when a narrow layout folds it into a menu: `NavItem`, `MenuItem`,
+  `MenuCheckboxItem`, `MenuSubmenu`, `TabItem`, `SegmentOption`,
+  `ChoiceOption`, `SwatchOption`, `AccordionSection`, `StepItem`, `Crumb`,
+  `BulkAction`, `SaveBarAction`, `ComboboxOption`, `SelectOption` and
+  `FilterOption`. A widget or a function with a control of its own takes
+  `<part>Key` for it: `showConfirmDialog(confirmKey:, cancelKey:)`,
+  `ErrorState(retryKey:)`, `Modal(closeKey:)`, `SideSheet(closeKey:)`,
+  `SaveCluster` and `SaveBar(saveKey:, commitKey:, discardKey:)`,
+  `FormSaveBar` and `FormActions(commitKey:, discardKey:)`,
+  `FormWizard(backKey:, nextKey:)`, `Pagination` and
+  `Pager(previousKey:, nextKey:)`, `Collection(previousPageKey:,
+  nextPageKey:)`, `Toast(actionKey:)`, `BulkActionBar(clearKey:)`,
+  `SearchField(clearKey:)`, `SignInForm(emailKey:, passwordKey:, submitKey:,
+  forgotKey:)`, `SetPasswordForm(newKey:, confirmKey:, submitKey:)`,
+  `ChangePasswordForm(currentKey:, newKey:, confirmKey:, submitKey:)` and
+  `NewPasswordFields(newKey:, confirmKey:)`. A folded `IconAction` keeps its
+  key on its row in the save bar's menu. `FormWizard` keyed its footer by
+  `ValueKey('back')` and `ValueKey('next')`, which an app's own `Key('next')`
+  equals; it now keys them by a type of its own. The README's API conventions
+  say the rule, and *Testing an app on the kit* shows it.
 - A tap target leaves its text out of any `SelectionArea` above it: `Tappable`,
   `CursorRegion`, `Button`, a `CollectionTable` row that opens, a cell edited
   on a double tap and a column header (both under the arrow), a field's label

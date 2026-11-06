@@ -67,6 +67,12 @@ class FormActions extends StatelessWidget {
   /// [SaveFlow.publish] the shortcut never publishes) while this is mounted.
   final bool saveShortcut;
 
+  /// The key of the commit button, to find it by in a test.
+  final Key? commitKey;
+
+  /// The key of the Discard button, to find it by in a test.
+  final Key? discardKey;
+
   const FormActions({
     super.key,
     required this.controller,
@@ -83,6 +89,8 @@ class FormActions extends StatelessWidget {
     this.commitDisabledHint,
     this.fields,
     this.saveShortcut = true,
+    this.commitKey,
+    this.discardKey,
   });
 
   @override
@@ -105,6 +113,8 @@ class FormActions extends StatelessWidget {
         onDiscard: showDiscard ? (onDiscard ?? controller.reset) : null,
         discardLabel: discardLabel,
         onCommit: controller.requestSubmit,
+        commitKey: commitKey,
+        discardKey: discardKey,
         commitEnabled: controller.canSubmit,
         commitDisabledHint:
             commitDisabledHint ??

@@ -41,6 +41,12 @@ class NewPasswordFields extends StatefulWidget {
   /// a field above it, say.
   final FocusNode? focusNode;
 
+  /// The key of the new-password input, to find it by in a test.
+  final Key? newKey;
+
+  /// The key of the confirmation input, to find it by in a test.
+  final Key? confirmKey;
+
   const NewPasswordFields({
     super.key,
     required this.onChanged,
@@ -51,6 +57,8 @@ class NewPasswordFields extends StatefulWidget {
     this.newLabel,
     this.confirmLabel,
     this.focusNode,
+    this.newKey,
+    this.confirmKey,
   });
 
   @override
@@ -156,6 +164,7 @@ class NewPasswordFieldsState extends State<NewPasswordFields> {
           _password,
           () => _passwordLeft = true,
           PasswordField(
+            key: widget.newKey,
             label: widget.newLabel ?? shell.newPassword,
             controller: _password,
             focusNode: _passwordFocus,
@@ -175,6 +184,7 @@ class NewPasswordFieldsState extends State<NewPasswordFields> {
           _confirm,
           () => _confirmLeft = true,
           PasswordField(
+            key: widget.confirmKey,
             label: widget.confirmLabel ?? shell.confirmPassword,
             controller: _confirm,
             focusNode: _confirmFocus,

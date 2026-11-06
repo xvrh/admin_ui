@@ -89,6 +89,13 @@ class FormWizard extends StatefulWidget {
   /// ([ValidationSummary.showsFor]), and a hidden summary leaves no gap.
   final Widget? summary;
 
+  /// The key of the Back button, to find it by in a test.
+  final Key? backKey;
+
+  /// The key of the Next button, which is the finish button on the last step,
+  /// to find it by in a test.
+  final Key? nextKey;
+
   const FormWizard({
     super.key,
     required this.controller,
@@ -96,6 +103,8 @@ class FormWizard extends StatefulWidget {
     this.initialStep = 0,
     this.onStepChanged,
     this.finishLabel,
+    this.backKey,
+    this.nextKey,
     this.direction,
     this.summary,
   }) : assert(steps.length > 0, 'A wizard needs a step'),
@@ -395,22 +404,24 @@ class _FormWizardState extends State<FormWizard>
       children: [
         if (_current > 0) ...[
           Flexible(
-            key: const ValueKey('back'),
+            key: const ValueKey(_FooterSlot.back),
             child: Button(
               l10n.fields.wizardBack,
+              key: widget.backKey,
               focusNode: _backFocus,
               onPressed: busy ? null : () => _goTo(_current - 1),
             ),
           ),
-          const Gap(AdminSpacing.md, key: ValueKey('gap')),
+          const Gap(AdminSpacing.md, key: ValueKey(_FooterSlot.gap)),
         ],
         Flexible(
-          key: const ValueKey('next'),
+          key: const ValueKey(_FooterSlot.next),
           child: Button.primary(
             last
                 ? widget.finishLabel ??
                       MaterialLocalizations.of(context).saveButtonLabel
                 : l10n.fields.wizardNext,
+            key: widget.nextKey,
             focusNode: _nextFocus,
             loading: busy,
             onPressed: nothingToSubmit ? null : _next,
@@ -426,6 +437,10 @@ class _FormWizardState extends State<FormWizard>
 /// room, paints nothing, takes no focus and has no semantics. It is a
 /// [TabScope] over the wizard's steps, so a field revealed on it (a jump to
 /// the field, a refused submit) asks the wizard to show it.
+/// The footer's slots, keyed by a type of the kit's own so that no key an
+/// app gives a button can equal one.
+enum _FooterSlot { back, gap, next }
+
 class _StepBody extends StatelessWidget {
   final String id;
   final bool shown;

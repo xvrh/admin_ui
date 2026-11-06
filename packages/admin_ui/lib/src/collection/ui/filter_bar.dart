@@ -30,7 +30,11 @@ import '../filter.dart';
 class FilterOption {
   final String id;
   final String label;
-  const FilterOption(this.id, this.label);
+
+  /// The key of the row built for this option, to find it by in a test.
+  final Key? key;
+
+  const FilterOption(this.id, this.label, {this.key});
 }
 
 /// A filterable field the [FilterBar] can edit. [key] is the [FieldId] carried
@@ -470,6 +474,7 @@ class _OptionsEditorState extends State<_OptionsEditor> {
         final option = _options[i];
         final checked = widget.selected.contains(option.id);
         return ListboxOption(
+          key: option.key,
           controller: _listbox,
           index: i,
           label: option.label,

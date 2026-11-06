@@ -135,6 +135,9 @@ class SideSheet extends StatelessWidget {
   /// for a sheet whose content heads itself.
   final String? semanticLabel;
 
+  /// The key of the close button, to find it by in a test.
+  final Key? closeKey;
+
   const SideSheet({
     super.key,
     this.title,
@@ -142,6 +145,7 @@ class SideSheet extends StatelessWidget {
     required this.child,
     this.footer,
     this.onDismiss,
+    this.closeKey,
     this.side = SideSheetSide.end,
     this.safeArea = true,
     this.semanticLabel,
@@ -239,7 +243,11 @@ class SideSheet extends StatelessWidget {
                             action,
                             const Gap(AdminSpacing.sm),
                           ],
-                          IconAction.close(size: closeSize, onPressed: close),
+                          IconAction.close(
+                            key: closeKey,
+                            size: closeSize,
+                            onPressed: close,
+                          ),
                         ],
                       ),
                     ),

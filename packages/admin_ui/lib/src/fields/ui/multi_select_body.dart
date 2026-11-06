@@ -453,6 +453,7 @@ class _TokensState extends State<_Tokens> {
     final hasGlyph = o.swatch != null || o.icon != null;
     final check = _drawnCheck(checked, enabled: !inert);
     return ListboxOption(
+      key: o.key,
       controller: _listbox,
       index: index,
       label: o.label,
@@ -524,6 +525,7 @@ class _Checklist extends StatelessWidget {
         ? context.stroke.controlStrong
         : context.stroke.control;
     return Tappable(
+      key: o.key,
       onTap: inert ? null : () => onToggle!(o.value),
       focusRadius: context.radii.radius,
       checked: selected,
@@ -643,6 +645,7 @@ class _Segmented extends StatelessWidget {
         ? colors.foregroundSubtle
         : (selected ? colors.primaryText : colors.foregroundMuted);
     return Tappable(
+      key: o.key,
       onTap: inert ? null : () => onToggle!(o.value),
       focusRadius: context.radii.radius,
       selected: selected,

@@ -14,7 +14,10 @@ class StepItem {
   final String title;
   final String? subtitle;
 
-  const StepItem(this.title, {this.subtitle});
+  /// The key of the step built for this item, to find it by in a test.
+  final Key? key;
+
+  const StepItem(this.title, {this.key, this.subtitle});
 }
 
 enum _NodeState { complete, active, upcoming, error }
@@ -161,6 +164,7 @@ class _HStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _StepTarget(
+      key: item.key,
       onTap: onTap,
       label: label,
       builder: (focused) => Column(
@@ -224,6 +228,7 @@ class _VStep extends StatelessWidget {
     final titleTop = math.max(0.0, (_nodeSize - line) / 2);
     return IntrinsicHeight(
       child: _StepTarget(
+        key: item.key,
         onTap: onTap,
         label: label,
         builder: (focused) => Row(
@@ -437,6 +442,7 @@ class _StepTarget extends StatelessWidget {
   final Widget Function(bool focused) builder;
 
   const _StepTarget({
+    super.key,
     required this.onTap,
     required this.label,
     required this.builder,

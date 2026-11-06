@@ -43,8 +43,12 @@ class TabItem {
   /// A disabled tab is dimmed and skipped by both taps and keyboard focus.
   final bool enabled;
 
+  /// The key of the tab built for this item, to find it by in a test.
+  final Key? key;
+
   const TabItem(
     this.label, {
+    this.key,
     this.icon,
     this.trailing,
     this.menu,
@@ -724,6 +728,7 @@ class _TabState extends State<_Tab> {
     final enabled = widget.item.enabled;
     if (widget.item.menu == null) _menu = null;
     Widget tab = Tappable.states(
+      key: widget.item.key,
       onTap: enabled ? _activate : null,
       focusNode: widget.node,
       showFocusRing: false,

@@ -26,8 +26,13 @@ class Crumb {
   final List<Crumb>? siblings;
   final bool loading;
 
+  /// The key of the link built for this crumb, or of its row in the menu of
+  /// crumbs an overflowing trail collapses, to find it by in a test.
+  final Key? key;
+
   const Crumb(
     this.label, {
+    this.key,
     this.icon,
     this.onTap,
     this.siblings,
@@ -335,7 +340,7 @@ class _CrumbView extends StatelessWidget {
           ),
           entries: [
             for (final s in siblings)
-              MenuItem(s.label, icon: s.icon, onSelect: s.onTap),
+              MenuItem(s.label, key: s.key, icon: s.icon, onSelect: s.onTap),
           ],
         ),
       ],
@@ -347,6 +352,7 @@ class _CrumbView extends StatelessWidget {
     final radius = context.radii.radiusSmall;
     final rest = colors.readableOn(colors.foregroundMuted);
     return Tappable.states(
+      key: crumb.key,
       onTap: crumb.onTap,
       link: true,
       focusRadius: radius,
@@ -442,7 +448,12 @@ class _OverflowCrumb extends StatelessWidget {
       ),
       entries: [
         for (final crumb in collapsed)
-          MenuItem(crumb.label, icon: crumb.icon, onSelect: crumb.onTap),
+          MenuItem(
+            crumb.label,
+            key: crumb.key,
+            icon: crumb.icon,
+            onSelect: crumb.onTap,
+          ),
       ],
     );
   }

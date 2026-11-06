@@ -56,6 +56,12 @@ class Pager extends StatelessWidget {
   final List<int> pageSizes;
   final ValueChanged<int>? onPageSize;
 
+  /// The key of the previous-page arrow, to find it by in a test.
+  final Key? previousKey;
+
+  /// The key of the next-page arrow, to find it by in a test.
+  final Key? nextKey;
+
   const Pager({
     super.key,
     required this.from,
@@ -71,6 +77,8 @@ class Pager extends StatelessWidget {
     this.pageSize,
     this.pageSizes = const [10, 25, 50],
     this.onPageSize,
+    this.previousKey,
+    this.nextKey,
   });
 
   int? get _pageCount {
@@ -153,6 +161,8 @@ class Pager extends StatelessWidget {
                   siblings: siblings,
                   size: ControlSize.small,
                   onChanged: onPage,
+                  previousKey: previousKey,
+                  nextKey: nextKey,
                 );
                 break;
               }
@@ -163,6 +173,8 @@ class Pager extends StatelessWidget {
               hasNext: count == null ? hasNext : current < count,
               size: ControlSize.small,
               onChanged: onPage,
+              previousKey: previousKey,
+              nextKey: nextKey,
             );
           } else {
             // [page] only orders the two arrows here: no number is drawn.
@@ -173,6 +185,8 @@ class Pager extends StatelessWidget {
               hasNext: hasNext && onNext != null,
               size: ControlSize.small,
               onChanged: (p) => p < at ? onPrev!() : onNext!(),
+              previousKey: previousKey,
+              nextKey: nextKey,
             );
           }
           final arrowsWidth = 2 * sizes.small + AdminSpacing.xs;

@@ -34,7 +34,11 @@ class SaveBarAction {
   final String? tooltip;
   final bool danger;
 
+  /// The key of the menu row built for this action, to find it by in a test.
+  final Key? key;
+
   const SaveBarAction({
+    this.key,
     required this.label,
     this.icon,
     this.onPressed,
@@ -143,6 +147,16 @@ class SaveBar extends StatelessWidget {
 
   final SaveBarPlacement placement;
 
+  /// The key of the Save button, to find it by in a test.
+  final Key? saveKey;
+
+  /// The key of the commit button, to find it by in a test.
+  final Key? commitKey;
+
+  /// The key of the Discard button, or of its row when a narrow bar folds it
+  /// into its menu, to find it by in a test.
+  final Key? discardKey;
+
   const SaveBar({
     super.key,
     this.leading,
@@ -169,6 +183,9 @@ class SaveBar extends StatelessWidget {
     this.commitDisabledHint,
     this.flow = SaveFlow.save,
     this.placement = SaveBarPlacement.top,
+    this.saveKey,
+    this.commitKey,
+    this.discardKey,
   });
 
   static const height = 56.0;
@@ -211,6 +228,9 @@ class SaveBar extends StatelessWidget {
                 onDiscard: onDiscard,
                 onSave: onSave,
                 onCommit: onCommit,
+                saveKey: saveKey,
+                commitKey: commitKey,
+                discardKey: discardKey,
                 discardLabel: discardLabel,
                 saveLabel: saveLabel,
                 commitLabel: commitLabel,

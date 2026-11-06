@@ -48,6 +48,10 @@ class SearchField extends StatefulWidget {
   /// within the window never reports.
   final Duration? debounce;
 
+  /// The key of the clear button the field shows once it holds text, to find it
+  /// by in a test.
+  final Key? clearKey;
+
   const SearchField({
     super.key,
     this.value = '',
@@ -59,6 +63,7 @@ class SearchField extends StatefulWidget {
     this.size = ControlSize.medium,
     this.controller,
     this.focusNode,
+    this.clearKey,
     this.autofocus = false,
     this.enabled = true,
     this.readOnly = false,
@@ -190,6 +195,7 @@ class _SearchFieldState extends State<SearchField> {
       suffix: _controller.text.isEmpty
           ? const SizedBox.shrink()
           : ClearButton(
+              key: widget.clearKey,
               onPressed: _clear,
               label: context.adminL10n.inputs.clearSearch,
             ),
