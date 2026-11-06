@@ -1,0 +1,217 @@
+name: Compare
+
+# `fw compare` renders every preview and replays every scenario on both sides
+# of a pull request (its head, and its merge base with the base branch), and
+# one comment on the pull request shows what moved. A difference is not a
+# failure: the comment is for the reviewer. The check fails only when a side
+# could not be compared.
+#
+# The reports live in a private S3 bucket, pr-<number>/<sha>/, and CloudFront
+# serves the comment's picture and the viewer from it.
+# .github/aws/comparisons.yaml makes both, and the role the publish job
+# assumes through GitHub's OIDC token, so no key is stored anywhere;
+# README.md ("Pull requests") sets it up. Until the
+# COMPARISON_* repository variables exist, the comment carries the table
+# without the picture and links to the run. A pull request from a fork or
+# from Dependabot gets a read-only token and no OIDC token, so its report
+# stays an artifact of the run and the job summary says so.
+#
+# A push to main compares it with its parent, which fills the shot cache that
+# every pull request then restores its base side from.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: compare-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# flutter-version and channel mirror .fvmrc, like ci.yaml.
+env:
+  FLUTTER_VERSION: 3.48.0-0.5.pre
+  FLUTTER_CHANNEL: beta
+
+jobs:
+  compare:
+    name: Previews and scenarios against the base
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      report: ${{ steps.report.outputs.written }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The head itself rather than GitHub's merge commit, so the
+          # comment's footer names a commit of the pull request.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # The base is the merge base; a shallow clone has none.
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+      - run: flutter pub get
+
+      # The rendered pictures and replays (content-addressed, trimmed by fw
+      # itself), the seed kernel, and flutterware's own build: the directory
+      # named by a forty-character hash. A run always saves a new entry and
+      # restores the latest one it can see: its own branch's, else main's.
+      - name: Restore flutterware's caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.flutterware/shots
+            ~/.flutterware/kernels
+            ~/.flutterware/????????????????????????????????????????
+          key: fw-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            fw-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}-
+            fw-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-
+
+      - name: Compare
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'HEAD~1' }}
+          REPORT: ${{ github.event_name == 'pull_request' && '--report=comparison-report' || '' }}
+        run: |
+          dart run flutterware compare --base="$BASE" ${REPORT:+"$REPORT"} \
+            --frames=changed --jobs=2
+
+      - name: Note whether a report was written
+        id: report
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f comparison-report/comment.md ]; then
+            echo "written=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.report.outputs.written == 'true' }}
+        with:
+          name: comparison-report
+          path: comparison-report
+          retention-days: 14
+      - name: Summary for a pull request that cannot publish
+        if: >-
+          !cancelled() && steps.report.outputs.written == 'true' && !(
+            github.event.pull_request.head.repo.full_name == github.repository &&
+            github.event.pull_request.user.login != 'dependabot[bot]')
+        env:
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "This pull request's token is read-only, so it cannot publish its comparison;"
+            echo "this run's \`comparison-report\` artifact is the report: serve"
+            echo "its \`web/\` directory over HTTP to browse it."
+            echo
+            grep -v '__MOSAIC_URL__' comparison-report/comment.md \
+              | sed -e "s|__VIEWER_URL__|$RUN|g"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    name: Comment on the pull request
+    needs: compare
+    if: >-
+      !cancelled() && needs.compare.outputs.report == 'true' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      id-token: write # the role that writes to the bucket
+      pull-requests: write # the comment
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+      SHA: ${{ github.event.pull_request.head.sha }}
+      REPO: ${{ github.repository }}
+      BUCKET: ${{ vars.COMPARISON_BUCKET }}
+      SITE_URL: ${{ vars.COMPARISON_URL }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: comparison-report
+          path: ${{ runner.temp }}/comparison-report
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        if: vars.COMPARISON_ROLE_ARN != ''
+        with:
+          role-to-assume: ${{ vars.COMPARISON_ROLE_ARN }}
+          aws-region: ${{ vars.COMPARISON_REGION }}
+      - name: Host the report
+        id: host
+        if: vars.COMPARISON_ROLE_ARN != ''
+        run: |
+          sha=${SHA:0:12}
+          aws s3 sync --only-show-errors \
+            "$RUNNER_TEMP/comparison-report" "s3://$BUCKET/pr-$PR/$sha/"
+          # The comment links to this push's report alone.
+          aws s3 rm --only-show-errors --recursive "s3://$BUCKET/pr-$PR/" \
+            --exclude "$sha/*"
+          echo "url=$SITE_URL/pr-$PR/$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Comment
+        env:
+          SITE: ${{ steps.host.outputs.url }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          comment=$RUNNER_TEMP/comment.md
+          report=$RUNNER_TEMP/comparison-report/comment.md
+          if [ -n "$SITE" ]; then
+            # Nothing serves an index for a directory, so the viewer is its file.
+            # `g`: a scenario row carries two viewer links on one line.
+            sed -e "s|__MOSAIC_URL__|$SITE/mosaic.png|g" \
+                -e "s|__VIEWER_URL__|$SITE/web/index.html|g" "$report" > "$comment"
+          else
+            grep -v '__MOSAIC_URL__' "$report" \
+              | sed -e "s|__VIEWER_URL__|$RUN|g" > "$comment"
+          fi
+          # A comment holds 65536 characters; the viewer has every row.
+          if [ "$(wc -c < "$comment")" -gt 64000 ]; then
+            head -c 64000 "$comment" > "$comment.cut"
+            printf '\n\n</details>\n\nThe table is cut here; the viewer lists every row.\n' \
+              >> "$comment.cut"
+            mv "$comment.cut" "$comment"
+          fi
+
+          # One comment per pull request, edited in place: this workflow's own,
+          # found by the marker fw writes on its first line.
+          ids=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]"
+                    and (.body | startswith("<!-- fw-compare -->"))) | .id')
+          id=${ids%%$'\n'*}
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" \
+              -F "body=@$comment" > /dev/null
+          else
+            gh api "repos/$REPO/issues/$PR/comments" -F "body=@$comment" > /dev/null
+          fi
+
+  prune:
+    name: Remove the report of a closed pull request
+    if: >-
+      github.event.action == 'closed' && vars.COMPARISON_ROLE_ARN != '' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      id-token: write
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.COMPARISON_ROLE_ARN }}
+          aws-region: ${{ vars.COMPARISON_REGION }}
+      - name: Remove pr-${{ github.event.pull_request.number }}
+        env:
+          BUCKET: ${{ vars.COMPARISON_BUCKET }}
+          PR: ${{ github.event.pull_request.number }}
+        run: aws s3 rm --only-show-errors --recursive "s3://$BUCKET/pr-$PR/"

@@ -34,6 +34,55 @@ review their diff: `fvm dart run tool/gen_barrels.dart` writes `api.txt`,
 `packages/admin_ui`). The README's "Versions" says which bump a change
 needs, and the CHANGELOG records it.
 
+## Pull requests
+
+CI runs the checks above and every package's tests. The Compare workflow
+runs flutterware's `fw compare`: every preview and scenario rendered on the
+pull request's head and on its merge base with `main`, and one comment on the
+pull request with what moved, edited in place on each push. Run
+`fvm dart run flutterware compare` to see the same before pushing.
+
+The reports live in a private S3 bucket that CloudFront serves, never on a
+branch of this repository: pub caches a git dependency as a mirror of every
+branch, and a report can run to 100 MB. The bucket holds `pr-<number>/<sha>/`
+for each open pull request's latest push. The publish job writes there as a
+role it assumes with GitHub's OIDC token, so no key is stored, and only this
+repository's pull request runs can assume it.
+
+What bounds it: a push replaces its pull request's previous report, closing
+the pull request deletes it, and anything left expires after 30 days, with
+versioning off so a delete frees the space. What it costs: storage is the
+open pull requests' latest reports at a few cents per GB-month, a push's
+upload is a fraction of a cent, and CloudFront's free allowance (1 TB and 10
+million requests a month) covers reading them. An optional budget mails an
+alert past a monthly amount.
+
+[`.github/aws/comparisons.yaml`](.github/aws/comparisons.yaml) creates all of
+it, once, from a shell signed in to the AWS account (add
+`CreateOidcProvider=false` if `aws iam list-open-id-connect-providers` already
+lists token.actions.githubusercontent.com; CloudFront takes a few minutes):
+
+```sh
+aws cloudformation deploy --region <region> --stack-name admin-ui-comparisons \
+  --template-file .github/aws/comparisons.yaml --capabilities CAPABILITY_IAM \
+  --parameter-overrides Repository=<owner>/admin_ui AlertEmail=<email> \
+  SubjectPrefix="$(gh api repos/<owner>/admin_ui/actions/oidc/customization/sub \
+    --jq '.sub_claim_prefix // ""')"
+for pair in BUCKET:Bucket REGION:Region ROLE_ARN:RoleArn URL:Url; do
+  gh variable set "COMPARISON_${pair%%:*}" --body "$(aws cloudformation describe-stacks \
+    --region <region> --stack-name admin-ui-comparisons --output text \
+    --query "Stacks[0].Outputs[?OutputKey=='${pair#*:}'].OutputValue")"
+done
+```
+
+Removing it is `aws s3 rm --recursive s3://<bucket>`, then `aws
+cloudformation delete-stack --stack-name admin-ui-comparisons`, then deleting
+the four `COMPARISON_*` variables. Until they exist, the comment still comes,
+with the table and no picture, and its links lead to the run, whose artifact
+is the report. A pull request from a fork or from Dependabot gets a read-only
+token and no OIDC token, so its report is only the artifact, and the run's
+summary says so.
+
 ## Licence
 
 BSD 3-Clause; see [LICENSE](LICENSE).
