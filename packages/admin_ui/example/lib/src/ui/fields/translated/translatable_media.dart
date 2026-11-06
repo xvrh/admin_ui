@@ -193,7 +193,9 @@ class _TranslatedMediaState extends State<_TranslatedMedia> {
   };
 
   static MediaItem _asset(String code, Color swatch) => MediaItem(
-    id: 'hero-$code-${swatch.hashCode}',
+    // Not `swatch.hashCode`: a hash can differ from run to run, and a key
+    // that moves shows in every comparison that renders this demo.
+    id: 'hero-$code-${swatch.toARGB32().toRadixString(16)}',
     name: 'hero_$code.jpg',
     bytes: 1024 * 480,
     swatch: swatch,
