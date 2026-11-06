@@ -5,11 +5,10 @@ enum Nav { dashboard, orders, customers, products, media, team, settings }
 
 /// Keys of the frame's controls, as `ValueKey('shell.<thing>')`. Scenarios
 /// target these, never English words.
-///
-/// The sidebar's rows have none: `NavItem` is data, not a widget, and takes
-/// no key. The harness's `navTo` finds a row by its localized label.
-// FRICTION(F-016): NavItem takes no key, so a row cannot be targeted by one.
 abstract final class ShellKeys {
+  /// The sidebar's row for [nav], in the rail and the phone's drawer too.
+  static ValueKey<String> nav(Nav nav) => ValueKey('shell.nav.${nav.name}');
+
   static const frame = ValueKey('shell.frame');
   static const menu = ValueKey('shell.menu');
   static const drawer = ValueKey('shell.drawer');

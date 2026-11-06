@@ -5,11 +5,17 @@ abstract final class AccessKeys {
   // sign in
   static const signInPage = ValueKey('access.signInPage');
   static const signInForm = ValueKey('access.signInForm');
+  static const signInEmail = ValueKey('access.signInEmail');
+  static const signInPassword = ValueKey('access.signInPassword');
+  static const signInSubmit = ValueKey('access.signInSubmit');
   static const demoAccounts = ValueKey('access.demoAccounts');
 
   // set password
   static const setPasswordPage = ValueKey('access.setPasswordPage');
   static const setPasswordForm = ValueKey('access.setPasswordForm');
+  static const newPassword = ValueKey('access.newPassword');
+  static const confirmPassword = ValueKey('access.confirmPassword');
+  static const setPasswordSubmit = ValueKey('access.setPasswordSubmit');
   static const inviteProblem = ValueKey('access.inviteProblem');
   static const backToSignIn = ValueKey('access.backToSignIn');
 

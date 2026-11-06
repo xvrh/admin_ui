@@ -8,9 +8,16 @@ import '../../../support/harness.dart';
 // WP-A: getting in. Staff sign in; an invited teammate chooses a first
 // password; an old invitation is turned away.
 
-/// The editable fields of the form under [form], in order.
-Finder _inputs(Key form) =>
-    find.descendant(of: find.byKey(form), matching: find.byType(EditableText));
+/// The text the input keyed [field] holds.
+String _textOf(ScenarioTester s, Key field) => s.tester
+    .widget<EditableText>(
+      find.descendant(
+        of: find.byKey(field),
+        matching: find.byType(EditableText),
+      ),
+    )
+    .controller
+    .text;
 
 void main() {
   scenario('Signing in', (s) async {
@@ -22,27 +29,27 @@ void main() {
     );
     expect(shop.route, isA<SignIn>());
     final (email, _) = demoAccounts.first;
-    final fields = _inputs(AccessKeys.signInForm);
-    // FRICTION(F-008): SignInForm's fields and button take no keys.
-    final submit = find.descendant(
-      of: find.byKey(AccessKeys.signInForm),
-      matching: find.text(s.kit.shell.signIn),
-    );
 
-    await s.enterText(fields.at(0), email);
-    await s.enterText(fields.at(1), 'not-the-password');
-    await s.tap(submit, shot: const Shot('Sign in · wrong password'));
+    await s.enterText(AccessKeys.signInEmail, email);
+    await s.enterText(AccessKeys.signInPassword, 'not-the-password');
+    await s.tap(
+      AccessKeys.signInSubmit,
+      shot: const Shot('Sign in · wrong password'),
+    );
     expect(shop.route, isA<SignIn>());
     expect(shop.calls.failuresOf(Endpoint.signIn), 1);
     expect(find.text(s.strings.access.wrongPassword), findsOneWidget);
     expect(
-      s.tester.widget<EditableText>(fields.at(0)).controller.text,
+      _textOf(s, AccessKeys.signInEmail),
       email,
       reason: 'the email is kept after the error',
     );
 
-    await s.enterText(fields.at(1), demoPassword);
-    await s.tap(submit, shot: const Shot('Dashboard after sign-in'));
+    await s.enterText(AccessKeys.signInPassword, demoPassword);
+    await s.tap(
+      AccessKeys.signInSubmit,
+      shot: const Shot('Dashboard after sign-in'),
+    );
     expect(shop.route, const Dashboard());
     final me = shop.api.currentStaff!;
     expect(find.text(s.strings.access.welcomeBack(me.name)), findsOneWidget);
@@ -72,13 +79,14 @@ void main() {
       (m) => m.status == StaffStatus.invited && m.email.startsWith('priya'),
     );
     expect(shop.calls.countOf(Endpoint.inviteInfo), 1);
-    final fields = _inputs(AccessKeys.setPasswordForm);
-    final join = find.text(s.strings.access.joinShop);
 
     // Typed twice alike, so the only thing wrong is the length.
-    await s.enterText(fields.at(0), 'fern');
-    await s.enterText(fields.at(1), 'fern');
-    await s.tap(join, shot: const Shot('Set password · too weak'));
+    await s.enterText(AccessKeys.newPassword, 'fern');
+    await s.enterText(AccessKeys.confirmPassword, 'fern');
+    await s.tap(
+      AccessKeys.setPasswordSubmit,
+      shot: const Shot('Set password · too weak'),
+    );
     expect(
       find.text(s.kit.shell.passwordTooShort(8)),
       findsOneWidget,
@@ -86,17 +94,20 @@ void main() {
     );
     expect(find.text(s.kit.shell.passwordsDontMatch), findsNothing);
 
-    await s.enterText(fields.at(0), 'green-thumb-42');
+    await s.enterText(AccessKeys.newPassword, 'green-thumb-42');
     await s.enterText(
-      fields.at(1),
+      AccessKeys.confirmPassword,
       'green-thumb-24',
       shot: const Shot('Set password · mismatch'),
     );
     expect(find.text(s.kit.shell.passwordsDontMatch), findsOneWidget);
     expect(shop.calls.countOf(Endpoint.setPassword), 0);
 
-    await s.enterText(fields.at(1), 'green-thumb-42');
-    await s.tap(join, shot: const Shot('Welcome, new teammate'));
+    await s.enterText(AccessKeys.confirmPassword, 'green-thumb-42');
+    await s.tap(
+      AccessKeys.setPasswordSubmit,
+      shot: const Shot('Welcome, new teammate'),
+    );
     expect(shop.calls.countOf(Endpoint.setPassword), 1);
     expect(shop.db.invites.where((i) => i.token == 'invite-7'), isEmpty);
     expect(

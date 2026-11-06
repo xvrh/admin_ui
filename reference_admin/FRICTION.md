@@ -24,7 +24,7 @@ two together.
 | F-013 | `AdminModule`'s String `route` and `navLabel` do not fit a typed router or a locale change | missing-api | S3 | wontfix |
 | F-014 | No permission model beyond `ValueForm(readOnly:)`, and no forbidden-state preset | missing-api | S3 | open |
 | F-015 | Frameless kit timers (search debounce, realtime coalesce, `DelayedLoading`) make scenario settling non-obvious | test-support | S3 | open |
-| F-016 | `NavItem` takes no key | test-support | S3 | open |
+| F-016 | `NavItem` takes no key | test-support | S3 | fixed |
 | F-017 | `NotificationCenter` bundles its bell with its panel, so the inbox cannot be a sheet on a phone | missing-api | S2 | fixed |
 | F-019 | Toasts start at the window's top edge, over the shell's top bar and its actions | awkward-default | S3 | open |
 | F-020 | `showSideSheet` draws no surface around a bare builder, and its doc reads as if it did | doc-gap | S3 | fixed |
@@ -219,6 +219,7 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 - **Evidence:** 02_home "The dashboard when stats fail" finds Retry by `s.kit.retry`; "Setting up a brand-new shop" finds Next by `s.kit.fields.wizardNext`; "Changing the shop's settings" finds Save by `MaterialLocalizations.saveButtonLabel`. 03_orders "Orders · shipping undone" (the toast's Undo), "Orders · shipped, undo offered" (a `BulkAction` by its text), "Orders · nothing matches" (Clear filters), "Saving a view of my own" (the `SavedViewsBar` "+" by its icon). 05_catalogue "Product · leave without saving?" (`FormSaveBar`, `FormActions`, the guard's Cancel, the picker's Select). 01_access "Signing in" and "An invited teammate sets a password" (the auth forms, formerly F-105). 06_media_team "Media · list" and "Media · alt text saved" (the library toolbar and the alt lanes, formerly F-405). 07_settings and the phone story: `Choice` options, `Segmented` segments, `SwatchRow` swatches and `ChangePasswordForm` fields by index.
 - **Workaround:** `find.text(s.kit.…)`.
 - **Proposal:** a `key` (or `saveKey`, `retryKey`, `confirmKey`) on each; `emailFieldKey`, `passwordFieldKey`, `submitKey` (or one `keyPrefix`) on the auth forms; keys derived from a parent key on the library's toolbar (`ValueKey('$key.view.list')`) and lane keys from the locale code. One kit PR.
+- **Progress:** the kit now keys every control it builds from the app's data (`MenuItem`, `BulkAction`, `SegmentOption`, `ChoiceOption`, `SwatchOption` and the rest take `key`), and the controls of its own named here: `showConfirmDialog(confirmKey:, cancelKey:)`, `ErrorState(retryKey:)`, `FormSaveBar` and `FormActions(commitKey:, discardKey:)`, `FormWizard(backKey:, nextKey:)`, `Toast(actionKey:)`, and the auth forms' inputs and submit (`SignInForm(emailKey:, passwordKey:, submitKey:)`, `SetPasswordForm(newKey:, confirmKey:, submitKey:)`, `ChangePasswordForm(currentKey:, …)`). `01_access_test.dart` signs in and sets a password by those keys. Still open: the asset library's view switch and type filter, an alt field's language lanes, and the `AppearancePicker`'s options, which the kit builds from data of its own; the scenarios that find the rest by `s.kit` words can move to keys one by one.
 
 ### F-009 · No money or relative-time formatting in `AdminFormats`; `DecimalField` has no currency mode
 
@@ -301,12 +302,12 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 
 - **Kind:** test-support
 - **Severity:** S3
-- **Status:** open (verified)
-- **Kit:** `shell.dart › NavItem` (`lib/src/shell/ui/sidebar.dart:24`) is a data class; `Sidebar` builds the rows, and wraps a collapsed rail's row in `Tip(message: label)` (`:481`), which `find.byTooltip` does not see.
-- **App:** `lib/src/keys/shell_keys.dart` (no nav keys); `test/support/harness.dart` `navTo` finds a row by its localized label, on the rail by `find.byWidgetPredicate((w) => w is Tip && w.message == label)`; the same in the phone story's `_railItem`.
+- **Status:** fixed (kit)
+- **Kit:** `shell.dart › NavItem` (`lib/src/shell/ui/sidebar.dart:24`) was a data class with no key; `Sidebar` built the rows, and wrapped a collapsed rail's row in `Tip(message: label)`, which `find.byTooltip` does not see.
+- **App:** `lib/src/keys/shell_keys.dart` had no nav keys; `test/support/harness.dart` `navTo` found a row by its localized label, on the rail by `find.byWidgetPredicate((w) => w is Tip && w.message == label)`; the same in the phone story's `_railItem`.
 - **Evidence:** "Signing in and opening every page" (smoke), `Smoke · orders` … `Smoke · settings`, on `window-small`, where the sidebar is a rail (formerly F-018).
 - **Workaround:** `find.text(label)` under the `Sidebar`, or the rail's `Tip`.
-- **Proposal:** `NavItem(key:)`, applied to the row it builds.
+- **Proposal:** done: `NavItem(key:)` goes on the row the sidebar builds, in the rail and the phone's drawer too. `ShellKeys.nav(nav)` keys each row, and `navTo` and the phone story tap it by its key at every width.
 
 ### F-017 · `NotificationCenter` bundles its bell with its panel, so the inbox cannot be a sheet on a phone
 

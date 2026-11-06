@@ -62,6 +62,7 @@ List<NavEntry> navEntries(
     if (permission != null && !session.can(permission)) return null;
     return NavItem(
       navLabel(strings, nav),
+      key: ShellKeys.nav(nav),
       icon: navIcon(nav),
       value: nav,
       badge: nav == Nav.orders && toShip > 0

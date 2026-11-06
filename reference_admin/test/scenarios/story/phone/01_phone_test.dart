@@ -1,8 +1,8 @@
 import 'package:admin_ui/collection.dart';
-import 'package:admin_ui/shell.dart' show SaveBar, Sidebar;
+import 'package:admin_ui/shell.dart' show SaveBar;
 import 'package:admin_ui/theme.dart' show AdminBreakpoint;
 import 'package:admin_ui/widgets.dart'
-    show Modal, ModalSize, NotificationInbox, Tabs, Tip;
+    show Modal, ModalSize, NotificationInbox, Tabs;
 import 'package:flutterware/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:reference_admin/src/fake/seed_accounts.dart';
@@ -74,7 +74,7 @@ void main() {
               of: find.byKey(ShellKeys.drawer),
               matching: find.text(s.strings.shell.navOrders),
             )
-          : _railItem(s, Nav.orders),
+          : find.byKey(ShellKeys.nav(Nav.orders)),
       shot: const Shot('Phone · orders as cards', tags: ['tour']),
     );
     expect(shop.route, isA<Orders>());
@@ -221,7 +221,7 @@ void main() {
               of: find.byKey(ShellKeys.drawer),
               matching: find.text(s.strings.shell.navOrders),
             )
-          : _railItem(s, Nav.orders),
+          : find.byKey(ShellKeys.nav(Nav.orders)),
       shot: const Shot('Phone · leave without saving?'),
     );
     expect(find.text(s.kit.shell.discardChangesTitle), findsOneWidget);
@@ -238,16 +238,6 @@ void main() {
     expect(shop.calls.countOf(Endpoint.saveProduct), 0);
   });
 }
-
-/// A tablet's rail item for [nav].
-// FRICTION(F-016): the rail's labels are in a kit Tip, which find.byTooltip
-// does not see.
-Finder _railItem(ScenarioTester s, Nav nav) => find.descendant(
-  of: find.byType(Sidebar),
-  matching: find.byWidgetPredicate(
-    (w) => w is Tip && w.message == navLabel(s.strings.shell, nav),
-  ),
-);
 
 Finder _collectionIn(CollectionViewMode mode) =>
     find.byWidgetPredicate((w) => w is Collection && w.viewMode == mode);
