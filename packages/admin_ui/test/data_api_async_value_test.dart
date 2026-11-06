@@ -79,6 +79,63 @@ void main() {
       expect((c.error, c.value), (null, 'back'));
     });
 
+    test('a background refresh changes nothing until it lands', () async {
+      final source = _Source();
+      final c = AsyncValueController<String?>(fetcher: source.call);
+      addTearDown(c.dispose);
+      source.calls.single.complete('first');
+      await pumpEventQueue();
+      var notified = 0;
+      c.addListener(() => notified++);
+
+      unawaited(c.refresh(background: true));
+      expect((c.loading, c.value, notified), (false, 'first', 0));
+
+      source.calls.last.complete('second');
+      await pumpEventQueue();
+      expect((c.loading, c.value, notified), (false, 'second', 1));
+    });
+
+    test('a background refresh that fails is the error, over the value '
+        'kept', () async {
+      final source = _Source();
+      final c = AsyncValueController<String?>(fetcher: source.call);
+      addTearDown(c.dispose);
+      source.calls.single.complete('kept');
+      await pumpEventQueue();
+
+      unawaited(c.refresh(background: true));
+      source.calls.last.completeError(StateError('down'));
+      await pumpEventQueue();
+      expect(c.error, isA<StateError>());
+      expect(c.value, 'kept');
+
+      unawaited(c.refresh(background: true));
+      expect(c.error, isA<StateError>(), reason: 'kept until it lands');
+      source.calls.last.complete('back');
+      await pumpEventQueue();
+      expect((c.error, c.value), (null, 'back'));
+    });
+
+    test('a background refresh that replaces a refresh keeps it showing '
+        'until it lands', () async {
+      final source = _Source();
+      final c = AsyncValueController<String?>(fetcher: source.call);
+      addTearDown(c.dispose);
+      source.calls.single.complete('first');
+      await pumpEventQueue();
+
+      unawaited(c.refresh());
+      unawaited(c.refresh(background: true));
+      source.calls[1].complete('asked');
+      await pumpEventQueue();
+      expect((c.loading, c.value), (true, 'first'), reason: 'superseded');
+
+      source.calls[2].complete('latest');
+      await pumpEventQueue();
+      expect((c.loading, c.value), (false, 'latest'));
+    });
+
     test('an answer after dispose is dropped, and notifies no one', () async {
       final source = _Source();
       final c = AsyncValueController<String?>(fetcher: source.call);
@@ -177,6 +234,36 @@ void main() {
       await tester.pump();
       expect(find.text('second'), findsOneWidget);
       expect(find.byType(TopProgressBar), findsNothing);
+      expect(tester.state(find.byType(_Counter)), same(state));
+    });
+
+    testWidgets('a background refresh shows no progress bar', (tester) async {
+      final source = _Source();
+      final c = AsyncValueController<String?>(fetcher: source.call);
+      addTearDown(c.dispose);
+      source.calls.single.complete('first');
+      await tester.pumpWidget(
+        _host(
+          AsyncValueBuilder<String?>(
+            controller: c,
+            builder: (context, value) => _Counter(value!),
+          ),
+        ),
+      );
+      await tester.pump();
+      final state = tester.state(find.byType(_Counter));
+
+      unawaited(c.refresh(background: true));
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.text('first'), findsOneWidget);
+      expect(find.byType(TopProgressBar), findsNothing);
+
+      source.calls.last.complete('second');
+      // The answer lands in the first pump's microtasks, after its frame:
+      // nothing on screen animates to have scheduled one.
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('second'), findsOneWidget);
       expect(tester.state(find.byType(_Counter)), same(state));
     });
 

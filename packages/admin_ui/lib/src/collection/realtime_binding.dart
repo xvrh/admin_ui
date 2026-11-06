@@ -17,22 +17,29 @@ import 'collection_controller.dart';
 class CollectionRealtime<T> {
   final CollectionController<T> controller;
   final Duration coalesce;
+
+  /// Whether each refetch is a background refresh, which shows nothing
+  /// while it runs (see [CollectionController.refresh]).
+  final bool background;
   StreamSubscription<Object?>? _changes;
   StreamSubscription<bool>? _connected;
   Timer? _pending;
   var _wasConnected = false;
 
-  CollectionRealtime._(this.controller, this.coalesce);
+  CollectionRealtime._(this.controller, this.coalesce, this.background);
 
   /// Binds [controller] to `onChanged`, a signal that the collection
-  /// changed, and `onConnected`, whether the transport is up.
+  /// changed, and `onConnected`, whether the transport is up. With
+  /// [background], the rows change in place when a refetch lands, and no
+  /// progress shows while it runs.
   factory CollectionRealtime.bind(
     CollectionController<T> controller, {
     required Stream<Object?> onChanged,
     required Stream<bool> onConnected,
     Duration coalesce = const Duration(milliseconds: 250),
+    bool background = false,
   }) {
-    final binding = CollectionRealtime<T>._(controller, coalesce);
+    final binding = CollectionRealtime<T>._(controller, coalesce, background);
     binding._changes = onChanged.listen((_) => binding._schedule());
     binding._connected = onConnected.listen((up) {
       if (up && !binding._wasConnected) binding._schedule();
@@ -48,7 +55,9 @@ class CollectionRealtime<T> {
       return;
     }
     _pending = Timer(coalesce, () {
-      if (!controller.isDisposed) controller.refresh();
+      if (!controller.isDisposed) {
+        controller.refresh(background: background);
+      }
     });
   }
 
