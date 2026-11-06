@@ -42,29 +42,33 @@ pull request's head and on its merge base with `main`, and one comment on the
 pull request with what moved, edited in place on each push. Run
 `fvm dart run flutterware compare` to see the same before pushing.
 
-The reports live in a repository of their own, `<this repository>-comparisons`
-(or the `COMPARISON_REPOSITORY` variable), never on a branch of this one: pub
-caches a git dependency as a mirror of every branch, and a report runs to
-100 MB. Its `main` holds `pr-<number>/<sha>/` for each open pull request's
-latest push, as one commit with no history; a closed pull request's report is
-removed. raw.githubusercontent.com serves the comment's picture and GitHub
-Pages the viewer. Setting it up, once, with a deploy key that can write to
-that repository alone:
+The reports live in an S3 bucket, never on a branch of this repository: pub
+caches a git dependency as a mirror of every branch, and a report can run to
+100 MB. The bucket holds `pr-<number>/<sha>/` for each open pull request's
+latest push and serves both the comment's picture and the viewer; a closed
+pull request's report is deleted, and anything older than 30 days expires.
+The publish job writes there as a role it assumes with GitHub's OIDC token,
+so no key is stored, and only this repository's pull request runs can assume
+it. [`.github/aws/comparisons.yaml`](.github/aws/comparisons.yaml) creates
+the bucket and the role, once, with credentials for the AWS account
+(`CreateOidcProvider=false` if the account already trusts GitHub's tokens):
 
 ```sh
-gh repo create <owner>/admin_ui-comparisons --public
-ssh-keygen -t ed25519 -N '' -C fw-compare -f comparison_key
-gh repo deploy-key add comparison_key.pub --repo <owner>/admin_ui-comparisons --allow-write --title fw-compare
-gh secret set COMPARISON_DEPLOY_KEY --repo <owner>/admin_ui < comparison_key
-rm comparison_key comparison_key.pub
+aws cloudformation deploy --stack-name admin-ui-comparisons \
+  --template-file .github/aws/comparisons.yaml --capabilities CAPABILITY_IAM \
+  --parameter-overrides Repository=<owner>/admin_ui
+for pair in BUCKET:Bucket REGION:Region ROLE_ARN:RoleArn; do
+  gh variable set "COMPARISON_${pair%%:*}" --body "$(aws cloudformation describe-stacks \
+    --stack-name admin-ui-comparisons --output text \
+    --query "Stacks[0].Outputs[?OutputKey=='${pair#*:}'].OutputValue")"
+done
 ```
 
-After the first report lands, switch on Pages for that repository: Settings →
-Pages → Deploy from a branch → `main`, `/ (root)`. Without the secret the
-comment still comes, with the table and no picture, and its links lead to the
-run, whose artifact is the report. A pull request from a fork or from
-Dependabot gets no secrets and a read-only token, so its report is only the
-artifact, and the run's summary says so.
+Until those three repository variables exist, the comment still comes, with
+the table and no picture, and its links lead to the run, whose artifact is
+the report. A pull request from a fork or from Dependabot gets a read-only
+token and no OIDC token, so its report is only the artifact, and the run's
+summary says so.
 
 ## Licence
 

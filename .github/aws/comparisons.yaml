@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Where the Compare workflow keeps the fw compare reports of pull requests: a
+  bucket anyone can read, and a role that only the repository's pull request
+  workflows can assume, to write under pr-* and nowhere else.
+
+Parameters:
+  Repository:
+    Type: String
+    Description: The GitHub repository whose pull requests publish, owner/name.
+    AllowedPattern: '[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+'
+  CreateOidcProvider:
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+    Description: >-
+      false when the account already has the token.actions.githubusercontent.com
+      identity provider; an account holds one per URL.
+  RetentionDays:
+    Type: Number
+    Default: 30
+    MinValue: 1
+    Description: >-
+      Days a report is kept. A closed pull request's report is deleted at once;
+      this is for the ones that never close.
+
+Conditions:
+  CreateProvider: !Equals [!Ref CreateOidcProvider, 'true']
+
+Resources:
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+      # IAM checks GitHub's tokens against its own trusted CAs; these are the
+      # published thumbprints, for the API versions that still ask for one.
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      # Public through the policy below, never through object ACLs.
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-reports
+            Status: Enabled
+            ExpirationInDays: !Ref RetentionDays
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AnyoneReadsReports
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub '${Bucket.Arn}/pr-*'
+          - Sid: HttpsOnly
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt Bucket.Arn
+              - !Sub '${Bucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+
+  PublishRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: !Sub >-
+        Assumed by the Compare workflow of ${Repository} on a pull request, to
+        publish and remove its fw compare report.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If
+                - CreateProvider
+                - !Ref GitHubOidcProvider
+                - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                # A pull_request run of this repository. GitHub gives a fork's
+                # pull request no ID token at all.
+                token.actions.githubusercontent.com:sub: !Sub 'repo:${Repository}:pull_request'
+      Policies:
+        - PolicyName: publish-reports
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub '${Bucket.Arn}/pr-*'
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !GetAtt Bucket.Arn
+                Condition:
+                  StringLike:
+                    s3:prefix: 'pr-*'
+
+Outputs:
+  Bucket:
+    Description: The COMPARISON_BUCKET repository variable.
+    Value: !Ref Bucket
+  Region:
+    Description: The COMPARISON_REGION repository variable.
+    Value: !Ref AWS::Region
+  RoleArn:
+    Description: The COMPARISON_ROLE_ARN repository variable.
+    Value: !GetAtt PublishRole.Arn

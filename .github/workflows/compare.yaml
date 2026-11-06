@@ -6,15 +6,14 @@ name: Compare
 # failure: the comment is for the reviewer. The check fails only when a side
 # could not be compared.
 #
-# The reports live in a repository of their own, not on a branch of this one:
-# pub's cache of a git dependency mirrors every branch, so a report here would
-# land in every app's copy of the kit. .github/scripts/comparison_site.sh
-# keeps them there; raw.githubusercontent.com serves the comment's picture and
-# GitHub Pages the viewer. Until the COMPARISON_DEPLOY_KEY secret exists
-# (README.md, "Pull requests"), the comment carries the table without the
-# picture and links to the run. A pull request from a fork or from Dependabot
-# gets no secrets and a read-only token, so its report stays an artifact of
-# the run and the job summary says so.
+# The reports live in an S3 bucket, pr-<number>/<sha>/, which also serves
+# the comment's picture and the viewer. .github/aws/comparisons.yaml makes the
+# bucket and the role the publish job assumes through GitHub's OIDC token, so
+# no key is stored anywhere; README.md ("Pull requests") sets it up. Until the
+# COMPARISON_* repository variables exist, the comment carries the table
+# without the picture and links to the run. A pull request from a fork or
+# from Dependabot gets a read-only token and no OIDC token, so its report
+# stays an artifact of the run and the job summary says so.
 #
 # A push to main compares it with its parent, which fills the shot cache that
 # every pull request then restores its base side from.
@@ -37,8 +36,6 @@ permissions:
 env:
   FLUTTER_VERSION: 3.48.0-0.5.pre
   FLUTTER_CHANNEL: beta
-  SITE_REPOSITORY: ${{ vars.COMPARISON_REPOSITORY || format('{0}-comparisons', github.repository) }}
-  SITE_BRANCH: main
 
 jobs:
   compare:
@@ -85,7 +82,8 @@ jobs:
           BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'HEAD~1' }}
           REPORT: ${{ github.event_name == 'pull_request' && '--report=comparison-report' || '' }}
         run: |
-          dart run flutterware compare --base="$BASE" $REPORT --frames=changed --jobs=2
+          dart run flutterware compare --base="$BASE" ${REPORT:+"$REPORT"} \
+            --frames=changed --jobs=2
 
       - name: Note whether a report was written
         id: report
@@ -125,55 +123,52 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
+      id-token: write # the role that writes to the bucket
       pull-requests: write # the comment
     env:
       GH_TOKEN: ${{ github.token }}
       PR: ${{ github.event.pull_request.number }}
-      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      SHA: ${{ github.event.pull_request.head.sha }}
       REPO: ${{ github.repository }}
+      BUCKET: ${{ vars.COMPARISON_BUCKET }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          sparse-checkout: .github/scripts
-          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: comparison-report
           path: ${{ runner.temp }}/comparison-report
 
+      - uses: aws-actions/configure-aws-credentials@v4
+        if: vars.COMPARISON_ROLE_ARN != ''
+        with:
+          role-to-assume: ${{ vars.COMPARISON_ROLE_ARN }}
+          aws-region: ${{ vars.COMPARISON_REGION }}
       - name: Host the report
         id: host
-        env:
-          SITE_REMOTE: git@github.com:${{ env.SITE_REPOSITORY }}.git
-          SITE_DEPLOY_KEY: ${{ secrets.COMPARISON_DEPLOY_KEY }}
+        if: vars.COMPARISON_ROLE_ARN != ''
         run: |
-          if [ -z "$SITE_DEPLOY_KEY" ]; then
-            echo "No COMPARISON_DEPLOY_KEY secret, so nothing is hosted and the"
-            echo "comment links to this run (README.md, \"Pull requests\")."
-            exit 0
-          fi
-          bash .github/scripts/comparison_site.sh publish \
-            "$PR" "${HEAD_SHA:0:12}" "$RUNNER_TEMP/comparison-report"
-          echo "hosted=true" >> "$GITHUB_OUTPUT"
+          sha=${SHA:0:12}
+          aws s3 sync --only-show-errors \
+            "$RUNNER_TEMP/comparison-report" "s3://$BUCKET/pr-$PR/$sha/"
+          # The comment links to this push's report alone.
+          aws s3 rm --only-show-errors --recursive "s3://$BUCKET/pr-$PR/" \
+            --exclude "$sha/*"
+          echo "url=https://$BUCKET.s3.$AWS_REGION.amazonaws.com/pr-$PR/$sha" \
+            >> "$GITHUB_OUTPUT"
 
       - name: Comment
         env:
-          HOSTED: ${{ steps.host.outputs.hosted }}
+          SITE: ${{ steps.host.outputs.url }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           comment=$RUNNER_TEMP/comment.md
           report=$RUNNER_TEMP/comparison-report/comment.md
-          if [ "$HOSTED" = true ]; then
-            dir="pr-$PR/${HEAD_SHA:0:12}"
-            owner=${SITE_REPOSITORY%%/*}
-            raw="https://raw.githubusercontent.com/$SITE_REPOSITORY/$SITE_BRANCH/$dir"
-            viewer="https://${owner,,}.github.io/${SITE_REPOSITORY#*/}/$dir/web/"
+          if [ -n "$SITE" ]; then
+            # S3 serves no index for a directory, so the viewer is its file.
             # `g`: a scenario row carries two viewer links on one line.
-            sed -e "s|__MOSAIC_URL__|$raw/mosaic.png|g" \
-                -e "s|__VIEWER_URL__|$viewer|g" "$report" > "$comment"
+            sed -e "s|__MOSAIC_URL__|$SITE/mosaic.png|g" \
+                -e "s|__VIEWER_URL__|$SITE/web/index.html|g" "$report" > "$comment"
           else
             grep -v '__MOSAIC_URL__' "$report" \
               | sed -e "s|__VIEWER_URL__|$RUN|g" > "$comment"
@@ -202,25 +197,20 @@ jobs:
   prune:
     name: Remove the report of a closed pull request
     if: >-
-      github.event.action == 'closed' &&
+      github.event.action == 'closed' && vars.COMPARISON_ROLE_ARN != '' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
-          ref: ${{ github.event.repository.default_branch }}
-          sparse-checkout: .github/scripts
-          persist-credentials: false
+          role-to-assume: ${{ vars.COMPARISON_ROLE_ARN }}
+          aws-region: ${{ vars.COMPARISON_REGION }}
       - name: Remove pr-${{ github.event.pull_request.number }}
         env:
-          SITE_REMOTE: git@github.com:${{ env.SITE_REPOSITORY }}.git
-          SITE_DEPLOY_KEY: ${{ secrets.COMPARISON_DEPLOY_KEY }}
+          BUCKET: ${{ vars.COMPARISON_BUCKET }}
           PR: ${{ github.event.pull_request.number }}
-        run: |
-          if [ -z "$SITE_DEPLOY_KEY" ]; then
-            echo "No COMPARISON_DEPLOY_KEY secret: nothing was hosted."
-            exit 0
-          fi
-          bash .github/scripts/comparison_site.sh remove "$PR"
+        run: aws s3 rm --only-show-errors --recursive "s3://$BUCKET/pr-$PR/"
