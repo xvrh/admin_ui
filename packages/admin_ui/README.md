@@ -48,8 +48,8 @@ lays out right to left.
 
 ## Install
 
-The kit is not on pub.dev. It is released as git tags of its repository,
-`v0.1.0` and on, and an app depends on one:
+The kit is not on pub.dev. An app pins a commit of its repository's `main`,
+one whose CI passed, by its full hash:
 
 ```yaml
 environment:
@@ -61,7 +61,7 @@ dependencies:
     git:
       url: https://github.com/xvrh/admin_ui.git
       path: packages/admin_ui
-      ref: v0.1.0
+      ref: <commit> # the full hash of a commit of main
   flutter:
     sdk: flutter
   material_ui: ^1.4.0
@@ -168,12 +168,12 @@ BSD 3-Clause; see [LICENSE](LICENSE).
 Below 1.0, a breaking change bumps the minor version (`0.1.0` to `0.2.0`)
 and anything else the patch. A change of look counts as breaking: a token's
 default, or a widget's shape, moves pixels in every app on the kit. The
-CHANGELOG lists each release's look changes under a heading of their own.
+CHANGELOG lists each version's look changes under a heading of their own.
 
 A rename keeps the old name, deprecated, with a `dart fix` rule to the new
 one, until the next breaking release removes it. [`api.txt`](api.txt)
 lists the public surface and [`looks.txt`](looks.txt) every theme's
-resolved tokens, so a release's diff of the two shows which bump it needs.
+resolved tokens, so a change's diff of the two shows which bump it needs.
 
 ## material_ui, not flutter/material
 
