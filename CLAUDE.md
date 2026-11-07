@@ -14,6 +14,8 @@ needs per-language menus") and invent neutral example data.
 - `fvm dart analyze --fatal-infos` must be clean.
 - `fvm dart run tool/check_constraints.dart`: every dependency constraint
   admits the latest release, or `_heldBack` says why not.
+- `main` takes a change only as a squashed pull request whose checks pass;
+  nothing pushes to it directly. `AGENTS.md` is this file, for other agents.
 
 ## Material comes from material_ui
 
