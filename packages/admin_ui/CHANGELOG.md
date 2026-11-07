@@ -86,6 +86,13 @@
   the sidebar widens, as an item's row is, rather than wrapped to the
   widening width. The catalog's shell demo folds to the rail between the
   breakpoints, and has a tablet-width preview.
+- A `CollectionTable` flex column whose share of the width would fall under
+  its `minWidth` keeps that minimum, and the other flex columns share what is
+  left. It used to keep its minimum on top of their full shares, so a table
+  whose columns fit scrolled sideways by the difference, with an edge shadow
+  saying there was more. A table now scrolls only when its columns' minimum
+  widths outgrow it, and the flex columns beside a held one are narrower by
+  what it took.
 
 ## 0.1.0
 

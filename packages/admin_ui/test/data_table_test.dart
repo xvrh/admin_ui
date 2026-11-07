@@ -117,6 +117,48 @@ void main() {
     expect(last, 120);
   });
 
+  testWidgets('a flex column held at its minWidth takes from the others', (
+    tester,
+  ) async {
+    // By share alone, Notes would be 160 of the 800, under its 200, and the
+    // table 840 wide.
+    await tester.pumpWidget(
+      _host(
+        CollectionTable<String>(
+          rows: _rows,
+          columns: [
+            TableColumn(label: 'Name', flex: 4, cell: (r) => Text(r)),
+            TableColumn(label: 'Notes', minWidth: 200, cell: (r) => Text(r)),
+          ],
+        ),
+      ),
+    );
+
+    expect(_horizontalExtent(tester), 0);
+    expect(
+      tester.getTopLeft(find.text('Notes')).dx,
+      inInclusiveRange(600, 630),
+    );
+  });
+
+  testWidgets('a table scrolls when its minimum widths outgrow it', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        CollectionTable<String>(
+          rows: _rows,
+          columns: [
+            TableColumn(label: 'Name', minWidth: 500, cell: (r) => Text(r)),
+            TableColumn(label: 'Notes', minWidth: 400, cell: (r) => Text(r)),
+          ],
+        ),
+      ),
+    );
+
+    expect(_horizontalExtent(tester), 100);
+  });
+
   testWidgets('double-tap enters inline edit; Enter commits and closes', (
     tester,
   ) async {
@@ -325,3 +367,10 @@ void main() {
     });
   }
 }
+
+/// How far the table scrolls sideways: 0 when its columns fit.
+double _horizontalExtent(WidgetTester tester) => tester
+    .stateList<ScrollableState>(find.byWidgetPredicate((w) => w is Scrollable))
+    .singleWhere((s) => s.position.axis == Axis.horizontal)
+    .position
+    .maxScrollExtent;

@@ -37,8 +37,10 @@ import 'view_support.dart';
 /// than a separate flag.
 ///
 /// Width is either [fixed] pixels or a [flex] share of the space left after the
-/// fixed columns. Flex columns expand to fill the viewport; when the columns
-/// outgrow it they clamp to [minWidth] and the table scrolls horizontally.
+/// fixed columns. Flex columns expand to fill the viewport. One whose share
+/// would fall under its [minWidth] keeps that minimum, and the other flex
+/// columns share what is left; only when the minimums outgrow the viewport
+/// does the table scroll horizontally.
 ///
 /// [pinned] columns freeze during horizontal scroll and must be the leading
 /// columns of the list. Where together they would take more than half the
@@ -554,7 +556,14 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
 
   /// Whole-pixel widths, so no column boundary lands between pixels — a
   /// fractional one shows as a seam where the pinned and scrolling halves of
-  /// a row meet. The leftover pixels go to the last flex column.
+  /// a row meet. The leftover pixels go to the last flex column still
+  /// sharing.
+  ///
+  /// A flex column whose share would fall under its [TableColumn.minWidth]
+  /// takes that minimum out of the room, and the others share what is left.
+  /// Each one held at its minimum only lowers the others' shares, so the
+  /// columns short in one pass are short in the next: holding them all at
+  /// once settles it.
   List<double> _layoutWidths(
     List<TableColumn<T>> cols,
     double available, {
@@ -564,25 +573,39 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
         (c.key == ignoreOverride ? c.fixed : _explicitWidth(c))
             ?.roundToDouble();
     final widths = [for (final c in cols) explicit(c) ?? 0.0];
-    final flexIndexes = [
+    final sharing = [
       for (var i = 0; i < cols.length; i++)
         if (explicit(cols[i]) == null) i,
     ];
-    if (flexIndexes.isEmpty) return widths;
+    if (sharing.isEmpty) return widths;
     final fixedTotal = widths.fold(0.0, (a, w) => a + w);
-    final flexTotal = flexIndexes.fold(0, (a, i) => a + cols[i].flex);
-    final remaining = available.isFinite
+    var room = available.isFinite
         ? math.max(0.0, (available - fixedTotal).floorToDouble())
         : 0.0;
-    var used = 0.0;
-    for (final i in flexIndexes) {
-      final share = flexTotal == 0
-          ? 0.0
-          : (remaining * cols[i].flex / flexTotal).floorToDouble();
-      widths[i] = math.max(cols[i].minWidth.ceilToDouble(), share);
-      used += widths[i];
+    double share(int i, int flexTotal) => flexTotal == 0
+        ? 0.0
+        : (room * cols[i].flex / flexTotal).floorToDouble();
+    while (sharing.isNotEmpty) {
+      final flexTotal = sharing.fold(0, (a, i) => a + cols[i].flex);
+      final short = [
+        for (final i in sharing)
+          if (share(i, flexTotal) < cols[i].minWidth.ceilToDouble()) i,
+      ];
+      if (short.isEmpty) {
+        var used = 0.0;
+        for (final i in sharing) {
+          widths[i] = share(i, flexTotal);
+          used += widths[i];
+        }
+        if (used < room) widths[sharing.last] += room - used;
+        break;
+      }
+      for (final i in short) {
+        widths[i] = cols[i].minWidth.ceilToDouble();
+        room -= widths[i];
+        sharing.remove(i);
+      }
     }
-    if (used < remaining) widths[flexIndexes.last] += remaining - used;
     return widths;
   }
 
