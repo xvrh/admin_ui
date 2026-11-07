@@ -40,6 +40,10 @@ jobs:
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: dart analyze --fatal-infos .
 
+      - name: The kit's version has its CHANGELOG heading
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run tool/check_version.dart
+
       - name: The kit admits the latest release of every dependency
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: dart run tool/check_constraints.dart
@@ -74,3 +78,32 @@ jobs:
       - name: flutter test
         working-directory: ${{ matrix.package }}
         run: flutter test
+
+  # A release is a tag, v<version>, on a commit of main whose CI passed:
+  # green here, on the tag's own run, says all three. The repository's rules
+  # keep a v* tag from being moved or deleted, so a red one stays, and the
+  # next version is the fix.
+  release:
+    name: Release
+    if: github.ref_type == 'tag'
+    needs: [checks, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: The tag is on main
+        run: |
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
+            echo "::error::$GITHUB_REF_NAME is not on main."
+            exit 1
+          }
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+      - run: flutter pub get
+      - name: The tag is the kit's version
+        run: dart run tool/check_version.dart --tag="$GITHUB_REF_NAME"
