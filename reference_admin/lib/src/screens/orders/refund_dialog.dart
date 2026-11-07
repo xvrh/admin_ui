@@ -122,13 +122,6 @@ class _RefundDialogState extends State<RefundDialog> {
           amountId: tooHigh ? strings.refundTooHigh : strings.refundInvalid,
         },
       );
-    } on ShopError catch (error) {
-      if (!mounted) rethrow;
-      // FRICTION(F-206): anything but a FormSubmitException out of onSubmit
-      // is reported as a Flutter error, so every shop error is converted.
-      throw FormSubmitException(
-        message: ErrorTextScope.describe(context, error),
-      );
     }
   }
 
@@ -156,7 +149,12 @@ class _RefundDialogState extends State<RefundDialog> {
       listenable: _form,
       builder: (context, _) {
         final submitting = _form.status == FormStatus.submitting;
-        final error = _form.submitError;
+        final error =
+            _form.submitError ??
+            switch (_form.submitFailure) {
+              final failure? => ErrorTextScope.describe(context, failure),
+              null => null,
+            };
         return Modal(
           key: OrdersKeys.refundDialog,
           title: strings.refundTitle(bidiIsolate(_order.label)),

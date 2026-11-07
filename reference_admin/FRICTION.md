@@ -53,7 +53,7 @@ two together.
 | F-203 | `CollectionTable` has no row context menu | missing-api | S3 | open |
 | F-204 | `SavedViewsBar`'s actions reach every view alike | missing-api | S3 | open |
 | F-205 | The kit has mention helpers but no mention composer | missing-api | S2 | fixed |
-| F-206 | Anything but a `FormSubmitException` out of `onSubmit` is reported as a Flutter error | awkward-default | S3 | open |
+| F-206 | Anything but a `FormSubmitException` out of `onSubmit` is reported as a Flutter error | awkward-default | S3 | fixed |
 | F-207 | A hover card needs a longer rest than any test helper knows | test-support | S3 | open |
 | F-208 | `KanbanBoard` pads itself inside the page's gutter, and its padding and gap are not exposed | awkward-default | S3 | open |
 | F-209 | `FilterBar` offers "Clear all" for conditions none of its pills shows | awkward-default | S3 | open |
@@ -629,12 +629,12 @@ Owned by WP-B.
 
 - **Kind:** awkward-default
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `forms.dart › ValueFormController` (`lib/src/forms/value_form_controller.dart:306`, `FlutterError.reportError` on any other error).
 - **App:** `lib/src/screens/orders/refund_dialog.dart` `_refund`: every `ShopError` is caught and rethrown as `FormSubmitException(message: ErrorTextScope.describe(…))`.
 - **Evidence:** an offline refund would fail a scenario (`FlutterError`) instead of showing "You're offline" in the dialog.
 - **Workaround:** the conversion, in each form's submit.
-- **Proposal:** a thrown error that `ErrorTextScope` can describe becomes `submitError`; report only what it cannot.
+- **Proposal:** done: anything else `onSubmit` throws is the controller's `submitFailure`, which `FormSaveBar` and `FormActions` word through `ErrorTextScope`. Only an `Error`, a bug in the save, is still reported. The same rule now holds for an async field check and for `showConfirmDialog(onConfirm:)`, whose `errorText` defaults to `ErrorTextScope.describe`. The refund and invite dialogs, the product forms and the shop forms convert only what they word themselves, a refused field or an edit conflict; the deactivate and restore confirms pass no `errorText`.
 
 ### F-207 · A hover card needs a longer rest than any test helper knows
 

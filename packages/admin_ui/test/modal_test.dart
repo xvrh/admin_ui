@@ -1,4 +1,4 @@
-import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/src/common/ui/error_text.dart';
 import 'package:admin_ui/src/common/ui/modal.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -96,11 +96,14 @@ void main() {
     expect(find.text('Delete?'), findsNothing);
   });
 
-  testWidgets('async onConfirm surfaces an error and stays open', (
-    tester,
-  ) async {
+  testWidgets('async onConfirm words a failure as the ErrorTextScope does, '
+      'and stays open', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        builder: (context, child) => ErrorTextScope(
+          describe: (_) => 'The shop is offline.',
+          child: child!,
+        ),
         home: Scaffold(
           body: Builder(
             builder: (context) => Center(
@@ -110,7 +113,7 @@ void main() {
                   title: 'Delete?',
                   message: 'Runs in-dialog.',
                   confirmLabel: 'Delete',
-                  onConfirm: () async => throw 'Boom (409).',
+                  onConfirm: () async => throw Exception('Boom (409).'),
                 ),
                 child: const Text('Open'),
               ),
@@ -125,12 +128,8 @@ void main() {
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
 
-    // The raw error never reaches the user; a generic retry prompt does.
     expect(find.textContaining('Boom'), findsNothing);
-    expect(
-      find.text(const AdminLocalizationsEn().somethingWentWrongTryAgain),
-      findsOneWidget,
-    );
+    expect(find.text('The shop is offline.'), findsOneWidget);
     expect(find.text('Delete?'), findsOneWidget); // still open for retry
   });
 }

@@ -226,8 +226,8 @@ final class FieldRules<V> extends ValidationRule {
 
   /// The first message [asyncValidators] give for [values], or null. A check
   /// that throws passes: the server that failed to answer checks again on
-  /// submit. What it threw is reported to [FlutterError.onError], so a bug
-  /// in the check still shows.
+  /// submit. An [Error] it throws is reported to [FlutterError.onError], so
+  /// a bug in the check still shows.
   @internal
   Future<String?> validateAsync(List<V> values) async {
     for (final value in values) {
@@ -235,14 +235,16 @@ final class FieldRules<V> extends ValidationRule {
         try {
           if (await validator(value) case final message?) return message;
         } catch (error, stack) {
-          FlutterError.reportError(
-            FlutterErrorDetails(
-              exception: error,
-              stack: stack,
-              library: 'admin_ui forms',
-              context: ErrorDescription('while checking a field'),
-            ),
-          );
+          if (error is Error) {
+            FlutterError.reportError(
+              FlutterErrorDetails(
+                exception: error,
+                stack: stack,
+                library: 'admin_ui forms',
+                context: ErrorDescription('while checking a field'),
+              ),
+            );
+          }
         }
       }
     }
@@ -325,7 +327,8 @@ final class FormRule extends ValidationRule {
 /// the value: [message] becomes the controller's `submitError` (shown by the
 /// save status in place of its generic one) and each of [fieldErrors], keyed
 /// by field id, shows under its field until the field is edited. Anything
-/// else thrown reads as the generic failure.
+/// else thrown becomes its `submitFailure`, which the save status words
+/// through `ErrorTextScope`.
 class FormSubmitException implements Exception {
   final String? message;
   final Map<String, String> fieldErrors;

@@ -119,7 +119,6 @@ class _TeamScreenState extends State<TeamScreen> {
       confirmLabel: strings.deactivate,
       danger: true,
       onConfirm: () async => updated = await context.api.deactivate(member.id),
-      errorText: (error) => ErrorTextScope.describe(context, error),
     );
     final done = updated;
     if (!confirmed || done == null || !mounted) return;

@@ -10,6 +10,7 @@ import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'alert.dart';
 import 'button.dart';
+import 'error_text.dart';
 import 'icon_action.dart';
 import 'severity.dart';
 
@@ -225,8 +226,9 @@ class _RenderModalMargin extends RenderPadding {
 /// shows a spinner and the dialog stays put while it runs (neither Escape nor
 /// the scrim close it), dismissing on success and surfacing a thrown error
 /// inline (so the user can retry) instead of closing on a failure. The inline
-/// message is [errorText] applied to the error — a generic "try again" when
-/// null, since a raw exception is rarely fit for the user. Without
+/// message is [errorText] applied to the error, or [ErrorTextScope.describe]
+/// when null: an unreachable server reads as one. An [Error] is a bug in the
+/// action, so it is also reported to [FlutterError.onError]. Without
 /// [onConfirm] the dialog just resolves the boolean and the caller does the
 /// work afterwards.
 ///
@@ -259,7 +261,7 @@ Future<bool> showConfirmDialog(
         cancelKey: cancelKey,
         danger: danger,
         onConfirm: onConfirm,
-        errorText: errorText ?? (_) => l10n.somethingWentWrongTryAgain,
+        errorText: errorText,
       );
     },
   );
@@ -275,7 +277,7 @@ class _ConfirmDialog extends StatefulWidget {
   final Key? cancelKey;
   final bool danger;
   final Future<void> Function()? onConfirm;
-  final String Function(Object error) errorText;
+  final String Function(Object error)? errorText;
 
   const _ConfirmDialog({
     required this.title,
@@ -295,7 +297,7 @@ class _ConfirmDialog extends StatefulWidget {
 
 class _ConfirmDialogState extends State<_ConfirmDialog> {
   bool _busy = false;
-  String? _error;
+  Object? _failure;
 
   /// Cancel's focus node: the safe choice takes focus when the dialog opens.
   final _cancel = FocusNode(debugLabel: 'Cancel');
@@ -328,16 +330,26 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
     }
     setState(() {
       _busy = true;
-      _error = null;
+      _failure = null;
     });
     try {
       await run();
       if (mounted) Navigator.of(context).pop(true);
-    } catch (e) {
+    } catch (error, stack) {
+      if (error is Error) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stack,
+            library: 'admin_ui',
+            context: ErrorDescription('while confirming in a dialog'),
+          ),
+        );
+      }
       if (mounted) {
         setState(() {
           _busy = false;
-          _error = widget.errorText(e);
+          _failure = error;
         });
         _focusCancel();
       }
@@ -387,9 +399,13 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
                   color: context.colors.foregroundSecondary,
                 ),
               ),
-              if (_error != null) ...[
+              if (_failure case final failure?) ...[
                 const Gap(AdminSpacing.lg),
-                Alert(_error!, severity: Severity.danger),
+                Alert(
+                  widget.errorText?.call(failure) ??
+                      ErrorTextScope.describe(context, failure),
+                  severity: Severity.danger,
+                ),
               ],
             ],
           ),
