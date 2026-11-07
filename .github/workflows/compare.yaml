@@ -47,7 +47,7 @@ jobs:
     outputs:
       report: ${{ steps.report.outputs.written }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The head itself rather than GitHub's merge commit, so the
           # comment's footer names a commit of the pull request.
@@ -67,7 +67,7 @@ jobs:
       # named by a forty-character hash. A run always saves a new entry and
       # restores the latest one it can see: its own branch's, else main's.
       - name: Restore flutterware's caches
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.flutterware/shots
@@ -93,7 +93,7 @@ jobs:
           if [ -f comparison-report/comment.md ]; then
             echo "written=true" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() && steps.report.outputs.written == 'true' }}
         with:
           name: comparison-report
@@ -136,12 +136,12 @@ jobs:
       BUCKET: ${{ vars.COMPARISON_BUCKET }}
       SITE_URL: ${{ vars.COMPARISON_URL }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: comparison-report
           path: ${{ runner.temp }}/comparison-report
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         if: vars.COMPARISON_ROLE_ARN != ''
         with:
           role-to-assume: ${{ vars.COMPARISON_ROLE_ARN }}
@@ -206,7 +206,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.COMPARISON_ROLE_ARN }}
           aws-region: ${{ vars.COMPARISON_REGION }}
