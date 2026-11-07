@@ -152,9 +152,6 @@ class _ProductEditorScreenState extends State<ProductEditorScreen> {
       );
     } on ConflictError {
       throw FormSubmitException(message: _strings.conflict);
-    } on ShopError catch (error) {
-      if (!mounted) rethrow;
-      throw FormSubmitException(message: context.strings.shell.error(error));
     }
   }
 
@@ -176,7 +173,6 @@ class _ProductEditorScreenState extends State<ProductEditorScreen> {
       onConfirm: () async {
         restored = await _api.restoreRevision(widget.id, version.version);
       },
-      errorText: (error) => ErrorTextScope.describe(context, error),
     );
     final product = restored;
     if (!confirmed || product == null || !mounted) return;

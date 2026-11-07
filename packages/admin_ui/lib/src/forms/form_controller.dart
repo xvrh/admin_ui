@@ -1,3 +1,4 @@
+/// @docImport '../common/ui/error_text.dart';
 /// @docImport 'value_form_controller.dart';
 library;
 
@@ -34,6 +35,12 @@ abstract class FormController extends ChangeNotifier {
   /// save status in place of its generic "Couldn’t save". Null when the
   /// backing has nothing more specific to say.
   String? get submitError => null;
+
+  /// What the last [submit] threw, when the backing has no words of its own
+  /// for it: with no [submitError], the save status shows it as
+  /// [ErrorTextScope.describe] words it. Null after a submit that failed
+  /// with nothing thrown, or did not fail.
+  Object? get submitFailure => null;
 
   /// True while there are edits that would be lost on navigating away. Drives
   /// the unsaved-changes guard. A backing whose edits auto-persist (e.g. a live

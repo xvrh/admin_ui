@@ -120,13 +120,10 @@ Iterable<ValidationRule> shopRules(
 /// The shop's refusal as the form shows it: each field the shop named under
 /// its cell, and the reason in the save status.
 FormSubmitException shopSubmitError(
-  ShopError error,
+  ValidationError error,
   ShopFields f,
   RefStrings strings,
 ) {
-  if (error is! ValidationError) {
-    return FormSubmitException(message: strings.shell.error(error));
-  }
   // FRICTION(F-103): a row's cell ids are opaque, so a server path such
   // as `shippingZones.1.name` is mapped by walking the handles.
   String? cellId(String path) {

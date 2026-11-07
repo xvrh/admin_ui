@@ -2,6 +2,19 @@
 
 ## 0.2.0
 
+- A failure the app expects shows in its words, and only a bug is reported.
+  Anything but a `FormSubmitException` that a `ValueFormController`'s
+  `onSubmit` throws is kept as `submitFailure`, a new getter of
+  `FormController`. `FormSaveBar` and `FormActions` word it through
+  `ErrorTextScope` when the controller has no `submitError`, so an
+  unreachable server says so beside Save without a conversion in each
+  form. Before, any such failure read as "Couldn’t save" and was reported
+  to `FlutterError.onError`, which fails a widget test. Now only an
+  `Error` is reported. An async field check that throws still passes, and
+  is reported only when it throws an `Error`. `showConfirmDialog`'s
+  `errorText` defaults to `ErrorTextScope.describe`, which an app's scope
+  words, rather than "Something went wrong. Try again.", and an `Error`
+  out of `onConfirm` is now reported too.
 - A refresh the user did not ask for can run in the background:
   `AsyncValueController.refresh(background: true)` and
   `CollectionController.refresh(background: true)`. Nothing on screen says it

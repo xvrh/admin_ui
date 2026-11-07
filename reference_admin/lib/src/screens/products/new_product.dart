@@ -136,9 +136,6 @@ class _NewProductScreenState extends State<NewProductScreen> {
                 : context.strings.shell.errorValidation,
         },
       );
-    } on ShopError catch (error) {
-      if (!mounted) rethrow;
-      throw FormSubmitException(message: context.strings.shell.error(error));
     }
     if (!mounted) return;
     showCatalogueToast(context, _strings.createdToast);

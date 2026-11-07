@@ -89,7 +89,7 @@ class _SetupScreenState extends State<SetupScreen> {
       final done = await _services.api.completeSetup(shop);
       _services.session.shopRenamed(done.name);
       if (mounted) setState(() => _ready = done);
-    } on ShopError catch (error) {
+    } on ValidationError catch (error) {
       throw shopSubmitError(error, _fields, _strings);
     }
   }

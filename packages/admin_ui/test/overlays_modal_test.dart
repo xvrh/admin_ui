@@ -401,13 +401,13 @@ void main() {
       await _openConfirm(
         tester,
         (_) {},
-        onConfirm: () async => throw StateError('409'),
+        onConfirm: () async => throw const FormatException('409'),
         errorText: (e) => 'Mapped ${e.runtimeType}',
       );
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Mapped StateError'), findsOneWidget);
+      expect(find.text('Mapped FormatException'), findsOneWidget);
       expect(find.textContaining('409'), findsNothing);
       expect(
         tester.getSemantics(find.byType(Alert)),
@@ -419,6 +419,22 @@ void main() {
         isTrue,
       );
       handle.dispose();
+    });
+
+    testWidgets('an Error out of onConfirm is a bug: shown, and reported', (
+      tester,
+    ) async {
+      await _openConfirm(
+        tester,
+        (_) {},
+        onConfirm: () async => throw StateError('bug'),
+      );
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isA<StateError>());
+      expect(find.text('Something went wrong. Try again.'), findsOneWidget);
+      expect(find.byType(Modal), findsOneWidget);
     });
   });
 

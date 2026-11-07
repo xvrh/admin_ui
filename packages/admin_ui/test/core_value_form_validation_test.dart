@@ -424,7 +424,9 @@ void main() {
       expect(c.errors, isEmpty);
     });
 
-    testWidgets('a check that throws passes, and is reported', (tester) async {
+    testWidgets('a check that throws passes; only an Error is reported', (
+      tester,
+    ) async {
       final reported = <Object>[];
       final onError = FlutterError.onError;
       FlutterError.onError = (details) => reported.add(details.exception);
@@ -433,7 +435,10 @@ void main() {
         rules: (f) => [
           FieldRules(
             f.email,
-            asyncValidators: [(_) async => throw StateError('offline')],
+            asyncValidators: [
+              (_) async => throw Exception('Connection refused'),
+              (_) async => throw StateError('bug'),
+            ],
           ),
         ],
       );
