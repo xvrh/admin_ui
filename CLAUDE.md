@@ -14,6 +14,10 @@ needs per-language menus") and invent neutral example data.
 - `fvm dart analyze --fatal-infos` must be clean.
 - `fvm dart run tool/check_constraints.dart`: every dependency constraint
   admits the latest release, or `_heldBack` says why not.
+- `fvm dart run tool/check_version.dart`: the kit's version has its
+  `CHANGELOG.md` heading, and no heading above it is older.
+- `main` takes a change only as a squashed pull request whose checks pass;
+  nothing pushes to it directly. `AGENTS.md` is this file, for other agents.
 
 ## Material comes from material_ui
 
@@ -33,7 +37,10 @@ and `test/material_ui_imports_test.dart` fails on one.
   change of look is breaking. Record each change in `CHANGELOG.md` under the
   next version, looks under a heading of their own. A rename keeps the old
   name deprecated, with a `dart fix` rule, until the next breaking release.
-- A release is a tag, `v<version>`, on a commit of `main` whose CI passed.
+- A release is a tag, `v<version>`, on a commit of `main` whose CI passed;
+  CI's Release job checks all three on the tag. Nothing can move or delete a
+  `v*` tag, since apps resolve it, so a wrong release is fixed by the next
+  one.
 
 ## Looking at a widget
 

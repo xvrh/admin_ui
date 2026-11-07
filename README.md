@@ -36,6 +36,12 @@ needs, and the CHANGELOG records it.
 
 ## Pull requests
 
+`main` takes a change only as a squashed pull request whose CI and Compare
+checks pass: nothing pushes to it directly, force-pushes or deletes it, and
+nothing moves or deletes a `v*` tag once pushed. Both are repository rulesets
+with no one allowed to bypass them; an agent working with the owner's
+credentials would get any bypass the owner has.
+
 CI runs the checks above and every package's tests. The Compare workflow
 runs flutterware's `fw compare`: every preview and scenario rendered on the
 pull request's head and on its merge base with `main`, and one comment on the
