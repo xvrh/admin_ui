@@ -105,7 +105,13 @@ class NavSection extends NavEntry {
 ///
 /// It paints the device's top and bottom insets in its own colour, keeping
 /// its content clear of them: under a [Shell]'s top bar only the bottom one
-/// is left, under its footer. In the compact [Shell]'s navigation drawer it
+/// is left, under its footer. Beside a top bar that spans the page alone
+/// (`AdminShellStyle.topBarSpan`), it runs the window's height and keeps
+/// both, and its head, as tall as the bar, holds the bar's `leading`: at the
+/// shell's inset in the whole sidebar, centred in the rail, where it reads
+/// [isCollapsed] to draw a form that fits (the mark without the wordmark).
+/// It is laid out at its own width, as the bar lays it out, and clipped to
+/// the sidebar. In the compact [Shell]'s navigation drawer it
 /// draws expanded and as wide as the drawer, whatever [collapsed] says,
 /// under the drawer's head, and closes the drawer as an item opens.
 ///
@@ -565,6 +571,7 @@ class _SidebarState extends State<Sidebar> {
   }) {
     final colors = context.colors;
     final drawer = NavigationDrawerScope.maybeOf(context);
+    final leading = drawer == null ? Shell.sidebarLeadingOf(context) : null;
     var itemIndex = 0;
 
     final column = Semantics(
@@ -597,6 +604,8 @@ class _SidebarState extends State<Sidebar> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ?drawer?.head,
+                if (leading != null)
+                  _ShellHead(leading: leading, collapsed: collapsed),
                 ?widget.header,
                 Expanded(
                   child: CallbackShortcuts(
@@ -649,6 +658,43 @@ class _SidebarState extends State<Sidebar> {
       collapsed: collapsed,
       onItemOpen: _onItemOpen,
       child: column,
+    );
+  }
+}
+
+/// The head of a sidebar as tall as the window, beside a top bar that spans
+/// the page alone: as tall as the bar, with the bar's [leading] at the
+/// shell's inset, where it sits above the sidebar in the other span, or
+/// centred in the [collapsed] rail. A clear rule where the bar has its
+/// hairline centres the leading as the bar centres its content.
+class _ShellHead extends StatelessWidget {
+  final Widget leading;
+  final bool collapsed;
+
+  const _ShellHead({required this.leading, required this.collapsed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: context.shellStyle.topBarHeight,
+      padding: EdgeInsetsDirectional.only(start: collapsed ? 0 : Shell.inset),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0x00000000))),
+      ),
+      // Laid out at its own width, as the bar lays it out, so a leading
+      // reads the same in either span. The sidebar clips what it cannot
+      // hold, and reveals it as it widens, as it does an item's row.
+      child: ClipRect(
+        child: OverflowBox(
+          alignment: collapsed
+              ? AlignmentDirectional.center
+              : AlignmentDirectional.centerStart,
+          minWidth: 0,
+          maxWidth: double.infinity,
+          minHeight: 0,
+          child: leading,
+        ),
+      ),
     );
   }
 }

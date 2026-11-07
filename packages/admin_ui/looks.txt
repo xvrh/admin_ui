@@ -203,6 +203,7 @@ shell.itemIconSize: null
 shell.indicator: null
 shell.indicatorWidth: 3
 shell.topBarHeight: 56
+shell.topBarSpan: window
 shell.sidebarPalette: null
 shell.topBarPalette: null
 overlay.tooltipArrow: false
@@ -461,6 +462,7 @@ shell.itemIconSize: 24
 shell.indicator: none
 shell.indicatorWidth: 3
 shell.topBarHeight: 64
+shell.topBarSpan: window
 shell.sidebarPalette: null
 shell.topBarPalette: null
 overlay.tooltipArrow: false
@@ -708,6 +710,7 @@ shell.itemIconSize: null
 shell.indicator: null
 shell.indicatorWidth: 3
 shell.topBarHeight: 56
+shell.topBarSpan: window
 shell.sidebarPalette: null
 shell.topBarPalette: null
 overlay.tooltipArrow: true
@@ -967,6 +970,7 @@ shell.itemIconSize: null
 shell.indicator: none
 shell.indicatorWidth: 3
 shell.topBarHeight: 64
+shell.topBarSpan: window
 shell.sidebarPalette.primary: #ff136ff6
 shell.sidebarPalette.primaryStrong: #ff0958d9
 shell.sidebarPalette.primarySubtle: #ff043164
@@ -1255,6 +1259,7 @@ shell.itemIconSize: 20
 shell.indicator: bar
 shell.indicatorWidth: 4
 shell.topBarHeight: 48
+shell.topBarSpan: window
 shell.sidebarPalette: null
 shell.topBarPalette: null
 overlay.tooltipArrow: true
@@ -1514,6 +1519,7 @@ shell.itemIconSize: null
 shell.indicator: edge
 shell.indicatorWidth: 3
 shell.topBarHeight: 48
+shell.topBarSpan: window
 shell.sidebarPalette: null
 shell.topBarPalette.primary: #ff0f62fe
 shell.topBarPalette.primaryStrong: #ff0050e6

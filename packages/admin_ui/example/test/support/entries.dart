@@ -253,6 +253,16 @@ const previewOnly = <PreviewOnlyDemo>[
   PreviewOnlyDemo('ShellDemo.tablet', 'Shell (tablet width)', ShellDemo.tablet),
   PreviewOnlyDemo('ShellDemo.phone', 'Shell (phone width)', ShellDemo.phone),
   PreviewOnlyDemo(
+    'ShellDemo.besidePage',
+    'Shell (top bar over the page)',
+    ShellDemo.besidePage,
+  ),
+  PreviewOnlyDemo(
+    'ShellDemo.besidePageTablet',
+    'Shell (top bar over the page, tablet width)',
+    ShellDemo.besidePageTablet,
+  ),
+  PreviewOnlyDemo(
     'ShellDrawerDemo',
     'Shell (phone, drawer open)',
     ShellDrawerDemo.new,

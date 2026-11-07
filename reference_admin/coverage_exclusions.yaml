@@ -65,6 +65,7 @@ theme_internals:
     - FieldVariant
     - NavIndicator
     - TableHeaderText
+    - TopBarSpan
     - antDarkPalette
     - antPalette
     - antSiderPalette

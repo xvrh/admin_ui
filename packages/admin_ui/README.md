@@ -342,6 +342,18 @@ A sidebar's `header` and `footer` fit the rail by reading
 signed-in account goes in the footer as a `SidebarAccount`, which does
 this itself.
 
+The top bar runs across the window, its `leading` (the logo) over the
+sidebar's icons. A theme whose `AdminShellStyle.topBarSpan` is
+`TopBarSpan.page` turns that around, as Ant's side layout does: the
+sidebar runs the window's height, and the top bar runs over the page
+alone, its content from the page gutter. The top bar's `leading` then
+heads the sidebar, as tall as the bar and in the sidebar's palette, so a
+dark sider carries the logo. It is laid out at its own width, as the bar
+lays it out, and the sidebar clips what it cannot hold. It heads the rail
+too, centred, and reads `Sidebar.isCollapsed(context)` there to draw a
+form that fits, such as the mark without the wordmark. When compact, it is back in the bar. The page
+keeps its state when a theme changes the span.
+
 The drawer holds the `sidebar`, expanded, or `Shell(drawer:)` when the
 app gives it one of its own (to key it, say). Its head is as tall as the
 top bar, with a close button where the bar has its menu button and the
@@ -362,7 +374,8 @@ of your own that calls `Shell.openDrawer`:
 On a device with insets (a camera island, a home indicator), the top bar
 runs under the status bar in its own colour and the sidebar keeps the
 bottom inset under its footer in its own, in the rail and in the drawer
-alike. A `SideSheet` keeps its parts clear of the insets at their edges;
+alike. Beside a top bar over the page alone, the sidebar keeps the top
+inset too. A `SideSheet` keeps its parts clear of the insets at their edges;
 `SideSheet(safeArea: false)` leaves the body's to a child that paints its
 own background under them.
 

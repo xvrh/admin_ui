@@ -412,6 +412,7 @@ theme.dart Gap
 theme.dart NavIndicator
 theme.dart TableDensity
 theme.dart TableHeaderText
+theme.dart TopBarSpan
 theme.dart adminAccents
 theme.dart adminThemes
 theme.dart antDarkPalette

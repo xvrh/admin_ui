@@ -10,6 +10,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../common/ui/modal_anchor.dart';
 import '../../theme/breakpoints.dart';
 import '../../theme/palette.dart';
+import '../../theme/shell_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/theme.dart';
 import '../../theme/tokens.dart';
@@ -26,6 +27,15 @@ import 'top_bar.dart';
 /// The top bar spans the whole width so the logo sits above the sidebar column,
 /// not beside it — the modern admin frame. [topBar] is optional; without it the
 /// shell is just sidebar + content.
+///
+/// A theme whose `AdminShellStyle.topBarSpan` is [TopBarSpan.page] turns
+/// that around: the sidebar runs the window's height, and the top bar runs
+/// over the page alone. The [TopBar]'s `leading` then heads the sidebar, at
+/// the bar's height and in the sidebar's palette, the rail's too: it reads
+/// [Sidebar.isCollapsed] to fit the rail, as a sidebar's header does. In a
+/// compact shell it stays in the bar. A top bar of the app's own keeps its
+/// content, and the sidebar has no head. The page keeps its state as a
+/// theme moves the bar.
 ///
 /// Shell *is* the page [Scaffold] — it provides the [Material] ancestor that ink,
 /// text fields and tooltips need, and the registered scaffold that
@@ -115,6 +125,24 @@ class Shell extends StatefulWidget {
   static Future<void> openDrawer(BuildContext context) =>
       context.getInheritedWidgetOfExactType<_ShellScope>()?.state._open() ??
       Future.value();
+
+  /// Whether the [TopBar] of the [Shell] around [context] leaves its
+  /// `leading` to the head of the sidebar beside the page: the bar spans the
+  /// page alone ([TopBarSpan.page]) and the shell is not compact. False
+  /// outside a shell. [context] rebuilds as it changes.
+  @internal
+  static bool leadsSidebar(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_ShellScope>()?.leadsSidebar ??
+      false;
+
+  /// What heads the sidebar beside the page of the [Shell] around
+  /// [context]: the [TopBar]'s `leading` while it leaves it there
+  /// ([leadsSidebar]), else null. [context] rebuilds as it changes.
+  @internal
+  static Widget? sidebarLeadingOf(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<_ShellScope>();
+    return scope != null && scope.leadsSidebar ? scope.leading : null;
+  }
 
   /// Tells the [Shell] around [context] whether its sidebar is a collapsed
   /// rail, which gives the top bar its menu button.
@@ -220,9 +248,17 @@ class _ShellState extends State<Shell> {
           SchedulerBinding.instance.addPostFrameCallback((_) => anchor.close());
         }
         final topBar = widget.topBar;
+        final spansPage =
+            topBar != null && context.shellStyle.topBarSpan == TopBarSpan.page;
+        final leading = switch (topBar) {
+          TopBar(:final leading) => leading,
+          _ => null,
+        };
+        // The page is the last child of the same rows in either span, so it
+        // keeps its state as a theme moves the bar.
         final row = Row(
           children: [
-            if (!compact) widget.sidebar,
+            if (!compact && !spansPage) widget.sidebar,
             Expanded(child: widget.child),
           ],
         );
@@ -230,23 +266,34 @@ class _ShellState extends State<Shell> {
           state: this,
           compact: compact,
           rail: rail,
+          leadsSidebar: spansPage && topBar is TopBar && !compact,
+          leading: leading,
           child: Scaffold(
             backgroundColor: context.colors.background,
-            body: Column(
+            body: Row(
               children: [
-                ?topBar,
+                // As tall as the window, it keeps the top inset itself.
+                if (!compact && spansPage) widget.sidebar,
                 Expanded(
-                  child: topBar == null
-                      ? row
-                      // The top bar takes the top inset. Read below the
-                      // Scaffold, which takes the keyboard's out of the body.
-                      : Builder(
-                          builder: (context) => MediaQuery.removePadding(
-                            context: context,
-                            removeTop: true,
-                            child: row,
-                          ),
-                        ),
+                  child: Column(
+                    children: [
+                      ?topBar,
+                      Expanded(
+                        child: topBar == null
+                            ? row
+                            // The top bar takes the top inset. Read below
+                            // the Scaffold, which takes the keyboard's out
+                            // of the body.
+                            : Builder(
+                                builder: (context) => MediaQuery.removePadding(
+                                  context: context,
+                                  removeTop: true,
+                                  child: row,
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -264,16 +311,29 @@ class _ShellScope extends InheritedWidget {
   /// The sidebar beside the page is a collapsed rail.
   final bool rail;
 
+  /// The top bar is a [TopBar] that spans the page alone, beside the
+  /// sidebar, whose head holds its [leading].
+  final bool leadsSidebar;
+
+  /// The [TopBar]'s `leading`.
+  final Widget? leading;
+
   const _ShellScope({
     required this.state,
     required this.compact,
     required this.rail,
+    required this.leadsSidebar,
+    required this.leading,
     required super.child,
   });
 
   @override
   bool updateShouldNotify(_ShellScope old) =>
-      compact != old.compact || rail != old.rail || state != old.state;
+      compact != old.compact ||
+      rail != old.rail ||
+      leadsSidebar != old.leadsSidebar ||
+      leading != old.leading ||
+      state != old.state;
 }
 
 /// Draws [child] in [palette] in place of the page's, for a part of the frame

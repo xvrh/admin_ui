@@ -19,9 +19,17 @@ import '../demo_kit.dart';
 /// In a window narrower than the medium breakpoint the frame is compact:
 /// the page takes the whole width and the top bar leads with the menu
 /// button, which opens the sidebar as a drawer.
+///
+/// With [TopBarSpan.page] the sidebar runs the window's height under the
+/// workspace, and the top bar runs over the page alone. The workspace there
+/// has no sidebar toggle, and over the rail it is its mark alone, centred on
+/// the rail's icons.
 class ShellDemo extends StatefulWidget {
   /// The window width the frame is drawn at, or null for the whole preview.
   final double? windowWidth;
+
+  /// What the top bar runs across.
+  final TopBarSpan topBarSpan;
 
   /// Whether the sidebar starts as its icon rail.
   final bool collapsed;
@@ -32,6 +40,7 @@ class ShellDemo extends StatefulWidget {
   @Preview(name: 'Shell (app frame)', wrapper: adminUiPreview)
   const ShellDemo({super.key})
     : windowWidth = null,
+      topBarSpan = TopBarSpan.window,
       collapsed = false,
       drawerOpen = false;
 
@@ -40,6 +49,7 @@ class ShellDemo extends StatefulWidget {
   @Preview(name: 'Shell (narrow window)', wrapper: adminUiPreview)
   const ShellDemo.narrow({super.key})
     : windowWidth = 500,
+      topBarSpan = TopBarSpan.window,
       collapsed = false,
       drawerOpen = false;
 
@@ -49,6 +59,7 @@ class ShellDemo extends StatefulWidget {
   @Preview(name: 'Shell (tablet width)', wrapper: adminUiPreview)
   const ShellDemo.tablet({super.key})
     : windowWidth = 900,
+      topBarSpan = TopBarSpan.window,
       collapsed = false,
       drawerOpen = false;
 
@@ -56,12 +67,36 @@ class ShellDemo extends StatefulWidget {
   @Preview(name: 'Shell (phone width)', wrapper: adminUiPreview)
   const ShellDemo.phone({super.key})
     : windowWidth = 360,
+      topBarSpan = TopBarSpan.window,
+      collapsed = false,
+      drawerOpen = false;
+
+  /// The frame with the top bar over the page alone: the sidebar runs the
+  /// window's height, headed by the workspace.
+  @Preview(name: 'Shell (top bar over the page)', wrapper: adminUiPreview)
+  const ShellDemo.besidePage({super.key})
+    : windowWidth = null,
+      topBarSpan = TopBarSpan.page,
+      collapsed = false,
+      drawerOpen = false;
+
+  /// That frame in a 900px window: the rail runs the window's height,
+  /// headed by the workspace's mark, and the top bar beside it leads with
+  /// the menu button.
+  @Preview(
+    name: 'Shell (top bar over the page, tablet width)',
+    wrapper: adminUiPreview,
+  )
+  const ShellDemo.besidePageTablet({super.key})
+    : windowWidth = 900,
+      topBarSpan = TopBarSpan.page,
       collapsed = false,
       drawerOpen = false;
 
   /// The phone frame with its drawer open: `ShellDrawerDemo`'s.
   const ShellDemo.drawerOpen({super.key})
     : windowWidth = 360,
+      topBarSpan = TopBarSpan.window,
       collapsed = false,
       drawerOpen = true;
 
@@ -147,10 +182,20 @@ class _ShellDemoState extends State<ShellDemo> {
   @override
   Widget build(BuildContext context) {
     final width = widget.windowWidth;
+    var frame = _frame(context);
+    if (widget.topBarSpan != context.shellStyle.topBarSpan) {
+      final tokens = context.adminTokens;
+      frame = Theme(
+        data: buildAppTheme(
+          tokens.copyWith(
+            shell: tokens.shell.copyWith(topBarSpan: widget.topBarSpan),
+          ),
+        ),
+        child: frame,
+      );
+    }
     return KeyboardHighlight(
-      child: width == null
-          ? _frame(context)
-          : _Window(width: width, child: _frame(context)),
+      child: width == null ? frame : _Window(width: width, child: frame),
     );
   }
 
@@ -242,9 +287,15 @@ class _ShellDemoState extends State<ShellDemo> {
   /// [Shell.inset], so the move is a shift rather than a padding. A frame
   /// with a drawer, compact or beside the rail between the breakpoints, has
   /// nothing to toggle: the workspace alone, after the shell's menu button
-  /// (and in its drawer, after the close button).
+  /// (and in its drawer, after the close button). At the head of a sidebar
+  /// as tall as the window, the workspace alone, and over its rail the mark
+  /// alone.
   Widget _leading(BuildContext context) {
-    if (Shell.hasDrawer(context)) return _workspace(context);
+    if (Sidebar.isCollapsed(context)) return _workspaceMark(context);
+    if (Shell.hasDrawer(context) ||
+        context.shellStyle.topBarSpan == TopBarSpan.page) {
+      return _workspace(context);
+    }
     return TweenAnimationBuilder<double>(
       tween: Tween(end: _collapsed ? _railInset(context) : 0),
       duration: context.motion.medium,
@@ -274,29 +325,33 @@ class _ShellDemoState extends State<ShellDemo> {
       padding: const EdgeInsetsDirectional.only(end: AdminSpacing.md),
       child: Row(
         children: [
-          Container(
-            width: _mark,
-            height: _mark,
-            decoration: BoxDecoration(
-              color: context.colors.primary,
-              borderRadius: BorderRadius.circular(context.radii.radiusSmall),
-            ),
-            alignment: Alignment.center,
-            // A mark, not a label: it keeps its size at any text scale, as
-            // the box around it does.
-            child: Text(
-              'A',
-              textScaler: TextScaler.noScaling,
-              style: context.type.heading.copyWith(
-                color: context.colors.onPrimary,
-                fontSize: 14,
-                height: 1,
-              ),
-            ),
-          ),
+          _workspaceMark(context),
           const Gap(AdminSpacing.md),
           Text('Acme Admin', style: context.type.bodyStrong),
         ],
+      ),
+    );
+  }
+
+  Widget _workspaceMark(BuildContext context) {
+    return Container(
+      width: _mark,
+      height: _mark,
+      decoration: BoxDecoration(
+        color: context.colors.primary,
+        borderRadius: BorderRadius.circular(context.radii.radiusSmall),
+      ),
+      alignment: Alignment.center,
+      // A mark, not a label: it keeps its size at any text scale, as the box
+      // around it does.
+      child: Text(
+        'A',
+        textScaler: TextScaler.noScaling,
+        style: context.type.heading.copyWith(
+          color: context.colors.onPrimary,
+          fontSize: 14,
+          height: 1,
+        ),
       ),
     );
   }
