@@ -7,7 +7,9 @@ resolution: workspace
 
 environment:
   sdk: ^3.14.0-0
-  flutter: 3.48.0-0.5.pre
+  # A floor: .fvmrc is the pin. A comparison resolves its base under the
+  # branch's SDK, which an exact version here would refuse.
+  flutter: '>=3.48.0-0.5.pre'
 
 dependencies:
   admin_ui:

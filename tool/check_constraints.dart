@@ -1,5 +1,5 @@
 // Fails when a dependency constraint of the kit excludes that dependency's
-// latest release, unless [_heldBack] says why. An app resolves the kit's
+// latest release, unless [heldBack] says why. An app resolves the kit's
 // constraints with its own, so one that stops short of a release holds
 // every app on the kit below it too, along with whatever that release pins
 // (a plugin's `win32`, say).
@@ -20,8 +20,8 @@ import 'package:yaml/yaml.dart';
 const _package = 'packages/admin_ui';
 
 /// Dependencies allowed to exclude their latest release, each with the
-/// reason.
-const _heldBack = <String, String>{
+/// reason. tool/upgrade.dart leaves their constraints alone.
+const heldBack = <String, String>{
   'desktop_drop':
       '0.9 needs cross_file ^0.4, and file_picker 13.1.0, the latest, still '
       'pins cross_file ^0.3.5. Widen once a file_picker release takes 0.4.',
@@ -59,24 +59,24 @@ Future<void> main() async {
   for (final MapEntry(key: name, value: constraint) in constraints.entries) {
     final version = latest[name]!;
     final excluded = !constraint.allows(version);
-    if (excluded && !_heldBack.containsKey(name)) {
+    if (excluded && !heldBack.containsKey(name)) {
       behind.add('$name: $constraint excludes $version');
-    } else if (!excluded && _heldBack.containsKey(name)) {
+    } else if (!excluded && heldBack.containsKey(name)) {
       stale.add('$name: $constraint now allows $version');
     }
   }
-  for (final name in _heldBack.keys) {
+  for (final name in heldBack.keys) {
     if (!constraints.containsKey(name)) stale.add('$name: not a dependency');
   }
 
   if (behind.isNotEmpty) {
     print(
-      'Widen these to the latest release, or list them in _heldBack with '
+      'Widen these to the latest release, or list them in heldBack with '
       'the reason:\n  ${behind.join('\n  ')}',
     );
   }
   if (stale.isNotEmpty) {
-    print('Remove these from _heldBack:\n  ${stale.join('\n  ')}');
+    print('Remove these from heldBack:\n  ${stale.join('\n  ')}');
   }
   if (behind.isNotEmpty || stale.isNotEmpty) exitCode = 1;
 }

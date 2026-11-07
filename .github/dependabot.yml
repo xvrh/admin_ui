@@ -1,10 +1,10 @@
-# The workflows' actions, one pull request a week for all of them. Pub
-# dependencies are tool/check_constraints.dart's: CI fails when a constraint
-# of the kit stops admitting a dependency's latest release.
+# The workflows' actions and the Flutter action's, one pull request a week
+# for all of them. Flutter and the pub dependencies are the Upgrade
+# workflow's (.github/workflows/upgrade.yaml).
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: /
+    directories: ['/', '/.github/actions/*']
     schedule:
       interval: weekly
     groups:
