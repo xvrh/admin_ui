@@ -113,25 +113,23 @@ version is written: every workflow installs the Flutter it names
 of `reference_admin` is a floor, since a comparison resolves its base under
 the branch's Flutter.
 
-The pull request comes from a GitHub App. One opened with a workflow's own
-token starts no workflow, so its checks would never report and `main`'s
-ruleset would hold it forever. Make the app once:
-
-1. [New GitHub App](https://github.com/settings/apps/new): any name and
-   homepage URL, Webhook unticked, the repository permissions Contents and
-   Pull requests on Read and write, installable only on this account.
-2. Install it on this repository alone, and generate a private key on its
-   page.
-3. Give the workflow its ID and key, then run it once instead of waiting for
-   Monday:
+The pull request is opened with `BOT_PAT`, a personal access token. One
+opened with a workflow's own token starts no workflow, so its checks would
+never report and `main`'s ruleset would hold it forever. Make a
+[fine-grained token](https://github.com/settings/personal-access-tokens/new)
+for this repository alone, with Contents and Pull requests on Read and write,
+then give it to the workflow (`gh secret set` asks for it) and run it once
+instead of waiting for Monday:
 
 ```sh
-gh variable set UPGRADE_APP_ID --body <the app's App ID>
-gh secret set UPGRADE_APP_PRIVATE_KEY < <the downloaded key>.pem
+gh secret set BOT_PAT
 gh workflow run upgrade.yaml
 ```
 
-Until both exist, the run fails at its first step and says so.
+The pull request is the token owner's, and its commits are
+`github-actions[bot]`'s. Without the secret, the run fails at its first step
+and says so; with an expired token, it fails at the checkout, and the same
+`gh secret set` renews it.
 
 ## Licence
 

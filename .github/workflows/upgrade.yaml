@@ -7,11 +7,11 @@ name: Upgrade
 # to fix on its branch, and the next run leaves a branch with someone else's
 # commit on it alone.
 #
-# The pull request comes from a GitHub App. One opened with the workflow's own
-# token would start no workflow, so its checks would never report and main's
-# ruleset would hold it forever. README.md ("Upgrades") sets the app up. The
-# Flutter version lives in .fvmrc alone, so the app pushes no workflow file
-# and needs no permission to.
+# The pull request is opened and pushed with BOT_PAT, a personal access
+# token. One opened with the workflow's own token would start no workflow, so
+# its checks would never report and main's ruleset would hold it forever.
+# README.md ("Upgrades") makes the token. The Flutter version lives in .fvmrc
+# alone, so the token pushes no workflow file and needs no permission to.
 
 on:
   schedule:
@@ -37,25 +37,22 @@ jobs:
     timeout-minutes: 30
     env:
       BRANCH: upgrade
+      # The upgrade's commits. A commit by anyone else on the branch is a fix
+      # this run must not push over.
+      BOT: github-actions[bot]
+      BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
     steps:
-      - name: The app is set up
+      - name: The token is set
         env:
-          APP_ID: ${{ vars.UPGRADE_APP_ID }}
-          HAS_KEY: ${{ secrets.UPGRADE_APP_PRIVATE_KEY != '' }}
+          HAS_TOKEN: ${{ secrets.BOT_PAT != '' }}
         run: |
-          if [ -z "$APP_ID" ] || [ "$HAS_KEY" != true ]; then
-            echo "::error::The UPGRADE_APP_ID variable and the UPGRADE_APP_PRIVATE_KEY secret are the app that opens the pull request; README.md (\"Upgrades\") sets them up."
+          if [ "$HAS_TOKEN" != true ]; then
+            echo "::error::The BOT_PAT secret opens the pull request; README.md (\"Upgrades\") makes it."
             exit 1
           fi
-      - name: The app's token
-        id: app
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ vars.UPGRADE_APP_ID }}
-          private-key: ${{ secrets.UPGRADE_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v4
         with:
-          token: ${{ steps.app.outputs.token }}
+          token: ${{ secrets.BOT_PAT }}
 
       # The index flutter-action installs from. When the beta channel points
       # at a stable release, its version has no `-`, and the Flutter action
@@ -77,8 +74,7 @@ jobs:
 
       - name: Open or update the pull request
         env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-          BOT: ${{ steps.app.outputs.app-slug }}[bot]
+          GH_TOKEN: ${{ secrets.BOT_PAT }}
           BASE: ${{ github.event.repository.default_branch }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
@@ -102,7 +98,7 @@ jobs:
             title="deps: Flutter $(jq -r .flutter .fvmrc) and the latest packages"
           fi
           git config user.name "$BOT"
-          git config user.email "$(gh api "/users/$BOT" --jq .id)+$BOT@users.noreply.github.com"
+          git config user.email "$BOT_EMAIL"
           git switch -q -c "$BRANCH"
           git add -A
           git commit -q -m "$title"
