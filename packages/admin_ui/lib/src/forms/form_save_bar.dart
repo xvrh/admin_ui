@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../common/ui/error_text.dart';
 import '../common/ui/field_registry.dart';
 import '../l10n/admin_ui_localizations.dart';
 import '../shell/ui/save_bar.dart';
@@ -23,8 +24,8 @@ SaveState saveStateFor(FormStatus status) => switch (status) {
 /// attention", from [FormController.errorCount]), which focuses the first
 /// invalid field among [fields] — each showing its message when the form
 /// sits in a `FormErrorsScope` of the same controller; a failed submit shows
-/// [FormController.submitError]. Cmd+S / Ctrl+S saves from anywhere on the
-/// page (see [FormShortcuts]).
+/// [FormController.submitError], or [FormController.submitFailure] in words.
+/// Cmd+S / Ctrl+S saves from anywhere on the page (see [FormShortcuts]).
 class FormSaveBar extends StatelessWidget {
   final FormController controller;
   final Widget? leading;
@@ -37,8 +38,9 @@ class FormSaveBar extends StatelessWidget {
 
   final String? savedLabel;
 
-  /// The error status when the controller has no [FormController.submitError];
-  /// "Couldn’t save" when null.
+  /// The error status when the controller has neither a
+  /// [FormController.submitError] nor a [FormController.submitFailure] to
+  /// word; "Couldn’t save" when null.
   final String? errorLabel;
 
   /// Discard's label; "Discard" in the app's language when null.
@@ -120,7 +122,12 @@ class FormSaveBar extends StatelessWidget {
         status: status,
         state: saveStateFor(controller.status),
         savedLabel: savedLabel,
-        errorLabel: controller.submitError ?? errorLabel,
+        errorLabel:
+            controller.submitError ??
+            switch (controller.submitFailure) {
+              final failure? => ErrorTextScope.describe(context, failure),
+              null => errorLabel,
+            },
         invalidCount: controller.errorCount,
         onShowInvalid: fields == null
             ? null

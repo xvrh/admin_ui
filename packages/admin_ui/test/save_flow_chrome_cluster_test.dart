@@ -1,4 +1,5 @@
 import 'package:admin_ui/src/common/ui/button.dart';
+import 'package:admin_ui/src/common/ui/error_text.dart';
 import 'package:admin_ui/src/common/ui/field_registry.dart';
 import 'package:admin_ui/src/common/ui/spinner.dart';
 import 'package:admin_ui/src/common/ui/tappable.dart';
@@ -21,6 +22,7 @@ class _Form extends FormController {
   FormStatus _status;
   Map<String, String?> _errors = const {};
   String? failure;
+  Object? thrown;
   var submits = 0;
   var resets = 0;
 
@@ -43,6 +45,9 @@ class _Form extends FormController {
 
   @override
   String? get submitError => failure;
+
+  @override
+  Object? get submitFailure => thrown;
 
   @override
   Future<void> submit() async {
@@ -177,20 +182,50 @@ void main() {
       expect(_button(tester, 'Save').onPressed, isNull);
     });
 
-    testWidgets('error: the controller’s message, else the generic one', (
-      tester,
-    ) async {
+    testWidgets('error: the controller’s message, else what failed in words, '
+        'else the generic one', (tester) async {
       final form = _Form(status: FormStatus.error);
       addTearDown(form.dispose);
       await tester.pumpWidget(_bar(form));
       expect(find.text('Couldn’t save'), findsOneWidget);
       expect(_button(tester, 'Save').onPressed, isNotNull, reason: 'retry');
 
+      form.thrown = Exception('Connection refused');
+      form.status = FormStatus.error;
+      await tester.pump();
+      expect(
+        find.text(
+          'Can’t reach the server. Check your connection and try again.',
+        ),
+        findsOneWidget,
+      );
+
       form.failure = 'The slug is already taken';
       form.status = FormStatus.error;
       await tester.pump();
       expect(find.text('The slug is already taken'), findsOneWidget);
     });
+
+    testWidgets(
+      'FormActions words a failure as the ErrorTextScope above does',
+      (tester) async {
+        final form = _Form(status: FormStatus.error)
+          ..thrown = Exception('Connection refused');
+        addTearDown(form.dispose);
+        await tester.pumpWidget(
+          _host(
+            ErrorTextScope(
+              describe: (_) => 'The catalogue is offline.',
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: FormActions(controller: form),
+              ),
+            ),
+          ),
+        );
+        expect(find.text('The catalogue is offline.'), findsOneWidget);
+      },
+    );
 
     testWidgets('dirty and invalid: the fields that need attention', (
       tester,

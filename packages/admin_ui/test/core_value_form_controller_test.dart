@@ -415,21 +415,41 @@ void main() {
       expect(form.canSubmit, isTrue);
     });
 
-    test('any other failure is the generic error, and is reported', () async {
+    test('any other exception is kept as the failure, not reported', () async {
       final reported = <FlutterErrorDetails>[];
       final onError = FlutterError.onError;
       FlutterError.onError = reported.add;
       addTearDown(() => FlutterError.onError = onError);
-      final form = contactForm(onSubmit: (_) async => throw Exception('503'));
+      final offline = Exception('Connection refused');
+      final form = contactForm(onSubmit: (_) async => throw offline);
       addTearDown(form.dispose);
       ContactFields(form.scope).name.set('Grace');
 
       await form.submit();
       expect(form.status, FormStatus.error);
       expect(form.submitError, isNull);
+      expect(form.submitFailure, same(offline));
       expect(form.hasUnsavedChanges, isTrue);
       expect(form.isDirty, isTrue);
-      expect(reported.single.exception, isA<Exception>());
+      expect(reported, isEmpty);
+
+      form.reset();
+      expect(form.submitFailure, isNull);
+    });
+
+    test('an Error is a bug in the save: kept, and reported', () async {
+      final reported = <FlutterErrorDetails>[];
+      final onError = FlutterError.onError;
+      FlutterError.onError = reported.add;
+      addTearDown(() => FlutterError.onError = onError);
+      final form = contactForm(onSubmit: (_) async => throw StateError('bug'));
+      addTearDown(form.dispose);
+      ContactFields(form.scope).name.set('Grace');
+
+      await form.submit();
+      expect(form.status, FormStatus.error);
+      expect(form.submitFailure, isA<StateError>());
+      expect(reported.single.exception, isA<StateError>());
       expect(reported.single.stack, isNotNull);
     });
 

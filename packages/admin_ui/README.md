@@ -1251,6 +1251,10 @@ whole, use `ValueFormController`:
   back to it, and `submit()` calls `onSubmit` with the current value. A
   successful submit rebases; an `onSubmit` that throws a
   `FormSubmitException` puts its messages under the fields it names.
+  Anything else it throws shows in the save status, worded by
+  `ErrorTextScope`, so an unreachable server needs no conversion. An
+  `Error` is also reported to `FlutterError.onError`: it is a bug in the
+  save.
 - `rules` returns the validation: a `FieldRules` per field, with
   `Validators` (`required`, `minLength`, `maxLength`, `pattern`, `email`,
   `url`, `min`, `max`) and optional async checks, which are debounced and
@@ -1836,6 +1840,12 @@ scripts its font lacks. `textWithoutFont()` lists the text on screen still
 drawn in the box font, empty when every run is in one of
 `testFontFamilies`. The example's sweep harness
 (`example/test/support/harness/`) is built on these.
+
+A test can make a save or a confirm fail. What `onSubmit` or a
+`showConfirmDialog`'s `onConfirm` throws shows in the save status or in
+the dialog, worded by `ErrorTextScope`, so the test asserts the words.
+Only an `Error` is reported to `FlutterError.onError`, which fails the
+test: it is a bug, not a failure the app expects.
 
 ### Finding the kit's controls
 

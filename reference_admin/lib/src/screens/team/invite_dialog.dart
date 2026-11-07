@@ -75,11 +75,6 @@ class _InviteDialogState extends State<InviteDialog> {
               : l10n.fields.invalidEmail,
         },
       );
-    } on ShopError catch (error) {
-      if (!mounted) rethrow;
-      throw FormSubmitException(
-        message: ErrorTextScope.describe(context, error),
-      );
     }
   }
 

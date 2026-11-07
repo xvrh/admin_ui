@@ -52,7 +52,9 @@ import 'validation.dart';
 /// **Submit.** [submit] reveals every message and, when all pass, awaits any
 /// async check still running, then calls `onSubmit` with [value]. A
 /// [FormSubmitException] it throws puts its messages under their fields and
-/// in [submitError]; anything else reads as the generic failure, and is
+/// in [submitError]. Anything else it throws is kept as [submitFailure],
+/// which the save status words through `ErrorTextScope`: an unreachable
+/// server reads as one. An [Error] is a bug in the save, so it is also
 /// reported to [FlutterError.onError].
 ///
 /// Notifies only when something a listener can see changes: the status, the
@@ -114,6 +116,7 @@ class ValueFormController<T> extends FormController {
   FormStatus _status = FormStatus.clean;
   bool _dirty = false;
   String? _submitError;
+  Object? _submitFailure;
   bool _submitAttempted = false;
   int _revealRequest = 0;
   Future<void>? _submitting;
@@ -151,6 +154,7 @@ class ValueFormController<T> extends FormController {
     _rebase();
     _status = FormStatus.clean;
     _submitError = null;
+    _submitFailure = null;
     _validateAll();
     _notifyIfChanged();
   }
@@ -207,6 +211,9 @@ class ValueFormController<T> extends FormController {
 
   @override
   String? get submitError => _submitError;
+
+  @override
+  Object? get submitFailure => _submitFailure;
 
   /// The strings the built-in messages are worded in; English until a
   /// [ValueForm] sets the app's. Setting it asks `rules` again, so a
@@ -289,6 +296,7 @@ class ValueFormController<T> extends FormController {
     final sent = _Sent(_tracker, _states.values);
     _status = FormStatus.submitting;
     _submitError = null;
+    _submitFailure = null;
     _notifyIfChanged();
     try {
       await _onSubmit?.call(value);
@@ -307,17 +315,19 @@ class ValueFormController<T> extends FormController {
       _serverErrors.addAll(e.fieldErrors);
       if (e.fieldErrors.isNotEmpty) _revealRequest++;
     } catch (error, stack) {
-      // Read as the generic failure, but a bug in the save is still one.
-      FlutterError.reportError(
-        FlutterErrorDetails(
-          exception: error,
-          stack: stack,
-          library: 'admin_ui forms',
-          context: ErrorDescription('while submitting a form'),
-        ),
-      );
+      if (error is Error) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stack,
+            library: 'admin_ui forms',
+            context: ErrorDescription('while submitting a form'),
+          ),
+        );
+      }
       if (_disposed) return;
       _status = FormStatus.error;
+      _submitFailure = error;
     }
     _validateAll();
     _notifyIfChanged();
@@ -335,6 +345,7 @@ class ValueFormController<T> extends FormController {
     _rebase();
     _status = FormStatus.clean;
     _submitError = null;
+    _submitFailure = null;
     _validateAll();
     _notifyIfChanged();
   }
@@ -687,6 +698,7 @@ class ValueFormController<T> extends FormController {
     required: _required,
     ruleFields: _ruleFields,
     submitError: _submitError,
+    submitFailure: _submitFailure,
     revealRequest: _revealRequest,
     submitAttempted: _submitAttempted,
   );
@@ -713,6 +725,7 @@ class _Observed {
   final Set<String> required;
   final Set<String> ruleFields;
   final String? submitError;
+  final Object? submitFailure;
   final int revealRequest;
   final bool submitAttempted;
 
@@ -725,6 +738,7 @@ class _Observed {
     required this.required,
     required this.ruleFields,
     required this.submitError,
+    required this.submitFailure,
     required this.revealRequest,
     required this.submitAttempted,
   });
@@ -733,6 +747,7 @@ class _Observed {
       status == o.status &&
       dirty == o.dirty &&
       submitError == o.submitError &&
+      identical(submitFailure, o.submitFailure) &&
       revealRequest == o.revealRequest &&
       submitAttempted == o.submitAttempted &&
       mapEquals(errors, o.errors) &&
