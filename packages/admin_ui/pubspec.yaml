@@ -32,7 +32,7 @@ dev_dependencies:
     sdk: flutter
   # For the README's font resolver sample, test/readme/font_resolver.dart.
   google_fonts: '>=8.1.0 <10.0.0'
-  analyzer: ^13.0.0
+  analyzer: ^14.7.0
   dart_style: ^3.1.9
   flutter_lints: ^6.0.0
 

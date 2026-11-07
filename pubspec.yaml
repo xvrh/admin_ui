@@ -7,7 +7,7 @@ environment:
 # Root-only tooling (tool/*.dart). The members resolve through
 # `resolution: workspace`.
 dev_dependencies:
-  analyzer: ^13.0.0
+  analyzer: ^14.7.0
   dart_style: ^3.1.9
   flutterware:
     git:
