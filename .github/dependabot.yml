@@ -1,0 +1,14 @@
+# The workflows' actions, one pull request a week for all of them. Pub
+# dependencies are tool/check_constraints.dart's: CI fails when a constraint
+# of the kit stops admitting a dependency's latest release.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
