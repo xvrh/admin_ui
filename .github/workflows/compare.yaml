@@ -33,11 +33,6 @@ concurrency:
 permissions:
   contents: read
 
-# flutter-version and channel mirror .fvmrc, like ci.yaml.
-env:
-  FLUTTER_VERSION: 3.48.0-0.5.pre
-  FLUTTER_CHANNEL: beta
-
 jobs:
   compare:
     name: Previews and scenarios against the base
@@ -55,11 +50,8 @@ jobs:
           # The base is the merge base; a shallow clone has none.
           fetch-depth: 0
           persist-credentials: false
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: ${{ env.FLUTTER_CHANNEL }}
-          cache: true
+      # The Flutter .fvmrc pins, and FLUTTER_VERSION for the cache's key.
+      - uses: ./.github/actions/flutter
       - run: flutter pub get
 
       # The rendered pictures and replays (content-addressed, trimmed by fw

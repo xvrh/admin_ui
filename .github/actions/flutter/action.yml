@@ -1,0 +1,28 @@
+name: Flutter
+description: >-
+  Puts the Flutter that .fvmrc pins on PATH, from the beta channel for a
+  prerelease and from stable otherwise, and sets FLUTTER_VERSION for the steps
+  after it. .fvmrc is the one place the version is written, so moving it moves
+  every workflow, and a pull request that moves it changes no workflow file.
+
+runs:
+  using: composite
+  steps:
+    - name: Read .fvmrc
+      id: pin
+      shell: bash
+      run: |
+        version="$(jq -r '.flutter // empty' .fvmrc)"
+        if [ -z "$version" ]; then
+          echo "::error file=.fvmrc::.fvmrc names no Flutter version"
+          exit 1
+        fi
+        case "$version" in *-*) channel=beta ;; *) channel=stable ;; esac
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        echo "channel=$channel" >> "$GITHUB_OUTPUT"
+        echo "FLUTTER_VERSION=$version" >> "$GITHUB_ENV"
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ steps.pin.outputs.version }}
+        channel: ${{ steps.pin.outputs.channel }}
+        cache: true

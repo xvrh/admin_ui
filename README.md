@@ -89,6 +89,50 @@ is the report. A pull request from a fork or from Dependabot gets a read-only
 token and no OIDC token, so its report is only the artifact, and the run's
 summary says so.
 
+## Upgrades
+
+Every Monday the Upgrade workflow moves `.fvmrc` to the latest Flutter beta
+and runs `tool/upgrade.dart`, which moves every pub dependency to its latest
+release. A constraint that excludes one is widened to it, unless
+`tool/check_constraints.dart` holds it back with a reason, and
+`pubspec.lock` takes the newest version every constraint allows. The
+workflow opens one pull request with the result, or updates the one already
+open. Its description lists what moved and what that asks of the pull
+request: a moved constraint of the kit, or a moved look, goes in the
+CHANGELOG. CI and Compare run on it as on any other pull request, and a red
+check is the upgrade's breakage, to fix on its branch. The next run leaves a
+branch with someone else's commit on it alone; otherwise it rebuilds the
+branch from `main`. On a Flutter move, Compare renders both sides with the
+new Flutter, so its pictures show what the packages moved; CI's sweeps and
+tests are what check Flutter itself.
+
+By hand, the same is `fvm dart run tool/upgrade.dart`, after moving `.fvmrc`
+and running `fvm install` for a new Flutter. `.fvmrc` is the only place the
+version is written: every workflow installs the Flutter it names
+(`.github/actions/flutter`). The `environment: flutter:` of the example and
+of `reference_admin` is a floor, since a comparison resolves its base under
+the branch's Flutter.
+
+The pull request comes from a GitHub App. One opened with a workflow's own
+token starts no workflow, so its checks would never report and `main`'s
+ruleset would hold it forever. Make the app once:
+
+1. [New GitHub App](https://github.com/settings/apps/new): any name and
+   homepage URL, Webhook unticked, the repository permissions Contents and
+   Pull requests on Read and write, installable only on this account.
+2. Install it on this repository alone, and generate a private key on its
+   page.
+3. Give the workflow its ID and key, then run it once instead of waiting for
+   Monday:
+
+```sh
+gh variable set UPGRADE_APP_ID --body <the app's App ID>
+gh secret set UPGRADE_APP_PRIVATE_KEY < <the downloaded key>.pem
+gh workflow run upgrade.yaml
+```
+
+Until both exist, the run fails at its first step and says so.
+
 ## Licence
 
 BSD 3-Clause; see [LICENSE](LICENSE).

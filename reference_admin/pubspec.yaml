@@ -10,7 +10,9 @@ resolution: workspace
 
 environment:
   sdk: ^3.14.0-0
-  flutter: 3.48.0-0.5.pre
+  # A floor: .fvmrc is the pin. A comparison resolves its base under the
+  # branch's SDK, which an exact version here would refuse.
+  flutter: '>=3.48.0-0.5.pre'
 
 # The allow-list test/unit/guards_test.dart holds this file to: a new
 # dependency is a decision, not a drive-by.

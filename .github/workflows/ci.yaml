@@ -10,22 +10,13 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# flutter-version and channel mirror .fvmrc.
-env:
-  FLUTTER_VERSION: 3.48.0-0.5.pre
-  FLUTTER_CHANNEL: beta
-
 jobs:
   checks:
     name: Format, analyze, dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: ${{ env.FLUTTER_CHANNEL }}
-          cache: true
+      - uses: ./.github/actions/flutter
       - name: Resolve the workspace
         id: setup
         run: flutter pub get
@@ -64,11 +55,7 @@ jobs:
           - reference_admin
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: ${{ env.FLUTTER_CHANNEL }}
-          cache: true
+      - uses: ./.github/actions/flutter
       - run: flutter pub get
       - name: flutter test
         working-directory: ${{ matrix.package }}
