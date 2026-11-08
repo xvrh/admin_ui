@@ -20,6 +20,9 @@ needs per-language menus") and invent neutral example data.
   release) in one pull request, whose breakage is fixed on its branch.
 - `main` takes a change only as a squashed pull request whose checks pass;
   nothing pushes to it directly. `AGENTS.md` is this file, for other agents.
+- The Review workflow keeps one comment on a pull request with Gemini's
+  review of its latest push against this file. It decides nothing: fix a
+  point that holds, and reply to one that does not with why.
 
 ## Material comes from material_ui
 

@@ -1,0 +1,230 @@
+name: Review
+
+# Gemini reads each push to a pull request against AGENTS.md, and one comment
+# on the pull request, edited in place, holds what it found. It decides
+# nothing: no check of this workflow is required, and a point it makes is
+# fixed or answered, as a reviewer's would be. It is another family of model
+# than the agents that write the pull requests, so it does not share their
+# blind spots.
+#
+# The review job runs the Gemini CLI that .github/review/package.json pins
+# (Dependabot moves it), with .github/review/settings.json as its system
+# settings, which override any settings file in the workspace: it reads files
+# and does nothing else, with no shell, no web, no extension and no MCP
+# server. Its token reads the repository; the job that writes the comment
+# runs no model.
+#
+# The GEMINI_API_KEY secret pays for it, and README.md ("Reviews") makes it.
+# Without it, the run says so and reviews nothing. A pull request from a fork
+# or from Dependabot gets no secret, so it is not reviewed; nor is a draft,
+# until it is marked ready. The GEMINI_MODEL repository variable picks the
+# model; without it, the CLI picks one.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  key:
+    name: Whether to review
+    if: >-
+      !github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      set: ${{ steps.key.outputs.set }}
+    steps:
+      - name: The key is set
+        id: key
+        env:
+          HAS_KEY: ${{ secrets.GEMINI_API_KEY != '' }}
+        run: |
+          if [ "$HAS_KEY" = true ]; then
+            echo "set=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "There is no GEMINI_API_KEY secret, so nothing is reviewed. README.md (\"Reviews\") makes it." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+  review:
+    name: Gemini's review
+    needs: key
+    if: needs.key.outputs.set == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      reviewed: ${{ steps.review.outputs.reviewed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The head itself rather than GitHub's merge commit, so the
+          # review's links name lines of a commit of the pull request.
+          ref: ${{ github.event.pull_request.head.sha }}
+          # The diff is against the merge base; a shallow clone has none.
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: .github/review/package-lock.json
+      # Outside the workspace, so the review's file tools never list it. The
+      # optional packages are a terminal and a keychain, which a review that
+      # reads files has no use for.
+      - name: Install the Gemini CLI
+        run: |
+          cli="$RUNNER_TEMP/gemini-cli"
+          mkdir -p "$cli"
+          cp .github/review/package.json .github/review/package-lock.json "$cli"
+          npm ci --prefix "$cli" --omit=optional --ignore-scripts --no-audit --no-fund
+          echo "$cli/node_modules/.bin" >> "$GITHUB_PATH"
+      # The CLI reads system settings only from a file and a directory that
+      # root owns, and skips them with a warning otherwise: a review without
+      # them could run a shell, so it does not start.
+      - name: Install its settings
+        run: |
+          sudo install -D -o root -g root -m 0644 .github/review/settings.json \
+            /etc/gemini-cli/settings.json
+          if "$RUNNER_TEMP/gemini-cli/node_modules/.bin/gemini" --version 2>&1 \
+              | grep -i 'skipping system settings'; then
+            echo "::error::The Gemini CLI skipped .github/review/settings.json."
+            exit 1
+          fi
+
+      - name: The pull request's title, description and diff
+        id: files
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          pr="$RUNNER_TEMP/pull-request"
+          mkdir -p "$pr"
+          printf '# %s\n\n%s\n' "$TITLE" "$BODY" > "$pr/description.md"
+          # A lock's diff is every package that moved, which the review has no
+          # way to judge; the pubspecs say what the change asked for.
+          git diff --merge-base "$BASE" HEAD -- . ':(exclude,glob)**/pubspec.lock' \
+            > "$pr/diff.patch"
+          size=$(wc -c < "$pr/diff.patch")
+          echo "The diff is $size bytes."
+          # About 100,000 tokens: ten times the usual pull request, and a
+          # review that would cost as much as ten.
+          if [ "$size" -gt 400000 ]; then
+            echo "The diff is $size bytes, more than the 400,000 a review reads, so nothing is reviewed." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "fits=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "fits=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Review
+        id: review
+        if: steps.files.outputs.fits == 'true'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Headless, the CLI stops in a folder it has not been told to trust.
+          GEMINI_CLI_TRUST_WORKSPACE: 'true'
+          MODEL: ${{ vars.GEMINI_MODEL }}
+          REPOSITORY: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          pr="$RUNNER_TEMP/pull-request"
+          out="$RUNNER_TEMP/gemini.json"
+          err="$RUNNER_TEMP/gemini.log"
+          prompt="$(
+            echo "Repository: $REPOSITORY"
+            echo "Head commit: $SHA"
+            echo "Title and description: $pr/description.md"
+            echo "Diff against the base, pubspec.lock left out: $pr/diff.patch"
+            echo
+            cat .github/review/prompt.md
+          )"
+          args=(--output-format json --include-directories "$pr" --prompt "$prompt")
+          if [ -n "$MODEL" ]; then args+=(--model "$MODEL"); fi
+
+          code=0
+          gemini "${args[@]}" < /dev/null > "$out" 2> "$err" || code=$?
+          if [ "$code" -ne 0 ] || ! jq -e '.response | strings | length > 0' "$out" > /dev/null 2>&1; then
+            # A failure's JSON goes to stderr, after anything else the CLI logged.
+            message=$(sed -n '/^{/,$p' "$err" \
+              | jq -rs 'map(.error.message? // empty) | last // empty' 2> /dev/null || true)
+            echo "::error::Gemini gave no review (exit code $code). ${message:-The log below says why.}"
+            tail -n 40 "$err"
+            exit 1
+          fi
+
+          version=$(jq -r '.packages["node_modules/@google/gemini-cli"].version' \
+            .github/review/package-lock.json)
+          usage=$(jq -r '[.stats.models // {} | to_entries[]
+              | "\(.key), \(.value.tokens.prompt // 0) tokens in and \((.value.tokens.candidates // 0) + (.value.tokens.thoughts // 0)) out"]
+              | join("; ")' "$out")
+          comment="$RUNNER_TEMP/review/comment.md"
+          mkdir -p "$(dirname "$comment")"
+          {
+            echo '<!-- gemini-review -->'
+            echo "### Gemini's review of \`${SHA:0:7}\`"
+            echo
+            jq -r .response "$out"
+            echo
+            echo "<sub>Gemini CLI $version · $usage · [the run]($RUN). Advisory: it reviews each push, and decides nothing.</sub>"
+          } > "$comment"
+          # A comment holds 65536 characters.
+          if [ "$(wc -c < "$comment")" -gt 64000 ]; then
+            head -c 64000 "$comment" > "$comment.cut"
+            printf '\n\nThe review is cut here; the run has all of it.\n' >> "$comment.cut"
+            mv "$comment.cut" "$comment"
+          fi
+          cat "$comment" >> "$GITHUB_STEP_SUMMARY"
+          echo "reviewed=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: steps.review.outputs.reviewed == 'true'
+        with:
+          name: review
+          path: ${{ runner.temp }}/review/comment.md
+
+  comment:
+    name: Post the review
+    needs: review
+    if: needs.review.outputs.reviewed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write # the comment
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: review
+          path: ${{ runner.temp }}/review
+      # One comment per pull request, edited in place: this workflow's own,
+      # found by the marker on its first line.
+      - name: Comment
+        run: |
+          comment="$RUNNER_TEMP/review/comment.md"
+          ids=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]"
+                    and (.body | startswith("<!-- gemini-review -->"))) | .id')
+          id=${ids%%$'\n'*}
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" \
+              -F "body=@$comment" > /dev/null
+          else
+            gh api "repos/$REPO/issues/$PR/comments" -F "body=@$comment" > /dev/null
+          fi

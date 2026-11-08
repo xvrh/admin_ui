@@ -89,6 +89,45 @@ is the report. A pull request from a fork or from Dependabot gets a read-only
 token and no OIDC token, so its report is only the artifact, and the run's
 summary says so.
 
+## Reviews
+
+The Review workflow has Gemini read each push to a pull request against
+`AGENTS.md` and keeps one comment on the pull request, edited in place, with
+what it found: a bug, a broken rule of `AGENTS.md`, a change of behaviour no
+test holds, a description the diff contradicts. It decides nothing: none of
+its checks is required, and a point it makes is fixed or answered as a
+reviewer's would be. The agents that write the pull requests are another
+family of model, so it does not share their blind spots.
+
+It reads files and does nothing else.
+[`.github/review/settings.json`](.github/review/settings.json) leaves the
+Gemini CLI no shell, no web, no extension and no MCP server, and installed as
+system settings, it overrides any settings file a pull request brings.
+[`.github/review/prompt.md`](.github/review/prompt.md) says what it looks for
+and how it answers. A draft, a pull request from a fork or from Dependabot,
+and a diff over 400 KB (lock files left out) are not reviewed. Dependabot
+moves the CLI that `.github/review/package.json` pins once a month; its
+pull request is not reviewed, so a CLI that broke shows as the next review's
+red check.
+
+A Gemini API key pays for it. A Google AI Pro or Ultra plan comes with
+monthly Google Cloud credits through the Google Developer Program: claim
+them there, on a Cloud billing account (with prepaid billing, they apply
+once the account holds a balance). The plan's own quota is for AI Studio and
+Antigravity, and no workflow can use it. Then create a key in
+[AI Studio](https://aistudio.google.com/apikey), in a project on that
+billing account, and give it to the workflow. The CLI picks the model,
+unless `GEMINI_MODEL` names one:
+
+```sh
+gh secret set GEMINI_API_KEY
+gh variable set GEMINI_MODEL --body gemini-3-flash-preview   # optional
+```
+
+Each comment's footer has the tokens its review used, and a budget on the
+billing account alerts past a monthly amount. Without the secret, the run
+says so and reviews nothing.
+
 ## Upgrades
 
 Every Monday the Upgrade workflow moves `.fvmrc` to the latest Flutter beta
