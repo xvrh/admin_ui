@@ -350,6 +350,7 @@ void describeAdminShellStyle(
   describeValue(v.indicator, '${p}indicator', out);
   describeValue(v.indicatorWidth, '${p}indicatorWidth', out);
   describeValue(v.topBarHeight, '${p}topBarHeight', out);
+  describeValue(v.topBarSpan, '${p}topBarSpan', out);
   if (v.sidebarPalette case final f?) {
     describeAdminPalette(f, '${p}sidebarPalette', out);
   } else {

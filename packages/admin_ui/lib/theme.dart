@@ -28,7 +28,8 @@ export 'src/theme/motion.dart' show AdminMotion, defaultMotion;
 export 'src/theme/overlay_style.dart' show AdminOverlayStyle;
 export 'src/theme/palette.dart' show AdminPalette;
 export 'src/theme/radii.dart' show AdminRadii, defaultRadii;
-export 'src/theme/shell_style.dart' show AdminShellStyle, NavIndicator;
+export 'src/theme/shell_style.dart'
+    show AdminShellStyle, NavIndicator, TopBarSpan;
 export 'src/theme/sizes.dart'
     show AdminControlSizes, AdminIconSizes, ControlSize, defaultControlSizes;
 export 'src/theme/spacing.dart' show AdminSpacing, Gap;

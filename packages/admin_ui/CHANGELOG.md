@@ -2,6 +2,15 @@
 
 ## 0.2.0
 
+- The top bar can run over the page alone, beside a sidebar as tall as the
+  window, as Ant's side layout does: `AdminShellStyle.topBarSpan` is
+  `TopBarSpan.window`, the default and the frame as before, or
+  `TopBarSpan.page`. With `page`, the `TopBar`'s `leading` heads the
+  sidebar, as tall as the bar and in the sidebar's palette. It heads the
+  rail too, centred, where it reads `Sidebar.isCollapsed` to fit. When
+  compact, it stays in the bar. The bar's content starts at the page
+  gutter, and the sidebar keeps the top inset. The page keeps its state as
+  a theme changes the span. The example's shell has two previews of it.
 - A failure the app expects shows in its words, and only a bug is reported.
   Anything but a `FormSubmitException` that a `ValueFormController`'s
   `onSubmit` throws is kept as `submitFailure`, a new getter of

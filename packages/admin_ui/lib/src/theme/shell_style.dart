@@ -1,3 +1,6 @@
+/// @docImport '../shell/ui/shell.dart';
+library;
+
 import 'dart:ui' show Color, lerpDouble;
 
 import 'package:flutter/foundation.dart';
@@ -21,11 +24,23 @@ enum NavIndicator {
   edge,
 }
 
+/// What the [Shell]'s top bar runs across; see [AdminShellStyle.topBarSpan].
+enum TopBarSpan {
+  /// The whole window, over the sidebar, its leading (the logo) above the
+  /// sidebar's icons: Carbon's UI shell, Ant's mixed layout.
+  window,
+
+  /// The page alone. The sidebar runs the window's height, and its head, as
+  /// tall as the bar, holds the bar's leading (the logo), the rail's too:
+  /// Ant's side layout.
+  page,
+}
+
 /// The geometry of the app frame: the sidebar's widths, its items and their
-/// selection mark, the top bar's height, and optional palettes that draw the
-/// sidebar or the top bar in another scheme than the page (Carbon's g100
-/// header, Ant's dark sider). Provided via [AdminTokens]; read through
-/// `context.shellStyle`.
+/// selection mark, the top bar's height and what it spans, and optional
+/// palettes that draw the sidebar or the top bar in another scheme than the
+/// page (Carbon's g100 header, Ant's dark sider). Provided via
+/// [AdminTokens]; read through `context.shellStyle`.
 ///
 /// The defaults are the kit's own frame: a 240px sidebar that collapses to a
 /// 64px rail, 36px items 4px apart, and a 56px top bar.
@@ -70,6 +85,10 @@ class AdminShellStyle {
   /// The top bar.
   final double topBarHeight;
 
+  /// Whether the top bar runs across the window, over the sidebar, or across
+  /// the page alone, beside a sidebar as tall as the window.
+  final TopBarSpan topBarSpan;
+
   /// The palette the sidebar draws with, in place of the page's: its rail,
   /// items, selection and labels. Null draws it in the page's palette.
   final AdminPalette? sidebarPalette;
@@ -90,6 +109,7 @@ class AdminShellStyle {
     this.indicator,
     this.indicatorWidth = 3,
     this.topBarHeight = 56,
+    this.topBarSpan = TopBarSpan.window,
     this.sidebarPalette,
     this.topBarPalette,
   });
@@ -130,6 +150,7 @@ class AdminShellStyle {
       indicator: indicator,
       indicatorWidth: indicatorWidth,
       topBarHeight: topBarHeight,
+      topBarSpan: topBarSpan,
       sidebarPalette: sidebarPalette?.branded(seed),
       topBarPalette: topBarPalette?.branded(seed),
     );
@@ -150,6 +171,7 @@ class AdminShellStyle {
     NavIndicator? indicator,
     double? indicatorWidth,
     double? topBarHeight,
+    TopBarSpan? topBarSpan,
     AdminPalette? sidebarPalette,
     AdminPalette? topBarPalette,
   }) => AdminShellStyle(
@@ -164,12 +186,14 @@ class AdminShellStyle {
     indicator: indicator ?? this.indicator,
     indicatorWidth: indicatorWidth ?? this.indicatorWidth,
     topBarHeight: topBarHeight ?? this.topBarHeight,
+    topBarSpan: topBarSpan ?? this.topBarSpan,
     sidebarPalette: sidebarPalette ?? this.sidebarPalette,
     topBarPalette: topBarPalette ?? this.topBarPalette,
   );
 
   /// Interpolates the lengths; a nullable one set on one side only, the
-  /// [indicator] and the palettes come from the side [t] is nearer.
+  /// [indicator], the [topBarSpan] and the palettes come from the side [t]
+  /// is nearer.
   static AdminShellStyle lerp(AdminShellStyle a, AdminShellStyle b, double t) {
     final near = t < 0.5 ? a : b;
     double d(double x, double y) => lerpDouble(x, y, t)!;
@@ -187,6 +211,7 @@ class AdminShellStyle {
       indicator: near.indicator,
       indicatorWidth: d(a.indicatorWidth, b.indicatorWidth),
       topBarHeight: d(a.topBarHeight, b.topBarHeight),
+      topBarSpan: near.topBarSpan,
       sidebarPalette: near.sidebarPalette,
       topBarPalette: near.topBarPalette,
     );
@@ -206,6 +231,7 @@ class AdminShellStyle {
       other.indicator == indicator &&
       other.indicatorWidth == indicatorWidth &&
       other.topBarHeight == topBarHeight &&
+      other.topBarSpan == topBarSpan &&
       other.sidebarPalette == sidebarPalette &&
       other.topBarPalette == topBarPalette;
 
@@ -222,6 +248,7 @@ class AdminShellStyle {
     indicator,
     indicatorWidth,
     topBarHeight,
+    topBarSpan,
     sidebarPalette,
     topBarPalette,
   );
@@ -233,6 +260,7 @@ class AdminShellStyle {
       '${itemMarginX ?? 'auto'}, radius '
       '${itemRadius ?? 'radiusSmall'}, icon ${itemIconSize ?? 'md'}, '
       'indicator ${indicator?.name ?? 'auto'} $indicatorWidth, top bar '
-      '$topBarHeight${sidebarPalette == null ? '' : ', own sidebar palette'}'
+      '$topBarHeight across the ${topBarSpan.name}'
+      '${sidebarPalette == null ? '' : ', own sidebar palette'}'
       '${topBarPalette == null ? '' : ', own top bar palette'})';
 }

@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../common/text_metrics.dart';
 import '../../common/ui/icon_action.dart';
+import '../../theme/shell_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'navigation_drawer.dart';
@@ -20,6 +21,9 @@ import 'shell.dart';
 /// `AdminShellStyle.topBarHeight`. Its content starts at [Shell.inset], over
 /// the sidebar's icons, and ends at the page gutter
 /// ([PageHeader.gutterOf]), so the last action lines up with the page's.
+/// A style whose `topBarSpan` is `TopBarSpan.page` runs the bar over the
+/// page alone: its content then starts at the page gutter too, and beside
+/// the sidebar its [leading] heads that sidebar instead.
 /// A style with a `topBarPalette` draws the bar and everything in it in
 /// that palette (Carbon's g100 header): build a [leading] or an action that
 /// reads the colours itself with a context below the bar (a [Builder]) for
@@ -42,7 +46,10 @@ class TopBar extends StatelessWidget {
   /// The logo or sidebar toggle at the start. Drawn in the bar's palette,
   /// which a theme may set apart from the page's: a widget that reads the
   /// colours itself (`context.colors`, `context.type`) must be built below
-  /// the bar, in a [Builder], or it keeps the page's.
+  /// the bar, in a [Builder], or it keeps the page's. Under a bar that
+  /// spans the page alone it heads the sidebar beside the page instead, in
+  /// the sidebar's palette, and reads `Sidebar.isCollapsed` to fit the rail
+  /// ([Shell]).
   final Widget? leading;
   final String? title;
   final Widget? search;
@@ -102,10 +109,18 @@ class TopBar extends StatelessWidget {
     final menu = Shell.hasDrawer(context)
         ? menuButton ?? const ShellMenuButton()
         : null;
+    final leading = Shell.leadsSidebar(context) ? null : this.leading;
+    // Over the page alone, the bar's content lines up with the page's.
+    final start = context.shellStyle.topBarSpan == TopBarSpan.page
+        ? PageHeader.gutterOf(context)
+        : Shell.inset;
     return Container(
       height: context.shellStyle.topBarHeight + top,
       padding: EdgeInsetsDirectional.only(
-        start: menu == null ? Shell.inset : menuButtonStartOf(context),
+        // The menu button's glyph, not its box, starts there.
+        start: menu == null
+            ? start
+            : start - (Shell.inset - menuButtonStartOf(context)),
         end: PageHeader.gutterOf(context),
         top: top,
       ),
@@ -119,7 +134,7 @@ class TopBar extends StatelessWidget {
           return Row(
             children: [
               if (menu != null) ...[menu, const Gap(menuButtonGap)],
-              if (leading != null) ...[leading!, const Gap(AdminSpacing.md)],
+              if (leading != null) ...[leading, const Gap(AdminSpacing.md)],
               Expanded(
                 child: _Middle(
                   title: title,
