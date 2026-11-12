@@ -594,6 +594,7 @@ widgets.dart Severity
 widgets.dart SeverityStyle
 widgets.dart SideSheet
 widgets.dart SideSheetSide
+widgets.dart SidewaysScrollScope
 widgets.dart Skeleton
 widgets.dart SkeletonGroup
 widgets.dart Sparkline

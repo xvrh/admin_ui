@@ -149,6 +149,7 @@ export 'src/common/ui/severity.dart'
     show Severity, SeverityStyle, severityStyleOf;
 export 'src/common/ui/side_sheet.dart'
     show SideSheet, SideSheetSide, showSideSheet;
+export 'src/common/ui/sideways_scroll_scope.dart' show SidewaysScrollScope;
 export 'src/common/ui/skeleton.dart' show Skeleton, SkeletonGroup;
 export 'src/common/ui/slider.dart' show ValueSlider;
 export 'src/common/ui/sparkline.dart' show BarSparkline, Sparkline;

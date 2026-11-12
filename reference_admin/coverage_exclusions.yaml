@@ -262,6 +262,7 @@ building_blocks:
     - showAssetPicker
     - showNavigationDrawer
     - showSaveViewDialog
+    - SidewaysScrollScope
     - StepItem
     - Steps
     - SwatchOption

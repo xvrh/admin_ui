@@ -2,6 +2,16 @@
 
 ## 0.2.0
 
+- On the web, a two-finger swipe over a wide table, a board or another view
+  that scrolls sideways no longer takes the browser back a page. Flutter lets
+  the browser have a wheel event that no scroll view under the pointer can
+  use: one at the view's edge, or one a little off its axis. Chrome and Safari
+  then give it the rest of the swipe, and on a Mac a sideways swipe the
+  browser owns means "back". `SidewaysScrollScope`, which `AdminScope` now
+  mounts, keeps those events in the app while the pointer is over a view that
+  has room to scroll sideways. Elsewhere the browser still gets them, so the
+  back swipe still works over a page that does not scroll sideways. It is
+  `overscroll-behavior-x: contain` on each such view, which Safari ignores.
 - The top bar can run over the page alone, beside a sidebar as tall as the
   window, as Ant's side layout does: `AdminShellStyle.topBarSpan` is
   `TopBarSpan.window`, the default and the frame as before, or
