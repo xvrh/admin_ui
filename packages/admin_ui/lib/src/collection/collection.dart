@@ -35,6 +35,10 @@ class Collection<T> extends StatelessWidget {
   /// either view.
   final void Function(T row)? onRowTap;
 
+  /// Whether [onRowTap] opens [row], in either view; null opens every row.
+  /// See [CollectionTable.canOpen] and [CollectionCards.canOpen].
+  final bool Function(T row)? canOpen;
+
   /// How a pointer starts an inline edit in [CollectionViewMode.table]; see
   /// [CollectionTable.editTrigger].
   final TableEditTrigger editTrigger;
@@ -112,6 +116,7 @@ class Collection<T> extends StatelessWidget {
     required this.controller,
     required this.columns,
     this.onRowTap,
+    this.canOpen,
     this.editTrigger = TableEditTrigger.auto,
     this.selectable = false,
     this.pageSizes = const [10, 25, 50],
@@ -170,6 +175,7 @@ class Collection<T> extends StatelessWidget {
                   onSort: c.sortBy,
                   onClearSort: c.clearSort,
                   onRowTap: onRowTap,
+                  canOpen: canOpen,
                   editTrigger: editTrigger,
                   selected: selectable ? c.selected : null,
                   onSelectionChanged: selectable ? c.setSelected : null,
@@ -194,6 +200,7 @@ class Collection<T> extends StatelessWidget {
                   cardBuilder: cardBuilder!,
                   rowKey: c.rowKey,
                   onCardTap: onRowTap,
+                  canOpen: canOpen,
                   selected: selectable ? c.selected : null,
                   onSelectionChanged: selectable ? c.setSelected : null,
                   loading: c.loading,

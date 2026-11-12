@@ -73,6 +73,11 @@ class KanbanBoard<T> extends StatefulWidget {
   /// `onRowTap`, a card view's or a board's `onCardTap`.
   final void Function(T item)? onCardTap;
 
+  /// Whether [onCardTap] opens [item]; null opens every card. A card that
+  /// does not open is no Tab stop and shows no hand, and still moves with
+  /// [onMove].
+  final bool Function(T item)? canOpen;
+
   /// Placeholder for a column with no cards. Defaults to a muted "No items",
   /// which reads "Drop here" while a card is being dragged, in the app's
   /// language.
@@ -97,6 +102,7 @@ class KanbanBoard<T> extends StatefulWidget {
     required this.itemKey,
     this.onMove,
     this.onCardTap,
+    this.canOpen,
     this.emptyBuilder,
     this.columnWidth = 300,
   });
@@ -316,7 +322,9 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     final column = widget.columns[index];
     final card = widget.cardBuilder(context, item);
     final onMove = widget.onMove;
-    final onCardTap = widget.onCardTap;
+    final onCardTap = (widget.canOpen?.call(item) ?? true)
+        ? widget.onCardTap
+        : null;
 
     Widget tile = card;
     if (onMove != null) {

@@ -23,6 +23,7 @@ Future<List<int>> _pump(
   WidgetTester tester, {
   TableEditTrigger trigger = TableEditTrigger.doubleTap,
   bool rowTap = true,
+  bool Function(_Item row)? canOpen,
 }) async {
   final opened = <int>[];
   final items = _items();
@@ -42,6 +43,7 @@ Future<List<int>> _pump(
                 rows: items,
                 rowKey: (r) => r.id,
                 onRowTap: rowTap ? (r) => opened.add(r.id) : null,
+                canOpen: canOpen,
                 editTrigger: trigger,
                 columns: [
                   TableColumn(
@@ -93,6 +95,35 @@ int _tapActions() => find.semantics
     .length;
 
 void main() {
+  testWidgets('a row canOpen leaves out opens on no tap and no Enter, and '
+      'edits as in a table with no row tap', (tester) async {
+    final handle = tester.ensureSemantics();
+    final opened = await _pump(
+      tester,
+      trigger: TableEditTrigger.auto,
+      canOpen: (r) => r.id != 2,
+    );
+    // Row 1 alone offers its open action.
+    expect(_tapActions(), 1);
+
+    await tester.tap(find.text('#2'));
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(opened, isEmpty);
+
+    await _doubleTap(tester, find.text('Bravo'));
+    expect(tester.widget<EditableText>(_editor).controller.text, 'Bravo');
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump(kDoubleTapTimeout);
+    expect(opened, isEmpty);
+
+    await tester.tap(find.text('#1'));
+    await tester.pump();
+    expect(opened, [1]);
+    handle.dispose();
+  });
+
   group('doubleTap, with a row tap', () {
     testWidgets('a single tap on an editable cell opens the row once the '
         'double-tap window has passed', (tester) async {

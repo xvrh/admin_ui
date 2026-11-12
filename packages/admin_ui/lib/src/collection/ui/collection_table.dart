@@ -233,6 +233,12 @@ class CollectionTable<T> extends StatefulWidget {
   /// `onRowTap`, a card view's or a board's `onCardTap`.
   final void Function(T row)? onRowTap;
 
+  /// Whether [onRowTap] opens [row]; null opens every row. A row that does
+  /// not open shows no hand and announces no open action, and Enter on it
+  /// only edits a cell or enters its control. Its cells edit on a double tap
+  /// as those of a table with no [onRowTap] do.
+  final bool Function(T row)? canOpen;
+
   /// How a pointer starts an inline edit; see [TableEditTrigger]. With
   /// [onRowTap] set, [TableEditTrigger.doubleTap] lets a double tap edit a
   /// cell that a single tap still opens the row from.
@@ -324,6 +330,7 @@ class CollectionTable<T> extends StatefulWidget {
     this.sort,
     this.onSort,
     this.onRowTap,
+    this.canOpen,
     this.editTrigger = TableEditTrigger.auto,
     this.selected,
     this.onSelectionChanged,
@@ -889,10 +896,13 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
       return;
     } else if (_bodyCells[at]?.enter() ?? false) {
       return;
-    } else {
-      widget.onRowTap?.call(row);
+    } else if (_opens(row)) {
+      widget.onRowTap!(row);
     }
   }
+
+  bool _opens(T row) =>
+      widget.onRowTap != null && (widget.canOpen?.call(row) ?? true);
 
   void _activateHeader(int col) {
     if (_isSelectionColumn(col)) {
@@ -1239,11 +1249,12 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
       }
       // The whole selection cell toggles the row, not only its box; the
       // box itself stays the one checkbox assistive technology sees.
+      final opens = _opens(row);
       final onTap = selectionColumn
           ? () => _toggleRow(row)
-          : widget.onRowTap == null
-          ? null
-          : () => widget.onRowTap!(row);
+          : opens
+          ? () => widget.onRowTap!(row)
+          : null;
       final cell = (row: v.row, col: v.column);
       return _BodyCell(
         signals: _signals,
@@ -1256,8 +1267,7 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
         // double.
         onDoubleTap:
             col.editable &&
-                (widget.onRowTap == null ||
-                    widget.editTrigger == TableEditTrigger.doubleTap)
+                (!opens || widget.editTrigger == TableEditTrigger.doubleTap)
             ? () => _startEdit(index, v.column)
             : null,
         // The row's open action is announced once, on its first cell.

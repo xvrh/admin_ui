@@ -36,6 +36,9 @@ import 'view_support.dart';
 /// anything is selected, and always under touch. A long press toggles a
 /// card; from the keyboard Space toggles the focused card and Enter opens it.
 ///
+/// [onCardTap] opens a card, and [canOpen] leaves out the rows that have
+/// nothing to open yet, such as an upload still on its way.
+///
 /// [loading]/[empty]/[error] drive the body state ([error] takes precedence,
 /// then [loading]). A load that runs past 150ms shows a top progress bar and
 /// dims the cards, which take no input until it lands; the first load
@@ -55,6 +58,12 @@ class CollectionCards<T> extends StatefulWidget {
   /// Opens a card. The tap is named for what the view draws: a table's
   /// `onRowTap`, a card view's or a board's `onCardTap`.
   final void Function(T row)? onCardTap;
+
+  /// Whether [onCardTap] opens [row]; null opens every row. A card that does
+  /// not open is content, not a control: no hand, no hover lift, no Tab stop
+  /// and no button for assistive technology. Under a selection its tap still
+  /// selects it.
+  final bool Function(T row)? canOpen;
 
   /// Identifies a row across reloads — a record id — so a refetch that
   /// returns fresh objects keeps its selection.
@@ -85,6 +94,7 @@ class CollectionCards<T> extends StatefulWidget {
     required this.rows,
     required this.cardBuilder,
     this.onCardTap,
+    this.canOpen,
     this.rowKey,
     this.selected,
     this.onSelectionChanged,
@@ -207,6 +217,7 @@ class _CollectionCardsState<T> extends State<CollectionCards<T>> {
       final row = widget.rows[index];
       final selected = selectable && keys.contains(_key(row));
       final open = widget.onCardTap;
+      final opens = open != null && (widget.canOpen?.call(row) ?? true);
       return _CardTile(
         // Keyed by record, so focus follows a card the list reorders.
         key: widget.rowKey == null ? null : ValueKey(_key(row)),
@@ -214,7 +225,7 @@ class _CollectionCardsState<T> extends State<CollectionCards<T>> {
         selectable: selectable,
         selected: selected,
         showCheck: checks,
-        onOpen: open == null ? null : () => open(row),
+        onOpen: opens ? () => open(row) : null,
         onToggle: selectable ? () => _toggle(row, keys) : null,
         child: Builder(builder: (context) => widget.cardBuilder(context, row)),
       );
@@ -396,7 +407,11 @@ class _CardTileState extends State<_CardTile> {
       selected: widget.selectable ? selected : null,
       showFocusRing: false,
       builder: (context, states) {
-        final hovered = states.contains(WidgetState.hovered);
+        // The lift says a tap does something, so a card with no tap of its
+        // own stays flat under the pointer.
+        final hovered =
+            states.contains(WidgetState.hovered) &&
+            (widget.onOpen != null || toggle != null);
         return FocusRing(
           focused: states.contains(WidgetState.focused),
           radius: radius,
