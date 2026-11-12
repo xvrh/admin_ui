@@ -88,6 +88,14 @@
   a drawer from the top bar's menu button: compact, and now also between
   the breakpoints beside a collapsed rail. `Shell.openDrawer` opens it in
   both. A top bar of the app's own shows its menu button by it.
+- A list can hold rows that open and rows that do not, such as an upload
+  still on its way among the files that have arrived: `canOpen` on
+  `CollectionTable`, `CollectionCards`, `KanbanBoard` and `Collection` says
+  which rows `onRowTap` or `onCardTap` opens, and null opens them all. A row
+  it leaves out is content, not a control: it shows no hand, is no Tab stop
+  as a card, opens on no Enter and announces no open action. A table cell of
+  such a row edits on a double tap, as in a table with no row tap. A card
+  under a selection still selects on a tap, and a board's card still moves.
 
 ### Looks
 
@@ -115,6 +123,10 @@
   saying there was more. A table now scrolls only when its columns' minimum
   widths outgrow it, and the flex columns beside a held one are narrower by
   what it took.
+- A `CollectionCards` card lifts under the pointer only when a tap on it
+  does something: it opens, or it selects. A card with neither, in a grid
+  with no `onCardTap` and no selection or left out by `canOpen`, keeps its
+  resting border and no shadow. Every card used to lift.
 
 ## 0.1.0
 

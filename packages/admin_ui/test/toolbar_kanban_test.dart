@@ -15,6 +15,7 @@ Future<void> _pump(
   List<KanbanColumn<_Card>> columns, {
   void Function(_Card item, String from, String to)? onMove,
   void Function(_Card item)? onCardTap,
+  bool Function(_Card item)? canOpen,
 }) async {
   tester.view.physicalSize = const Size(1600, 700);
   tester.view.devicePixelRatio = 1;
@@ -27,6 +28,7 @@ Future<void> _pump(
           itemKey: (c) => c.id,
           onMove: onMove,
           onCardTap: onCardTap,
+          canOpen: canOpen,
           cardBuilder: (_, c) => Container(
             height: 60,
             padding: KanbanBoard.cardPadding,
@@ -168,6 +170,29 @@ void main() {
     expect(find.byType(Draggable<Object>), findsNothing);
     expect(find.text('No items'), findsOneWidget);
     expect(find.text('Drop here'), findsNothing);
+  });
+
+  testWidgets('a card canOpen leaves out is no Tab stop and opens on no tap', (
+    tester,
+  ) async {
+    final opened = <String>[];
+    await _pump(
+      tester,
+      [
+        _column('a', cards: const ['1', '2']),
+      ],
+      onCardTap: (item) => opened.add(item.id),
+      canOpen: (item) => item.id != 'a1',
+    );
+
+    await tester.tap(find.text('card a1'));
+    await tester.pump();
+    expect(opened, isEmpty);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(opened, ['a2']);
   });
 
   testWidgets('Alt+→ / Alt+← move a focused card; screen readers get '
