@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- A dashboard can hold its layout while its figures load. `BarList`,
+  `LineChart` (and `LineChart.time`) and `BarChart` take `loading`, as
+  `StatCard` does: the list keeps its labels, its bars and values pulse,
+  and a chart keeps its legend over a skeleton of its plot. Each is exactly
+  as tall as it is loaded, so nothing below moves when the values land. A
+  `BarList` row with an empty label stands for a row not known yet.
+  `SkeletonText` is new: a skeleton exactly one line of a text style tall,
+  for a page's own placeholder rows, and the one `StatCard` draws with.
 - A click picks a `Combobox` option in an app wrapped in a `SelectionArea`.
   A press held past the tap timeout let the area take focus from the field,
   which closed the list before the release reached the option, so the
@@ -114,6 +122,14 @@
 
 ### Looks
 
+- A loading `StatCard` keeps room for the delta and the caption it is given,
+  and for no other. It kept room for both whatever it was given, so a card
+  that loads into one with a caption alone stood taller by the height of
+  the delta's chip, and one with neither by a whole row, and the page moved
+  up when the figures landed. Their words are not shown while it loads, so
+  a page gives the loading card the delta and caption the loaded one will
+  have, with any words. A loading card given neither is a row shorter than
+  before.
 - Stock Material widgets under `buildAppTheme` draw the accent the way the
   kit's own controls do, at its contrast target. The label of an
   `OutlinedButton` or an `ElevatedButton`, and a selected `ListTile`, take

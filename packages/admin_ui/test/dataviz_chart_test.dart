@@ -14,11 +14,16 @@ Widget _host(
   Widget child, {
   AdminPalette palette = irisPalette,
   double width = 400,
+  double textScale = 1,
 }) => MaterialApp(
   theme: buildAppTheme(AdminTokens.from(palette: palette)),
-  home: Scaffold(
-    body: Center(
-      child: SizedBox(width: width, child: child),
+  home: MediaQuery.withClampedTextScaling(
+    minScaleFactor: textScale,
+    maxScaleFactor: textScale,
+    child: Scaffold(
+      body: Center(
+        child: SizedBox(width: width, child: child),
+      ),
     ),
   ),
 );
@@ -519,6 +524,74 @@ void main() {
       expect(up.blRadiusX, 0);
       expect(down.tlRadiusX, 0);
       expect(down.blRadiusX, _cap(down));
+    });
+  });
+
+  group('loading', () {
+    for (final scale in [1.0, 2.0]) {
+      testWidgets('a bar list is as tall as it is loaded, text x$scale', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(
+            const BarList(
+              sort: false,
+              items: [
+                BarListItem('Signed up', 12),
+                BarListItem('Paid', 5),
+                BarListItem('Refunded', 1),
+              ],
+            ),
+            textScale: scale,
+          ),
+        );
+        final loaded = tester.getSize(find.byType(BarList)).height;
+
+        final semantics = tester.ensureSemantics();
+        await tester.pumpWidget(
+          _host(
+            const BarList(
+              sort: false,
+              loading: true,
+              items: [
+                BarListItem('Signed up', 0),
+                BarListItem('Paid', 0),
+                BarListItem('', 0),
+              ],
+            ),
+            textScale: scale,
+          ),
+        );
+        expect(tester.getSize(find.byType(BarList)).height, loaded);
+        expect(find.text('Signed up'), findsOneWidget);
+        expect(find.text('0'), findsNothing);
+        expect(find.byType(SkeletonGroup), findsOneWidget);
+        expect(find.bySemanticsLabel(RegExp('^Loading…')), findsOneWidget);
+        semantics.dispose();
+      });
+    }
+
+    testWidgets('a chart keeps its legend and its height', (tester) async {
+      const series = [
+        ChartSeries('This year', [12, 19, 14]),
+        ChartSeries('Last year', [9, 11, 13]),
+      ];
+      final labels = _months.sublist(0, 3);
+      for (final chart in [
+        (bool loading) =>
+            LineChart(series: series, labels: labels, loading: loading),
+        (bool loading) =>
+            BarChart(series: series, labels: labels, loading: loading),
+      ]) {
+        await tester.pumpWidget(_host(KeyedSubtree(child: chart(false))));
+        final loaded = tester.getSize(find.byType(KeyedSubtree).last).height;
+
+        await tester.pumpWidget(_host(KeyedSubtree(child: chart(true))));
+        expect(tester.getSize(find.byType(KeyedSubtree).last).height, loaded);
+        expect(find.text('This year'), findsOneWidget);
+        expect(find.text('Jan'), findsNothing);
+        expect(find.byType(Skeleton), findsWidgets);
+      }
     });
   });
 

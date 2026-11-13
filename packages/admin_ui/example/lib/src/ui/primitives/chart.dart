@@ -300,6 +300,25 @@ class ChartDemo extends StatelessWidget {
         ),
         const Gap(AdminSpacing.xxxl),
 
+        const DemoSection('Bar list and line chart — loading'),
+        const BarList(
+          sort: false,
+          loading: true,
+          items: [
+            BarListItem('Visited', 0),
+            BarListItem('Signed up', 0),
+            BarListItem('', 0),
+            BarListItem('', 0),
+          ],
+        ),
+        const Gap(AdminSpacing.lg),
+        const LineChart(
+          loading: true,
+          series: [ChartSeries('This year', []), ChartSeries('Last year', [])],
+          labels: [],
+        ),
+        const Gap(AdminSpacing.xxxl),
+
         const DemoSection('Chart card — populated / loading / empty'),
         ChartCard(
           title: 'Revenue',

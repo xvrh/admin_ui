@@ -39,12 +39,14 @@ class StatDelta {
 /// Assistive technology reads the tile as one sentence — "Revenue: $48.2k, up
 /// 12%, vs last month" — so the trend arrow is spoken too.
 ///
-/// While [loading], the figure, the delta and the caption are pulsing bars,
-/// each as tall as the line it stands in for, so the card is exactly as tall
-/// as a loaded one with a delta or a caption and nothing moves when the
-/// figures land. The [label] and [icon] still show when given, so the page
-/// names what is coming; an empty [label] is a bar too. A loading card takes
-/// no taps and reads as the label and "Loading…".
+/// While [loading], the figure is a pulsing bar, and so are the [delta] and
+/// the [caption] the card is given, each as tall as what it stands in for.
+/// Their words are not shown, so give a loading card the delta and caption
+/// the loaded card will have, with any words: it is then exactly as tall as
+/// the loaded card, and nothing moves when the figures land. The [label] and
+/// [icon] still show when given, so the page names what is coming; an empty
+/// [label] is a bar too. A loading card takes no taps and reads as the label
+/// and "Loading…".
 class StatCard extends StatelessWidget {
   /// The muted name over the figure; a bar while [loading] when empty.
   /// Required, as [value] is, once the card is loaded.
@@ -57,7 +59,8 @@ class StatCard extends StatelessWidget {
   final String? caption;
   final VoidCallback? onTap;
 
-  /// Draws the figure, delta and caption as skeleton bars; see [StatCard].
+  /// Draws the figure, and the delta and caption it is given, as skeleton
+  /// bars; see [StatCard].
   final bool loading;
 
   const StatCard({
@@ -145,7 +148,7 @@ class StatCard extends StatelessWidget {
             children: [
               Expanded(
                 child: loading && label.isEmpty
-                    ? _SkeletonLine(style: labelStyle, widthFactor: 0.4)
+                    ? SkeletonText(style: labelStyle, widthFactor: 0.4)
                     : Text(
                         label,
                         maxLines: 1,
@@ -163,7 +166,7 @@ class StatCard extends StatelessWidget {
           ),
           const Gap(AdminSpacing.md),
           if (loading)
-            _SkeletonLine(style: valueStyle, widthFactor: 0.55)
+            SkeletonText(style: valueStyle, widthFactor: 0.55)
           else
             Text(
               value,
@@ -171,18 +174,20 @@ class StatCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: valueStyle,
             ),
-          if (loading) ...[
+          if (loading && (delta != null || caption != null)) ...[
             const Gap(AdminSpacing.md),
             Row(
               children: [
-                const _SkeletonDeltaChip(),
-                const Gap(AdminSpacing.md),
-                Expanded(
-                  child: _SkeletonLine(style: captionStyle, widthFactor: 0.5),
-                ),
+                if (delta != null) const _SkeletonDeltaChip(),
+                if (delta != null && caption != null)
+                  const Gap(AdminSpacing.md),
+                if (caption != null)
+                  Expanded(
+                    child: SkeletonText(style: captionStyle, widthFactor: 0.5),
+                  ),
               ],
             ),
-          ] else if (delta != null || caption != null) ...[
+          ] else if (!loading && (delta != null || caption != null)) ...[
             const Gap(AdminSpacing.md),
             Row(
               children: [
@@ -203,34 +208,6 @@ class StatCard extends StatelessWidget {
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-/// A loading line of [style]: a bar about the height of its capitals, from
-/// the start of a box one line tall, [widthFactor] of the width.
-///
-/// The line is measured rather than laid out as empty text: [StatGrid] sizes
-/// its rows by intrinsic height, which a paragraph can report from the font
-/// it had before a late font load while laying out in the new one.
-class _SkeletonLine extends StatelessWidget {
-  final TextStyle style;
-  final double widthFactor;
-
-  const _SkeletonLine({required this.style, required this.widthFactor});
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.textScalerOf(context).scale(style.fontSize ?? 14);
-    return SizedBox(
-      height: lineHeightOf(context, style),
-      child: Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: FractionallySizedBox(
-          widthFactor: widthFactor,
-          child: Skeleton(height: (size * 0.7).roundToDouble()),
-        ),
       ),
     );
   }
@@ -329,7 +306,8 @@ class _DeltaChip extends StatelessWidget {
 /// ```dart
 /// StatGrid(
 ///   children: [
-///     for (final label in labels) StatCard(label: label, loading: true),
+///     for (final label in labels)
+///       StatCard(label: label, caption: 'vs last month', loading: true),
 ///   ],
 /// )
 /// ```

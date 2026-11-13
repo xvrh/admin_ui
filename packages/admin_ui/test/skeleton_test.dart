@@ -172,4 +172,41 @@ void main() {
       }
     });
   }
+
+  for (final scale in [1.0, 2.0]) {
+    testWidgets('SkeletonText is one line of its style tall, text x$scale', (
+      tester,
+    ) async {
+      const style = TextStyle(fontSize: 24, height: 1.3);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery.withClampedTextScaling(
+            minScaleFactor: scale,
+            maxScaleFactor: scale,
+            child: const Scaffold(
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Revenue', key: Key('text'), style: style),
+                  SizedBox(
+                    width: 200,
+                    child: SkeletonText(
+                      key: Key('line'),
+                      style: style,
+                      widthFactor: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('line'))).height,
+        tester.getSize(find.byKey(const Key('text'))).height,
+      );
+      expect(tester.getSize(find.byType(Skeleton)).width, 100);
+    });
+  }
 }

@@ -96,6 +96,10 @@ List<Color> _resolve(List<Color?> own, AdminPalette palette) {
 /// end instead, as for a score out of 10 that reads against 10 when no value
 /// reaches it. Marks outside a fixed range are cut at the plot's edge.
 ///
+/// While [loading], the plot is a skeleton as tall as [height] under the
+/// series' legend, so the chart is as tall as it is loaded and nothing moves
+/// when the values land. The series' values are not read.
+///
 /// Right to left, the chart mirrors: the categories (or time) run from the
 /// right, and the value axis stands on the right. Values default to the app's
 /// locale in compact form ('1.2K', '1,2 k' in French); [formatY] overrides
@@ -131,6 +135,9 @@ class LineChart extends StatelessWidget {
   /// The top of the value axis whatever the data; null fits the data.
   final double? maxY;
 
+  /// Draws the plot as a skeleton; see [LineChart].
+  final bool loading;
+
   final bool _time;
 
   const LineChart({
@@ -147,6 +154,7 @@ class LineChart extends StatelessWidget {
     this.startAtZero,
     this.minY,
     this.maxY,
+    this.loading = false,
   }) : timeSeries = const [],
        _time = false,
        assert(minY == null || maxY == null || minY < maxY);
@@ -171,6 +179,7 @@ class LineChart extends StatelessWidget {
     this.startAtZero,
     this.minY,
     this.maxY,
+    this.loading = false,
   }) : timeSeries = series,
        series = const [],
        labels = const [],
@@ -188,6 +197,14 @@ class LineChart extends StatelessWidget {
       for (final s in series) s.label,
       for (final s in timeSeries) s.label,
     ];
+    if (loading) {
+      return _LoadingChart(
+        legend: showLegend && names.length > 1
+            ? [for (var i = 0; i < names.length; i++) (names[i], colors[i])]
+            : const [],
+        height: height,
+      );
+    }
     var lo = double.infinity, hi = -double.infinity;
     for (final s in series) {
       for (final v in s.values) {
@@ -256,6 +273,9 @@ class LineChart extends StatelessWidget {
 /// or [stacked] segments. Negative values hang down from the zero line (and
 /// stack downward). Pairs with a [LineChart] on the same dashboard, and
 /// mirrors right to left the same way.
+///
+/// While [loading], the plot is a skeleton as tall as [height] under the
+/// series' legend, as a [LineChart]'s is.
 class BarChart extends StatelessWidget {
   final List<ChartSeries> series;
   final List<String> labels;
@@ -264,6 +284,9 @@ class BarChart extends StatelessWidget {
   final bool showLegend;
   final int yTicks;
   final String Function(double)? formatY;
+
+  /// Draws the plot as a skeleton; see [BarChart].
+  final bool loading;
 
   const BarChart({
     super.key,
@@ -274,12 +297,24 @@ class BarChart extends StatelessWidget {
     this.showLegend = true,
     this.yTicks = 4,
     this.formatY,
+    this.loading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final palette = context.colors;
     final colors = _resolve([for (final s in series) s.color], palette);
+    if (loading) {
+      return _LoadingChart(
+        legend: showLegend && series.length > 1
+            ? [
+                for (var i = 0; i < series.length; i++)
+                  (series[i].label, colors[i]),
+              ]
+            : const [],
+        height: height,
+      );
+    }
     final count = series.isEmpty ? 0 : series.first.values.length;
     var lo = 0.0, hi = 0.0;
     for (var i = 0; i < count; i++) {
@@ -448,6 +483,12 @@ class BarListItem {
 /// from the start edge, and take the first chart colour unless an item has
 /// its own. Sorted descending unless [sort] is false; capped at [maxItems] if
 /// set. Values default to the app's locale in compact form.
+///
+/// While [loading], each row's bar and value are pulsing bars, and the list
+/// is exactly as tall as it is loaded, so nothing moves when the values land.
+/// A row's [BarListItem.label] still shows, so the list names what is coming;
+/// for rows not known yet, give as many items as are expected with empty
+/// labels. The values are ignored and the rows keep their order.
 class BarList extends StatelessWidget {
   final List<BarListItem> items;
   final double? max;
@@ -455,6 +496,9 @@ class BarList extends StatelessWidget {
   final int? maxItems;
   final double barHeight;
   final String Function(double)? formatValue;
+
+  /// Draws the bars and values as skeletons; see [BarList].
+  final bool loading;
 
   const BarList({
     super.key,
@@ -464,7 +508,12 @@ class BarList extends StatelessWidget {
     this.maxItems,
     this.barHeight = 30,
     this.formatValue,
+    this.loading = false,
   });
+
+  /// The share of the width each loading row's bar takes, one per row and
+  /// the last for the rest: falling, as a ranked list does.
+  static const _loadingBars = [0.92, 0.74, 0.6, 0.48, 0.38, 0.3];
 
   @override
   Widget build(BuildContext context) {
@@ -472,7 +521,7 @@ class BarList extends StatelessWidget {
     final format = formatValue ?? context.adminFormats.compact;
 
     var rows = items;
-    if (sort) {
+    if (sort && !loading) {
       rows = [...items]..sort((a, b) => b.value.compareTo(a.value));
     }
     if (maxItems != null && rows.length > maxItems!) {
@@ -482,12 +531,39 @@ class BarList extends StatelessWidget {
     final scale = top <= 0 ? 1.0 : top;
     // Taller by as much as the labels grow at a large text size.
     final barHeight = this.barHeight + textGrowthOf(context, context.type.body);
+    final radius = BorderRadius.circular(context.radii.radiusSmall);
+    final valueStyle = context.type.bodyStrong.copyWith(
+      color: colors.foregroundSecondary,
+    );
 
-    return Column(
+    Widget bar(int index, BarListItem item) {
+      if (loading) {
+        return FractionallySizedBox(
+          alignment: AlignmentDirectional.centerStart,
+          widthFactor: _loadingBars[math.min(index, _loadingBars.length - 1)],
+          child: Skeleton(height: barHeight, borderRadius: radius),
+        );
+      }
+      return FractionallySizedBox(
+        alignment: AlignmentDirectional.centerStart,
+        widthFactor: (item.value / scale).clamp(0.0, 1.0),
+        child: Container(
+          height: barHeight,
+          decoration: BoxDecoration(
+            color: (item.color ?? colors.chart.first)
+                // token-literal: a bar's wash under its value
+                .withValues(alpha: 0.16),
+            borderRadius: radius,
+          ),
+        ),
+      );
+    }
+
+    final list = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final item in rows)
+        for (final (index, item) in rows.indexed)
           Padding(
             padding: const EdgeInsets.only(bottom: AdminSpacing.sm),
             child: Row(
@@ -495,21 +571,7 @@ class BarList extends StatelessWidget {
                 Expanded(
                   child: Stack(
                     children: [
-                      FractionallySizedBox(
-                        alignment: AlignmentDirectional.centerStart,
-                        widthFactor: (item.value / scale).clamp(0.0, 1.0),
-                        child: Container(
-                          height: barHeight,
-                          decoration: BoxDecoration(
-                            color: (item.color ?? colors.chart.first)
-                                // token-literal: a bar's wash under its value
-                                .withValues(alpha: 0.16),
-                            borderRadius: BorderRadius.circular(
-                              context.radii.radiusSmall,
-                            ),
-                          ),
-                        ),
-                      ),
+                      bar(index, item),
                       SizedBox(
                         height: barHeight,
                         child: Padding(
@@ -539,16 +601,23 @@ class BarList extends StatelessWidget {
                   ),
                 ),
                 const Gap(AdminSpacing.lg),
-                Text(
-                  format(item.value),
-                  style: context.type.bodyStrong.copyWith(
-                    color: colors.foregroundSecondary,
-                  ),
-                ),
+                if (loading)
+                  SkeletonText(
+                    style: valueStyle,
+                    width: MediaQuery.textScalerOf(context).scale(40),
+                  )
+                else
+                  Text(format(item.value), style: valueStyle),
               ],
             ),
           ),
       ],
+    );
+    if (!loading) return list;
+    return Semantics(
+      container: true,
+      label: context.adminL10n.loading,
+      child: SkeletonGroup(child: list),
     );
   }
 }
@@ -659,6 +728,33 @@ class _ChartSkeleton extends StatelessWidget {
             ),
             const Gap(AdminSpacing.md),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// A [LineChart] or [BarChart] while it loads: its legend, and the plot's
+/// height in skeleton.
+class _LoadingChart extends StatelessWidget {
+  final List<(String, Color)> legend;
+  final double height;
+
+  const _LoadingChart({required this.legend, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      label: context.adminL10n.loading,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (legend.isNotEmpty) ...[
+            _Legend(entries: legend),
+            const Gap(AdminSpacing.lg),
+          ],
+          SizedBox(height: height, child: const _ChartSkeleton()),
         ],
       ),
     );

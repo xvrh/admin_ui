@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/tokens.dart';
+import '../text_metrics.dart';
 
 /// The pulse held at its midpoint, for reduced motion.
 const _stillPulse = AlwaysStoppedAnimation<double>(0.5);
@@ -101,6 +102,58 @@ class _SkeletonState extends State<Skeleton>
   void dispose() {
     _own?.dispose();
     super.dispose();
+  }
+}
+
+/// A [Skeleton] standing in for one line of text in [style]: a bar about the
+/// height of its capitals, in a box exactly as tall as the line. A placeholder
+/// built of them is as tall as the text it becomes, at any text size.
+///
+/// The bar is [width] wide, or [widthFactor] of the width the box is given,
+/// which then has to be bounded. It sits at [alignment] in the box, so a
+/// figure's bar can stand at the end of a column of figures.
+///
+/// The line is measured, not laid out as empty text: a paragraph reports its
+/// intrinsic height from the font it had before a late font load while it
+/// lays out in the new one, and a row sized by intrinsic height would then be
+/// off. It is measured again when a font loads.
+class SkeletonText extends StatelessWidget {
+  final TextStyle style;
+  final double? width;
+  final double widthFactor;
+  final AlignmentGeometry alignment;
+
+  const SkeletonText({
+    super.key,
+    required this.style,
+    this.width,
+    this.widthFactor = 1,
+    this.alignment = AlignmentDirectional.centerStart,
+  }) : assert(widthFactor >= 0 && widthFactor <= 1);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: PaintingBinding.instance.systemFonts,
+      builder: (context, _) {
+        final effective = DefaultTextStyle.of(context).style.merge(style);
+        final size = MediaQuery.textScalerOf(context)
+            .scale(effective.fontSize ?? 14);
+        final bar = Skeleton(
+          width: width ?? double.infinity,
+          height: (size * 0.7).roundToDouble(),
+        );
+        return SizedBox(
+          height: lineHeightOf(context, style),
+          child: Align(
+            alignment: alignment,
+            child: width == null
+                ? FractionallySizedBox(widthFactor: widthFactor, child: bar)
+                : bar,
+          ),
+        );
+      },
+    );
   }
 }
 

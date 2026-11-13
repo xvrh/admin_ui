@@ -81,14 +81,17 @@ class StatCardDemo extends StatelessWidget {
             StatCard(
               label: 'Revenue',
               icon: Icons.payments_rounded,
+              delta: StatDelta(''),
+              caption: '',
               loading: true,
             ),
             StatCard(
               label: 'Active users',
               icon: Icons.group_rounded,
+              caption: '',
               loading: true,
             ),
-            StatCard(loading: true),
+            StatCard(delta: StatDelta(''), loading: true),
             StatCard(loading: true),
           ],
         ),
