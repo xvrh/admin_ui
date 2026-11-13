@@ -1,0 +1,37 @@
+{
+  "tools": {
+    "core": [
+      "read_file",
+      "read_many_files",
+      "glob",
+      "grep_search",
+      "list_directory"
+    ],
+    "useRipgrep": false
+  },
+  "context": {
+    "fileName": ["AGENTS.md"]
+  },
+  "model": {
+    "maxSessionTurns": 100
+  },
+  "security": {
+    "auth": { "enforcedType": "gemini-api-key" },
+    "disableYoloMode": true
+  },
+  "admin": {
+    "extensions": { "enabled": false },
+    "mcp": { "enabled": false },
+    "skills": { "enabled": false }
+  },
+  "advanced": {
+    "ignoreLocalEnv": true
+  },
+  "general": {
+    "enableAutoUpdate": false,
+    "enableAutoUpdateNotification": false
+  },
+  "privacy": {
+    "usageStatisticsEnabled": false
+  }
+}

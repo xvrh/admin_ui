@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "The Gemini CLI that .github/workflows/review.yaml runs, pinned here so Dependabot moves it.",
+  "dependencies": {
+    "@google/gemini-cli": "0.67.0"
+  }
+}

@@ -1,6 +1,7 @@
 # The workflows' actions and the Flutter action's, one pull request a week
-# for all of them. Flutter and the pub dependencies are the Upgrade
-# workflow's (.github/workflows/upgrade.yaml).
+# for all of them, and the Gemini CLI that the Review workflow runs, once a
+# month. Flutter and the pub dependencies are the Upgrade workflow's
+# (.github/workflows/upgrade.yaml).
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -10,5 +11,13 @@ updates:
     groups:
       actions:
         patterns: ['*']
+    commit-message:
+      prefix: ci
+
+  # A release a week, and the review is advisory: a month's is enough.
+  - package-ecosystem: npm
+    directory: /.github/review
+    schedule:
+      interval: monthly
     commit-message:
       prefix: ci
