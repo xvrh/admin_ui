@@ -163,6 +163,7 @@ building_blocks:
     - AuthField
     - AuthFieldError
     - BooleanBody
+    - BrowserSwipeGuard
     - BulkActionBar
     - Choice
     - ChoiceOption

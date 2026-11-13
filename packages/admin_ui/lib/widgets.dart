@@ -19,6 +19,7 @@ export 'src/common/ui/attention_grid.dart'
     show AttentionGrid, AttentionItem, AttentionTile;
 export 'src/common/ui/avatar.dart' show Avatar, AvatarShape;
 export 'src/common/ui/breadcrumbs.dart' show Breadcrumbs, Crumb;
+export 'src/common/ui/browser_swipe_guard.dart' show BrowserSwipeGuard;
 export 'src/common/ui/button.dart' show Button, ButtonVariant, SplitButton;
 export 'src/common/ui/calendar.dart' show Calendar, CalendarMode;
 export 'src/common/ui/chart.dart'

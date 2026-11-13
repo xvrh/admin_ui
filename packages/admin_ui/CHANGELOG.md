@@ -2,6 +2,16 @@
 
 ## 0.2.0
 
+- On the web, a two-finger swipe no longer takes the browser back a page,
+  which it often did while scrolling a wide table back to its start.
+  Flutter lets the browser have a scroll that no scroll view under the
+  pointer uses: one at a view's edge, over a header, or a little off a
+  view's axis, and on a Mac the browser takes a sideways one as "back".
+  Once one scroll anywhere on the page has reached Chrome, it goes back on
+  later swipes even when the app keeps every event of them, so keeping only
+  the scrolls over a wide view is not enough. `BrowserSwipeGuard`, which
+  `AdminScope` now mounts, keeps every scroll in the app, wherever the
+  pointer is. The browser's back button and Cmd+[ still go back.
 - The top bar can run over the page alone, beside a sidebar as tall as the
   window, as Ant's side layout does: `AdminShellStyle.topBarSpan` is
   `TopBarSpan.window`, the default and the frame as before, or

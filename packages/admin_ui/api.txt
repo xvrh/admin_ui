@@ -475,6 +475,7 @@ widgets.dart BarList
 widgets.dart BarListItem
 widgets.dart BarSparkline
 widgets.dart Breadcrumbs
+widgets.dart BrowserSwipeGuard
 widgets.dart Button
 widgets.dart ButtonVariant
 widgets.dart Calendar
