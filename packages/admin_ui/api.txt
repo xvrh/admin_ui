@@ -475,6 +475,7 @@ widgets.dart BarList
 widgets.dart BarListItem
 widgets.dart BarSparkline
 widgets.dart Breadcrumbs
+widgets.dart BrowserSwipeGuard
 widgets.dart Button
 widgets.dart ButtonVariant
 widgets.dart Calendar
@@ -594,7 +595,6 @@ widgets.dart Severity
 widgets.dart SeverityStyle
 widgets.dart SideSheet
 widgets.dart SideSheetSide
-widgets.dart SidewaysScrollScope
 widgets.dart Skeleton
 widgets.dart SkeletonGroup
 widgets.dart Sparkline

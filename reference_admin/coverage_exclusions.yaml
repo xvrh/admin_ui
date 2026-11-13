@@ -163,6 +163,7 @@ building_blocks:
     - AuthField
     - AuthFieldError
     - BooleanBody
+    - BrowserSwipeGuard
     - BulkActionBar
     - Choice
     - ChoiceOption
@@ -262,7 +263,6 @@ building_blocks:
     - showAssetPicker
     - showNavigationDrawer
     - showSaveViewDialog
-    - SidewaysScrollScope
     - StepItem
     - Steps
     - SwatchOption

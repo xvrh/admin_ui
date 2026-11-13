@@ -2,15 +2,15 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../theme/theme.dart';
 import '../../theme/tokens.dart';
+import 'browser_swipe_guard.dart';
 import 'command_registry.dart';
 import 'leave_guard.dart';
 import 'modal_anchor.dart';
-import 'sideways_scroll_scope.dart';
 import 'toast.dart';
 
 /// The scopes the kit's widgets reach for, mounted in one widget: the kit's
 /// theme, a [ToastScope], a [LeaveGuardScope], a [CommandScope], a
-/// [ModalAnchor] and a [SidewaysScrollScope].
+/// [ModalAnchor] and a [BrowserSwipeGuard].
 ///
 /// Place it inside the home route, around the shell:
 ///
@@ -55,8 +55,8 @@ import 'toast.dart';
 /// - a [CommandScope] over [commands], or over a registry of its own, which
 ///   it disposes;
 /// - a [ModalAnchor] opened through [modals], or through `ModalAnchor.of`;
-/// - a [SidewaysScrollScope], so a swipe over a wide table or another view
-///   that scrolls sideways does not take the browser back.
+/// - a [BrowserSwipeGuard], so a two-finger swipe does not take the browser
+///   back a page.
 ///
 /// Each of those scopes stays public, for an app that mounts them where it
 /// wants them.
@@ -127,7 +127,7 @@ class _AdminScopeState extends State<AdminScope> {
   @override
   Widget build(BuildContext context) {
     Widget child = ModalAnchor(controller: widget.modals, child: widget.child);
-    child = SidewaysScrollScope(child: child);
+    child = BrowserSwipeGuard(child: child);
     child = CommandScope(registry: _commands, child: child);
     // Mounted whichever registry it is, so the page keeps its state when
     // [AdminScope.leaveGuards] or a scope above comes or goes. A registry

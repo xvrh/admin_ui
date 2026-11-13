@@ -19,6 +19,7 @@ export 'src/common/ui/attention_grid.dart'
     show AttentionGrid, AttentionItem, AttentionTile;
 export 'src/common/ui/avatar.dart' show Avatar, AvatarShape;
 export 'src/common/ui/breadcrumbs.dart' show Breadcrumbs, Crumb;
+export 'src/common/ui/browser_swipe_guard.dart' show BrowserSwipeGuard;
 export 'src/common/ui/button.dart' show Button, ButtonVariant, SplitButton;
 export 'src/common/ui/calendar.dart' show Calendar, CalendarMode;
 export 'src/common/ui/chart.dart'
@@ -149,7 +150,6 @@ export 'src/common/ui/severity.dart'
     show Severity, SeverityStyle, severityStyleOf;
 export 'src/common/ui/side_sheet.dart'
     show SideSheet, SideSheetSide, showSideSheet;
-export 'src/common/ui/sideways_scroll_scope.dart' show SidewaysScrollScope;
 export 'src/common/ui/skeleton.dart' show Skeleton, SkeletonGroup;
 export 'src/common/ui/slider.dart' show ValueSlider;
 export 'src/common/ui/sparkline.dart' show BarSparkline, Sparkline;
