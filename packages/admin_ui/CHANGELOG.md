@@ -2,6 +2,11 @@
 
 ## 0.2.0
 
+- A click picks a `Combobox` option in an app wrapped in a `SelectionArea`.
+  A press held past the tap timeout let the area take focus from the field,
+  which closed the list before the release reached the option, so the
+  value stayed as it was. Arrows and Enter already worked. A press in the
+  list now keeps focus in the field, and a click elsewhere still closes it.
 - On the web, a two-finger swipe no longer takes the browser back a page,
   which it often did while scrolling a wide table back to its start.
   Flutter lets the browser have a scroll that no scroll view under the

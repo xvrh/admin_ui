@@ -182,6 +182,9 @@ class _ComboboxState<T> extends State<Combobox<T>> {
   /// Enter pressed while a search was in flight: picks its first result.
   bool _pendingEnter = false;
 
+  /// The pointers down in the open list.
+  final _presses = <int>{};
+
   FocusNode get _focus =>
       widget.focusNode ?? (_ownFocus ??= FocusNode(debugLabel: 'Combobox'));
 
@@ -276,7 +279,15 @@ class _ComboboxState<T> extends State<Combobox<T>> {
   }
 
   void _onFocus() {
-    if (!_focus.hasFocus && _open) _popover?.close();
+    if (_focus.hasFocus || !_open) return;
+    // A press in the list leaves focus in the field, but a host's
+    // SelectionArea takes it once the press outlasts the tap timeout. Closing
+    // then would pull the option from under the release.
+    if (_presses.isNotEmpty) {
+      _focus.requestFocus();
+      return;
+    }
+    _popover?.close();
   }
 
   void _onOpenChanged(bool open) {
@@ -289,6 +300,7 @@ class _ComboboxState<T> extends State<Combobox<T>> {
     // A search still in flight answers nothing now.
     _searchId++;
     _pendingEnter = false;
+    _presses.clear();
     setState(() {
       _open = false;
       _loading = false;
@@ -582,12 +594,17 @@ class _ComboboxState<T> extends State<Combobox<T>> {
     // Taps in the list count as inside the field, which keeps its focus;
     // nothing in it takes focus from the field.
     return TextFieldTapRegion(
-      child: ExcludeFocus(
-        child: PopoverMenuSurface(
-          width: math.max(anchor, ListboxMenu.minWidth),
-          maxHeight: _listMaxHeight,
-          fitAvailableHeight: true,
-          child: body,
+      child: Listener(
+        onPointerDown: (event) => _presses.add(event.pointer),
+        onPointerUp: (event) => _presses.remove(event.pointer),
+        onPointerCancel: (event) => _presses.remove(event.pointer),
+        child: ExcludeFocus(
+          child: PopoverMenuSurface(
+            width: math.max(anchor, ListboxMenu.minWidth),
+            maxHeight: _listMaxHeight,
+            fitAvailableHeight: true,
+            child: body,
+          ),
         ),
       ),
     );
