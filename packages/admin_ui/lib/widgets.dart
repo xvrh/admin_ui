@@ -150,7 +150,7 @@ export 'src/common/ui/severity.dart'
     show Severity, SeverityStyle, severityStyleOf;
 export 'src/common/ui/side_sheet.dart'
     show SideSheet, SideSheetSide, showSideSheet;
-export 'src/common/ui/skeleton.dart' show Skeleton, SkeletonGroup;
+export 'src/common/ui/skeleton.dart' show Skeleton, SkeletonGroup, SkeletonText;
 export 'src/common/ui/slider.dart' show ValueSlider;
 export 'src/common/ui/sparkline.dart' show BarSparkline, Sparkline;
 export 'src/common/ui/spinner.dart' show LoadingOverlay, LoadingPanel, Spinner;

@@ -526,7 +526,8 @@ class _Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = context.strings.access;
-    // The tiles' names and glyphs show while their figures load.
+    // The tiles' names and glyphs show while their figures load, with room
+    // for the trend each loaded tile shows.
     final tiles = StatGrid(
       minTileWidth: compact ? 150 : 220,
       spacing: compact ? AdminSpacing.md : AdminSpacing.lg,
@@ -534,21 +535,25 @@ class _Loading extends StatelessWidget {
         StatCard(
           label: strings.kpiRevenue,
           icon: Icons.payments_outlined,
+          delta: const StatDelta(''),
           loading: true,
         ),
         StatCard(
           label: strings.kpiOrders,
           icon: Icons.receipt_long_outlined,
+          delta: const StatDelta(''),
           loading: true,
         ),
         StatCard(
           label: strings.kpiAverageOrder,
           icon: Icons.shopping_basket_outlined,
+          delta: const StatDelta(''),
           loading: true,
         ),
         StatCard(
           label: strings.kpiNewCustomers,
           icon: Icons.person_add_alt_outlined,
+          delta: const StatDelta(''),
           loading: true,
         ),
       ],

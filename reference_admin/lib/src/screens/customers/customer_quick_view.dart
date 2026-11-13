@@ -172,7 +172,9 @@ class _Details extends StatelessWidget {
           ListenableBuilder(
             listenable: orders,
             builder: (context, _) => orders.loading && orders.items.isEmpty
-                ? const SkeletonGroup(child: Skeleton(width: 240))
+                ? SkeletonGroup(
+                    child: SkeletonText(style: context.type.body, width: 240),
+                  )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

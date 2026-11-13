@@ -30,8 +30,14 @@ Future<void> _pump(
   await tester.pump();
 }
 
-/// A loaded card with every row, beside the same card loading.
-Widget _pair({String loadingLabel = 'Revenue', IconData? icon}) => Row(
+/// A loaded card, beside the same card loading: with a delta and a caption
+/// unless told otherwise, the loading one's in other words.
+Widget _pair({
+  String loadingLabel = 'Revenue',
+  IconData? icon,
+  bool delta = true,
+  bool caption = true,
+}) => Row(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
     Expanded(
@@ -40,8 +46,8 @@ Widget _pair({String loadingLabel = 'Revenue', IconData? icon}) => Row(
         label: 'Revenue',
         value: r'$48.2k',
         icon: icon,
-        delta: const StatDelta('12%'),
-        caption: 'vs last month',
+        delta: delta ? const StatDelta('12%') : null,
+        caption: caption ? 'vs last month' : null,
       ),
     ),
     const SizedBox(width: 16),
@@ -50,6 +56,8 @@ Widget _pair({String loadingLabel = 'Revenue', IconData? icon}) => Row(
         key: const ValueKey('loading'),
         label: loadingLabel,
         icon: icon,
+        delta: delta ? const StatDelta('') : null,
+        caption: caption ? '' : null,
         loading: true,
       ),
     ),
@@ -86,17 +94,31 @@ void main() {
               ('', Icons.payments_rounded),
               ('', null),
             ]) {
-              await _pump(
-                tester,
-                _pair(loadingLabel: label, icon: icon),
-                tokens: tokens,
-                textScale: scale,
-              );
-              expect(
-                _height(tester, 'loading'),
-                _height(tester, 'loaded'),
-                reason: 'label "$label", icon $icon',
-              );
+              for (final (delta, caption) in [
+                (true, true),
+                (true, false),
+                (false, true),
+                (false, false),
+              ]) {
+                await _pump(
+                  tester,
+                  _pair(
+                    loadingLabel: label,
+                    icon: icon,
+                    delta: delta,
+                    caption: caption,
+                  ),
+                  tokens: tokens,
+                  textScale: scale,
+                );
+                expect(
+                  _height(tester, 'loading'),
+                  _height(tester, 'loaded'),
+                  reason:
+                      'label "$label", icon $icon, delta $delta, '
+                      'caption $caption',
+                );
+              }
             }
           },
         );
@@ -125,7 +147,11 @@ void main() {
       expect(find.byType(Skeleton), findsNWidgets(3));
 
       await _pump(tester, const StatCard(loading: true));
-      expect(find.byType(Skeleton), findsNWidgets(4), reason: 'the label too');
+      expect(
+        find.byType(Skeleton),
+        findsNWidgets(2),
+        reason: 'the label and the figure, and no delta or caption',
+      );
     });
 
     testWidgets('the delta bar is the chip: its height and its pill', (
@@ -143,7 +169,13 @@ void main() {
                 delta: StatDelta('12%'),
               ),
             ),
-            Expanded(child: StatCard(label: 'Revenue', loading: true)),
+            Expanded(
+              child: StatCard(
+                label: 'Revenue',
+                delta: StatDelta(''),
+                loading: true,
+              ),
+            ),
           ],
         ),
         tokens: irisTheme.tokens,
