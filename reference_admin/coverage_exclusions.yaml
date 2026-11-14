@@ -426,6 +426,8 @@ not_needed:
     - StatusDot
     - StillLinearProgress
     - ValueSlider
+    - ZoomController
+    - ZoomView
 
 test_support:
   reason: "(d) the test-support library, package:admin_ui/testing.dart, which tests import and lib/ never does: test/support/fonts.dart calls loadAdminFonts; the rest serve a catalog's sweep harness, which the scenarios stand in for"

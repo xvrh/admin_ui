@@ -104,6 +104,7 @@ import 'ui/primitives/tabs.dart';
 import 'ui/primitives/timeline.dart';
 import 'ui/primitives/tip.dart';
 import 'ui/primitives/upload.dart';
+import 'ui/primitives/zoom_view.dart';
 import 'ui/screens/capabilities/comments_button.dart';
 import 'ui/screens/capabilities/help_button.dart';
 import 'ui/screens/capabilities/history_button.dart';
@@ -164,6 +165,7 @@ Map<String, dynamic> genericCatalog() => {
     'Description list': const DescriptionListDemo(),
     'JSON viewer': const JsonViewDemo(),
     'Log view': const LogViewDemo(),
+    'Zoom view': const ZoomViewDemo(),
     'Stat card / dashboard': const StatCardDemo(),
     'Attention tiles': const AttentionGridDemo(),
     'Charts / sparklines': const ChartDemo(),

@@ -653,6 +653,8 @@ widgets.dart UploadItem
 widgets.dart UploadStatus
 widgets.dart UploadZone
 widgets.dart ValueSlider
+widgets.dart ZoomController
+widgets.dart ZoomView
 widgets.dart describeError
 widgets.dart fieldInputDecoration
 widgets.dart fieldTextStyle

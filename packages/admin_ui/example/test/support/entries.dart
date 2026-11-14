@@ -30,6 +30,7 @@ import 'package:admin_ui_example/src/ui/primitives/notification_center.dart';
 import 'package:admin_ui_example/src/ui/primitives/overlay_surfaces.dart';
 import 'package:admin_ui_example/src/ui/primitives/states/progress.dart';
 import 'package:admin_ui_example/src/ui/primitives/thumbnail_image.dart';
+import 'package:admin_ui_example/src/ui/primitives/zoom_view.dart';
 import 'package:admin_ui_example/src/ui/screens/customer_form.dart';
 import 'package:admin_ui_example/src/ui/screens/customer_form_states.dart';
 import 'package:admin_ui_example/src/ui/screens/form_wizard.dart';
@@ -92,6 +93,11 @@ const previewOnly = <PreviewOnlyDemo>[
     'JsonViewDemo.rowActions',
     'JSON viewer · row actions, a long value shown whole',
     JsonViewDemo.rowActions,
+  ),
+  PreviewOnlyDemo(
+    'ZoomViewDemo.zoomedIn',
+    'Zoom view · zoomed in',
+    ZoomViewDemo.zoomedIn,
   ),
   PreviewOnlyDemo(
     'FilterEditorsDemo',
