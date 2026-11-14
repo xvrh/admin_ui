@@ -546,6 +546,7 @@ widgets.dart LeaveGuardEntry
 widgets.dart LeaveGuardRegistry
 widgets.dart LeaveGuardScope
 widgets.dart LineChart
+widgets.dart ListRow
 widgets.dart Listbox
 widgets.dart ListboxController
 widgets.dart ListboxMenu
