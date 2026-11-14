@@ -183,3 +183,4 @@ export 'src/common/ui/tree.dart'
 export 'src/common/ui/tree_editor.dart'
     show TreeEditor, TreeEditorEntry, TreeEditorLayout, TreeEntryBadge;
 export 'src/common/ui/upload.dart' show UploadItem, UploadStatus, UploadZone;
+export 'src/common/ui/zoom_view.dart' show ZoomController, ZoomView;

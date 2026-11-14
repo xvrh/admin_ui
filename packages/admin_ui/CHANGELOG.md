@@ -2,6 +2,23 @@
 
 ## 0.2.0
 
+- An app can show a large picture, a photo, a scan or a plan, and let the
+  reader look at it closely: `ZoomView` lays its `child` out at
+  `contentSize`, the picture's own pixels, so what the app paints over the
+  picture is in its coordinates, and opens it fitted, centred, with nothing
+  painted in the bands beside it. The wheel zooms about the pointer, a
+  trackpad pinches and pans, a drag pans under the open hand, a double click
+  goes to actual pixels and back, and with focus `+`, `-`, `0` and `1` zoom,
+  fit and show actual pixels, with or without ⌘ or Ctrl, and the arrow keys
+  pan. It never shows the picture smaller than fitted or larger than
+  `maxScale`, 800% by default, and stops panning at the picture's edges,
+  centring it along an axis it does not fill. Fitted, it stays fitted as its
+  pane resizes; zoomed in, it keeps the point at its middle. Zooming only
+  transforms the child, which is never built again by it. A floating bar in
+  the bottom end corner zooms out, shows the percentage, zooms in and fits
+  (`showControls`), and a `ZoomController` drives it from the app's own
+  controls. Steps take the theme's medium motion. `DisplayMessages` has
+  `zoomArea`, `zoomAreaHint`, `zoomIn`, `zoomOut` and `zoomToFit`, new.
 - An app can show a job's output, a deploy, an import, a build, as it runs
   or after: `LogView` draws its `LogLine`s, oldest first, in the theme's
   `monoSmall`. A line's `prefix`, a time or an elapsed "12.4 s", sits muted

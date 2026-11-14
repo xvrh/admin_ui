@@ -103,6 +103,21 @@ abstract class DisplayMessages extends AdminMessages {
   /// A log with no lines yet.
   String get logEmpty;
 
+  // Zoom view.
+
+  /// The accessible name of a zoom view, where the app gives none.
+  String get zoomArea;
+
+  /// How to zoom and pan a zoom view, read after its name.
+  String get zoomAreaHint;
+
+  String get zoomIn;
+
+  String get zoomOut;
+
+  /// Zooms a zoom view out until all of its content shows.
+  String get zoomToFit;
+
   // Upload.
 
   /// Every upload in the queue finished: "Upload complete" for one file.
@@ -421,6 +436,22 @@ class DisplayMessagesEn extends DisplayMessages {
 
   @override
   String get logEmpty => 'No output yet';
+
+  @override
+  String get zoomArea => 'Zoomable view';
+
+  @override
+  String get zoomAreaHint =>
+      'Scroll to zoom, drag to pan; + and − zoom, 0 fits, arrow keys pan.';
+
+  @override
+  String get zoomIn => 'Zoom in';
+
+  @override
+  String get zoomOut => 'Zoom out';
+
+  @override
+  String get zoomToFit => 'Zoom to fit';
 
   @override
   String uploadDone(int total) => plural(
@@ -782,6 +813,23 @@ class DisplayMessagesFr extends DisplayMessages {
 
   @override
   String get logEmpty => 'Aucune sortie pour l’instant';
+
+  @override
+  String get zoomArea => 'Vue zoomable';
+
+  @override
+  String get zoomAreaHint =>
+      'Faites défiler pour zoomer, glissez pour vous déplacer ; + et − '
+      'zooment, 0 ajuste, les flèches déplacent.';
+
+  @override
+  String get zoomIn => 'Zoom avant';
+
+  @override
+  String get zoomOut => 'Zoom arrière';
+
+  @override
+  String get zoomToFit => 'Ajuster à la vue';
 
   @override
   String uploadDone(int total) => plural(
@@ -1165,6 +1213,23 @@ class DisplayMessagesAr extends DisplayMessages {
 
   @override
   String get logEmpty => 'لا توجد مخرجات بعد';
+
+  @override
+  String get zoomArea => 'عرض قابل للتكبير';
+
+  @override
+  String get zoomAreaHint =>
+      'مرّر للتكبير واسحب للتحريك؛ + و − للتكبير والتصغير، و0 للملاءمة، '
+      'ومفاتيح الأسهم للتحريك.';
+
+  @override
+  String get zoomIn => 'تكبير';
+
+  @override
+  String get zoomOut => 'تصغير';
+
+  @override
+  String get zoomToFit => 'ملاءمة للعرض';
 
   @override
   String uploadDone(int total) => plural(
