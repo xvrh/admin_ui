@@ -403,6 +403,8 @@ not_needed:
     - InMemorySavedViewsStore
     - ListboxMenu
     - LoadingOverlay
+    - LogLine
+    - LogView
     - MaskedBody
     - MaskedDateField
     - MaskedField
