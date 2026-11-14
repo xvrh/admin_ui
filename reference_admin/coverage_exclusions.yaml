@@ -402,6 +402,7 @@ not_needed:
     - HelpButton
     - InMemorySavedViewsStore
     - ListboxMenu
+    - ListRow
     - LoadingOverlay
     - LogLine
     - LogView
