@@ -50,7 +50,7 @@ jobs:
             echo "::error::The BOT_PAT secret opens the pull request; README.md (\"Upgrades\") makes it."
             exit 1
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.BOT_PAT }}
 
