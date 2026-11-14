@@ -109,6 +109,7 @@ export 'src/common/ui/labeled_field.dart'
         LabeledField;
 export 'src/common/ui/leave_guard.dart'
     show LeaveGuardEntry, LeaveGuardRegistry, LeaveGuardScope;
+export 'src/common/ui/list_row.dart' show ListRow;
 export 'src/common/ui/listbox.dart'
     show Listbox, ListboxController, ListboxMenu, ListboxOption;
 export 'src/common/ui/menu.dart'

@@ -2,6 +2,18 @@
 
 ## 0.2.0
 
+- The master list of a master / detail layout has a row of its own:
+  `ListRow`, a title with a muted subtitle under it, between a `leading`
+  widget (an icon, an `Avatar`, a `StatusDot`) and a `trailing` one (a
+  `StatusPill`, a `Tag`, a count, a timestamp). A column of them fills the
+  first pane of a `SplitView`, whose next pane shows the detail of the
+  `selected` row. The selected row takes a selected table row's fill and is
+  announced as selected; hover and press lay the state layer over it, and
+  the subtitle stays at 4.5:1 on every fill. The title and the subtitle
+  take one line each and end in an ellipsis, so a long title never pushes
+  the trailing widget out, and the row mirrors right to left. Without
+  `onTap` a row does not open: no hand, no hover, no Tab stop and no
+  button, and its text can be selected.
 - A dashboard can hold its layout while its figures load. `BarList`,
   `LineChart` (and `LineChart.time`) and `BarChart` take `loading`, as
   `StatCard` does: the list keeps its labels, its bars and values pulse,
