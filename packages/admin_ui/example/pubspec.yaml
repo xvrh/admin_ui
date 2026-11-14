@@ -20,7 +20,7 @@ dependencies:
   flutterware:
     git:
       url: https://github.com/xvrh/flutterware.git
-      ref: e9962fbf68b22beb0d1acd8394268681a51b9c83
+      ref: 2ac0749fe4553190e38286b433b9eb8feb489730
   intl:
   logging:
   material_ui: ^1.4.0
