@@ -81,6 +81,7 @@ import 'ui/primitives/feedback/toast.dart';
 import 'ui/primitives/hover_card.dart';
 import 'ui/primitives/input_field.dart';
 import 'ui/primitives/json_view.dart';
+import 'ui/primitives/log_view.dart';
 import 'ui/primitives/menu.dart';
 import 'ui/primitives/modal_anchor.dart';
 import 'ui/primitives/notification_center.dart';
@@ -162,6 +163,7 @@ Map<String, dynamic> genericCatalog() => {
     'Announcement bar': const AnnouncementBarDemo(),
     'Description list': const DescriptionListDemo(),
     'JSON viewer': const JsonViewDemo(),
+    'Log view': const LogViewDemo(),
     'Stat card / dashboard': const StatCardDemo(),
     'Attention tiles': const AttentionGridDemo(),
     'Charts / sparklines': const ChartDemo(),
