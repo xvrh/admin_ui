@@ -2,6 +2,20 @@
 
 ## 0.2.0
 
+- An app can show a job's output, a deploy, an import, a build, as it runs
+  or after: `LogView` draws its `LogLine`s, oldest first, in the theme's
+  `monoSmall`. A line's `prefix`, a time or an elapsed "12.4 s", sits muted
+  in a column as wide as the widest, right-aligned in tabular figures, and
+  its `severity` tints it: success, warning and danger in their text-safe
+  colours, info plain. It opens on the last line and keeps it in view as
+  lines arrive, a burst of them in one frame too, while the reader is at the
+  end; a reader who scrolls up stays on what they are reading until they
+  scroll back down. With `follow: false` it opens on the first line and
+  moves only when scrolled. It fills the height it is given, builds lines
+  as they scroll into view, wraps long ones, mirrors right to left, and is
+  a read-only place whose selection copies one line per line. With no lines
+  it shows `emptyText`, or `DisplayMessages.logEmpty`, new: "No output
+  yet".
 - A dashboard can hold its layout while its figures load. `BarList`,
   `LineChart` (and `LineChart.time`) and `BarChart` take `loading`, as
   `StatCard` does: the list keeps its labels, its bars and values pulse,

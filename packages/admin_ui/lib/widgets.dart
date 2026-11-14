@@ -111,6 +111,7 @@ export 'src/common/ui/leave_guard.dart'
     show LeaveGuardEntry, LeaveGuardRegistry, LeaveGuardScope;
 export 'src/common/ui/listbox.dart'
     show Listbox, ListboxController, ListboxMenu, ListboxOption;
+export 'src/common/ui/log_view.dart' show LogLine, LogView;
 export 'src/common/ui/menu.dart'
     show
         Menu,

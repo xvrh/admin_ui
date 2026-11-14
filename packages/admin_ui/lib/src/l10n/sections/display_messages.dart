@@ -98,6 +98,11 @@ abstract class DisplayMessages extends AdminMessages {
   /// A source that failed to parse; [detail] is the parser's own message.
   String invalidJson(String detail);
 
+  // Log view.
+
+  /// A log with no lines yet.
+  String get logEmpty;
+
   // Upload.
 
   /// Every upload in the queue finished: "Upload complete" for one file.
@@ -413,6 +418,9 @@ class DisplayMessagesEn extends DisplayMessages {
 
   @override
   String invalidJson(String detail) => 'Invalid JSON — $detail';
+
+  @override
+  String get logEmpty => 'No output yet';
 
   @override
   String uploadDone(int total) => plural(
@@ -771,6 +779,9 @@ class DisplayMessagesFr extends DisplayMessages {
 
   @override
   String invalidJson(String detail) => 'JSON non valide — $detail';
+
+  @override
+  String get logEmpty => 'Aucune sortie pour l’instant';
 
   @override
   String uploadDone(int total) => plural(
@@ -1151,6 +1162,9 @@ class DisplayMessagesAr extends DisplayMessages {
 
   @override
   String invalidJson(String detail) => 'JSON غير صالح — $detail';
+
+  @override
+  String get logEmpty => 'لا توجد مخرجات بعد';
 
   @override
   String uploadDone(int total) => plural(

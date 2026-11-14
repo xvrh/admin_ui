@@ -552,6 +552,8 @@ widgets.dart ListboxMenu
 widgets.dart ListboxOption
 widgets.dart LoadingOverlay
 widgets.dart LoadingPanel
+widgets.dart LogLine
+widgets.dart LogView
 widgets.dart Menu
 widgets.dart MenuButton
 widgets.dart MenuCheckboxItem
