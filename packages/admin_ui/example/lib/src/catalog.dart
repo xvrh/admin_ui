@@ -292,6 +292,7 @@ Map<String, dynamic> genericCatalog() => {
     'Form wizard': const FormWizardDemo(),
     'Leave guard': const LeaveGuardDemo(),
     'Shell (app frame)': const ShellDemo(),
+    'Shell (no sidebar)': const ShellWithoutSidebarDemo(),
     'Sidebar account': const SidebarAccountDemo(),
     'Page scaffold': const PageScaffoldDemo(),
     'Page scaffold with tabs': const PageScaffoldDemo.tabs(),

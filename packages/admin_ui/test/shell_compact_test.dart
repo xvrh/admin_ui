@@ -8,11 +8,13 @@ const _page = ValueKey('page');
 const _ar = Locale('ar');
 
 /// A frame: a top bar leading with a logo over a sidebar of two pages, in
-/// [tokens] and [locale], its sidebar [collapsed] into the rail.
+/// [tokens] and [locale], its sidebar [collapsed] into the rail, or no
+/// sidebar at all without [withSidebar].
 Widget _app({
   AdminTokens? tokens,
   Locale? locale,
   bool collapsed = false,
+  bool withSidebar = true,
   Widget? drawer,
   Widget? drawerLeading,
   Widget topBarLeading = const Text('Acme'),
@@ -25,22 +27,24 @@ Widget _app({
   home: AdminScope(
     child: Shell(
       topBar: TopBar(leading: topBarLeading),
-      sidebar: Sidebar(
-        collapsed: collapsed,
-        entries: [
-          NavItem(
-            'Pages',
-            icon: Icons.description_outlined,
-            selected: true,
-            onTap: () => opened?.add('Pages'),
-          ),
-          NavItem(
-            'Media',
-            icon: Icons.photo_library_outlined,
-            onTap: () => opened?.add('Media'),
-          ),
-        ],
-      ),
+      sidebar: withSidebar
+          ? Sidebar(
+              collapsed: collapsed,
+              entries: [
+                NavItem(
+                  'Pages',
+                  icon: Icons.description_outlined,
+                  selected: true,
+                  onTap: () => opened?.add('Pages'),
+                ),
+                NavItem(
+                  'Media',
+                  icon: Icons.photo_library_outlined,
+                  onTap: () => opened?.add('Media'),
+                ),
+              ],
+            )
+          : null,
       drawer: drawer,
       drawerLeading: drawerLeading,
       child: const SizedBox.expand(key: _page),
@@ -361,6 +365,50 @@ void main() {
       await Shell.openDrawer(tester.element(find.text('Acme')));
       await tester.pumpAndSettle();
       expect(_close, findsNothing);
+    });
+  });
+
+  group('without a sidebar', () {
+    for (final width in [599.0, 1000.0]) {
+      testWidgets('at $width the page takes the width, and the bar leads '
+          'with its logo, no menu button', (tester) async {
+        await _pump(tester, _app(withSidebar: false), size: Size(width, 700));
+        expect(_menu, findsNothing);
+        expect(
+          tester.getRect(find.byKey(_page)),
+          Rect.fromLTRB(0, TopBar.height, width, 700),
+        );
+        final context = tester.element(find.byKey(_page));
+        expect(
+          tester.getRect(find.text('Acme')).left,
+          PageHeader.gutterOf(context),
+          reason: 'in line with the page',
+        );
+        expect(Shell.hasDrawer(context), isFalse);
+        await Shell.openDrawer(context);
+        await tester.pumpAndSettle();
+        expect(_close, findsNothing);
+      });
+    }
+
+    testWidgets('a drawer still opens from the menu button while compact', (
+      tester,
+    ) async {
+      final drawer = Sidebar(
+        entries: [NavItem('Drawer only', icon: Icons.star, onTap: () {})],
+      );
+      await _pump(
+        tester,
+        _app(withSidebar: false, drawer: drawer),
+        size: const Size(1000, 700),
+      );
+      expect(_menu, findsNothing);
+      expect(find.text('Drawer only'), findsNothing);
+      expect(tester.getRect(find.byKey(_page)).left, 0);
+
+      await _pump(tester, _app(withSidebar: false, drawer: drawer));
+      await _open(tester);
+      expect(find.text('Drawer only'), findsOneWidget);
     });
   });
 }

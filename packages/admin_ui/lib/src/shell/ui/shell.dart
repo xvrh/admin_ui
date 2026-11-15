@@ -70,8 +70,16 @@ import 'top_bar.dart';
 /// On a device with insets, the top bar runs under the status bar in its
 /// own colour and keeps its content below it, and the sidebar keeps the
 /// bottom inset under its footer in its own colour.
+///
+/// Without a [sidebar], the page takes the width at every size: a tool of
+/// one screen, or an app whose navigation sits in its top bar, a switch or a
+/// row of tabs. The top bar keeps its `leading`, in either span, starts its
+/// content at the page gutter, in line with the page, and has no menu
+/// button, unless the shell has a [drawer]: a compact shell then opens it
+/// from that button, as it would a sidebar.
 class Shell extends StatefulWidget {
-  final Widget sidebar;
+  /// The navigation beside the page, a [Sidebar]; none when null.
+  final Widget? sidebar;
   final Widget? topBar;
   final Widget child;
 
@@ -86,7 +94,7 @@ class Shell extends StatefulWidget {
 
   const Shell({
     super.key,
-    required this.sidebar,
+    this.sidebar,
     this.topBar,
     this.drawer,
     this.drawerLeading,
@@ -112,11 +120,13 @@ class Shell extends StatefulWidget {
   /// Whether the [Shell] around [context] opens its navigation as a drawer
   /// from its top bar's menu button: while it is compact, and between the
   /// breakpoints beside a collapsed rail ([Sidebar.collapsed]). False
-  /// outside a shell. [context] rebuilds as it changes. A top bar of the
+  /// outside a shell, and in one with neither a sidebar nor a drawer. [context] rebuilds as it changes. A top bar of the
   /// app's own shows its menu button by it.
   static bool hasDrawer(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<_ShellScope>();
-    return scope != null && (scope.compact || scope.rail);
+    return scope != null &&
+        scope.hasNavigation &&
+        (scope.compact || scope.rail);
   }
 
   /// Opens the navigation drawer of the [Shell] around [context], resolving
@@ -128,12 +138,23 @@ class Shell extends StatefulWidget {
 
   /// Whether the [TopBar] of the [Shell] around [context] leaves its
   /// `leading` to the head of the sidebar beside the page: the bar spans the
-  /// page alone ([TopBarSpan.page]) and the shell is not compact. False
-  /// outside a shell. [context] rebuilds as it changes.
+  /// page alone ([TopBarSpan.page]), the shell is not compact, and it has a
+  /// sidebar. False outside a shell. [context] rebuilds as it changes.
   @internal
   static bool leadsSidebar(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_ShellScope>()?.leadsSidebar ??
       false;
+
+  /// Whether the [TopBar] of the [Shell] around [context] starts its content
+  /// at the page gutter, in line with the page: it spans the page alone
+  /// ([TopBarSpan.page]), or the shell has no sidebar. Outside a shell, by
+  /// the span alone. [context] rebuilds as it changes.
+  @internal
+  static bool barStartsAtPage(BuildContext context) {
+    if (context.shellStyle.topBarSpan == TopBarSpan.page) return true;
+    final scope = context.dependOnInheritedWidgetOfExactType<_ShellScope>();
+    return scope != null && !scope.hasSidebar;
+  }
 
   /// What heads the sidebar beside the page of the [Shell] around
   /// [context]: the [TopBar]'s `leading` while it leaves it there
@@ -183,8 +204,11 @@ class _ShellState extends State<Shell> {
     });
   }
 
+  /// What the drawer holds; null when the shell has nothing to open.
+  Widget? get _navigation => widget.drawer ?? widget.sidebar;
+
   NavigationDrawerContent get _content => (
-    sidebar: widget.drawer ?? widget.sidebar,
+    sidebar: _navigation ?? const SizedBox.shrink(),
     leading:
         widget.drawerLeading ??
         switch (widget.topBar) {
@@ -217,7 +241,9 @@ class _ShellState extends State<Shell> {
   }
 
   Future<void> _open() async {
-    if (!(_compact || _railDrawer) || _anchor != null) return;
+    if (!(_compact || _railDrawer) || _navigation == null || _anchor != null) {
+      return;
+    }
     _drawer.value = _content;
     final anchor = _anchor = ModalAnchor.of(context);
     try {
@@ -238,6 +264,7 @@ class _ShellState extends State<Shell> {
         );
         final compact = breakpoint.isCompact;
         _compact = compact;
+        final sidebar = widget.sidebar;
         // An expanded window's rail is the user's choice, with a toggle of
         // the app's own.
         final rail = breakpoint.isMedium && _rail;
@@ -258,7 +285,7 @@ class _ShellState extends State<Shell> {
         // keeps its state as a theme moves the bar.
         final row = Row(
           children: [
-            if (!compact && !spansPage) widget.sidebar,
+            if (!compact && !spansPage) ?sidebar,
             Expanded(child: widget.child),
           ],
         );
@@ -266,14 +293,17 @@ class _ShellState extends State<Shell> {
           state: this,
           compact: compact,
           rail: rail,
-          leadsSidebar: spansPage && topBar is TopBar && !compact,
+          hasSidebar: sidebar != null,
+          hasNavigation: _navigation != null,
+          leadsSidebar:
+              spansPage && topBar is TopBar && !compact && sidebar != null,
           leading: leading,
           child: Scaffold(
             backgroundColor: context.colors.background,
             body: Row(
               children: [
                 // As tall as the window, it keeps the top inset itself.
-                if (!compact && spansPage) widget.sidebar,
+                if (!compact && spansPage) ?sidebar,
                 Expanded(
                   child: Column(
                     children: [
@@ -311,6 +341,12 @@ class _ShellScope extends InheritedWidget {
   /// The sidebar beside the page is a collapsed rail.
   final bool rail;
 
+  /// The shell has a sidebar.
+  final bool hasSidebar;
+
+  /// The shell has a sidebar or a drawer to open.
+  final bool hasNavigation;
+
   /// The top bar is a [TopBar] that spans the page alone, beside the
   /// sidebar, whose head holds its [leading].
   final bool leadsSidebar;
@@ -322,6 +358,8 @@ class _ShellScope extends InheritedWidget {
     required this.state,
     required this.compact,
     required this.rail,
+    required this.hasSidebar,
+    required this.hasNavigation,
     required this.leadsSidebar,
     required this.leading,
     required super.child,
@@ -331,6 +369,8 @@ class _ShellScope extends InheritedWidget {
   bool updateShouldNotify(_ShellScope old) =>
       compact != old.compact ||
       rail != old.rail ||
+      hasSidebar != old.hasSidebar ||
+      hasNavigation != old.hasNavigation ||
       leadsSidebar != old.leadsSidebar ||
       leading != old.leading ||
       state != old.state;
