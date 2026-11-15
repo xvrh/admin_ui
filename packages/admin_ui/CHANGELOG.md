@@ -2,6 +2,15 @@
 
 ## 0.2.0
 
+- A `SplitView` can keep its side panes at a size of their own, as a
+  desktop app keeps its sidebar and inspector: `initialSizes` gives each
+  pane its width or height in logical pixels and one pane none, the free
+  pane, which takes what the others leave and alone follows the view as it
+  resizes. A divider resizes the sized pane beside it, and
+  `onSizesChanged` reports the sizes after a drag. Short of room, the sized
+  panes give way, down to their `minSizes`, before the free pane goes under
+  its own, and take their sizes back as the view widens. `SplitView.two`
+  takes `firstSize` or `secondSize` for the same.
 - The master list of a master / detail layout has a row of its own:
   `ListRow`, a title with a muted subtitle under it, between a `leading`
   widget (an icon, an `Avatar`, a `StatusDot`) and a `trailing` one (a
