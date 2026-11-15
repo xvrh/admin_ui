@@ -8,6 +8,11 @@
   either span, starts its content at the page gutter, in line with the
   page, and has no menu button, unless the shell has a `drawer`, which a
   compact shell still opens from it.
+- `ZoomController.show` zooms a `ZoomView` to a region of its content, in
+  the content's pixels, such as one the app painted over the picture: as
+  large as the view holds it and centred on it, no larger than `maxScale`
+  and no smaller than fitted, stopping at the content's edge as a pan
+  does, in the same step as the other controls.
 - A `SplitView` can keep its side panes at a size of their own, as a
   desktop app keeps its sidebar and inspector: `initialSizes` gives each
   pane its width or height in logical pixels and one pane none, the free
