@@ -7,7 +7,6 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../common/text_metrics.dart';
 import '../../common/ui/icon_action.dart';
-import '../../theme/shell_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'navigation_drawer.dart';
