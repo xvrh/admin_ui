@@ -17,7 +17,7 @@ const phoneStory = ScenarioProfile(
   devices: [
     Devices.iphone16,
     Devices.iphoneSe,
-    Devices.androidMedium,
+    Devices.androidTall,
     Devices.iPad,
   ],
   languages: ['en', 'fr', 'ar'],
