@@ -255,6 +255,65 @@ void main() {
     expect(notified, greaterThan(8));
   });
 
+  group('show', () {
+    // A 400 × 300 view of an 800 × 400 content, fitted at 0.5.
+
+    testWidgets('fills the view with a region, centred on it', (tester) async {
+      final controller = ZoomController();
+      await tester.pumpWidget(_host(controller: controller));
+
+      controller.show(const Rect.fromLTWH(300, 150, 100, 50));
+      await tester.pumpAndSettle();
+      // The width binds: 400 / 100.
+      expect(controller.scale, 4);
+      expect(
+        _pointAt(tester, const Offset(200, 150), 4),
+        const Offset(350, 175),
+      );
+      expect(find.text('400%'), findsOneWidget);
+    });
+
+    testWidgets('near an edge, stops at the content\'s edge', (tester) async {
+      final controller = ZoomController();
+      await tester.pumpWidget(_host(controller: controller));
+
+      controller.show(const Rect.fromLTWH(0, 0, 100, 100));
+      await tester.pumpAndSettle();
+      // The height binds: 300 / 100.
+      expect(controller.scale, 3);
+      expect(_drawn(tester).topLeft, Offset.zero);
+    });
+
+    testWidgets('a small region shows at the maximum scale, a large one '
+        'fits', (tester) async {
+      final controller = ZoomController();
+      await tester.pumpWidget(_host(controller: controller, maxScale: 4));
+
+      controller.show(const Rect.fromLTWH(400, 200, 2, 2));
+      await tester.pumpAndSettle();
+      expect(controller.scale, 4);
+      expect(
+        _pointAt(tester, const Offset(200, 150), 4),
+        const Offset(401, 201),
+      );
+
+      controller.show(const Rect.fromLTWH(-100, -100, 1000, 600));
+      await tester.pumpAndSettle();
+      expect(controller.isFitted, isTrue);
+      expect(_drawn(tester), const Rect.fromLTWH(0, 50, 400, 200));
+    });
+
+    testWidgets('lands in one frame under reduced motion', (tester) async {
+      final controller = ZoomController();
+      await tester.pumpWidget(
+        _host(controller: controller, reducedMotion: true),
+      );
+
+      controller.show(const Rect.fromLTWH(300, 150, 100, 50));
+      expect(controller.scale, 4);
+    });
+  });
+
   testWidgets('steps land in one frame under reduced motion', (tester) async {
     final controller = ZoomController();
     await tester.pumpWidget(_host(controller: controller, reducedMotion: true));

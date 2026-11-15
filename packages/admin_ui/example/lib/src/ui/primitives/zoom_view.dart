@@ -279,6 +279,13 @@ class _ZoomedPlanState extends State<_ZoomedPlan> {
 
 const _pageSize = Size(1200, 2400);
 
+/// Where [_PagePainter] stamps the page, with room around it.
+final _stampRegion = Rect.fromCenter(
+  center: const Offset(900, 2150),
+  width: 440,
+  height: 300,
+);
+
 /// A tall page, zoomed from the page's own buttons, its scale read from the
 /// controller.
 class _PageWithButtons extends StatefulWidget {
@@ -321,6 +328,10 @@ class _PageWithButtonsState extends State<_PageWithButtons> {
               ),
               Button('Fit', onPressed: _zoom.isFitted ? null : _zoom.fit),
               Button('Actual pixels', onPressed: _zoom.actualSize),
+              Button(
+                'Show the stamp',
+                onPressed: () => _zoom.show(_stampRegion),
+              ),
               Text(
                 '${(_zoom.scale * 100).round()}%',
                 style: TextStyle(color: context.colors.foregroundMuted),

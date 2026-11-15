@@ -56,6 +56,15 @@ class ZoomController extends ChangeNotifier {
   /// [zoomIn] climbs, and no further than fitted.
   void zoomOut() => _view?._zoomOut();
 
+  /// Zooms and pans to [region], a rectangle of the content in its own
+  /// pixels, such as one the app painted over a picture: as large as the
+  /// view holds it, centred on it. No larger than [ZoomView.maxScale], so a
+  /// small region shows at that scale about its centre, and no smaller than
+  /// fitted, so a region larger than the view fits it instead. Near an edge
+  /// the view stops at the content's edge, as a pan does. Inflate [region]
+  /// to leave room around it.
+  void show(Rect region) => _view?._showRegion(region);
+
   void _changed() => notifyListeners();
 }
 
@@ -480,6 +489,22 @@ class _ZoomViewState extends State<ZoomView>
     final from = _target;
     final scale = math.min(_maxScale, _levelAtLeast(from.scale * _step));
     _moveTo(_zoomed(from, scale, _middle), anchor: _middle);
+  }
+
+  void _showRegion(Rect region) {
+    assert(
+      region.isFinite && region.width >= 0 && region.height >= 0,
+      'ZoomController.show takes a finite region of the content, not $region.',
+    );
+    if (_viewport.isEmpty) return;
+    final scale = _clampScale(
+      math.min(
+        _viewport.width / math.max(region.width, 1e-9),
+        _viewport.height / math.max(region.height, 1e-9),
+      ),
+    );
+    final origin = _clampOrigin(scale, _middle - region.center * scale);
+    _moveTo((scale: scale, origin: origin), anchor: _middle);
   }
 
   void _zoomOut() {
