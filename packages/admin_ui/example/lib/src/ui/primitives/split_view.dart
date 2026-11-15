@@ -54,6 +54,24 @@ class SplitViewDemo extends StatelessWidget {
         ),
         const Gap(AdminSpacing.xxl),
 
+        const DemoSection(
+          'Sized side panes · list │ content │ inspector (only the content '
+          'follows the width)',
+        ),
+        _Frame(
+          height: 320,
+          child: SplitView(
+            initialSizes: const [200, null, 240],
+            minSizes: const [160, 240, 200],
+            children: const [
+              _Pane('List · 200', tone: 0),
+              _Pane('Content', tone: 1),
+              _Pane('Inspector · 240', tone: 2),
+            ],
+          ),
+        ),
+        const Gap(AdminSpacing.xxl),
+
         const DemoSection('Persisted weights (onWeightsChanged)'),
         const _PersistedDemo(),
       ],
