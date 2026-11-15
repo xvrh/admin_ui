@@ -409,6 +409,62 @@ class _Content extends StatelessWidget {
   }
 }
 
+/// A shell without a sidebar: a tool of one screen, whose views are a
+/// switch in its top bar. The page takes the width at every size, and the
+/// bar keeps its leading, with no menu button.
+class ShellWithoutSidebarDemo extends StatefulWidget {
+  @Preview(
+    name: 'Shell (no sidebar, views in the top bar)',
+    wrapper: adminUiPreview,
+  )
+  const ShellWithoutSidebarDemo({super.key});
+
+  @override
+  State<ShellWithoutSidebarDemo> createState() =>
+      _ShellWithoutSidebarDemoState();
+}
+
+class _ShellWithoutSidebarDemoState extends State<ShellWithoutSidebarDemo> {
+  var _view = 'Queue';
+
+  @override
+  Widget build(BuildContext context) {
+    return AdminScope(
+      child: Shell(
+        topBar: TopBar(
+          leading: Builder(
+            builder: (context) => Row(
+              children: [
+                Text('Print desk', style: context.type.bodyStrong),
+                const Gap(AdminSpacing.lg),
+                Segmented<String>(
+                  segments: const [
+                    SegmentOption('Queue', 'Queue'),
+                    SegmentOption('Printers', 'Printers'),
+                    SegmentOption('History', 'History'),
+                  ],
+                  value: _view,
+                  size: ControlSize.small,
+                  semanticLabel: 'View',
+                  onChanged: (view) => setState(() => _view = view),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            Button.primary(
+              'Print',
+              icon: Icons.print_outlined,
+              onPressed: () {},
+            ),
+          ],
+        ),
+        child: _Content(page: _view),
+      ),
+    );
+  }
+}
+
 /// Opens the shell's drawer once the frame is up.
 class _OpenDrawer extends StatefulWidget {
   final Widget child;

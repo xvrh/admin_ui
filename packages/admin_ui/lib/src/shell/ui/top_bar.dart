@@ -7,7 +7,6 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../common/text_metrics.dart';
 import '../../common/ui/icon_action.dart';
-import '../../theme/shell_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'navigation_drawer.dart';
@@ -19,7 +18,8 @@ import 'shell.dart';
 /// (buttons, a user [Menu]). A strip of the raised `surface` (above the
 /// page in both modes) with a hairline underneath, as tall as the theme's
 /// `AdminShellStyle.topBarHeight`. Its content starts at [Shell.inset], over
-/// the sidebar's icons, and ends at the page gutter
+/// the sidebar's icons, or at the page gutter in a shell without a sidebar,
+/// and ends at the page gutter
 /// ([PageHeader.gutterOf]), so the last action lines up with the page's.
 /// A style whose `topBarSpan` is `TopBarSpan.page` runs the bar over the
 /// page alone: its content then starts at the page gutter too, and beside
@@ -111,7 +111,7 @@ class TopBar extends StatelessWidget {
         : null;
     final leading = Shell.leadsSidebar(context) ? null : this.leading;
     // Over the page alone, the bar's content lines up with the page's.
-    final start = context.shellStyle.topBarSpan == TopBarSpan.page
+    final start = Shell.barStartsAtPage(context)
         ? PageHeader.gutterOf(context)
         : Shell.inset;
     return Container(

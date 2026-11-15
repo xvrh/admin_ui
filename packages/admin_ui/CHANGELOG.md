@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- A `Shell` can go without a sidebar: a tool of one screen, or an app whose
+  navigation sits in its top bar, a switch or a row of tabs. The page then
+  takes the width at every size, and the top bar keeps its `leading`, in
+  either span, starts its content at the page gutter, in line with the
+  page, and has no menu button, unless the shell has a `drawer`, which a
+  compact shell still opens from it.
 - A `SplitView` can keep its side panes at a size of their own, as a
   desktop app keeps its sidebar and inspector: `initialSizes` gives each
   pane its width or height in logical pixels and one pane none, the free

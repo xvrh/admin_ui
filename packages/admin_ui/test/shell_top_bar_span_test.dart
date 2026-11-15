@@ -16,10 +16,12 @@ AdminTokens _tokens(TopBarSpan span) => defaultTokens.copyWith(
 );
 
 /// A frame: a top bar leading with a logo and titled, over or beside a
-/// sidebar of two pages, [collapsed] into the rail.
+/// sidebar of two pages, [collapsed] into the rail, or no sidebar at all
+/// without [withSidebar].
 Widget _app({
   TopBarSpan span = TopBarSpan.page,
   bool collapsed = false,
+  bool withSidebar = true,
   Widget? topBar,
   Widget? leading,
   Widget page = const SizedBox.expand(key: _page),
@@ -36,13 +38,23 @@ Widget _app({
               title: 'Workspace',
               leading: leading ?? const Text('Acme', key: _logo),
             ),
-        sidebar: Sidebar(
-          collapsed: collapsed,
-          entries: [
-            NavItem('Pages', icon: Icons.description_outlined, onTap: () {}),
-            NavItem('Media', icon: Icons.photo_library_outlined, onTap: () {}),
-          ],
-        ),
+        sidebar: withSidebar
+            ? Sidebar(
+                collapsed: collapsed,
+                entries: [
+                  NavItem(
+                    'Pages',
+                    icon: Icons.description_outlined,
+                    onTap: () {},
+                  ),
+                  NavItem(
+                    'Media',
+                    icon: Icons.photo_library_outlined,
+                    onTap: () {},
+                  ),
+                ],
+              )
+            : null,
         child: page,
       ),
     ),
@@ -122,6 +134,20 @@ void main() {
       final logo = tester.getRect(find.byKey(_logo));
       expect(logo.left, Shell.inset);
       expect(logo.center.dy, tester.getRect(find.text('Workspace')).center.dy);
+    });
+
+    testWidgets('without a sidebar, the bar runs the width and keeps its '
+        'leading', (tester) async {
+      await _pump(tester, _app(withSidebar: false));
+      expect(
+        tester.getRect(find.byType(TopBar)),
+        const Rect.fromLTRB(0, 0, 1280, TopBar.height),
+      );
+      expect(_inTopBar(find.byKey(_logo)), findsOneWidget);
+      expect(
+        tester.getRect(find.byKey(_page)),
+        const Rect.fromLTRB(0, TopBar.height, 1280, 800),
+      );
     });
 
     testWidgets('the bar\'s content starts at the page gutter', (tester) async {
