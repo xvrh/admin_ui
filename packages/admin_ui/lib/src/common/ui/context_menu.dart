@@ -1,11 +1,9 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'browser_menu_hold.dart';
 import 'menu.dart';
 import 'popover.dart';
 
@@ -65,11 +63,7 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
   /// Radix's context menu stands 2px off it.
   static const _gap = 2.0;
 
-  /// Regions the pointer is over, on the web: the browser's context menu is
-  /// off while there is one.
-  static var _hoveredRegions = 0;
-
-  bool _hovered = false;
+  final _browserMenu = BrowserMenuHold();
   PopoverController? _menu;
   FocusNode? _returnTo;
 
@@ -77,7 +71,7 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
   void didUpdateWidget(ContextMenuRegion oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!widget.enabled && oldWidget.enabled) {
-      _setHovered(false);
+      _browserMenu.over = false;
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted && !widget.enabled) _menu?.close();
       });
@@ -86,20 +80,8 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
 
   @override
   void dispose() {
-    _setHovered(false);
+    _browserMenu.over = false;
     super.dispose();
-  }
-
-  void _setHovered(bool hovered) {
-    if (!kIsWeb || hovered == _hovered) return;
-    _hovered = hovered;
-    if (hovered) {
-      if (_hoveredRegions++ == 0) {
-        unawaited(BrowserContextMenu.disableContextMenu());
-      }
-    } else if (--_hoveredRegions == 0) {
-      unawaited(BrowserContextMenu.enableContextMenu());
-    }
   }
 
   void _openAt(Offset position) {
@@ -151,8 +133,8 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
       onKeyEvent: _onKey,
       child: MouseRegion(
         opaque: false,
-        onEnter: (_) => _setHovered(widget.enabled),
-        onExit: (_) => _setHovered(false),
+        onEnter: (_) => _browserMenu.over = widget.enabled,
+        onExit: (_) => _browserMenu.over = false,
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           excludeFromSemantics: true,

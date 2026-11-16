@@ -11,6 +11,7 @@ import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
+import 'browser_menu_hold.dart';
 import 'field_chrome.dart';
 import 'input_decoration.dart';
 import 'labeled_field.dart';
@@ -97,6 +98,16 @@ class InputField extends StatefulWidget {
   /// direction either way.
   final TextDirection? textDirection;
 
+  /// Builds the menu a right-click or a long press opens in the field, in
+  /// place of the platform's: items of the app's own above
+  /// `editableTextState.contextMenuButtonItems`, such as the spellings to
+  /// replace the word under the pointer with. Null: the platform's menu,
+  /// which on the web is the browser's.
+  ///
+  /// On the web the browser's own menu is off while the pointer is over a
+  /// field that has one, so this one opens there.
+  final EditableTextContextMenuBuilder? contextMenuBuilder;
+
   const InputField({
     super.key,
     this.value = '',
@@ -124,6 +135,7 @@ class InputField extends StatefulWidget {
     this.textInputAction,
     this.autofillHints,
     this.textDirection,
+    this.contextMenuBuilder,
   });
 
   @override
@@ -131,6 +143,7 @@ class InputField extends StatefulWidget {
 }
 
 class _InputFieldState extends State<InputField> {
+  final _browserMenu = BrowserMenuHold();
   TextEditingController? _own;
   TextEditingController get _controller =>
       widget.controller ?? (_own ??= TextEditingController(text: widget.value));
@@ -147,10 +160,12 @@ class _InputFieldState extends State<InputField> {
         selection: TextSelection.collapsed(offset: value.length),
       );
     }
+    if (widget.contextMenuBuilder == null) _browserMenu.over = false;
   }
 
   @override
   void dispose() {
+    _browserMenu.over = false;
     _own?.dispose();
     super.dispose();
   }
@@ -167,7 +182,8 @@ class _InputFieldState extends State<InputField> {
   Widget _input(BuildContext context) {
     final state = FieldStateScope.of(context);
     final direction = _textDirection;
-    return TextField(
+    final menu = widget.contextMenuBuilder;
+    final field = TextField(
       controller: _controller,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
@@ -191,8 +207,24 @@ class _InputFieldState extends State<InputField> {
         leadingIcon: widget.icon,
         suffix: widget.suffix,
       ).copyWith(counterText: '', hintTextDirection: direction),
+      contextMenuBuilder: menu ?? _platformMenu,
+    );
+    if (menu == null) return field;
+    return MouseRegion(
+      opaque: false,
+      onEnter: (_) => _browserMenu.over = widget.contextMenuBuilder != null,
+      onExit: (_) => _browserMenu.over = false,
+      child: field,
     );
   }
+
+  /// [TextField]'s own default: the platform's menu.
+  static Widget _platformMenu(
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) => AdaptiveTextSelectionToolbar.editableText(
+    editableTextState: editableTextState,
+  );
 
   @override
   Widget build(BuildContext context) {
