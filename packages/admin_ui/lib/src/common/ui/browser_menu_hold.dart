@@ -7,6 +7,9 @@ import 'package:flutter/services.dart';
 /// a right-click: the browser's context menu is off while there is one.
 var _held = 0;
 
+/// Turning the browser's menu off, while a region holds it.
+Future<void>? _turningOff;
+
 /// The browser's own context menu turned off while the pointer is over a
 /// region that opens a menu of its own, and back on once it is over none of
 /// them, so it still opens everywhere else. Off the web it does nothing.
@@ -24,9 +27,14 @@ final class BrowserMenuHold {
     if (!kIsWeb || over == _over) return;
     _over = over;
     if (over) {
-      if (_held++ == 0) unawaited(BrowserContextMenu.disableContextMenu());
+      if (_held++ == 0) _turningOff = BrowserContextMenu.disableContextMenu();
     } else if (--_held == 0) {
+      _turningOff = null;
       unawaited(BrowserContextMenu.enableContextMenu());
     }
   }
+
+  /// Completes once the browser's menu is off: at once off the web, or when
+  /// it already is.
+  Future<void> get off => _turningOff ?? Future<void>.value();
 }

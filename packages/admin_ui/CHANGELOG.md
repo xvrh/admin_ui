@@ -6,7 +6,8 @@
   long press opens in it, in place of the platform's, such as spellings for
   the word under the pointer above the usual Cut, Copy and Paste. On the web
   the browser's own menu is off while the pointer is over such a field, as
-  over a `ContextMenuRegion`.
+  over a `ContextMenuRegion`, and the field opens its own whether it took
+  the focus from a click or from the keyboard.
 - A `Shell` can go without a sidebar: a tool of one screen, or an app whose
   navigation sits in its top bar, a switch or a row of tabs. The page then
   takes the width at every size, and the top bar keeps its `leading`, in

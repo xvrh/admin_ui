@@ -47,6 +47,33 @@ void main() {
     expect(platformItems, isNotEmpty);
   });
 
+  testWidgets('a menu given later keeps the field as it was: its focus, '
+      'what was typed', (tester) async {
+    final focus = FocusNode();
+    addTearDown(focus.dispose);
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+    Widget field(EditableTextContextMenuBuilder? menu) => _app(
+      InputField(
+        controller: controller,
+        focusNode: focus,
+        contextMenuBuilder: menu,
+      ),
+    );
+    await tester.pumpWidget(field(null));
+    await tester.enterText(find.byType(TextField), 'A colour');
+    final editable = tester.state<EditableTextState>(find.byType(EditableText));
+
+    await tester.pumpWidget(field((context, state) => const SizedBox()));
+
+    expect(
+      tester.state<EditableTextState>(find.byType(EditableText)),
+      same(editable),
+    );
+    expect(focus.hasFocus, isTrue);
+    expect(controller.text, 'A colour');
+  });
+
   testWidgets('without one, a right-click opens the platform\'s menu', (
     tester,
   ) async {
