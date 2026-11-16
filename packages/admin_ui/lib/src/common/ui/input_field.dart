@@ -3,14 +3,18 @@
 /// @docImport 'search_field.dart';
 library;
 
+import 'dart:async';
 import 'dart:ui' show SemanticsValidationResult;
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
+import 'browser_menu_hold.dart';
 import 'field_chrome.dart';
 import 'input_decoration.dart';
 import 'labeled_field.dart';
@@ -97,6 +101,16 @@ class InputField extends StatefulWidget {
   /// direction either way.
   final TextDirection? textDirection;
 
+  /// Builds the menu a right-click or a long press opens in the field, in
+  /// place of the platform's: items of the app's own above
+  /// `editableTextState.contextMenuButtonItems`, such as the spellings to
+  /// replace the word under the pointer with. Null: the platform's menu,
+  /// which on the web is the browser's.
+  ///
+  /// On the web the browser's own menu is off while the pointer is over a
+  /// field that has one, so this one opens there.
+  final EditableTextContextMenuBuilder? contextMenuBuilder;
+
   const InputField({
     super.key,
     this.value = '',
@@ -124,6 +138,7 @@ class InputField extends StatefulWidget {
     this.textInputAction,
     this.autofillHints,
     this.textDirection,
+    this.contextMenuBuilder,
   });
 
   @override
@@ -131,6 +146,14 @@ class InputField extends StatefulWidget {
 }
 
 class _InputFieldState extends State<InputField> {
+  final _browserMenu = BrowserMenuHold();
+
+  /// Whether the field goes without its menu for a frame. Flutter decides
+  /// whether a field uses its own menu when the field takes the focus, and
+  /// on the web it does not while the browser's menu is on: a field focused
+  /// from the keyboard, the pointer elsewhere, would never open its menu.
+  /// Without one for a frame, then with it again, it decides anew.
+  bool _menuGone = false;
   TextEditingController? _own;
   TextEditingController get _controller =>
       widget.controller ?? (_own ??= TextEditingController(text: widget.value));
@@ -147,10 +170,27 @@ class _InputFieldState extends State<InputField> {
         selection: TextSelection.collapsed(offset: value.length),
       );
     }
+    if (widget.contextMenuBuilder == null) _browserMenu.over = false;
+  }
+
+  void _enter() {
+    if (widget.contextMenuBuilder == null) return;
+    _browserMenu.over = true;
+    if (!kIsWeb) return;
+    unawaited(
+      _browserMenu.off.then((_) {
+        if (!mounted || !_browserMenu.over) return;
+        setState(() => _menuGone = true);
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _menuGone = false);
+        });
+      }),
+    );
   }
 
   @override
   void dispose() {
+    _browserMenu.over = false;
     _own?.dispose();
     super.dispose();
   }
@@ -167,32 +207,47 @@ class _InputFieldState extends State<InputField> {
   Widget _input(BuildContext context) {
     final state = FieldStateScope.of(context);
     final direction = _textDirection;
-    return TextField(
-      controller: _controller,
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
-      enabled: state.enabled,
-      readOnly: state.readOnly,
-      obscureText: widget.obscureText,
-      onChanged: widget.onChanged,
-      onSubmitted: widget.onSubmitted,
-      maxLines: widget.maxLines,
-      minLines: widget.minLines,
-      maxLength: widget.maxLength,
-      keyboardType: widget.keyboardType,
-      textInputAction: widget.textInputAction,
-      autofillHints: widget.autofillHints,
-      textDirection: direction,
-      style: fieldTextStyle(context),
-      decoration: fieldInputDecoration(
-        context,
-        hint: widget.hint,
-        size: widget.size,
-        leadingIcon: widget.icon,
-        suffix: widget.suffix,
-      ).copyWith(counterText: '', hintTextDirection: direction),
+    final menu = widget.contextMenuBuilder;
+    return MouseRegion(
+      opaque: false,
+      onEnter: (_) => _enter(),
+      onExit: (_) => _browserMenu.over = false,
+      child: TextField(
+        controller: _controller,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        enabled: state.enabled,
+        readOnly: state.readOnly,
+        obscureText: widget.obscureText,
+        onChanged: widget.onChanged,
+        onSubmitted: widget.onSubmitted,
+        maxLines: widget.maxLines,
+        minLines: widget.minLines,
+        maxLength: widget.maxLength,
+        keyboardType: widget.keyboardType,
+        textInputAction: widget.textInputAction,
+        autofillHints: widget.autofillHints,
+        textDirection: direction,
+        style: fieldTextStyle(context),
+        decoration: fieldInputDecoration(
+          context,
+          hint: widget.hint,
+          size: widget.size,
+          leadingIcon: widget.icon,
+          suffix: widget.suffix,
+        ).copyWith(counterText: '', hintTextDirection: direction),
+        contextMenuBuilder: _menuGone ? null : menu ?? _platformMenu,
+      ),
     );
   }
+
+  /// [TextField]'s own default: the platform's menu.
+  static Widget _platformMenu(
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) => AdaptiveTextSelectionToolbar.editableText(
+    editableTextState: editableTextState,
+  );
 
   @override
   Widget build(BuildContext context) {
