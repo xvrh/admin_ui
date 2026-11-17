@@ -202,6 +202,42 @@ void main() {
       expect(deco.border, isA<OutlineInputBorder>());
     });
 
+    testWidgets('draws no outline over the field, at rest or focused', (
+      tester,
+    ) async {
+      final focus = FocusNode();
+      addTearDown(focus.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MaskedBody(
+              mask: Masks.date,
+              focusNode: focus,
+              onChanged: (_) {},
+              ghostMask: true,
+            ),
+          ),
+        ),
+      );
+      // The field's own decorator comes first, the ghost's over it.
+      final ghost = find.byType(InputDecorator).last;
+      final noLine = paints
+        ..everything((method, arguments) {
+          if (method != #drawRRect &&
+              method != #drawDRRect &&
+              method != #drawPath) {
+            return true;
+          }
+          return (arguments.last as Paint).color.a == 0;
+        });
+
+      expect(tester.renderObject(ghost), noLine);
+
+      focus.requestFocus();
+      await tester.pumpAndSettle();
+      expect(tester.renderObject(ghost), noLine);
+    });
+
     testWidgets('renders typed value plus the remaining ghost suffix', (
       tester,
     ) async {

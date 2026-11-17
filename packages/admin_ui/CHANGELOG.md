@@ -227,6 +227,12 @@
   does something: it opens, or it selects. A card with neither, in a grid
   with no `onCardTap` and no selection or left out by `canOpen`, keeps its
   resting border and no shadow. Every card used to lift.
+- A `MaskedBody` with `ghostMask`, and so a `MaskedDateField` and the
+  `inline` and `masked` editors of a `DateBody`, draws the field's outline
+  alone. The decorator that lays the ghost over the field drew an outline of
+  its own, which Material coloured for the state: the colour scheme's
+  `outline` at rest and its `primary`, 2px wide, under focus, with a 4px
+  corner inside the field's own.
 
 ## 0.1.0
 

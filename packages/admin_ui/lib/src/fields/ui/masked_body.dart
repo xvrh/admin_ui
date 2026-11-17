@@ -381,10 +381,14 @@ class _MaskedBodyState extends State<MaskedBody> {
   /// The real, fully-decorated [TextField] (so its rounded chrome and focus
   /// border are exactly right) with the ghost painted on top through an
   /// [InputDecorator] that mirrors the field's geometry — same content padding,
-  /// same (but transparent) border width — so the ghost's transparent prefix and
+  /// an outline border like the field's — so the ghost's transparent prefix and
   /// grey suffix land pixel-aligned with the editable text underneath.
   Widget _ghostField(BuildContext context) {
     final base = fieldInputDecoration(context);
+    // The decorator repaints a plain `border` in Material's colour for each
+    // state unless its side is none, and a theme may set a border per state:
+    // every state gets an outline with no side, laid out as the field's.
+    const outline = OutlineInputBorder(borderSide: BorderSide.none);
     return Stack(
       children: [
         _field(context, base),
@@ -397,11 +401,12 @@ class _MaskedBodyState extends State<MaskedBody> {
                   filled: false,
                   fillColor: Colors.transparent,
                   hintText: null,
-                  // An outline, like the field's, so the ghost lays out on
-                  // the same geometry.
-                  border: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
+                  border: outline,
+                  enabledBorder: outline,
+                  focusedBorder: outline,
+                  disabledBorder: outline,
+                  errorBorder: outline,
+                  focusedErrorBorder: outline,
                 ),
                 child: _ghost(context),
               ),
