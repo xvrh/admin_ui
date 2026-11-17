@@ -218,11 +218,15 @@ void main() {
   });
 
   group('icon-only segments', () {
+    /// Where the segment holding [icon] draws: inside a track's inset, which
+    /// its tap target spans too.
+    Finder drawn(IconData icon) => find
+        .ancestor(of: find.byIcon(icon), matching: find.byType(DecoratedBox))
+        .first;
+
     Future<void> expectCentred(WidgetTester tester, IconData icon) async {
       final glyph = tester.getCenter(find.byIcon(icon));
-      final segment = tester.getCenter(
-        find.ancestor(of: find.byIcon(icon), matching: find.byType(Tappable)),
-      );
+      final segment = tester.getCenter(drawn(icon));
       expect((glyph.dx - segment.dx).abs(), lessThanOrEqualTo(0.5));
       expect((glyph.dy - segment.dy).abs(), lessThanOrEqualTo(0.5));
     }
@@ -262,7 +266,7 @@ void main() {
         find.descendant(of: segment, matching: find.byType(Text)),
         findsNothing,
       );
-      final size = tester.getSize(segment);
+      final size = tester.getSize(drawn(Icons.grid_view_rounded));
       expect(size.width, size.height, reason: 'square, like showLabel: false');
       await expectCentred(tester, Icons.grid_view_rounded);
     });

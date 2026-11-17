@@ -210,6 +210,15 @@ overlay.tooltipArrow: false
 overlay.tooltipMaxWidth: 280
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
+segmented.variant: track
+segmented.inset: 3
+segmented.trackOutline: false
+segmented.knobOutline: true
+segmented.indicator: false
+segmented.checkmark: false
+segmented.inverse: false
+segmented.radius: null
+segmented.labelWeight: w500
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -469,6 +478,15 @@ overlay.tooltipArrow: false
 overlay.tooltipMaxWidth: 200
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
+segmented.variant: joined
+segmented.inset: 3
+segmented.trackOutline: false
+segmented.knobOutline: true
+segmented.indicator: false
+segmented.checkmark: true
+segmented.inverse: false
+segmented.radius: null
+segmented.labelWeight: w500
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -717,6 +735,15 @@ overlay.tooltipArrow: true
 overlay.tooltipMaxWidth: 280
 overlay.arrowWidth: 10
 overlay.arrowHeight: 5
+segmented.variant: track
+segmented.inset: 3
+segmented.trackOutline: false
+segmented.knobOutline: false
+segmented.indicator: false
+segmented.checkmark: false
+segmented.inverse: false
+segmented.radius: null
+segmented.labelWeight: w500
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1006,6 +1033,15 @@ overlay.tooltipArrow: true
 overlay.tooltipMaxWidth: 250
 overlay.arrowWidth: 16
 overlay.arrowHeight: 8
+segmented.variant: track
+segmented.inset: 2
+segmented.trackOutline: false
+segmented.knobOutline: false
+segmented.indicator: false
+segmented.checkmark: false
+segmented.inverse: false
+segmented.radius: null
+segmented.labelWeight: w400
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1266,6 +1302,15 @@ overlay.tooltipArrow: true
 overlay.tooltipMaxWidth: 240
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
+segmented.variant: track
+segmented.inset: 2
+segmented.trackOutline: true
+segmented.knobOutline: true
+segmented.indicator: true
+segmented.checkmark: false
+segmented.inverse: false
+segmented.radius: null
+segmented.labelWeight: w400
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1555,6 +1600,15 @@ overlay.tooltipArrow: true
 overlay.tooltipMaxWidth: 288
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
+segmented.variant: joined
+segmented.inset: 3
+segmented.trackOutline: false
+segmented.knobOutline: true
+segmented.indicator: false
+segmented.checkmark: false
+segmented.inverse: true
+segmented.radius: 4
+segmented.labelWeight: w400
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 

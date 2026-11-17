@@ -20,6 +20,7 @@ void describeAdminTokens(AdminTokens v, String path, Map<String, String> out) {
   describeAdminButtonStyle(v.button, '${p}button', out);
   describeAdminShellStyle(v.shell, '${p}shell', out);
   describeAdminOverlayStyle(v.overlay, '${p}overlay', out);
+  describeAdminSegmentedStyle(v.segmented, '${p}segmented', out);
   describeAdminBreakpoints(v.breakpoints, '${p}breakpoints', out);
 }
 
@@ -373,6 +374,23 @@ void describeAdminOverlayStyle(
   describeValue(v.tooltipMaxWidth, '${p}tooltipMaxWidth', out);
   describeValue(v.arrowWidth, '${p}arrowWidth', out);
   describeValue(v.arrowHeight, '${p}arrowHeight', out);
+}
+
+void describeAdminSegmentedStyle(
+  AdminSegmentedStyle v,
+  String path,
+  Map<String, String> out,
+) {
+  final p = path.isEmpty ? '' : '$path.';
+  describeValue(v.variant, '${p}variant', out);
+  describeValue(v.inset, '${p}inset', out);
+  describeValue(v.trackOutline, '${p}trackOutline', out);
+  describeValue(v.knobOutline, '${p}knobOutline', out);
+  describeValue(v.indicator, '${p}indicator', out);
+  describeValue(v.checkmark, '${p}checkmark', out);
+  describeValue(v.inverse, '${p}inverse', out);
+  describeValue(v.radius, '${p}radius', out);
+  describeValue(v.labelWeight, '${p}labelWeight', out);
 }
 
 void describeAdminBreakpoints(

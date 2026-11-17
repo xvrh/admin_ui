@@ -6,6 +6,7 @@ import '../focus.dart';
 import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
+import '../segmented_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -116,4 +117,6 @@ final irisTheme = AdminTheme.from(
   button: const AdminButtonStyle(), // centred, height / 2 - 4 either side
   shell: const AdminShellStyle(), // a 240 / 64 sidebar, a 56 top bar
   overlay: const AdminOverlayStyle(), // plain tooltips at 280, a 12×6 arrow
+  // a track with a hairline-ringed knob 3 in, sliding
+  segmented: const AdminSegmentedStyle(),
 );

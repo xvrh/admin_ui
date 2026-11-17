@@ -8,6 +8,7 @@ import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
+import '../segmented_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -299,5 +300,12 @@ final antTheme = AdminTheme.from(
     tooltipMaxWidth: 250,
     arrowWidth: 16,
     arrowHeight: 8,
+  ),
+  // Segmented: trackBg behind an itemSelectedBg thumb lifted by
+  // boxShadowTertiary, trackPadding 2, regular labels
+  segmented: const AdminSegmentedStyle(
+    inset: 2,
+    knobOutline: false,
+    labelWeight: FontWeight.w400,
   ),
 );

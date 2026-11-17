@@ -6,6 +6,7 @@ import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
+import '../segmented_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
@@ -192,4 +193,7 @@ final shadcnTheme = AdminTheme.from(
     arrowWidth: 10,
     arrowHeight: 5,
   ),
+  // the tabs list: bg-muted rounded-lg p-[3px] behind a bg-background
+  // trigger lifted by shadow-sm, font-medium
+  segmented: const AdminSegmentedStyle(knobOutline: false),
 );

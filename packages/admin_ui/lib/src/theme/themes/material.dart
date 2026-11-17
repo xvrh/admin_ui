@@ -8,6 +8,7 @@ import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
+import '../segmented_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../state_layer.dart';
@@ -273,4 +274,10 @@ final materialTheme = AdminTheme.from(
   ),
   // the plain tooltip: no arrow, and 200dp at most (PlainTooltipMaxWidth)
   overlay: const AdminOverlayStyle(tooltipMaxWidth: 200),
+  // the segmented button: outlined segments, the selected one in
+  // secondaryContainer under a check, labelLarge
+  segmented: const AdminSegmentedStyle(
+    variant: SegmentedVariant.joined,
+    checkmark: true,
+  ),
 );

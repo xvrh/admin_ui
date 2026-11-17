@@ -8,6 +8,7 @@ import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
+import '../segmented_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -292,4 +293,13 @@ final carbonTheme = AdminTheme.from(
   ),
   // Tooltip: a caret, max-inline-size 18rem; the caret is 0.75rem × 0.375rem
   overlay: const AdminOverlayStyle(tooltipArrow: true, tooltipMaxWidth: 288),
+  // the high-contrast content switcher: a $border-inverse outline, the
+  // selected switch in $layer-selected-inverse under $text-inverse, rounded
+  // 4, body-compact-01
+  segmented: const AdminSegmentedStyle(
+    variant: SegmentedVariant.joined,
+    inverse: true,
+    radius: 4,
+    labelWeight: FontWeight.w400,
+  ),
 );

@@ -200,6 +200,18 @@
   during a frame notifies after it, and that notify reached the disposed
   registry, an assertion in debug, as did a command withdrawn from one
   already disposed. A disposed registry now notifies nobody.
+- A theme says how its segmented controls are drawn, as it does its fields
+  and buttons: `AdminTokens.segmented`, an `AdminSegmentedStyle` read
+  through `context.segmentedStyle` and given to `AdminTheme.from` as
+  `segmented`. Its `variant` is a `SegmentedVariant.track`, a recessed
+  track whose selected segment is a raised knob that slides between them,
+  or `SegmentedVariant.joined`, segments in one outline with the selected
+  one filled. `inset` is the gap between a track and its knob,
+  `trackOutline` and `knobOutline` ring them in a hairline, `indicator`
+  adds an accent pill at the knob's foot, `checkmark` a check before the
+  selected label, `inverse` fills a joined selection with the foreground
+  inside a foreground outline, `radius` gives the control a corner of its
+  own, and `labelWeight` weighs every label alike.
 
 ### Looks
 
@@ -253,6 +265,31 @@
   to two lines before the ellipsis, in every listbox: one longer than the
   widest menu wraps, as does one in a combobox's or a mention's list, which
   keep their field's width.
+
+- A `Segmented` is drawn as each theme's reference system draws one. It was
+  an outlined strip in every theme, its dividers the field outline at full
+  height and its selection the soft primary tint, which read as a row of
+  cells rather than a choice. Iris, shadcn and Ant now draw a track, the
+  hover wash over what lies beneath, with the selected segment a raised knob
+  in the surface that slides to the next selection over the theme's medium
+  duration, its label in the foreground and the others in the muted shade
+  that holds 4.5:1 on the track: Iris rings its knob in a hairline 3 in,
+  shadcn lifts it on its small shadow 3 in, as its tabs list does, and Ant 2
+  in, as its `Segmented` does, with regular labels. Fluent rings the track
+  too and sets a 16px accent pill on the knob's foot, its labels lifted half
+  the pill's height, as its `Segmented` does. Material keeps the outlined
+  segments, the selection now in `softFill`, M3's secondaryContainer, under
+  `onSoft`, with a check before its label or in its icon's place, and room
+  kept for the check either side of every other label so the segments never
+  move. Carbon draws its high-contrast content switcher: a foreground
+  outline, hairline dividers, and the selection filled in the foreground
+  under the surface's colour, the dividers beside it swallowed, rounded 4
+  where its buttons are square, with regular labels. On a track each
+  segment's tap target runs the control's full height, its wash and the
+  knob drawn the inset in from the edge; a dark track rings its knob, a step
+  lighter than the surface, where a shadow does not read. Disabled, a knob
+  rests flat. A `DiffView`'s locale and unchanged toggles are drawn as lone
+  segments of the `Segmented` beside them, in each theme's look.
 
 ## 0.1.0
 

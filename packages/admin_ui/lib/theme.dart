@@ -28,6 +28,8 @@ export 'src/theme/motion.dart' show AdminMotion, defaultMotion;
 export 'src/theme/overlay_style.dart' show AdminOverlayStyle;
 export 'src/theme/palette.dart' show AdminPalette;
 export 'src/theme/radii.dart' show AdminRadii, defaultRadii;
+export 'src/theme/segmented_style.dart'
+    show AdminSegmentedStyle, SegmentedVariant;
 export 'src/theme/shell_style.dart'
     show AdminShellStyle, NavIndicator, TopBarSpan;
 export 'src/theme/sizes.dart'
