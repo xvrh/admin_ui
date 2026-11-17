@@ -195,6 +195,11 @@
   as a card, opens on no Enter and announces no open action. A table cell of
   such a row edits on a double tap, as in a table with no row tap. A card
   under a selection still selects on a tap, and a board's card still moves.
+- A screen that owns its `CommandRegistry` can dispose it as it unmounts,
+  while the widgets under it withdraw their commands. A command withdrawn
+  during a frame notifies after it, and that notify reached the disposed
+  registry, an assertion in debug, as did a command withdrawn from one
+  already disposed. A disposed registry now notifies nobody.
 
 ### Looks
 

@@ -202,5 +202,76 @@ void main() {
       expect(r.active().single.title, 'item-0');
       expect(r.active().single.title, 'item-1');
     });
+
+    testWidgets('a host disposing its registry as a contributor unmounts', (
+      tester,
+    ) async {
+      await tester.pumpWidget(const _RegistryHost());
+      final registry = tester
+          .state<_RegistryHostState>(find.byType(_RegistryHost))
+          .registry;
+      expect(registry.active().map((i) => i.title), ['Publish']);
+
+      // The contributor withdraws mid-frame, which defers the notify past the
+      // frame, and the host disposes the registry in the same unmount.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+    });
+
+    test('a subscription withdrawn after its registry is disposed', () {
+      final r = CommandRegistry();
+      final sub = r.contribute(() => [_item('Publish', 'Page')]);
+      r.dispose();
+      expect(sub.dispose, returnsNormally);
+    });
   });
+}
+
+class _RegistryHost extends StatefulWidget {
+  const _RegistryHost();
+
+  @override
+  State<_RegistryHost> createState() => _RegistryHostState();
+}
+
+class _RegistryHostState extends State<_RegistryHost> {
+  final registry = CommandRegistry();
+
+  @override
+  void dispose() {
+    registry.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      CommandScope(registry: registry, child: const _EditorCommands());
+}
+
+class _EditorCommands extends StatefulWidget {
+  const _EditorCommands();
+
+  @override
+  State<_EditorCommands> createState() => _EditorCommandsState();
+}
+
+class _EditorCommandsState extends State<_EditorCommands> {
+  CommandSubscription? _subscription;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _subscription ??= CommandScope.of(context)
+        .contribute(() => [_item('Publish', 'Page')]);
+  }
+
+  @override
+  void dispose() {
+    _subscription?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
 }
