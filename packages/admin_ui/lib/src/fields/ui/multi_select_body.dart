@@ -390,6 +390,23 @@ class _TokensState extends State<_Tokens> {
       itemCount: items.length + offset,
       closeOnSelect: false,
       onSelect: _activate,
+      optionsWidth: (context) => widget.options.fold<double>(
+        0,
+        (widest, o) => math.max(
+          widest,
+          ListboxOption.widthOf(
+            context,
+            label: o.label,
+            description: o.description,
+            leading: o.swatch != null || o.icon != null
+                ? Check.size +
+                      context.sizes.fieldIconGap +
+                      context.sizes.fieldIcon
+                : Check.size,
+            checkbox: true,
+          ),
+        ),
+      ),
       onFilterChanged: showSearch ? _onFilter : null,
       filterController: _filterController,
       filterHint: widget.creatable

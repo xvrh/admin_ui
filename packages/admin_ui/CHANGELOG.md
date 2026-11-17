@@ -2,6 +2,13 @@
 
 ## 0.2.0
 
+- A `ListboxMenu` takes `optionsWidth`, the width its widest option needs,
+  which `ListboxOption.widthOf` measures, and grows past its trigger to
+  hold it, up to `ListboxMenu.maxWidth` and the screen's width. `Check.size`
+  is the side of a check box.
+- A `FilterOption` takes a `description`: a muted line under its label in
+  the filter's menu, for what tells apart options whose labels are alike.
+  The pill's summary shows the label alone.
 - An `InputField` takes a `contextMenuBuilder`: the menu a right-click or a
   long press opens in it, in place of the platform's, such as spellings for
   the word under the pointer above the usual Cut, Copy and Paste. On the web
@@ -238,6 +245,14 @@
   its own, which Material coloured for the state: the colour scheme's
   `outline` at rest and its `primary`, 2px wide, under focus, with a 4px
   corner inside the field's own.
+- The menu of a `SelectBody`, a `MultiSelectBody` and a `FilterBar`'s
+  choices grows to its longest option, from the trigger's width up to
+  480px and the screen's width, so options that differ only near their end
+  can be told apart. It stayed the trigger's width, at least 200px, and cut
+  every option to one line. An option's label and description now take up
+  to two lines before the ellipsis, in every listbox: one longer than the
+  widest menu wraps, as does one in a combobox's or a mention's list, which
+  keep their field's width.
 
 ## 0.1.0
 

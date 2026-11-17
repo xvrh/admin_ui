@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 final _lineHeights = <(TextStyle, TextScaler), double>{};
@@ -31,6 +32,25 @@ double textGrowthOf(BuildContext context, TextStyle style) {
       _lineHeight(effective, scaler) -
       _lineHeight(effective, TextScaler.noScaling);
   return growth > 0 ? growth.ceilToDouble() : 0;
+}
+
+/// The width [text] takes on one line as a [Text] of [style] under [context]
+/// lays it out, rounded up to a whole pixel so a box that wide holds it.
+@internal
+double textWidthOf(BuildContext context, String text, TextStyle style) {
+  if (text.isEmpty) return 0;
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+    maxLines: 1,
+  )..layout();
+  final width = painter.width.ceilToDouble();
+  painter.dispose();
+  return width;
 }
 
 double _lineHeight(TextStyle style, TextScaler scaler) {

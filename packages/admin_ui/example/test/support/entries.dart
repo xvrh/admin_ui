@@ -110,6 +110,11 @@ const previewOnly = <PreviewOnlyDemo>[
     FilterEditorsDemo.yesNo,
   ),
   PreviewOnlyDemo(
+    'FilterEditorsDemo.longOptions',
+    'Filter editor · long options, open',
+    FilterEditorsDemo.longOptions,
+  ),
+  PreviewOnlyDemo(
     'PasswordStrengthDemo',
     'Password strength',
     PasswordStrengthDemo.new,

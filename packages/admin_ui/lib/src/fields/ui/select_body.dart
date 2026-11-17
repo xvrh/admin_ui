@@ -289,6 +289,20 @@ class _DropdownState extends State<_Dropdown> {
       anchorWidth: controller.anchorWidth,
       itemCount: items.length,
       onSelect: (i) => _choose(items[i]),
+      optionsWidth: (context) => widget.options.fold<double>(
+        0,
+        (widest, o) => math.max(
+          widest,
+          ListboxOption.widthOf(
+            context,
+            label: o.label,
+            description: o.description,
+            leading: o.swatch != null || o.icon != null
+                ? context.sizes.fieldIcon
+                : 0,
+          ),
+        ),
+      ),
       onFilterChanged: widget.searchable ? _onFilter : null,
       footer: widget.searchable && _query.isNotEmpty
           ? context.adminL10n.countOf(items.length, widget.options.length)
