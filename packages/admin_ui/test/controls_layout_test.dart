@@ -170,10 +170,16 @@ void main() {
       final [all, live, long] = _segments(tester);
       expect(all.width, lessThan(live.width));
       expect(long.right - all.left, 250);
-      // The short labels keep their natural width.
+      // The short labels keep their natural width: the label, its padding
+      // either side and, first on the track, the track's inset.
       expect(
         all.width,
-        closeTo(tester.getSize(find.text('All')).width + 32, 1),
+        closeTo(
+          tester.getSize(find.text('All')).width +
+              AdminSpacing.lg * 2 +
+              defaultTokens.segmented.inset,
+          1,
+        ),
       );
     });
 
@@ -226,9 +232,14 @@ void main() {
           text: paragraph.text,
           textDirection: TextDirection.ltr,
         )..layout();
+        // The label, its padding either side and, at either end of the
+        // track, the track's inset.
         expect(
           segments[i].width,
-          closeTo(painter.width + 32, 1),
+          closeTo(
+            painter.width + AdminSpacing.lg * 2 + defaultTokens.segmented.inset,
+            1,
+          ),
           reason: label,
         );
         painter.dispose();
@@ -253,8 +264,25 @@ void main() {
           ),
         ),
       );
-      for (final r in _segments(tester)) {
-        expect(r.size, const Size(36, 36));
+      // Inside the track's inset, where it draws its wash and the knob
+      // sits; its tap target runs the control's full height.
+      final side = 36 - defaultTokens.segmented.inset * 2;
+      for (final tappable
+          in find
+              .descendant(
+                of: find.byType(Segmented<String>),
+                matching: find.byType(Tappable),
+              )
+              .evaluate()) {
+        final drawn = find.descendant(
+          of: find.byElementPredicate((e) => e == tappable),
+          matching: find.byType(DecoratedBox),
+        );
+        expect(tester.getSize(drawn.first), Size(side, side));
+        expect(
+          tester.getSize(find.byElementPredicate((e) => e == tappable)).height,
+          36,
+        );
       }
     });
 

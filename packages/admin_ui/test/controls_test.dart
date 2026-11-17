@@ -4,6 +4,7 @@ import 'package:admin_ui/src/common/ui/segmented.dart';
 import 'package:admin_ui/src/common/ui/tag.dart';
 import 'package:admin_ui/src/common/ui/toggle.dart';
 import 'package:admin_ui/src/theme/contrast.dart';
+import 'package:admin_ui/src/theme/segmented_style.dart';
 import 'package:admin_ui/src/theme/theme.dart';
 import 'package:admin_ui/src/theme/themes/iris.dart';
 import 'package:admin_ui/src/theme/themes/shadcn.dart';
@@ -154,13 +155,19 @@ void main() {
         ),
       ),
     );
-    Color fill(String label) => tester
-        .widget<ColoredBox>(
-          find
-              .ancestor(of: find.text(label), matching: find.byType(ColoredBox))
-              .first,
-        )
-        .color;
+    Color fill(String label) =>
+        (tester
+                    .widget<DecoratedBox>(
+                      find
+                          .ancestor(
+                            of: find.text(label),
+                            matching: find.byType(DecoratedBox),
+                          )
+                          .first,
+                    )
+                    .decoration
+                as BoxDecoration)
+            .color!;
     final colors = AdminTokens.from(palette: irisPalette).palette;
     expect(fill('B'), isNot(fill('A')));
     expect(fill('B'), isNot(colors.surface));
@@ -276,34 +283,58 @@ void main() {
         expect(borderOf(box(tester, ring('Beta'))), palette.controlAccent);
       });
 
-      testWidgets('selected segment is primaryText on primarySubtle ($mode)', (
-        tester,
-      ) async {
-        await tester.pumpWidget(
-          themed(
-            Segmented<String>(
-              value: 'a',
-              onChanged: (_) {},
-              segments: const [
-                SegmentOption('a', 'List'),
-                SegmentOption('b', 'Grid'),
-              ],
+      testWidgets('a selected segment is the foreground on its knob, or '
+          'onSoft on the soft fill in joined segments ($mode)', (tester) async {
+        for (final variant in SegmentedVariant.values) {
+          await tester.pumpWidget(
+            MaterialApp(
+              theme: buildAppTheme(
+                AdminTokens.from(
+                  palette: palette,
+                  segmented: AdminSegmentedStyle(variant: variant),
+                ),
+              ),
+              home: Scaffold(
+                body: Center(
+                  child: Segmented<String>(
+                    key: ValueKey(variant),
+                    value: 'a',
+                    onChanged: (_) {},
+                    segments: const [
+                      SegmentOption('a', 'List'),
+                      SegmentOption('b', 'Grid'),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        );
-        expect(
-          tester.widget<Text>(find.text('List')).style!.color,
-          palette.primaryText,
-        );
-        final chip = tester.widget<ColoredBox>(
-          find
-              .ancestor(
-                of: find.text('List'),
-                matching: find.byType(ColoredBox),
-              )
-              .first,
-        );
-        expect(chip.color, palette.primarySubtle);
+          );
+          // The app animates from one theme to the next.
+          await tester.pumpAndSettle();
+          final track = variant == SegmentedVariant.track;
+          expect(
+            tester.widget<Text>(find.text('List')).style!.color,
+            track ? palette.foreground : palette.onSoft,
+            reason: variant.name,
+          );
+          final chip =
+              tester
+                      .widget<DecoratedBox>(
+                        find
+                            .ancestor(
+                              of: find.text('List'),
+                              matching: find.byType(DecoratedBox),
+                            )
+                            .first,
+                      )
+                      .decoration
+                  as BoxDecoration;
+          expect(
+            chip.color,
+            track ? const Color(0x00000000) : palette.softFill,
+            reason: '${variant.name}: on a track the knob shows through',
+          );
+        }
       });
     }
   });

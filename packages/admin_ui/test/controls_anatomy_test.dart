@@ -24,6 +24,7 @@ AdminTokens _tokens(AdminTheme theme, {bool dark = false, Color? brand}) {
     stroke: source.stroke,
     iconSizes: source.iconSizes,
     field: source.field,
+    segmented: source.segmented,
   );
 }
 
@@ -47,27 +48,61 @@ const _three = [
   SegmentOption('c', 'Three'),
 ];
 
-/// The fill behind the segment labelled [label].
-Color _segmentFill(WidgetTester tester, String label) => tester
-    .widget<ColoredBox>(
-      find
-          .ancestor(of: find.text(label), matching: find.byType(ColoredBox))
-          .first,
-    )
-    .color;
+/// The fill behind the segment labelled [label]: its own box, clear on a
+/// track.
+Color _segmentFill(WidgetTester tester, String label) =>
+    (tester
+                .widget<DecoratedBox>(
+                  find
+                      .ancestor(
+                        of: find.text(label),
+                        matching: find.byType(DecoratedBox),
+                      )
+                      .first,
+                )
+                .decoration
+            as BoxDecoration)
+        .color!;
+
+/// The knob a track draws behind its selected segment: the one box in the
+/// Segmented that holds no label. Null in joined segments.
+BoxDecoration? _knob(WidgetTester tester) {
+  final boxes = find.descendant(
+    of: find.byWidgetPredicate((w) => w is Segmented),
+    matching: find.byType(DecoratedBox),
+  );
+  for (final box in boxes.evaluate()) {
+    final labels = find.descendant(
+      of: find.byElementPredicate((e) => e == box),
+      matching: find.byType(Text),
+    );
+    if (labels.evaluate().isEmpty) {
+      return (box.widget as DecoratedBox).decoration as BoxDecoration;
+    }
+  }
+  return null;
+}
+
+/// What the selected segment labelled [label] is drawn on: its knob on a
+/// track, its own fill in joined segments.
+Color _selectionFill(WidgetTester tester, AdminTokens tokens, String label) =>
+    tokens.segmented.variant == SegmentedVariant.track
+    ? _knob(tester)!.color!
+    : _segmentFill(tester, label);
 
 Color _textColor(WidgetTester tester, String label) =>
     tester.widget<Text>(find.text(label)).style!.color!;
 
-/// The Segmented group's box: the container that draws its edge.
-Container _group(WidgetTester tester) => tester
-    .widgetList<Container>(
-      find.descendant(
+/// The Segmented group's box: its track, or the container that draws the
+/// joined segments' edge.
+Container _group(WidgetTester tester) => tester.widget<Container>(
+  find
+      .descendant(
         of: find.byWidgetPredicate((w) => w is Segmented),
         matching: find.byType(Container),
-      ),
-    )
-    .firstWhere((c) => c.foregroundDecoration is BoxDecoration);
+      )
+      .first,
+);
 
 /// The widget of type [T] that holds the primary focus, if any.
 T? _focused<T extends Widget>() {
@@ -202,9 +237,16 @@ void main() {
         ),
       );
       final colors = defaultTokens.palette;
+      // An unselected segment at rest: clear on the track, its label in the
+      // muted shade that holds 4.5:1 there.
+      expect(defaultTokens.segmented.variant, SegmentedVariant.track);
       for (final label in ['Two', 'Three']) {
-        expect(_segmentFill(tester, label), colors.surface, reason: label);
-        expect(_textColor(tester, label), colors.foregroundMuted);
+        expect(
+          _segmentFill(tester, label),
+          const Color(0x00000000),
+          reason: label,
+        );
+        expect(_textColor(tester, label), colors.foregroundMutedOnTint);
       }
       final cursors = tester
           .widgetList<MouseRegion>(
@@ -224,7 +266,7 @@ void main() {
             final name = '${theme.name} ${dark ? 'Dark' : 'Light'} $brand';
             testWidgets(name, (tester) async {
               final tokens = _tokens(theme, dark: dark, brand: seed);
-              Future<List<Color>> look({required bool readOnly}) async {
+              Future<List<Object?>> look({required bool readOnly}) async {
                 await tester.pumpWidget(
                   _host(
                     tokens,
@@ -242,16 +284,19 @@ void main() {
                     _segmentFill(tester, label),
                     _textColor(tester, label),
                   ],
-                  (_group(tester).foregroundDecoration! as BoxDecoration)
-                      .border!
-                      .top
-                      .color,
+                  _selectionFill(tester, tokens, 'One'),
+                  _group(tester).decoration,
+                  _group(tester).foregroundDecoration,
+                  _knob(tester),
                 ];
               }
 
               final readOnly = await look(readOnly: true);
               expect(readOnly, await look(readOnly: false));
-              final ratio = contrastRatio(readOnly[1], readOnly[0]);
+              final ratio = contrastRatio(
+                readOnly[1]! as Color,
+                readOnly[4]! as Color,
+              );
               expect(
                 ratio,
                 greaterThanOrEqualTo(4.5),
@@ -291,9 +336,11 @@ void main() {
     }
   });
 
-  group('the Segmented group takes the button corner and the field edge', () {
+  group('the Segmented takes its corner, a track ringing a concentric knob '
+      'and joined segments a field edge', () {
     for (final MapEntry(key: name, value: tokens) in _themes.entries) {
       testWidgets(name, (tester) async {
+        final style = tokens.segmented;
         for (final size in ControlSize.values) {
           for (final enabled in [true, false]) {
             await tester.pumpWidget(
@@ -308,15 +355,11 @@ void main() {
                 ),
               ),
             );
-            final corner = BorderRadius.circular(tokens.radii.button(size));
+            final radius = style.radius ?? tokens.radii.button(size);
+            final corner = BorderRadius.circular(radius);
             final group = _group(tester);
-            final edge = group.foregroundDecoration! as BoxDecoration;
-            expect(edge.borderRadius, corner, reason: '$size');
-            expect(
-              (group.decoration! as BoxDecoration).borderRadius,
-              corner,
-              reason: '$size clip',
-            );
+            final box = group.decoration! as BoxDecoration;
+            expect(box.borderRadius, corner, reason: '$size');
             final ring = tester.widget<FocusRing>(
               find
                   .ancestor(
@@ -325,17 +368,45 @@ void main() {
                   )
                   .last,
             );
-            expect(ring.radius, tokens.radii.button(size), reason: '$size');
+            expect(ring.radius, radius, reason: '$size');
+            expect(
+              tester.getSize(find.byType(Segmented<String>)).height,
+              size == ControlSize.small
+                  ? tokens.sizes.small
+                  : tokens.sizes.height(size),
+              reason: '$size height',
+            );
 
+            if (style.variant == SegmentedVariant.track) {
+              final edge =
+                  style.inset +
+                  (style.trackOutline ? tokens.stroke.hairline : 0);
+              expect(box.color, tokens.palette.hoverOverlay, reason: 'track');
+              expect(group.foregroundDecoration, isNull);
+              expect(
+                _knob(tester)!.borderRadius,
+                BorderRadius.circular((radius - edge).clamp(0, radius)),
+                reason: '$size knob, concentric',
+              );
+              continue;
+            }
+            expect(_knob(tester), isNull, reason: 'joined: no knob');
             final states = {if (!enabled) WidgetState.disabled};
             final chrome = resolveFieldChrome(tokens, states);
-            final expected = chrome.variant == FieldVariant.filled
+            final expected = style.inverse && enabled
+                ? BorderSide(
+                    color: tokens.palette.foreground,
+                    width: tokens.stroke.hairline,
+                  )
+                : chrome.variant == FieldVariant.filled
                 ? chrome.rule
                 : fieldBorderSide(
                     tokens.palette,
                     states,
                     stroke: tokens.stroke,
                   );
+            final edge = group.foregroundDecoration! as BoxDecoration;
+            expect(edge.borderRadius, corner, reason: '$size edge');
             final side = (edge.border! as Border).top;
             expect(
               (side.color, side.width),
@@ -346,17 +417,22 @@ void main() {
         }
       });
     }
-    test('a stadium in Material, square in Carbon', () {
-      expect(_themes['Material Light']!.radii.button(ControlSize.medium), 999);
-      expect(_themes['Carbon Light']!.radii.button(ControlSize.small), 0);
+    test('a stadium in Material; Carbon rounds 4 where its buttons are '
+        'square', () {
+      final material = _themes['Material Light']!;
+      expect(material.segmented.variant, SegmentedVariant.joined);
+      expect(material.radii.button(ControlSize.medium), 999);
+      final carbon = _themes['Carbon Light']!;
+      expect(carbon.radii.button(ControlSize.small), 0);
+      expect(carbon.segmented.radius, 4);
     });
   });
 
   // One read-only rule (the enabled look, at full contrast) and one disabled
   // rule (a grey label, and the value's mark dimmed from the control's own
   // selected look: a solid mark in the disabled grey under the page colour
-  // for the three that fill it, Segmented's soft tint in a neutral tone)
-  // across the four selection controls.
+  // for the three that fill it; Segmented's knob, resting flat, or its joined
+  // fill in a neutral tone) across the four selection controls.
   group('read-only and disabled look alike across Toggle, Check, Choice and '
       'Segmented', () {
     for (final MapEntry(key: name, value: tokens) in _themes.entries) {
@@ -462,7 +538,7 @@ void main() {
               label: _textColor(tester, 'Choice'),
             ),
             'Segmented': (
-              mark: _segmentFill(tester, 'Picked'),
+              mark: _selectionFill(tester, tokens, 'Picked'),
               content: _textColor(tester, 'Picked'),
               label: _textColor(tester, 'Other'),
             ),
@@ -486,11 +562,17 @@ void main() {
             label: colors.foregroundSubtle,
           ), reason: '$control disabled');
         }
+        final track = tokens.segmented.variant == SegmentedVariant.track;
         expect(disabled['Segmented'], (
-          mark: Color.alphaBlend(colors.pressedOverlay, colors.surface),
+          mark: track
+              ? enabled['Segmented']!.mark
+              : Color.alphaBlend(colors.pressedOverlay, colors.surface),
           content: colors.foregroundSubtle,
           label: colors.foregroundSubtle,
         ), reason: 'Segmented disabled');
+        if (track) {
+          expect(_knob(tester)!.boxShadow, isNull, reason: 'a flat knob');
+        }
         expect(
           _segmentFill(tester, 'Other'),
           isNot(disabled['Segmented']!.mark),

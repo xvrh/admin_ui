@@ -25,8 +25,14 @@ final _palettes = <String, AdminPalette>{
             : palette.branded(seed),
 };
 
-Widget _themed(AdminPalette palette, Widget child) => MaterialApp(
-  theme: buildAppTheme(AdminTokens.from(palette: palette)),
+Widget _themed(
+  AdminPalette palette,
+  Widget child, {
+  AdminSegmentedStyle? segmented,
+}) => MaterialApp(
+  theme: buildAppTheme(
+    AdminTokens.from(palette: palette, segmented: segmented),
+  ),
   home: Scaffold(
     body: Center(child: SizedBox(width: 320, child: child)),
   ),
@@ -58,6 +64,63 @@ String _ratio(double r) => '${r.toStringAsFixed(2)}:1';
 
 /// Whether [color] is a grey, with no hue to tell it from another grey.
 bool _isGrey(Color color) => HSLColor.fromColor(color).saturation < 0.1;
+
+/// A segmented control's three looks: a track, joined segments with a soft
+/// selection, and joined segments with an inverse one.
+const _segmentStyles = {
+  'track': AdminSegmentedStyle(),
+  'joined': AdminSegmentedStyle(variant: SegmentedVariant.joined),
+  'inverse': AdminSegmentedStyle(
+    variant: SegmentedVariant.joined,
+    inverse: true,
+  ),
+};
+
+/// The fill of the segment labelled [label]: its own box, clear on a track.
+Color _segmentFill(WidgetTester tester, String label) =>
+    (tester
+                .widget<DecoratedBox>(
+                  find
+                      .ancestor(
+                        of: find.text(label),
+                        matching: find.byType(DecoratedBox),
+                      )
+                      .first,
+                )
+                .decoration
+            as BoxDecoration)
+        .color!;
+
+/// The knob a track draws behind its selected segment: the one box in the
+/// Segmented that holds no label.
+BoxDecoration _knob(WidgetTester tester) {
+  final boxes = find.descendant(
+    of: find.byWidgetPredicate((w) => w is Segmented),
+    matching: find.byType(DecoratedBox),
+  );
+  final knob = boxes.evaluate().firstWhere(
+    (box) => find
+        .descendant(
+          of: find.byElementPredicate((e) => e == box),
+          matching: find.byType(Text),
+        )
+        .evaluate()
+        .isEmpty,
+  );
+  return (knob.widget as DecoratedBox).decoration as BoxDecoration;
+}
+
+/// The render object that lays out the segments and paints the dividers.
+RenderObject _strip(WidgetTester tester, String label) => tester.renderObject(
+  find
+      .ancestor(
+        of: find.text(label),
+        matching: find.byWidgetPredicate(
+          (w) => w.runtimeType.toString() == '_SegmentStrip',
+        ),
+      )
+      .first,
+);
 
 void main() {
   group('an on control is marked at 3:1 on the surface', () {
@@ -449,67 +512,83 @@ void main() {
 
   group('a hovered or pressed segment keeps its label at 4.5:1, and the '
       'hovered one reads apart from the selection', () {
-    for (final MapEntry(key: name, value: palette) in _palettes.entries) {
-      testWidgets(name, (tester) async {
-        final hovered = WidgetStatesController({WidgetState.hovered});
-        final pressed = WidgetStatesController({WidgetState.pressed});
-        addTearDown(hovered.dispose);
-        addTearDown(pressed.dispose);
-        await tester.pumpWidget(
-          _themed(
-            palette,
-            Segmented<String>(
-              value: 'a',
-              onChanged: (_) {},
-              segments: [
-                const SegmentOption('a', 'List'),
-                SegmentOption('b', 'Grid', statesController: hovered),
-                SegmentOption('c', 'Map', statesController: pressed),
-              ],
+    for (final MapEntry(key: look, value: style) in _segmentStyles.entries) {
+      for (final MapEntry(key: name, value: palette) in _palettes.entries) {
+        testWidgets('$look, $name', (tester) async {
+          final hovered = WidgetStatesController({WidgetState.hovered});
+          final pressed = WidgetStatesController({WidgetState.pressed});
+          addTearDown(hovered.dispose);
+          addTearDown(pressed.dispose);
+          await tester.pumpWidget(
+            _themed(
+              palette,
+              segmented: style,
+              Segmented<String>(
+                value: 'a',
+                onChanged: (_) {},
+                segments: [
+                  const SegmentOption('a', 'List'),
+                  SegmentOption('b', 'Grid', statesController: hovered),
+                  SegmentOption('c', 'Map', statesController: pressed),
+                ],
+              ),
             ),
-          ),
-        );
-        Color text(String label) =>
-            tester.widget<Text>(find.text(label)).style!.color!;
-        Color fill(String label) => tester
-            .widget<ColoredBox>(
-              find
-                  .ancestor(
-                    of: find.text(label),
-                    matching: find.byType(ColoredBox),
-                  )
-                  .first,
-            )
-            .color;
-        for (final label in ['Grid', 'Map']) {
-          expect(
-            fill(label),
-            isNot(palette.surface),
-            reason: '$label: the tint shows',
           );
-          final ratio = contrastRatio(text(label), fill(label));
-          expect(
-            ratio,
-            greaterThanOrEqualTo(4.5),
-            reason: '$label: ${_ratio(ratio)}',
-          );
-        }
-        expect(text('Grid'), isNot(text('List')));
-        if (_isGrey(palette.primaryText)) {
-          // A neutral selection's fill is a grey much like the hover's, and
-          // no hue sets its label apart: lightness has to.
-          final apart = contrastRatio(text('Grid'), text('List'));
-          expect(
-            apart,
-            greaterThanOrEqualTo(1.5),
-            reason: 'hovered against selected label: ${_ratio(apart)}',
-          );
-        }
-      });
+          final track = style.variant == SegmentedVariant.track;
+          Color text(String label) =>
+              tester.widget<Text>(find.text(label)).style!.color!;
+          // What a label sits on: its segment's fill, over the track's wash
+          // on a track.
+          Color ground(String label) => track
+              ? Color.alphaBlend(
+                  _segmentFill(tester, label),
+                  Color.alphaBlend(palette.hoverOverlay, palette.surface),
+                )
+              : _segmentFill(tester, label);
+          for (final label in ['Grid', 'Map']) {
+            expect(
+              _segmentFill(tester, label),
+              isNot(track ? const Color(0x00000000) : palette.surface),
+              reason: '$label: the tint shows',
+            );
+            final ratio = contrastRatio(text(label), ground(label));
+            expect(
+              ratio,
+              greaterThanOrEqualTo(4.5),
+              reason: '$label: ${_ratio(ratio)}',
+            );
+          }
+          if (track) {
+            // The selection is the raised knob, which a hovered segment's
+            // wash can't pass for.
+            final knob = _knob(tester);
+            expect(knob.color, isNot(ground('Grid')));
+            expect(knob.boxShadow ?? knob.border, isNotNull, reason: 'raised');
+            final ratio = contrastRatio(text('List'), knob.color!);
+            expect(
+              ratio,
+              greaterThanOrEqualTo(4.5),
+              reason: 'the selected label on its knob: ${_ratio(ratio)}',
+            );
+            return;
+          }
+          expect(text('Grid'), isNot(text('List')));
+          if (!style.inverse && _isGrey(palette.onSoft)) {
+            // A neutral selection's fill is a grey much like the hover's,
+            // and no hue sets its label apart: lightness has to.
+            final apart = contrastRatio(text('Grid'), text('List'));
+            expect(
+              apart,
+              greaterThanOrEqualTo(1.5),
+              reason: 'hovered against selected label: ${_ratio(apart)}',
+            );
+          }
+        });
+      }
     }
   });
 
-  testWidgets('Segmented is outlined like a field, dividers included', (
+  testWidgets('joined segments are outlined like a field, dividers included', (
     tester,
   ) async {
     final palette = _palettes['shadcn Light Default']!;
@@ -517,6 +596,7 @@ void main() {
       await tester.pumpWidget(
         _themed(
           palette,
+          segmented: _segmentStyles['joined'],
           Segmented<String>(
             value: 'a',
             onChanged: enabled ? (_) {} : null,
@@ -541,15 +621,7 @@ void main() {
             .first,
       );
       expect(_borderOf(group.foregroundDecoration! as BoxDecoration), outline);
-      final strip = find
-          .ancestor(
-            of: find.text('List'),
-            matching: find.byWidgetPredicate(
-              (w) => w.runtimeType.toString() == '_SegmentStrip',
-            ),
-          )
-          .first;
-      expect(tester.renderObject(strip), paints..rect(color: outline));
+      expect(_strip(tester, 'List'), paints..rect(color: outline));
     }
 
     await expectOutline(enabled: true);
@@ -559,6 +631,59 @@ void main() {
       reason: 'an enabled field is outlined in controlBorder',
     );
     await expectOutline(enabled: false);
+  });
+
+  testWidgets('an inverse switcher is ringed in the foreground, and its '
+      'selection swallows the dividers beside it', (tester) async {
+    final palette = _palettes['Carbon Light Default']!;
+    Future<void> pump(String value) => tester.pumpWidget(
+      _themed(
+        palette,
+        segmented: _segmentStyles['inverse'],
+        Segmented<String>(
+          value: value,
+          onChanged: (_) {},
+          segments: const [
+            SegmentOption('a', 'Day'),
+            SegmentOption('b', 'Week'),
+            SegmentOption('c', 'Month'),
+          ],
+        ),
+      ),
+    );
+    await pump('a');
+    final group = tester.widget<Container>(
+      find
+          .descendant(
+            of: find.byType(Segmented<String>),
+            matching: find.byWidgetPredicate(
+              (w) => w is Container && w.foregroundDecoration != null,
+            ),
+          )
+          .first,
+    );
+    expect(
+      _borderOf(group.foregroundDecoration! as BoxDecoration),
+      palette.foreground,
+    );
+    expect(_segmentFill(tester, 'Day'), palette.foreground);
+    expect(
+      tester.widget<Text>(find.text('Day')).style!.color,
+      palette.foregroundOn(palette.foreground),
+    );
+    expect(
+      _strip(tester, 'Day'),
+      paints
+        ..rect(color: palette.foreground)
+        ..rect(color: palette.border),
+    );
+    await pump('b');
+    expect(
+      _strip(tester, 'Day'),
+      paints
+        ..rect(color: palette.foreground)
+        ..rect(color: palette.foreground),
+    );
   });
 
   group('calendar day rows', () {

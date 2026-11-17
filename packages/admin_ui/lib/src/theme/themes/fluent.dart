@@ -8,6 +8,7 @@ import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
+import '../segmented_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -254,4 +255,12 @@ final fluentTheme = AdminTheme.from(
   ),
   // Tooltip: withArrow, maxWidth 240px, a 6px arrowHeight
   overlay: const AdminOverlayStyle(tooltipArrow: true, tooltipMaxWidth: 240),
+  // Segmented: an outlined track, the selected item raised in
+  // ControlFillColorDefault over a short accent pill, regular labels
+  segmented: const AdminSegmentedStyle(
+    inset: 2,
+    trackOutline: true,
+    indicator: true,
+    labelWeight: FontWeight.w400,
+  ),
 );

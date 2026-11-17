@@ -1,20 +1,16 @@
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:material_ui/material_ui.dart';
 
-import '../../common/text_metrics.dart';
 import '../../common/ui/avatar.dart';
 import '../../common/ui/button.dart';
 import '../../common/ui/empty_state.dart';
 import '../../common/ui/panel.dart';
 import '../../common/ui/segmented.dart';
 import '../../common/ui/tag.dart';
-import '../../common/ui/tappable.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../l10n/formats.dart';
 import '../../l10n/sections/display_messages.dart';
-import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
-import '../../theme/theme.dart' show fieldBorderSide;
 import '../../theme/tokens.dart';
 import '../diff_model.dart';
 import 'block_diff.dart';
@@ -187,7 +183,7 @@ class _DiffViewState extends State<DiffView> {
 
   List<Widget> _localeToggles() => [
     for (final code in widget.diff.locales)
-      _Toggle(
+      SegmentToggle(
         label: code.toUpperCase(),
         active: _locales.contains(code),
         onTap: () => setState(() {
@@ -201,7 +197,7 @@ class _DiffViewState extends State<DiffView> {
   ];
 
   Widget _showUnchangedToggle(BuildContext context) {
-    return _Toggle(
+    return SegmentToggle(
       label: context.adminL10n.display.diffUnchanged,
       icon: _showUnchanged
           ? Icons.visibility_outlined
@@ -717,90 +713,6 @@ class _CountChips extends StatelessWidget {
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
       ),
-    );
-  }
-}
-
-/// A toggle button for the locale filter and the unchanged switch, drawn as
-/// a lone segment of the [Segmented] beside it: the medium control height,
-/// the field outline and radius, the body label, and the soft primary fill
-/// while on. The pointer lays the neutral hover and press overlays over
-/// either fill.
-class _Toggle extends StatelessWidget {
-  final String label;
-  final IconData? icon;
-  final bool active;
-  final VoidCallback onTap;
-
-  const _Toggle({
-    required this.label,
-    required this.active,
-    required this.onTap,
-    this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final type = context.type;
-    // A toggle button: a button's corner, as the Segmented beside it takes.
-    final radius = context.radii.button(ControlSize.medium);
-    final height = context.sizes.medium;
-    return Tappable.states(
-      onTap: onTap,
-      selected: active,
-      focusRadius: radius,
-      builder: (context, states) {
-        final pressed = states.contains(WidgetState.pressed);
-        final hovered = states.contains(WidgetState.hovered);
-        final overlay = pressed
-            ? colors.pressedOverlay
-            : hovered
-            ? colors.hoverOverlay
-            : null;
-        final base = active ? colors.primarySubtle : colors.surface;
-        // Muted text keeps 4.5:1 on the hover and press tints in its on-tint
-        // shade, as a segment's does.
-        final ink = active
-            ? colors.primaryText
-            : overlay != null
-            ? colors.foregroundMutedOnTint
-            : colors.foregroundMuted;
-        return Container(
-          // Taller by as much as the label grows at a large text size.
-          height: height + textGrowthOf(context, type.body),
-          padding: EdgeInsets.symmetric(
-            horizontal: height / 2 - AdminSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: overlay == null ? base : Color.alphaBlend(overlay, base),
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.fromBorderSide(
-              fieldBorderSide(colors, const {}, stroke: context.stroke),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: context.iconSizes.md, color: ink),
-                const Gap(AdminSpacing.sm),
-              ],
-              // Ellipsized where the toolbar leaves it less than its label.
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: type
-                      .weighted(type.body, FontWeight.w500)
-                      .copyWith(color: ink),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

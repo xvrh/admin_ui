@@ -14,8 +14,8 @@ const _stroke = AdminStroke(
 
 final _tokens = AdminTokens.from(palette: irisPalette, stroke: _stroke);
 
-Widget _host(Widget child) => MaterialApp(
-  theme: buildAppTheme(_tokens),
+Widget _host(Widget child, {AdminTokens? tokens}) => MaterialApp(
+  theme: buildAppTheme(tokens ?? _tokens),
   home: Scaffold(
     body: Center(child: SizedBox(width: 320, child: child)),
   ),
@@ -95,9 +95,14 @@ void main() {
       expect(border().chromeOf(const {}).outline.width, _stroke.fieldError);
     });
 
-    testWidgets('a Segmented control', (tester) async {
+    testWidgets('joined segments', (tester) async {
       await tester.pumpWidget(
         _host(
+          tokens: _tokens.copyWith(
+            segmented: const AdminSegmentedStyle(
+              variant: SegmentedVariant.joined,
+            ),
+          ),
           Segmented<String>(
             value: 'a',
             onChanged: (_) {},
