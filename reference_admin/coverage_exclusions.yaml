@@ -47,6 +47,7 @@ theme_internals:
     - AdminMotion
     - AdminOverlayStyle
     - AdminPalette
+    - AdminSegmentedStyle
     - AdminShellStyle
     - AdminStateLayer
     - AdminStroke
@@ -64,6 +65,7 @@ theme_internals:
     - FieldRequiredMark
     - FieldVariant
     - NavIndicator
+    - SegmentedVariant
     - TableHeaderText
     - TopBarSpan
     - antDarkPalette
