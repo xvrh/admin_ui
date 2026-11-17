@@ -10,6 +10,7 @@ import 'command_palette.dart' show PaletteItem;
 /// current state.
 class CommandRegistry extends ChangeNotifier {
   final _contributors = <_Contributor>[];
+  bool _disposed = false;
 
   /// Registers a command [builder]; dispose the returned handle to withdraw it.
   /// Global commands register once and keep the handle for the app's lifetime;
@@ -23,22 +24,34 @@ class CommandRegistry extends ChangeNotifier {
 
   List<PaletteItem> active() => [for (final c in _contributors) ...c.builder()];
 
+  /// A subscription withdrawn after the registry is disposed, as when the
+  /// widget owning the registry unmounts along with the ones contributing to
+  /// it, notifies nobody.
   void _remove(_Contributor c) {
-    if (_contributors.remove(c)) {
+    if (_contributors.remove(c) && !_disposed) {
       _notify();
     }
   }
 
   /// Notifies dependents, but never mid-frame: a subscription disposed while a
   /// widget unmounts (tree locked) would otherwise try to mark [CommandScope]
-  /// dirty and throw. Defer to the next frame when that happens.
+  /// dirty and throw. Defer to the next frame when that happens, unless the
+  /// registry is disposed by then.
   void _notify() {
     if (SchedulerBinding.instance.schedulerPhase ==
         SchedulerPhase.persistentCallbacks) {
-      SchedulerBinding.instance.addPostFrameCallback((_) => notifyListeners());
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (!_disposed) notifyListeners();
+      });
     } else {
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 }
 
