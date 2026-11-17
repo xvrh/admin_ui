@@ -81,8 +81,10 @@ dependency_overrides:
 ```
 
 **Flutter 3.47 and Dart 3.13 are the floor**, set by material_ui 1.4. The
-kit uses no later API: it analyzes clean against Flutter 3.47's last beta
-(3.47.0-0.4.pre). Its other dependencies take caret constraints.
+kit uses no later API, and CI holds it to that on every pull request: on
+the latest Flutter 3.47, it resolves the kit alone, analyzes it at the
+lowest and at the latest versions its constraints admit, and runs its
+tests. Its other dependencies take caret constraints.
 
 **Build the app on material_ui**, as the next section explains. A kit widget
 under a `MaterialApp` from `package:flutter/material.dart` finds no theme

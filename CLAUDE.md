@@ -14,8 +14,12 @@ needs per-language menus") and invent neutral example data.
 - `fvm dart analyze --fatal-infos` must be clean.
 - `fvm dart run tool/check_constraints.dart`: every dependency constraint
   admits the latest release, or `heldBack` says why not.
+- `fvm dart run tool/check_floor.dart --flutter=<a 3.47 SDK>`: the kit
+  resolved alone on the oldest Flutter its `environment: flutter:` admits,
+  analyzed and tested. An app may build it with that Flutter.
 - `.fvmrc` is the only place the Flutter version is written; every workflow
-  installs the one it names. Each Monday the Upgrade workflow moves it to the
+  installs the one it names, except the floor job, which reads the floor
+  from the kit's pubspec. Each Monday the Upgrade workflow moves it to the
   latest beta and runs `tool/upgrade.dart` (every dependency to its latest
   release) in one pull request, whose breakage is fixed on its branch.
 - `main` takes a change only as a squashed pull request whose checks pass;

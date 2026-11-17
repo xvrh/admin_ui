@@ -60,3 +60,29 @@ jobs:
       - name: flutter test
         working-directory: ${{ matrix.package }}
         run: flutter test
+
+  # The jobs above run the Flutter .fvmrc pins. An app builds the kit with
+  # its own, as old as the kit's `environment: flutter:` admits, so this one
+  # runs the latest stable patch of that floor (tool/check_floor.dart).
+  floor:
+    name: Floor · packages/admin_ui
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Read the floor
+        id: floor
+        run: |
+          constraint="$(yq -r '.environment.flutter' packages/admin_ui/pubspec.yaml)"
+          floor='^>= *([0-9]+)\.([0-9]+)\.'
+          if [[ ! "$constraint" =~ $floor ]]; then
+            echo "::error file=packages/admin_ui/pubspec.yaml::environment: flutter: is '$constraint', not a '>=x.y.z' floor"
+            exit 1
+          fi
+          echo "version=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.x" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.floor.outputs.version }}
+          channel: stable
+          cache: true
+      # `dart`, not `dart run`: the workspace does not resolve on the floor.
+      - run: dart tool/check_floor.dart
