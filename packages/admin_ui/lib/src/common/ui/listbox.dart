@@ -13,6 +13,7 @@ import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
+import '../text_metrics.dart';
 import 'field_chrome.dart';
 import 'input_decoration.dart';
 import 'popover.dart';
@@ -463,9 +464,10 @@ class _ListboxState extends State<Listbox> {
   }
 }
 
-/// One row of a [Listbox]: [label] with an optional [description] line and
-/// [leading] glyph, at least the medium control height, on the theme's small
-/// radius. The [controller]'s highlight fills it with
+/// One row of a [Listbox]: [label] with an optional [description] under it
+/// and [leading] glyph, at least the medium control height, on the theme's
+/// small radius. The label and the description each take up to two lines
+/// before an ellipsis. The [controller]'s highlight fills it with
 /// [AdminPalette.listHighlight]; the pointer moving over it moves the highlight
 /// there. A [selected] row shows a trailing check — or, with [checkbox] (a
 /// multi-select), [leading] is the checkbox and there is none.
@@ -513,6 +515,35 @@ class ListboxOption extends StatelessWidget {
   static double contentInset(BuildContext context) =>
       math.max(0, context.sizes.fieldPaddingX - AdminSpacing.xs);
 
+  /// The width a row needs to show [label] and [description] on one line
+  /// each, after a [leading] widget that wide (none when 0) and before the
+  /// check of a selected row, which a [checkbox] row does not take. The label
+  /// is measured in the weight a selected row gives it, so the widest row
+  /// holds whichever one is selected.
+  static double widthOf(
+    BuildContext context, {
+    required String label,
+    String? description,
+    double leading = 0,
+    bool checkbox = false,
+  }) {
+    final sizes = context.sizes;
+    final type = context.type;
+    final style = checkbox
+        ? type.fieldText
+        : type.weighted(type.fieldText, type.spec.strong);
+    var text = textWidthOf(context, label, style);
+    if (description != null) {
+      text = math.max(text, textWidthOf(context, description, type.caption));
+    }
+    return 2 * contentInset(context) +
+        (leading > 0
+            ? math.max(leading, sizes.fieldIcon) + sizes.fieldIconGap
+            : 0) +
+        text +
+        (checkbox ? 0 : sizes.fieldIconGap + sizes.fieldIcon);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -558,14 +589,14 @@ class ListboxOption extends StatelessWidget {
               title ??
                   Text(
                     label,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: labelStyle,
                   ),
               if (description != null)
                 Text(
                   description!,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: type.caption.copyWith(
                     color: enabled
@@ -639,8 +670,8 @@ class ListboxOption extends StatelessWidget {
 /// A field dropdown's content — a select's, a multi-select's: a [Listbox]
 /// under an optional filter box, with [emptyText] when there are no rows and
 /// an optional [footer] line, on a [PopoverMenuSurface] as wide as the
-/// trigger ([anchorWidth]) but at least [minWidth] — and the focus model
-/// around it.
+/// trigger ([anchorWidth]) but at least [minWidth], and wider when its
+/// options need it ([optionsWidth]) — and the focus model around it.
 ///
 /// As it opens, focus moves into it: onto the filter box when there is one
 /// ([onFilterChanged] set), whose ArrowUp/ArrowDown, Home/End,
@@ -652,6 +683,10 @@ class ListboxMenu extends StatefulWidget {
   /// The narrowest the menu gets, beside a narrower trigger.
   static const minWidth = 200.0;
 
+  /// The widest the menu grows to hold its options, beside a narrower
+  /// trigger.
+  static const maxWidth = 480.0;
+
   final ListboxController controller;
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
@@ -659,6 +694,13 @@ class ListboxMenu extends StatefulWidget {
   /// The trigger's width, from [PopoverController.anchorWidth].
   final double? anchorWidth;
   final double maxHeight;
+
+  /// The width the widest option needs, from [ListboxOption.widthOf]. The
+  /// menu grows past its trigger to hold it, up to [maxWidth] and the width
+  /// of the screen, and a longer option wraps onto a second line. Asked as
+  /// the menu opens, and again when the theme or the text size changes; the
+  /// menu stays the trigger's width when null.
+  final double Function(BuildContext context)? optionsWidth;
 
   /// Called with the option Enter (or Space) activates. With [closeOnSelect]
   /// the popover then closes and hands focus back to its trigger.
@@ -696,6 +738,7 @@ class ListboxMenu extends StatefulWidget {
     required this.onSelect,
     this.closeOnSelect = true,
     this.maxHeight = 360,
+    this.optionsWidth,
     this.onFilterChanged,
     this.filterController,
     this.filterHint,
@@ -715,6 +758,33 @@ class _ListboxMenuState extends State<ListboxMenu> {
   final _listNode = FocusNode(debugLabel: 'Listbox', skipTraversal: true);
 
   bool get _filtered => widget.onFilterChanged != null;
+
+  /// [ListboxMenu.optionsWidth] as last asked: measuring every option on
+  /// every keystroke in the filter box would cost a long list its typing.
+  double? _optionsWidth;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _optionsWidth = null;
+  }
+
+  /// The trigger's width, at least [ListboxMenu.minWidth], grown to the
+  /// options' up to [ListboxMenu.maxWidth] and the room across the screen.
+  double _width(BuildContext context) {
+    final anchor = widget.anchorWidth;
+    final trigger = anchor == null || !anchor.isFinite
+        ? ListboxMenu.minWidth
+        : math.max(anchor, ListboxMenu.minWidth);
+    final measure = widget.optionsWidth;
+    if (measure == null) return trigger;
+    final screen = Popover.availableSizeOf(context)?.width ?? double.infinity;
+    final options = (_optionsWidth ??= measure(context)) + 2 * AdminSpacing.xs;
+    return options.clamp(
+      trigger,
+      math.max(trigger, math.min(ListboxMenu.maxWidth, screen)),
+    );
+  }
 
   @override
   void initState() {
@@ -788,11 +858,8 @@ class _ListboxMenuState extends State<ListboxMenu> {
             onKeyEvent: (_, event) => _onTab(event),
             semanticLabel: widget.semanticLabel,
           );
-    final anchor = widget.anchorWidth;
     return PopoverMenuSurface(
-      width: anchor == null || !anchor.isFinite
-          ? ListboxMenu.minWidth
-          : math.max(anchor, ListboxMenu.minWidth),
+      width: _width(context),
       maxHeight: widget.maxHeight,
       fitAvailableHeight: true,
       child: Column(

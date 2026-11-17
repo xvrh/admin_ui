@@ -1,6 +1,8 @@
 import 'package:admin_ui/src/collection/filter.dart';
 import 'package:admin_ui/src/collection/ui/filter_bar.dart';
 import 'package:admin_ui/theme.dart';
+import 'package:admin_ui/widgets.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -106,5 +108,83 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(InputDecorator), findsNWidgets(2));
     expectSmall('range filter');
+  });
+
+  group('an options menu', () {
+    // The test font draws each character as a square: 13px at field size.
+    const live = 'Northwind / Web shop (live)';
+    const test = 'Northwind / Web shop (test)';
+    const long = 'Northwind Trading (main account) / Web shop (live)';
+
+    Future<void> open(WidgetTester tester, List<FilterOption> options) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildAppTheme(defaultTokens),
+          home: Scaffold(
+            body: FilterBar(
+              fields: [OptionsFilterField('account', 'Account', options)],
+              active: const [],
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Account'));
+      await tester.pumpAndSettle();
+    }
+
+    FilterOption option(String label) => FilterOption(label, label);
+
+    RenderParagraph paragraph(WidgetTester tester, String text) =>
+        tester.renderObject<RenderParagraph>(find.text(text));
+
+    bool oneLine(RenderParagraph p) =>
+        p.getMaxIntrinsicWidth(double.infinity) <= p.size.width;
+
+    double menuWidth(WidgetTester tester) =>
+        tester.getSize(find.byType(PopoverMenuSurface)).width;
+
+    testWidgets('grows past its pill to show each option whole', (
+      tester,
+    ) async {
+      await open(tester, [option(live), option(test)]);
+      for (final label in [live, test]) {
+        expect(oneLine(paragraph(tester, label)), isTrue, reason: label);
+      }
+      expect(menuWidth(tester), greaterThan(ListboxMenu.minWidth));
+    });
+
+    testWidgets('shows a description under its label, whole', (tester) async {
+      const account = 'Northwind Trading (main account)';
+      await open(tester, const [
+        FilterOption('live', 'Web shop (live)', description: account),
+      ]);
+      final label = tester.getRect(find.text('Web shop (live)'));
+      final description = tester.getRect(find.text(account));
+      expect(description.top, greaterThanOrEqualTo(label.bottom));
+      expect(oneLine(paragraph(tester, account)), isTrue);
+    });
+
+    testWidgets('stops at its widest and wraps a longer option', (
+      tester,
+    ) async {
+      await open(tester, [option(live), option(long)]);
+      expect(menuWidth(tester), ListboxMenu.maxWidth);
+      final p = paragraph(tester, long);
+      expect(oneLine(p), isFalse);
+      expect(p.didExceedMaxLines, isFalse, reason: 'two lines hold it');
+      expect(oneLine(paragraph(tester, live)), isTrue);
+    });
+
+    testWidgets('stays inside a phone’s screen', (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await open(tester, [option(long)]);
+      final menu = tester.getRect(find.byType(PopoverMenuSurface));
+      expect(menu.left, greaterThanOrEqualTo(0));
+      expect(menu.right, lessThanOrEqualTo(360));
+      expect(menu.width, lessThan(ListboxMenu.maxWidth));
+    });
   });
 }
