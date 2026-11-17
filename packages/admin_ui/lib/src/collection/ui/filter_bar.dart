@@ -31,10 +31,14 @@ class FilterOption {
   final String id;
   final String label;
 
+  /// A muted line under [label] in the menu, which the filter's summary
+  /// leaves out.
+  final String? description;
+
   /// The key of the row built for this option, to find it by in a test.
   final Key? key;
 
-  const FilterOption(this.id, this.label, {this.key});
+  const FilterOption(this.id, this.label, {this.description, this.key});
 }
 
 /// A filterable field the [FilterBar] can edit. [key] is the [FieldId] carried
@@ -476,6 +480,7 @@ class _OptionsEditorState extends State<_OptionsEditor> {
           ListboxOption.widthOf(
             context,
             label: o.label,
+            description: o.description,
             leading: Check.size,
             checkbox: true,
           ),
@@ -490,6 +495,7 @@ class _OptionsEditorState extends State<_OptionsEditor> {
           controller: _listbox,
           index: i,
           label: option.label,
+          description: option.description,
           checkbox: true,
           selected: checked,
           leading: _drawnCheck(checked),

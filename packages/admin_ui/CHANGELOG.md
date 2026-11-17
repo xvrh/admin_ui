@@ -6,6 +6,9 @@
   which `ListboxOption.widthOf` measures, and grows past its trigger to
   hold it, up to `ListboxMenu.maxWidth` and the screen's width. `Check.size`
   is the side of a check box.
+- A `FilterOption` takes a `description`: a muted line under its label in
+  the filter's menu, for what tells apart options whose labels are alike.
+  The pill's summary shows the label alone.
 - An `InputField` takes a `contextMenuBuilder`: the menu a right-click or a
   long press opens in it, in place of the platform's, such as spellings for
   the word under the pointer above the usual Cut, Copy and Paste. On the web

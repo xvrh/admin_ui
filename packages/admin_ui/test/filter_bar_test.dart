@@ -116,17 +116,13 @@ void main() {
     const test = 'Northwind / Web shop (test)';
     const long = 'Northwind Trading (main account) / Web shop (live)';
 
-    Future<void> open(WidgetTester tester, List<String> labels) async {
+    Future<void> open(WidgetTester tester, List<FilterOption> options) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: buildAppTheme(defaultTokens),
           home: Scaffold(
             body: FilterBar(
-              fields: [
-                OptionsFilterField('account', 'Account', [
-                  for (final label in labels) FilterOption(label, label),
-                ]),
-              ],
+              fields: [OptionsFilterField('account', 'Account', options)],
               active: const [],
               onChanged: (_) {},
             ),
@@ -136,6 +132,8 @@ void main() {
       await tester.tap(find.text('Account'));
       await tester.pumpAndSettle();
     }
+
+    FilterOption option(String label) => FilterOption(label, label);
 
     RenderParagraph paragraph(WidgetTester tester, String text) =>
         tester.renderObject<RenderParagraph>(find.text(text));
@@ -149,17 +147,28 @@ void main() {
     testWidgets('grows past its pill to show each option whole', (
       tester,
     ) async {
-      await open(tester, const [live, test]);
+      await open(tester, [option(live), option(test)]);
       for (final label in [live, test]) {
         expect(oneLine(paragraph(tester, label)), isTrue, reason: label);
       }
       expect(menuWidth(tester), greaterThan(ListboxMenu.minWidth));
     });
 
+    testWidgets('shows a description under its label, whole', (tester) async {
+      const account = 'Northwind Trading (main account)';
+      await open(tester, const [
+        FilterOption('live', 'Web shop (live)', description: account),
+      ]);
+      final label = tester.getRect(find.text('Web shop (live)'));
+      final description = tester.getRect(find.text(account));
+      expect(description.top, greaterThanOrEqualTo(label.bottom));
+      expect(oneLine(paragraph(tester, account)), isTrue);
+    });
+
     testWidgets('stops at its widest and wraps a longer option', (
       tester,
     ) async {
-      await open(tester, const [live, long]);
+      await open(tester, [option(live), option(long)]);
       expect(menuWidth(tester), ListboxMenu.maxWidth);
       final p = paragraph(tester, long);
       expect(oneLine(p), isFalse);
@@ -171,7 +180,7 @@ void main() {
       tester.view.physicalSize = const Size(360, 640);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      await open(tester, const [long]);
+      await open(tester, [option(long)]);
       final menu = tester.getRect(find.byType(PopoverMenuSurface));
       expect(menu.left, greaterThanOrEqualTo(0));
       expect(menu.right, lessThanOrEqualTo(360));
