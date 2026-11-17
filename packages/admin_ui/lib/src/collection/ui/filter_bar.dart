@@ -469,6 +469,18 @@ class _OptionsEditorState extends State<_OptionsEditor> {
       itemCount: _options.length,
       closeOnSelect: false,
       onSelect: (i) => _toggle(_options[i]),
+      optionsWidth: (context) => _options.fold<double>(
+        0,
+        (widest, o) => math.max(
+          widest,
+          ListboxOption.widthOf(
+            context,
+            label: o.label,
+            leading: Check.size,
+            checkbox: true,
+          ),
+        ),
+      ),
       semanticLabel: widget.field.label,
       itemBuilder: (context, i) {
         final option = _options[i];
@@ -805,6 +817,10 @@ class _BoolEditorState extends State<_BoolEditor> {
       anchorWidth: widget.anchorWidth,
       itemCount: _choices.length,
       onSelect: (i) => widget.onChanged(_choices[i]),
+      optionsWidth: (context) => math.max(
+        ListboxOption.widthOf(context, label: widget.field._yes(context)),
+        ListboxOption.widthOf(context, label: widget.field._no(context)),
+      ),
       semanticLabel: widget.field.label,
       itemBuilder: (context, i) => ListboxOption(
         controller: _listbox,

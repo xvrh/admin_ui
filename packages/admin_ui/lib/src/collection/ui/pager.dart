@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
 
+import '../../common/text_metrics.dart';
 import '../../common/ui/field_chrome.dart';
 import '../../common/ui/icon_action.dart';
 import '../../common/ui/input_decoration.dart';
@@ -132,7 +133,7 @@ class Pager extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final room = constraints.maxWidth;
-          final labelWidth = _textWidth(context, label, labelStyle);
+          final labelWidth = textWidthOf(context, label, labelStyle);
           final selectWidth = showSize
               ? _PageSizeSelect.widthOf(context, pageSizes)
               : 0.0;
@@ -223,22 +224,6 @@ class Pager extends StatelessWidget {
   }
 }
 
-double _textWidth(BuildContext context, String text, TextStyle style) {
-  if (text.isEmpty) return 0;
-  final painter = TextPainter(
-    text: TextSpan(
-      text: text,
-      style: DefaultTextStyle.of(context).style.merge(style),
-    ),
-    textDirection: Directionality.of(context),
-    textScaler: MediaQuery.textScalerOf(context),
-    maxLines: 1,
-  )..layout();
-  final width = painter.width.ceilToDouble();
-  painter.dispose();
-  return width;
-}
-
 String _perPage(BuildContext context, int size) =>
     context.adminL10n.collection.perPage(size);
 
@@ -271,7 +256,7 @@ class _PageSizeSelect extends StatefulWidget {
     );
     var text = 0.0;
     for (final o in options) {
-      text = math.max(text, _textWidth(context, _perPage(context, o), style));
+      text = math.max(text, textWidthOf(context, _perPage(context, o), style));
     }
     return 2 * sizes.fieldPaddingX +
         text +

@@ -20,6 +20,9 @@ import 'tappable.dart';
 /// change — still a Tab stop, announced read-only, with no hover (see
 /// `FieldState`).
 class Check extends StatelessWidget {
+  /// The box's side, without a [label].
+  static const size = 18.0;
+
   final bool value;
 
   /// Shows a dash instead of a tick — for a "some selected" select-all box.
@@ -129,8 +132,8 @@ class Check extends StatelessWidget {
       border = hovered ? offHoverOutline(colors) : colors.controlBorder;
     }
     return Container(
-      width: 18,
-      height: 18,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: fill,
         borderRadius: BorderRadius.circular(context.radii.radiusCheck),

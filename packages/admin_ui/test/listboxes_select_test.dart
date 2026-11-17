@@ -1,4 +1,5 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -234,6 +235,40 @@ void main() {
       expect(
         tester.getSize(find.byType(PopoverMenuSurface)).width,
         tester.getSize(find.byType(FieldTrigger)).width,
+      );
+    });
+
+    testWidgets('the menu widens to show a longer option whole', (
+      tester,
+    ) async {
+      const long = 'Northwind Trading / Web shop';
+      await tester.pumpWidget(
+        _host(
+          _select(
+            initial: 'live',
+            options: const [
+              SelectOption(value: 'live', label: long),
+              SelectOption(value: 'test', label: 'Web shop (test)'),
+            ],
+          ),
+        ),
+      );
+      await tester.tap(find.byType(FieldTrigger));
+      await tester.pumpAndSettle();
+      // Selected, it is bold and has its check: it still takes one line.
+      final label = tester.renderObject<RenderParagraph>(
+        find.descendant(
+          of: find.byType(ListboxOption),
+          matching: find.text(long),
+        ),
+      );
+      expect(
+        label.getMaxIntrinsicWidth(double.infinity),
+        lessThanOrEqualTo(label.size.width),
+      );
+      expect(
+        tester.getSize(find.byType(PopoverMenuSurface)).width,
+        greaterThan(tester.getSize(find.byType(FieldTrigger)).width),
       );
     });
   });
