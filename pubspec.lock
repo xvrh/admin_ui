@@ -257,8 +257,8 @@ packages:
     dependency: "direct dev"
     description:
       path: "."
-      ref: "2ac0749fe4553190e38286b433b9eb8feb489730"
-      resolved-ref: "2ac0749fe4553190e38286b433b9eb8feb489730"
+      ref: a1ed158233f53bb808a0f23be6ce8eb953b1f389
+      resolved-ref: a1ed158233f53bb808a0f23be6ce8eb953b1f389
       url: "https://github.com/xvrh/flutterware.git"
     source: git
     version: "0.7.0"

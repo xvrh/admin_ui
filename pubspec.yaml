@@ -12,7 +12,7 @@ dev_dependencies:
   flutterware:
     git:
       url: https://github.com/xvrh/flutterware.git
-      ref: 2ac0749fe4553190e38286b433b9eb8feb489730
+      ref: a1ed158233f53bb808a0f23be6ce8eb953b1f389
   http: ^1.6.0
   path: ^1.9.1
   pub_semver: ^2.2.0
