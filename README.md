@@ -42,7 +42,10 @@ every commit an app pins stays on it. This is a repository ruleset that no
 one may bypass: an agent working with the owner's credentials would get any
 bypass the owner has.
 
-CI runs the checks above and every package's tests. The Compare workflow
+CI runs the checks above and every package's tests, and checks the kit on
+the oldest Flutter it admits, which an app may still build it with:
+`tool/check_floor.dart` on the latest patch of the floor its
+`environment: flutter:` names. The Compare workflow
 runs flutterware's `fw compare`: every preview and scenario rendered on the
 pull request's head and on its merge base with `main`, and one comment on the
 pull request with what moved, edited in place on each push. Run
