@@ -24,6 +24,7 @@ void describeAdminTokens(AdminTokens v, String path, Map<String, String> out) {
   describeAdminSelectionStyle(v.selection, '${p}selection', out);
   describeAdminSliderStyle(v.slider, '${p}slider', out);
   describeAdminTabsStyle(v.tabs, '${p}tabs', out);
+  describeAdminFeedbackStyle(v.feedback, '${p}feedback', out);
   describeAdminBreakpoints(v.breakpoints, '${p}breakpoints', out);
 }
 
@@ -456,6 +457,20 @@ void describeAdminTabsStyle(
   describeValue(v.indicatorShape, '${p}indicatorShape', out);
   describeValue(v.indicatorThickness, '${p}indicatorThickness', out);
   describeValue(v.rule, '${p}rule', out);
+}
+
+void describeAdminFeedbackStyle(
+  AdminFeedbackStyle v,
+  String path,
+  Map<String, String> out,
+) {
+  final p = path.isEmpty ? '' : '$path.';
+  describeValue(v.alertFill, '${p}alertFill', out);
+  describeValue(v.alertBar, '${p}alertBar', out);
+  describeValue(v.alertRadius, '${p}alertRadius', out);
+  describeValue(v.toastFill, '${p}toastFill', out);
+  describeValue(v.toastBar, '${p}toastBar', out);
+  describeValue(v.toastOutline, '${p}toastOutline', out);
 }
 
 void describeAdminBreakpoints(

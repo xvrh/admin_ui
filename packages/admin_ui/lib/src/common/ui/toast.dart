@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../l10n/admin_ui_localizations.dart';
+import '../../theme/feedback_style.dart';
 import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
@@ -933,6 +934,12 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
     final style = severityStyleOf(context, widget.toast.severity);
     final corners = BorderRadius.circular(context.radii.radiusMenu);
     final top = widget.position._top;
+    // The theme's toast: a card in the surface colour or tinted with its
+    // status, outlined in its fill's edge or lifted on its shadow alone,
+    // behind a status bar on its leading edge where the theme has one.
+    final look = context.feedbackStyle;
+    final tinted = look.toastFill == FeedbackFill.tint;
+    final dark = context.colors.brightness == Brightness.dark;
 
     final card = DecoratedBox(
       decoration: BoxDecoration(
@@ -940,18 +947,22 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
         boxShadow: context.elevation.md,
       ),
       child: Material(
-        color: context.colors.surface,
+        color: tinted ? style.surface : context.colors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: corners,
-          side: BorderSide(color: context.colors.border),
+          // A dark palette, where a shadow does not read, always rings it.
+          side: look.toastOutline || dark
+              ? BorderSide(color: tinted ? style.border : context.colors.border)
+              : BorderSide.none,
         ),
         clipBehavior: Clip.antiAlias,
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(width: 4, color: style.accent),
+              if (look.toastBar > 0)
+                Container(width: look.toastBar, color: style.accent),
               Expanded(child: _content(context, style)),
             ],
           ),

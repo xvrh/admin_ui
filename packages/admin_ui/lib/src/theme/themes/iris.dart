@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../button_style.dart';
+import '../feedback_style.dart';
 import '../field_style.dart';
 import '../focus.dart';
 import '../motion.dart';
@@ -132,4 +133,7 @@ final irisTheme = AdminTheme.from(
   // 32 / 40 / 48 tall, labels at the button weight, the selected one in the
   // accent over a 2px bar as wide as its tab, on a hairline
   tabs: const AdminTabsStyle(),
+  // a tinted alert; a toast in the surface colour, outlined, behind a 4px
+  // status bar
+  feedback: const AdminFeedbackStyle(),
 );

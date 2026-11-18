@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../button_style.dart';
 import '../elevation.dart';
+import '../feedback_style.dart';
 import '../focus.dart';
 import '../motion.dart';
 import '../overlay_style.dart';
@@ -344,5 +345,12 @@ final shadcnTheme = AdminTheme.from(
     selectedInk: TabsSelectedInk.foreground,
     labelWeight: FontWeight.w500,
     rule: TabsRule.none,
+  ),
+  // Alert: rounded-lg border bg-card, the status in its icon alone. Sonner:
+  // --normal-bg under --normal-border, no status bar
+  feedback: const AdminFeedbackStyle(
+    alertFill: FeedbackFill.surface,
+    alertRadius: 10,
+    toastBar: 0,
   ),
 );

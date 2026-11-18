@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../button_style.dart';
 import '../elevation.dart';
+import '../feedback_style.dart';
 import '../field_style.dart';
 import '../focus.dart';
 import '../motion.dart';
@@ -386,5 +387,13 @@ final carbonTheme = AdminTheme.from(
     labelWeight: FontWeight.w400,
     selectedLabelWeight: FontWeight.w600,
     rule: TabsRule.indicator,
+  ),
+  // The low-contrast notification, inline and toast: the status's
+  // notification background behind a 3px bar of the support colour on the
+  // leading edge, a 1px border on the other three
+  feedback: const AdminFeedbackStyle(
+    alertBar: 3,
+    toastFill: FeedbackFill.tint,
+    toastBar: 3,
   ),
 );

@@ -20,6 +20,7 @@ export 'src/theme/button_style.dart'
 export 'src/theme/contrast.dart' show contrastRatio, relativeLuminance;
 export 'src/theme/elevation.dart'
     show AdminElevation, defaultDarkElevation, defaultElevation;
+export 'src/theme/feedback_style.dart' show AdminFeedbackStyle, FeedbackFill;
 export 'src/theme/field_style.dart'
     show AdminFieldStyle, FieldFocusIndicator, FieldRequiredMark, FieldVariant;
 export 'src/theme/focus.dart' show AdminFocusSpec;

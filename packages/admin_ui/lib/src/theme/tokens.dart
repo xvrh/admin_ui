@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'breakpoints.dart';
 import 'button_style.dart';
 import 'elevation.dart';
+import 'feedback_style.dart';
 import 'field_style.dart';
 import 'focus.dart';
 import 'motion.dart';
@@ -27,16 +28,17 @@ import 'typography.dart';
 /// building a [ThemeData] with a different [AdminTokens] (see
 /// `buildAppTheme`).
 ///
-/// Beside the scales, eight anatomy members give each theme the shapes of
+/// Beside the scales, nine anatomy members give each theme the shapes of
 /// its reference system, so a component reads them rather than asking which
 /// theme it is in: [field] (outlined, filled or underlined boxes), [button]
 /// (alignment, padding, weight, disabled look), [shell] (the sidebar's and
 /// top bar's geometry and palettes), [overlay] (tooltip and popover
 /// arrows, a tooltip's measure), [segmented] (a track and knob, or joined
 /// segments), [selection] (a switch's track, a checkbox's box, a radio's
-/// mark), [slider] (its track and thumb) and [tabs] (a strip's height, its
-/// labels and its indicator). [breakpoints] are the window widths where the
-/// layouts change.
+/// mark), [slider] (its track and thumb), [tabs] (a strip's height, its
+/// labels and its indicator) and [feedback] (an alert's and a toast's fill
+/// and status bar). [breakpoints] are the window widths where the layouts
+/// change.
 @immutable
 class AdminTokens extends ThemeExtension<AdminTokens> {
   final AdminPalette palette;
@@ -85,6 +87,10 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
   /// The anatomy of a tab strip. Read through `context.tabsStyle`.
   final AdminTabsStyle tabs;
 
+  /// The anatomy of an alert and a toast. Read through
+  /// `context.feedbackStyle`.
+  final AdminFeedbackStyle feedback;
+
   /// The widths where the compact, medium and expanded layouts start. Read
   /// through `context.breakpoints`, or classify the window with
   /// [AdminBreakpoint.of].
@@ -109,15 +115,16 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     this.selection = const AdminSelectionStyle(),
     this.slider = const AdminSliderStyle(),
     this.tabs = const AdminTabsStyle(),
+    this.feedback = const AdminFeedbackStyle(),
     this.breakpoints = const AdminBreakpoints(),
   });
 
   /// Builds a token set from a [palette], with optional [radii], typography
   /// [type] spec, [elevation], [focus] ring, control [sizes], [table]
   /// metrics, [motion], [stroke] widths, [iconSizes], the [field],
-  /// [button], [shell], [overlay], [segmented], [selection], [slider] and
-  /// [tabs] anatomy, and the layout [breakpoints]. Typography colours are
-  /// derived from the palette so they stay in sync (and [copyWith] keeps
+  /// [button], [shell], [overlay], [segmented], [selection], [slider],
+  /// [tabs] and [feedback] anatomy, and the layout [breakpoints]. Typography
+  /// colours are derived from the palette so they stay in sync (and [copyWith] keeps
   /// them so). Without an [elevation], a dark palette gets
   /// [defaultDarkElevation] (shadows must be denser to read on a dark page)
   /// and a light one [defaultElevation].
@@ -140,6 +147,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     AdminSelectionStyle? selection,
     AdminSliderStyle? slider,
     AdminTabsStyle? tabs,
+    AdminFeedbackStyle? feedback,
     AdminBreakpoints? breakpoints,
   }) {
     return AdminTokens(
@@ -165,6 +173,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       selection: selection ?? const AdminSelectionStyle(),
       slider: slider ?? const AdminSliderStyle(),
       tabs: tabs ?? const AdminTabsStyle(),
+      feedback: feedback ?? const AdminFeedbackStyle(),
       breakpoints: breakpoints ?? const AdminBreakpoints(),
     );
   }
@@ -204,6 +213,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     AdminSelectionStyle? selection,
     AdminSliderStyle? slider,
     AdminTabsStyle? tabs,
+    AdminFeedbackStyle? feedback,
     AdminBreakpoints? breakpoints,
   }) {
     return AdminTokens(
@@ -225,6 +235,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       selection: selection ?? this.selection,
       slider: slider ?? this.slider,
       tabs: tabs ?? this.tabs,
+      feedback: feedback ?? this.feedback,
       breakpoints: breakpoints ?? this.breakpoints,
     );
   }
@@ -260,6 +271,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       selection: AdminSelectionStyle.lerp(selection, other.selection, t),
       slider: AdminSliderStyle.lerp(slider, other.slider, t),
       tabs: AdminTabsStyle.lerp(tabs, other.tabs, t),
+      feedback: AdminFeedbackStyle.lerp(feedback, other.feedback, t),
       breakpoints: AdminBreakpoints.lerp(breakpoints, other.breakpoints, t),
     );
   }
@@ -286,6 +298,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
           other.selection == selection &&
           other.slider == slider &&
           other.tabs == tabs &&
+          other.feedback == feedback &&
           other.breakpoints == breakpoints;
 
   @override
@@ -308,6 +321,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     selection,
     slider,
     tabs,
+    feedback,
     breakpoints,
   );
 }
@@ -459,6 +473,10 @@ extension AdminTokensContext on BuildContext {
 
   /// The active tab strip anatomy. `context.tabsStyle.heightOf(size)`, …
   AdminTabsStyle get tabsStyle => adminTokens.tabs;
+
+  /// The active alert and toast anatomy. `context.feedbackStyle.alertFill`,
+  /// …
+  AdminFeedbackStyle get feedbackStyle => adminTokens.feedback;
 
   /// The active layout breakpoints. `context.breakpoints.medium`, … (the
   /// window's class is [AdminBreakpoint.of]).

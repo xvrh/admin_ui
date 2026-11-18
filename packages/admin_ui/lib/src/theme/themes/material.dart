@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../button_style.dart';
 import '../elevation.dart';
+import '../feedback_style.dart';
 import '../field_style.dart';
 import '../focus.dart';
 import '../motion.dart';
@@ -360,4 +361,7 @@ final materialTheme = AdminTheme.from(
     indicatorShape: TabsIndicatorShape.roundedTop,
     indicatorThickness: 3,
   ),
+  // M3 has no inline alert, and its snackbar is an inverse surface, which
+  // the palette has no role for: the kit's own alert and toast
+  feedback: const AdminFeedbackStyle(),
 );

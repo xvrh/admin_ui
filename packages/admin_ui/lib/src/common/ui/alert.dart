@@ -10,6 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../theme/feedback_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'icon_action.dart';
@@ -86,18 +87,29 @@ class Alert extends StatelessWidget {
     required bool urgent,
   }) {
     const close = IconActionSize.inline;
-    return Container(
+    // The theme's alert: tinted with its status, or a card in the surface
+    // colour whose icon alone carries it; at the theme's corner for an
+    // alert; behind a status bar on its leading edge where the theme has one.
+    final look = context.feedbackStyle;
+    final tinted = look.alertFill == FeedbackFill.tint;
+    final corners = BorderRadius.circular(
+      look.alertRadius ?? context.radii.radius,
+    );
+    final bar = look.alertBar;
+    final box = Container(
       padding: EdgeInsetsDirectional.only(
-        start: AdminSpacing.lg,
+        start: AdminSpacing.lg + bar,
         // The close glyph, not its hit box, keeps the 12px inset.
         end: onDismiss == null
             ? AdminSpacing.lg
             : AdminSpacing.lg - (close.box - close.glyph) / 2,
       ),
       decoration: BoxDecoration(
-        color: style.surface,
-        borderRadius: BorderRadius.circular(context.radii.radius),
-        border: Border.all(color: style.border),
+        color: tinted ? style.surface : context.colors.surface,
+        borderRadius: corners,
+        border: Border.all(
+          color: tinted ? style.border : context.colors.border,
+        ),
       ),
       child: firstLineRow(
         firstLine: firstLineHeight(
@@ -152,6 +164,23 @@ class Alert extends StatelessWidget {
                     ),
                 ],
               ),
+      ),
+    );
+    if (bar == 0) return box;
+    // The bar lies over the box's leading edge, inside its corners.
+    return ClipRRect(
+      borderRadius: corners,
+      child: Stack(
+        children: [
+          box,
+          PositionedDirectional(
+            start: 0,
+            top: 0,
+            bottom: 0,
+            width: bar,
+            child: ColoredBox(color: style.accent),
+          ),
+        ],
       ),
     );
   }

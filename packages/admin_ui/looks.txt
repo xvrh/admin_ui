@@ -257,6 +257,12 @@ tabs.indicatorWidth: tab
 tabs.indicatorShape: square
 tabs.indicatorThickness: null
 tabs.rule: hairline
+feedback.alertFill: tint
+feedback.alertBar: 0
+feedback.alertRadius: null
+feedback.toastFill: surface
+feedback.toastBar: 4
+feedback.toastOutline: true
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -563,6 +569,12 @@ tabs.indicatorWidth: label
 tabs.indicatorShape: roundedTop
 tabs.indicatorThickness: 3
 tabs.rule: hairline
+feedback.alertFill: tint
+feedback.alertBar: 0
+feedback.alertRadius: null
+feedback.toastFill: surface
+feedback.toastBar: 4
+feedback.toastOutline: true
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -866,6 +878,12 @@ tabs.indicatorWidth: tab
 tabs.indicatorShape: square
 tabs.indicatorThickness: null
 tabs.rule: none
+feedback.alertFill: surface
+feedback.alertBar: 0
+feedback.alertRadius: 10
+feedback.toastFill: surface
+feedback.toastBar: 0
+feedback.toastOutline: true
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1232,6 +1250,12 @@ tabs.indicatorWidth: label
 tabs.indicatorShape: square
 tabs.indicatorThickness: null
 tabs.rule: hairline
+feedback.alertFill: tint
+feedback.alertBar: 0
+feedback.alertRadius: 8
+feedback.toastFill: surface
+feedback.toastBar: 0
+feedback.toastOutline: false
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1539,6 +1563,12 @@ tabs.indicatorWidth: label
 tabs.indicatorShape: pill
 tabs.indicatorThickness: null
 tabs.rule: none
+feedback.alertFill: tint
+feedback.alertBar: 0
+feedback.alertRadius: null
+feedback.toastFill: surface
+feedback.toastBar: 0
+feedback.toastOutline: false
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1875,6 +1905,12 @@ tabs.indicatorWidth: tab
 tabs.indicatorShape: square
 tabs.indicatorThickness: null
 tabs.rule: indicator
+feedback.alertFill: tint
+feedback.alertBar: 3
+feedback.alertRadius: null
+feedback.toastFill: tint
+feedback.toastBar: 3
+feedback.toastOutline: true
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
