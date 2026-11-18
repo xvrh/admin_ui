@@ -50,6 +50,7 @@ theme_internals:
     - AdminSegmentedStyle
     - AdminSelectionStyle
     - AdminShellStyle
+    - AdminSliderStyle
     - AdminStateLayer
     - AdminStroke
     - AdminSyntaxColors
@@ -70,6 +71,8 @@ theme_internals:
     - SegmentedVariant
     - SelectionInk
     - SelectionOutline
+    - SliderRail
+    - SliderThumb
     - TableHeaderText
     - ToggleOffStyle
     - ToggleOnColor

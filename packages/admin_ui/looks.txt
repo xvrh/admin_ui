@@ -231,6 +231,12 @@ selection.radioMark: disc
 selection.radioDot: 8
 selection.ink: accent
 selection.outline: control
+slider.trackHeight: 4
+slider.thumb: disc
+slider.thumbSize: 18
+slider.thumbRing: 2
+slider.rail: border
+slider.ink: accent
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -511,6 +517,12 @@ selection.radioMark: dot
 selection.radioDot: 10
 selection.ink: accent
 selection.outline: secondary
+slider.trackHeight: 16
+slider.thumb: bar
+slider.thumbSize: 44
+slider.thumbRing: 2
+slider.rail: soft
+slider.ink: accent
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -788,6 +800,12 @@ selection.radioMark: disc
 selection.radioDot: 8
 selection.ink: accent
 selection.outline: control
+slider.trackHeight: 6
+slider.thumb: ringed
+slider.thumbSize: 16
+slider.thumbRing: 1
+slider.rail: border
+slider.ink: accent
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1128,6 +1146,12 @@ selection.radioMark: disc
 selection.radioDot: 6
 selection.ink: accent
 selection.outline: control
+slider.trackHeight: 4
+slider.thumb: ringed
+slider.thumbSize: 14
+slider.thumbRing: 2
+slider.rail: border
+slider.ink: accent
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1409,6 +1433,12 @@ selection.radioMark: dot
 selection.radioDot: 10
 selection.ink: accent
 selection.outline: control
+slider.trackHeight: 4
+slider.thumb: inset
+slider.thumbSize: 20
+slider.thumbRing: 4
+slider.rail: control
+slider.ink: accent
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1719,6 +1749,12 @@ selection.radioMark: dot
 selection.radioDot: 8
 selection.ink: foreground
 selection.outline: foreground
+slider.trackHeight: 2
+slider.thumb: disc
+slider.thumbSize: 14
+slider.thumbRing: 2
+slider.rail: border
+slider.ink: foreground
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 

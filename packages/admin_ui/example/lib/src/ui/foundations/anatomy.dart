@@ -8,8 +8,8 @@ import '../demo_kit.dart';
 /// The active theme's anatomy tokens, drawn from the tokens alone: a field's
 /// box in each state (`resolveFieldChrome` through `fieldDecoration`), a
 /// stock `TextField` on the theme's `FieldBorder`, the button and shell
-/// geometry, the switch, checkbox and radio, and the palettes the frame
-/// draws its sidebar and top bar in.
+/// geometry, the switch, checkbox, radio and slider, and the palettes the
+/// frame draws its sidebar and top bar in.
 class AnatomyDemo extends StatelessWidget {
   @Preview(name: 'Anatomy', wrapper: adminUiPreview)
   const AnatomyDemo({super.key});
@@ -21,6 +21,7 @@ class AnatomyDemo extends StatelessWidget {
     final button = tokens.button;
     final shell = tokens.shell;
     final selection = tokens.selection;
+    final slider = tokens.slider;
     final radii = tokens.radii;
     String n(double v) =>
         v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
@@ -140,6 +141,26 @@ class AnatomyDemo extends StatelessWidget {
             ChoiceOption('selected', 'Selected'),
             ChoiceOption('unselected', 'Unselected'),
           ],
+        ),
+        const Gap(AdminSpacing.xl),
+
+        const DemoSection('Slider'),
+        _value(
+          context,
+          'track',
+          '${n(slider.trackHeight)}, ${slider.rail.name} past the thumb',
+        ),
+        _value(
+          context,
+          'thumb',
+          '${slider.thumb.name} ${n(slider.thumbSize)}'
+              '${slider.thumb == SliderThumb.ringed || slider.thumb == SliderThumb.inset ? ', ring ${n(slider.thumbRing)}' : ''}'
+              ', in the ${slider.ink.name}',
+        ),
+        const Gap(AdminSpacing.md),
+        SizedBox(
+          width: 280,
+          child: ValueSlider(value: 0.4, showValue: false, onChanged: (_) {}),
         ),
         const Gap(AdminSpacing.xl),
 

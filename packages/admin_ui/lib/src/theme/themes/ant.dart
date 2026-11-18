@@ -12,6 +12,7 @@ import '../segmented_style.dart';
 import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
+import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
 import '../typography.dart';
@@ -350,5 +351,13 @@ final antTheme = AdminTheme.from(
     checkSize: 16,
     radioSize: 16,
     radioDot: 6,
+  ),
+  // Slider: railSize 4 under a handleSize 10 handle in colorBgElevated,
+  // ringed by handleLineWidth 2: 14 across. Its rail is colorFillTertiary,
+  // black at 4%, which the kit draws in the border colour
+  slider: const AdminSliderStyle(
+    thumb: SliderThumb.ringed,
+    thumbSize: 14,
+    thumbRing: 2,
   ),
 );

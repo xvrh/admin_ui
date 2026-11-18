@@ -12,6 +12,7 @@ import '../segmented_style.dart';
 import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
+import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
 import '../typography.dart';
@@ -324,5 +325,14 @@ final fluentTheme = AdminTheme.from(
     radioSize: 16,
     radioMark: RadioMark.dot,
     radioDot: 10,
+  ),
+  // Slider: a 4px rail in colorNeutralStrokeAccessible under a 20px thumb,
+  // the brand colour inside a band of colorNeutralBackground1 a fifth of
+  // the thumb wide, edged in colorNeutralStroke1
+  slider: const AdminSliderStyle(
+    thumb: SliderThumb.inset,
+    thumbSize: 20,
+    thumbRing: 4,
+    rail: SliderRail.control,
   ),
 );

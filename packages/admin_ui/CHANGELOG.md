@@ -50,6 +50,18 @@
   Flutter's guidelines for targets, a name and 24 by 24
   (`example/test/sweeps/a11y_guidelines_sweep_test.dart`). The targets it
   lets through are listed there, each with its reason.
+- A theme says how its sliders are drawn: `AdminTokens.slider`, an
+  `AdminSliderStyle` read through `context.sliderStyle` and given to
+  `AdminTheme.from` as `slider`. `trackHeight` is the track's height and
+  `rail` what the track past the thumb is drawn in: the border colour
+  (`SliderRail.border`), `controlBorder` (`control`) or `softFill` (`soft`).
+  `thumb` is a `SliderThumb.disc` in the ink; `ringed`, the surface colour
+  inside a ring of the ink, on the theme's small shadow; `inset`, the ink
+  inside a band of the surface colour, edged in a hairline; or `bar`, M3's
+  4dp handle, which parts the track by 6dp on either side. `thumbSize` is
+  the thumb's diameter, or a bar's height, and `thumbRing` the width of a
+  ring or a band. `ink` draws the track up to the thumb, and the thumb, in
+  the accent or in the foreground (`SelectionInk`).
 - A theme says how its switches, checkboxes and radios are drawn, as it
   does its fields, buttons and segmented controls: `AdminTokens.selection`,
   an `AdminSelectionStyle` read through `context.selectionStyle` and given
@@ -391,6 +403,22 @@
 
 ### Looks
 
+- Each reference theme draws its slider as its design system does, where
+  every theme drew a 4px track under an 18px disc in the accent. Iris keeps
+  those.
+  - Material: a 16dp track, the secondary container past the handle, parted
+    by a 4×44dp bar with 6dp on either side, half as wide under a press,
+    and ending in a stop dot. The slider's row is 44 tall there (was 40).
+  - shadcn: a 6px track under a 16px white thumb in a 1px ring of the
+    primary, on the small shadow.
+  - Ant: a 14px white thumb in a 2px ring of the primary.
+  - Fluent: a rail in the neutral accessible stroke (was the divider grey)
+    under a 20px thumb, the brand colour inside a 4px white band edged in a
+    hairline.
+  - Carbon: a 2px track under a 14px thumb, both near-black on a light page
+    and near-white on a dark one (were Blue 60).
+- A `ValueSlider` whose thumb is taller than a medium control is as tall as
+  its thumb.
 - Each reference theme draws its switch, checkbox and radio at its design
   system's sizes and with its marks, where every theme drew a 36×20 switch,
   an 18px box and an 18px radio filled around a light dot. Iris keeps those.
