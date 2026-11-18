@@ -155,14 +155,14 @@ class _TipState extends State<Tip> {
     final chip =
         TooltipTheme.of(context).decoration ??
         BoxDecoration(
-          color: context.colors.foreground,
+          color: context.colors.inverseSurface,
           borderRadius: BorderRadius.circular(
             overlay.tooltipRadius ?? context.radii.radiusSmall,
           ),
         );
     final fill = switch (chip) {
       BoxDecoration(:final color?) => color,
-      _ => context.colors.foreground,
+      _ => context.colors.inverseSurface,
     };
     final radius = switch (chip) {
       BoxDecoration(:final borderRadius?) =>

@@ -955,6 +955,7 @@ is not the look you want:
 | `fieldFill`, `fieldFillHover`, `fieldRule` | `surface`, `hoverOverlay` over it, and `controlBorder` held to 3:1 on the fill and the page: a field's box and the bottom rule of a filled or underlined one |
 | `softFill`, `onSoft` | `primarySubtle`, and `primaryText` held to 4.5:1 on it: a soft (tonal) button |
 | `neutralFill`, `neutralFillHover`, `neutralFillActive`, `onNeutralFill` | `foregroundSecondary`, `surface` over it at the hover and pressed opacities, and white or near-black on it: a filled neutral button (Carbon's secondary) |
+| `inverseSurface`, `onInverseSurface` | `foreground` and `surface`, or, under an authored surface, white or near-black: a tooltip's chip and a stock snack bar, and what reads on them |
 | `placeholder` | `foregroundMuted`, or `foregroundSubtle` adjusted to 4.5:1 |
 | `listHighlight`, `separator` | `foreground` over `surface` at 6% (8% dark), and the stronger of `border` and `borderSubtle`: menu hover rows and overlay dividers |
 | `navHoverFill`, `navSelectedFill`, `navSelectedText`, `navIndicator` | `foreground` over `background`, `primarySubtle`, `primaryText` and `primary`, each held to its contrast floor: the sidebar's items |
@@ -1334,6 +1335,15 @@ given), its padding (`tooltipPaddingX`, `tooltipPaddingY`), its text
 (`tooltipText`: the caption or the body) and how long the pointer rests
 before it shows (`tooltipDelay`); a `Tip` given a `waitDuration` keeps its
 own.
+
+The chip is filled with the palette's `inverseSurface` under
+`onInverseSurface` text, as a stock snack bar is. A palette that authors
+neither gets its foreground under its card colour, which is Iris's own
+tooltip and shadcn's (`bg-foreground text-background`). The other four
+author the pair from their design system: Material's `inverseSurface` and
+`inverseOnSurface`, Ant's `colorBgSpotlight`, Fluent's
+`colorNeutralBackgroundStatic` and Carbon's `$background-inverse`. Ant's and
+Fluent's stay dark in dark mode, where the other four turn light.
 
 | Theme | Tooltip corner | Padding | Text | Delay |
 |---|---|---|---|---|

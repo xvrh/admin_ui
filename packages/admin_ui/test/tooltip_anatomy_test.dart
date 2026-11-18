@@ -151,9 +151,9 @@ void main() {
           };
           expect(data.textStyle!.fontSize, style.fontSize);
           expect(data.textStyle!.height, style.height);
-          // the inverse chip: the surface colour on the foreground
-          expect(data.textStyle!.color, tokens.palette.surface);
-          expect(chip.color, tokens.palette.foreground);
+          // the inverse chip: the palette's inverse surface and its content
+          expect(data.textStyle!.color, tokens.palette.onInverseSurface);
+          expect(chip.color, tokens.palette.inverseSurface);
           expect(
             contrastRatio(data.textStyle!.color!, chip.color!),
             greaterThanOrEqualTo(4.5),

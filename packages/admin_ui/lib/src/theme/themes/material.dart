@@ -82,6 +82,9 @@ const materialPalette = AdminPalette(
   navIndicator: Color(0x00000000),
   softFill: Color(0xFFE8DEF8), // the tonal button: secondaryContainer
   onSoft: Color(0xFF1D192B), // onSecondaryContainer
+  // a plain tooltip's and a snackbar's container, and what reads on it
+  inverseSurface: Color(0xFF322F35), // inverseSurface: neutral20
+  onInverseSurface: Color(0xFFF5EFF7), // inverseOnSurface: neutral95
 );
 
 /// Material 3 (dark) — the page is `surface`, cards and inputs the
@@ -124,6 +127,8 @@ const materialDarkPalette = AdminPalette(
   navIndicator: Color(0x00000000),
   softFill: Color(0xFF4A4458), // the tonal button: secondaryContainer
   onSoft: Color(0xFFE8DEF8), // onSecondaryContainer
+  inverseSurface: Color(0xFFE6E0E9), // inverseSurface: neutral90
+  onInverseSurface: Color(0xFF322F35), // inverseOnSurface: neutral20
 );
 
 /// M3's state layers: hover 8%, focus and pressed 10%, dragged 16%, for a

@@ -79,6 +79,9 @@ const fluentPalette = AdminPalette(
   navSelectedFill: Color(0xFFE0E0E0), // colorSubtleBackgroundPressed
   navHoverFill: Color(0xFFEBEBEB), // colorSubtleBackgroundSelected
   navSelectedText: Color(0xFF242424), // colorNeutralForeground1
+  // the inverted Tooltip, which the kit draws
+  inverseSurface: Color(0xFF333333), // colorNeutralBackgroundStatic
+  onInverseSurface: Color(0xFFFFFFFF), // colorNeutralForegroundStaticInverted
 );
 
 /// Microsoft Fluent (dark) — the page is colorNeutralBackground2, cards and
@@ -122,6 +125,9 @@ const fluentDarkPalette = AdminPalette(
   navHoverFill: Color(0xFF333333), // colorSubtleBackgroundSelected
   navSelectedText: Color(0xFFFFFFFF), // colorNeutralForeground1
   navIndicator: Color(0xFF479EF5), // colorCompoundBrandStroke
+  // colorNeutralBackgroundStatic stays dark in the dark theme
+  inverseSurface: Color(0xFF3D3D3D),
+  onInverseSurface: Color(0xFFFFFFFF),
 );
 
 /// The Fluent 2 type ramp: body1 (14/20) for body, controls and labels,

@@ -558,8 +558,8 @@ void main() {
         expect(scheme.onSurfaceVariant, p.foregroundMuted);
         expect(scheme.outline, p.controlBorder);
         expect(scheme.outlineVariant, p.border);
-        expect(scheme.inverseSurface, p.foreground);
-        expect(scheme.onInverseSurface, p.surface);
+        expect(scheme.inverseSurface, p.inverseSurface);
+        expect(scheme.onInverseSurface, p.onInverseSurface);
         expect(scheme.error, p.danger);
         expect(scheme.onError, p.onDanger);
         expect(scheme.primaryContainer, p.primarySubtle);
@@ -579,7 +579,7 @@ void main() {
         expect(theme.dividerTheme.color, p.border);
         expect(theme.cardTheme.color, p.surface);
         expect(theme.cardTheme.elevation, 0);
-        expect(theme.snackBarTheme.backgroundColor, p.foreground);
+        expect(theme.snackBarTheme.backgroundColor, p.inverseSurface);
         expect(theme.visualDensity, VisualDensity.standard);
         expect(theme.materialTapTargetSize, MaterialTapTargetSize.shrinkWrap);
         expect(theme.extension<AdminTokens>(), same(tokens));

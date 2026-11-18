@@ -76,6 +76,9 @@ const carbonPalette = AdminPalette(
   neutralFill: Color(0xFF393939), // $button-secondary (Gray 80)
   neutralFillHover: Color(0xFF474747), // $button-secondary-hover
   neutralFillActive: Color(0xFF6F6F6F), // $button-secondary-active
+  // a tooltip is a high-contrast popover
+  inverseSurface: Color(0xFF393939), // $background-inverse
+  onInverseSurface: Color(0xFFFFFFFF), // $text-inverse
 );
 
 /// IBM Carbon (g100) — the page is $background, cards and inputs $layer-01
@@ -126,6 +129,8 @@ const carbonDarkPalette = AdminPalette(
   neutralFill: Color(0xFF6F6F6F), // $button-secondary
   neutralFillHover: Color(0xFF5E5E5E), // $button-secondary-hover
   neutralFillActive: Color(0xFF393939), // $button-secondary-active
+  inverseSurface: Color(0xFFF4F4F4), // $background-inverse
+  onInverseSurface: Color(0xFF161616), // $text-inverse
 );
 
 /// Carbon's UI shell header, which is g100 in every theme: a #161616

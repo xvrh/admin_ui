@@ -88,7 +88,7 @@ class _TipDemoState extends State<TipDemo> {
             'with an arrow; Iris and Material keep a plain chip.',
             style: context.type.bodyMuted,
           ),
-          const _PinnedTips(child: _Sides()),
+          const PinnedTips(child: _Sides()),
 
           const DemoSection('Long message — opened by focus'),
           Text(
@@ -214,16 +214,16 @@ class _Sides extends StatelessWidget {
 
 /// Opens every tooltip below it once it has laid out, so a static render
 /// shows them all.
-class _PinnedTips extends StatefulWidget {
+class PinnedTips extends StatefulWidget {
   final Widget child;
 
-  const _PinnedTips({required this.child});
+  const PinnedTips({super.key, required this.child});
 
   @override
-  State<_PinnedTips> createState() => _PinnedTipsState();
+  State<PinnedTips> createState() => _PinnedTipsState();
 }
 
-class _PinnedTipsState extends State<_PinnedTips> {
+class _PinnedTipsState extends State<PinnedTips> {
   @override
   void initState() {
     super.initState();

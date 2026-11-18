@@ -71,6 +71,10 @@ const antPalette = AdminPalette(
   info: Color(0xFF0958D9), // blue-7: Ant's colorInfo is the primary itself
   chart: _chartLight,
   navIndicator: Color(0x00000000),
+  // a tooltip: colorBgSpotlight, black at 85%, as it lands on white, under
+  // colorTextLightSolid
+  inverseSurface: Color(0xFF262626),
+  onInverseSurface: Color(0xFFFFFFFF),
 );
 
 /// Ant Design (dark) — the page is colorBgLayout, cards and inputs
@@ -104,6 +108,9 @@ const antDarkPalette = AdminPalette(
   info: Color(0xFF3C89E8), // blue-7 (dark)
   chart: _chartDark,
   navIndicator: Color(0x00000000),
+  // colorBgSpotlight stays dark in the dark algorithm: black lightened 26%
+  inverseSurface: Color(0xFF424242),
+  onInverseSurface: Color(0xFFFFFFFF),
 );
 
 /// Ant Design's dark Sider and Menu (`theme="dark"`), the sidebar of the
@@ -136,6 +143,9 @@ const antSiderPalette = AdminPalette(
   navSelectedFill: Color(0xFF136FF6), // darkItemSelectedBg: colorPrimary
   navSelectedText: Color(0xFFFFFFFF), // darkItemSelectedColor
   navIndicator: Color(0x00000000),
+  // a collapsed Sider's tooltips are the page's: colorBgSpotlight
+  inverseSurface: Color(0xFF262626),
+  onInverseSurface: Color(0xFFFFFFFF),
 );
 
 /// Ant's scale: fontSize 14 on a 22px line for body, controls and labels,

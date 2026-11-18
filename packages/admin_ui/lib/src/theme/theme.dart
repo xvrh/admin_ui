@@ -143,10 +143,10 @@ ThemeData buildAppTheme(AdminTokens tokens) {
       inputDecorationTheme: inputTheme,
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: palette.foreground,
-      contentTextStyle: type.body.copyWith(color: palette.surface),
+      backgroundColor: palette.inverseSurface,
+      contentTextStyle: type.body.copyWith(color: palette.onInverseSurface),
       actionTextColor: base.colorScheme.inversePrimary,
-      closeIconColor: palette.surface,
+      closeIconColor: palette.onInverseSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radii.radius),
       ),
@@ -233,7 +233,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
         vertical: tokens.overlay.tooltipPaddingY,
       ),
       decoration: BoxDecoration(
-        color: palette.foreground,
+        color: palette.inverseSurface,
         borderRadius: BorderRadius.circular(
           tokens.overlay.tooltipRadius ?? radii.radiusSmall,
         ),
@@ -241,7 +241,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
       textStyle: switch (tokens.overlay.tooltipText) {
         TooltipText.caption => type.caption,
         TooltipText.body => type.body,
-      }.copyWith(color: palette.surface),
+      }.copyWith(color: palette.onInverseSurface),
     ),
   );
 
