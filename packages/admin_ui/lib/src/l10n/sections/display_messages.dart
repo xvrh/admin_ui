@@ -143,6 +143,12 @@ abstract class DisplayMessages extends AdminMessages {
   /// A chart card with nothing to plot.
   String get chartEmpty;
 
+  /// The low end of a heat grid's legend, before its lightest fill.
+  String get heatLess;
+
+  /// The high end of a heat grid's legend, after its fullest fill.
+  String get heatMore;
+
   /// A stat tile's name and value: "Revenue: $48.2k".
   String statValue(String label, String value);
 
@@ -483,6 +489,12 @@ class DisplayMessagesEn extends DisplayMessages {
 
   @override
   String get chartEmpty => 'No data for this period';
+
+  @override
+  String get heatLess => 'Less';
+
+  @override
+  String get heatMore => 'More';
 
   @override
   String statValue(String label, String value) => '$label: $value';
@@ -861,6 +873,12 @@ class DisplayMessagesFr extends DisplayMessages {
 
   @override
   String get chartEmpty => 'Aucune donnée pour cette période';
+
+  @override
+  String get heatLess => 'Moins';
+
+  @override
+  String get heatMore => 'Plus';
 
   /// French sets a no-break space before the colon.
   @override
@@ -1274,6 +1292,12 @@ class DisplayMessagesAr extends DisplayMessages {
 
   @override
   String get chartEmpty => 'لا توجد بيانات لهذه الفترة';
+
+  @override
+  String get heatLess => 'أقل';
+
+  @override
+  String get heatMore => 'أكثر';
 
   @override
   String statValue(String label, String value) => '$label: $value';

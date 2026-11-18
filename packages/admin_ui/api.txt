@@ -481,6 +481,7 @@ widgets.dart BrowserSwipeGuard
 widgets.dart Button
 widgets.dart ButtonVariant
 widgets.dart Calendar
+widgets.dart CalendarHeatGrid
 widgets.dart CalendarMode
 widgets.dart ChartCard
 widgets.dart ChartSeries

@@ -66,6 +66,7 @@ import 'ui/primitives/avatar.dart';
 import 'ui/primitives/breadcrumbs.dart';
 import 'ui/primitives/button.dart';
 import 'ui/primitives/calendar.dart';
+import 'ui/primitives/calendar_heat_grid.dart';
 import 'ui/primitives/chart.dart';
 import 'ui/primitives/combobox.dart';
 import 'ui/primitives/command_palette.dart';
@@ -172,6 +173,7 @@ Map<String, dynamic> genericCatalog() => {
     'Attention tiles': const AttentionGridDemo(),
     'Charts / sparklines': const ChartDemo(),
     'Heat table / retention': const HeatTableDemo(),
+    'Calendar heat grid': const CalendarHeatGridDemo(),
     'Timeline / activity': const TimelineDemo(),
     'Search field': const SearchFieldDemo(),
     'Input field': const InputFieldDemo(),

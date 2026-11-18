@@ -395,6 +395,7 @@ not_needed:
     - AssetRefField
     - BarChart
     - BarSparkline
+    - CalendarHeatGrid
     - ChartSeries
     - Combobox
     - ComboboxOption

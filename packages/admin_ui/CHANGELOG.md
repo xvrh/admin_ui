@@ -2,6 +2,24 @@
 
 ## 0.2.0
 
+- An app can show on which days someone used something, and how much:
+  `CalendarHeatGrid` draws a square per day, a column per week and a row
+  per day of the week, over the `weeks` up to today's (26 by default) or
+  the weeks of a `CalendarHeatGrid.range`. A day's value in `values` takes
+  one of `levels` fills by its share of `max`, from the lightest up to
+  `color`, the theme's first chart colour by default; a day without one is
+  a faint square that shows on a card and on the page in every theme and
+  mode, and `levels: 1` draws days used or not. Days after today are blank.
+  The months are named above the weeks, every second weekday at the side,
+  and a legend runs from "Less" to "More" under the grid's end. The names,
+  the dates and the week's first day follow the app's locale, or `locale`,
+  as a `Calendar`'s do, and `firstDayOfWeek` overrides the week's start. A
+  day's `Tip` gives its date and value (`formatValue`) on hover, on a long
+  press and under keyboard focus: the grid is one Tab stop, the latest day,
+  which the arrows move by day and by week, and Home and End to the week's
+  ends. Narrower than its weeks, it scrolls sideways under a drag, opening
+  on the latest week, with the weekday names kept at its side; right to
+  left, it mirrors. `DisplayMessages` has `heatLess` and `heatMore`, new.
 - A cohort retention grid, or any matrix read by intensity, is a
   `HeatTable`: a header row over a few leading `labels` columns
   (`HeatTableLabel`: "Week of", "People") and a value column for each of
