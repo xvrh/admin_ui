@@ -442,6 +442,7 @@ not_needed:
     - MediaItem
     - MediaKind
     - MediaStatus
+    - NavGroup
     - OptionalBooleanField
     - OptionalField
     - OptionalNumberField
