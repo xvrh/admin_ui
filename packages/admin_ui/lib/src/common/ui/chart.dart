@@ -756,6 +756,12 @@ class ChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final titleStyle = context.type.bodyStrong.copyWith(
+      color: colors.foreground,
+    );
+    final subtitleStyle = context.type.caption.copyWith(
+      color: colors.foregroundMuted,
+    );
     final Widget body;
     if (loading) {
       body = SizedBox(height: bodyHeight, child: const _ChartSkeleton());
@@ -775,30 +781,37 @@ class ChartCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          _CardHeader(
-            textDirection: Directionality.of(context),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: context.type.bodyStrong.copyWith(
-                    color: colors.foreground,
-                  ),
-                ),
-                if (subtitle != null) ...[
-                  const Gap(AdminSpacing.xxs),
-                  Text(
-                    subtitle!,
-                    style: context.type.caption.copyWith(
-                      color: colors.foregroundMuted,
+          // The title's width is measured from its text, which a late font
+          // load changes; a paragraph's intrinsic width can keep the
+          // fallback font's.
+          ListenableBuilder(
+            listenable: PaintingBinding.instance.systemFonts,
+            builder: (context, _) => _CardHeader(
+              textDirection: Directionality.of(context),
+              titleWidth: trailing == null
+                  ? 0
+                  : math.min(
+                      minTitleWidth,
+                      math.max(
+                        textWidthOf(context, title, titleStyle),
+                        subtitle == null
+                            ? 0.0
+                            : textWidthOf(context, subtitle!, subtitleStyle),
+                      ),
                     ),
-                  ),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(title, style: titleStyle),
+                  if (subtitle != null) ...[
+                    const Gap(AdminSpacing.xxs),
+                    Text(subtitle!, style: subtitleStyle),
+                  ],
                 ],
-              ],
+              ),
+              trailing: trailing,
             ),
-            trailing: trailing,
           ),
           const Gap(AdminSpacing.xl),
           body,
@@ -812,17 +825,21 @@ enum _CardHeaderSlot { title, trailing }
 
 /// A [ChartCard]'s title block and its trailing widget. Side by side, both
 /// at the top and the trailing widget at the end, while the title keeps
-/// [ChartCard.minTitleWidth] or its one-line width, whichever is less;
-/// otherwise the trailing widget goes under the title, at the start.
+/// [titleWidth]; otherwise the trailing widget goes under the title, at the
+/// start.
 class _CardHeader
     extends SlottedMultiChildRenderObjectWidget<_CardHeaderSlot, RenderBox> {
   final Widget title;
   final Widget? trailing;
+
+  /// The least the title keeps beside the trailing widget.
+  final double titleWidth;
   final TextDirection textDirection;
 
   const _CardHeader({
     required this.title,
     required this.trailing,
+    required this.titleWidth,
     required this.textDirection,
   });
 
@@ -837,23 +854,32 @@ class _CardHeader
 
   @override
   _RenderCardHeader createRenderObject(BuildContext context) =>
-      _RenderCardHeader(textDirection: textDirection);
+      _RenderCardHeader(titleWidth: titleWidth, textDirection: textDirection);
 
   @override
   void updateRenderObject(
     BuildContext context,
     _RenderCardHeader renderObject,
   ) {
-    renderObject.textDirection = textDirection;
+    renderObject
+      ..titleWidth = titleWidth
+      ..textDirection = textDirection;
   }
 }
 
 class _RenderCardHeader extends RenderBox
     with SlottedContainerRenderObjectMixin<_CardHeaderSlot, RenderBox> {
-  _RenderCardHeader({required this._textDirection});
+  _RenderCardHeader({required this._titleWidth, required this._textDirection});
 
   /// Between the title and the trailing widget beside it, or under it.
   static const _gap = AdminSpacing.lg;
+
+  double _titleWidth;
+  set titleWidth(double value) {
+    if (value == _titleWidth) return;
+    _titleWidth = value;
+    markNeedsLayout();
+  }
 
   TextDirection _textDirection;
   set textDirection(TextDirection value) {
@@ -928,11 +954,7 @@ class _RenderCardHeader extends RenderBox
     // At its own width, as a row lays out a child it does not stretch.
     var trailingSize = layoutChild(trailing, const BoxConstraints());
     final beside = width - trailingSize.width - _gap;
-    final wanted = math.min(
-      ChartCard.minTitleWidth,
-      title.getMaxIntrinsicWidth(double.infinity),
-    );
-    final inline = beside >= wanted;
+    final inline = beside >= _titleWidth;
     if (!inline && trailingSize.width > width) {
       trailingSize = layoutChild(trailing, BoxConstraints(maxWidth: width));
     }
