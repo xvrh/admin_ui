@@ -15,6 +15,7 @@ import '../sizes.dart';
 import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
+import '../tabs_style.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
@@ -359,5 +360,17 @@ final antTheme = AdminTheme.from(
     thumb: SliderThumb.ringed,
     thumbSize: 14,
     thumbRing: 2,
+  ),
+  // Tabs: horizontalItemPadding 12 (8 small, 16 large) around a 22px line,
+  // 24 at large: 38 / 46 / 56 tall. Regular labels in colorText,
+  // itemSelectedColor colorPrimary, over a 2px ink bar as wide as the label,
+  // on a colorBorderSecondary rule
+  tabs: const AdminTabsStyle(
+    heightSmall: 38,
+    heightMedium: 46,
+    heightLarge: 56,
+    restInk: TabsRestInk.foreground,
+    labelWeight: FontWeight.w400,
+    indicatorWidth: TabsIndicatorWidth.label,
   ),
 );

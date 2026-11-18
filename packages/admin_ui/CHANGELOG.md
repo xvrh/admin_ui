@@ -2,6 +2,24 @@
 
 ## 0.2.0
 
+- A theme says how its tab strips are drawn: `AdminTokens.tabs`, an
+  `AdminTabsStyle` read through `context.tabsStyle` and given to
+  `AdminTheme.from` as `tabs`. `heightSmall`, `heightMedium` and
+  `heightLarge` are a strip's height at each `Tabs.size`, which was 32, 40
+  and 48 in every theme. `selectedInk` writes a line strip's selected label
+  in the accent or the foreground (`TabsSelectedInk`), and `restInk` the
+  others in `foregroundMuted`, `foregroundSecondary` or the foreground
+  (`TabsRestInk`), each a step stronger under the pointer. `labelWeight`
+  weighs every label, where each was the button's weight, and
+  `selectedLabelWeight` the selected one where it is set heavier: a tab is
+  then as wide as its label at the heavier weight, so selecting one never
+  moves the rest. `indicatorWidth` makes the selected tab's indicator as wide
+  as its tab or as its label (`TabsIndicatorWidth`), `indicatorShape` leaves
+  its ends square, rounds its top or rounds both (`TabsIndicatorShape`), and
+  `indicatorThickness` sets its thickness, `AdminStroke.indicator` where
+  none is given. `rule` is what a line strip stands on: a hairline, a rule
+  as thick as the indicator, or none (`TabsRule`); `Tabs.baseline: false`
+  still draws none.
 - More of the kit says what it is to assistive technology, each widget
   with the role Flutter has for it (`SemanticsRole`), asserted through the
   semantics tree. What a screen reader announces changes for these:
@@ -403,6 +421,28 @@
 
 ### Looks
 
+- Each reference theme draws a `Tabs` line strip as its design system does,
+  where every theme drew a strip 32, 40 or 48 tall, its labels at the
+  button weight in the muted grey, the selected one in the accent over a
+  2px bar as wide as its tab, on a hairline. Iris keeps those. A strip's
+  height moves whatever is laid out under it.
+  - Material: 40, 48 or 56 tall (was 32, 40, 48); labels at w500 (were w600)
+    in on-surface-variant; a 3dp indicator as wide as the label, rounded at
+    the top.
+  - shadcn: 32, 36 or 40 tall; labels at w500 (were w600), the selected one
+    in the foreground (was the primary, the same near-black); no rule under
+    the strip.
+  - Ant: 38, 46 or 56 tall; labels at w400 (were w600) in the text colour
+    (were the muted grey), which take the primary under the pointer; an ink
+    bar as wide as the label.
+  - Fluent: 32, 44 or 52 tall; labels at w400 in the second neutral, the
+    selected one at w600 in the foreground (was the brand colour); a brand
+    indicator as wide as the label, round at both ends; no rule under the
+    strip.
+  - Carbon: labels at w400 in `$text-secondary`, the selected one at w600 in
+    `$text-primary` (was Blue 60); the strip stands on a 2px rule (was 1px),
+    which the selected tab's indicator covers.
+  An enclosed strip changes only in its height and its labels' weight.
 - Each reference theme draws its slider as its design system does, where
   every theme drew a 4px track under an 18px disc in the accent. Iris keeps
   those.

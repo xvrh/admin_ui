@@ -14,6 +14,7 @@ import '../sizes.dart';
 import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
+import '../tabs_style.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
@@ -322,5 +323,16 @@ final shadcnTheme = AdminTheme.from(
     thumb: SliderThumb.ringed,
     thumbSize: 16,
     thumbRing: 1,
+  ),
+  // Tabs, variant line: an h-9 list on no rule, font-medium triggers in
+  // text-foreground/60, the active one text-foreground over a 2px
+  // bg-foreground bar
+  tabs: const AdminTabsStyle(
+    heightSmall: 32,
+    heightMedium: 36,
+    heightLarge: 40,
+    selectedInk: TabsSelectedInk.foreground,
+    labelWeight: FontWeight.w500,
+    rule: TabsRule.none,
   ),
 );

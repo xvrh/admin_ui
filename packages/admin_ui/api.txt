@@ -393,6 +393,7 @@ theme.dart AdminStateLayer
 theme.dart AdminStroke
 theme.dart AdminSyntaxColors
 theme.dart AdminTableMetrics
+theme.dart AdminTabsStyle
 theme.dart AdminTheme
 theme.dart AdminThemeContext
 theme.dart AdminTokens
@@ -421,6 +422,11 @@ theme.dart SliderRail
 theme.dart SliderThumb
 theme.dart TableDensity
 theme.dart TableHeaderText
+theme.dart TabsIndicatorShape
+theme.dart TabsIndicatorWidth
+theme.dart TabsRestInk
+theme.dart TabsRule
+theme.dart TabsSelectedInk
 theme.dart ToggleOffStyle
 theme.dart ToggleOnColor
 theme.dart TopBarSpan

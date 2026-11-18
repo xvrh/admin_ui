@@ -15,6 +15,7 @@ import '../sizes.dart';
 import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
+import '../tabs_style.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
@@ -334,5 +335,21 @@ final fluentTheme = AdminTheme.from(
     thumbSize: 20,
     thumbRing: 4,
     rail: SliderRail.control,
+  ),
+  // TabList: tabs 32 / 44 / 52 tall on no rule, body1 in
+  // colorNeutralForeground2, the selected one body1Strong in
+  // colorNeutralForeground1 over a strokeWidthThicker brand indicator, inset
+  // from the tab's sides and round at its ends
+  tabs: const AdminTabsStyle(
+    heightSmall: 32,
+    heightMedium: 44,
+    heightLarge: 52,
+    selectedInk: TabsSelectedInk.foreground,
+    restInk: TabsRestInk.secondary,
+    labelWeight: FontWeight.w400,
+    selectedLabelWeight: FontWeight.w600,
+    indicatorWidth: TabsIndicatorWidth.label,
+    indicatorShape: TabsIndicatorShape.pill,
+    rule: TabsRule.none,
   ),
 );

@@ -23,6 +23,7 @@ void describeAdminTokens(AdminTokens v, String path, Map<String, String> out) {
   describeAdminSegmentedStyle(v.segmented, '${p}segmented', out);
   describeAdminSelectionStyle(v.selection, '${p}selection', out);
   describeAdminSliderStyle(v.slider, '${p}slider', out);
+  describeAdminTabsStyle(v.tabs, '${p}tabs', out);
   describeAdminBreakpoints(v.breakpoints, '${p}breakpoints', out);
 }
 
@@ -427,6 +428,25 @@ void describeAdminSliderStyle(
   describeValue(v.thumbRing, '${p}thumbRing', out);
   describeValue(v.rail, '${p}rail', out);
   describeValue(v.ink, '${p}ink', out);
+}
+
+void describeAdminTabsStyle(
+  AdminTabsStyle v,
+  String path,
+  Map<String, String> out,
+) {
+  final p = path.isEmpty ? '' : '$path.';
+  describeValue(v.heightSmall, '${p}heightSmall', out);
+  describeValue(v.heightMedium, '${p}heightMedium', out);
+  describeValue(v.heightLarge, '${p}heightLarge', out);
+  describeValue(v.selectedInk, '${p}selectedInk', out);
+  describeValue(v.restInk, '${p}restInk', out);
+  describeValue(v.labelWeight, '${p}labelWeight', out);
+  describeValue(v.selectedLabelWeight, '${p}selectedLabelWeight', out);
+  describeValue(v.indicatorWidth, '${p}indicatorWidth', out);
+  describeValue(v.indicatorShape, '${p}indicatorShape', out);
+  describeValue(v.indicatorThickness, '${p}indicatorThickness', out);
+  describeValue(v.rule, '${p}rule', out);
 }
 
 void describeAdminBreakpoints(

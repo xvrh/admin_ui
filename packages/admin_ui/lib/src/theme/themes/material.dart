@@ -16,6 +16,7 @@ import '../slider_style.dart';
 import '../state_layer.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
+import '../tabs_style.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
@@ -344,5 +345,18 @@ final materialTheme = AdminTheme.from(
     thumb: SliderThumb.bar,
     thumbSize: 44,
     rail: SliderRail.soft,
+  ),
+  // Primary tabs: a 48dp row, titleSmall labels in on-surface-variant, the
+  // selected one in primary over a 3dp indicator as wide as its label,
+  // rounded at the top, on the divider
+  tabs: const AdminTabsStyle(
+    heightSmall: 40,
+    heightMedium: 48,
+    heightLarge: 56,
+    restInk: TabsRestInk.secondary,
+    labelWeight: FontWeight.w500,
+    indicatorWidth: TabsIndicatorWidth.label,
+    indicatorShape: TabsIndicatorShape.roundedTop,
+    indicatorThickness: 3,
   ),
 );
