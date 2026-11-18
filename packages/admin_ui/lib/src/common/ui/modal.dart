@@ -518,9 +518,9 @@ class Modal extends StatefulWidget {
   State<Modal> createState() => _ModalState();
 }
 
-/// Line height of the title, as a multiple of its font size: fixed so the
-/// close button can centre on the first line in every theme's font.
-const _titleLineHeight = 1.5;
+/// Line height of a title whose style names none, as a multiple of its font
+/// size.
+const _fallbackTitleLine = 1.5;
 
 /// Room inside the scrolling region for a focus ring drawn around its first
 /// or last control, which the region's clip would otherwise cut.
@@ -561,16 +561,21 @@ class _ModalState extends State<Modal> {
 
     // The close button is taller than the title's line: it hangs [overhang]
     // above and below it, which the header takes back from its padding so
-    // the title's line keeps its 24px and its 12px to the content. Under a
+    // the title's line keeps its height and its 12px to the content. Under a
     // description the header ends with the description instead ([below]).
     const close = IconActionSize.small;
-    final titleStyle = context.type.heading.copyWith(
-      height: _titleLineHeight,
-      leadingDistribution: TextLeadingDistribution.even,
-    );
+    // The title is on the theme's own line, which the close button centres
+    // on; a typography built by hand may name none, and gets a fixed one.
+    final role = context.type.dialogTitle;
+    final titleStyle = role.height == null
+        ? role.copyWith(
+            height: _fallbackTitleLine,
+            leadingDistribution: TextLeadingDistribution.even,
+          )
+        : role;
     final line =
         MediaQuery.textScalerOf(context).scale(titleStyle.fontSize!) *
-        _titleLineHeight;
+        titleStyle.height!;
     final overhang = dismiss != null
         ? math.max(0.0, (close.box - line) / 2)
         : 0.0;

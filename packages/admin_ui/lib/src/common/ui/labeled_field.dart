@@ -330,8 +330,9 @@ class FieldDescription extends StatelessWidget {
 /// edge, centred on the first line of text, and the text follows it 6 on; a
 /// wrapped line keeps to the text's indent. Nothing paints outside the
 /// widget, so a clipping card or a field at the page gutter keeps the glyph.
-/// The type is [AdminTypography.fieldMessage] (weight 500). An error is a
-/// live region, so a screen reader announces it as it appears.
+/// The type is [AdminTypography.fieldMessage], at the theme's message
+/// weight. An error is a live region, so a screen reader announces it as it
+/// appears.
 ///
 /// While [pending], the line says the value is being checked: a [Spinner]
 /// for the glyph and "Checking…", both in [AdminPalette.foregroundMuted]. It

@@ -192,6 +192,7 @@ const _ramp = AdminTypeRamp(
   titleLarge: AdminTypeStep(20, 28), // heading-03
   pageTitle: AdminTypeStep(28, 36), // heading-04
   heading: AdminTypeStep(16, 22), // heading-compact-02
+  dialogTitle: AdminTypeStep(20, 28), // a modal's heading: heading-03
   // heading-compact-01
   sectionLabel: AdminTypeStep(14, 18, letterSpacing: 0.16),
   fieldLabel: AdminTypeStep(12, 16, letterSpacing: 0.32), // label-01
@@ -255,7 +256,9 @@ final carbonTheme = AdminTheme.from(
     monoFontFamily: 'IBM Plex Mono',
     monoFontFamilyFallback: ['monospace', 'Menlo', 'Consolas', 'Courier New'],
     heading: FontWeight.w600,
+    title: FontWeight.w400, // heading-03 and heading-04 are regular
     label: FontWeight.w400, // label-01
+    message: FontWeight.w400, // a form requirement: no 500 in Carbon's type
     uppercaseLabels: false,
     ramp: _ramp,
   ),

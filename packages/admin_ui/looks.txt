@@ -48,6 +48,7 @@ typography.fieldDescription: Inter 12 w400 height 1.3333 spacing 0 #ff6b7280 eve
 typography.fieldMessage: Inter 12 w500 height 1.3333 spacing 0 even
 typography.pageTitle: Inter 22 w700 height 1.2727 spacing 0 #ff15181d even
 typography.heading: Inter 16 w700 height 1.5 spacing 0 #ff15181d even
+typography.dialogTitle: Inter 16 w700 height 1.5 spacing 0 #ff15181d even
 typography.sectionLabel: Inter 12 w700 height 1.3333 spacing 0.3 #ff3a3d43 even
 typography.body: Inter 13 w400 height 1.5385 spacing 0 #ff15181d even
 typography.bodyStrong: Inter 13 w600 height 1.5385 spacing 0 #ff15181d even
@@ -84,6 +85,7 @@ typography.spec.ramp.pageTitle.letterSpacing: 0
 typography.spec.ramp.heading.size: 16
 typography.spec.ramp.heading.line: 24
 typography.spec.ramp.heading.letterSpacing: 0
+typography.spec.ramp.dialogTitle: null
 typography.spec.ramp.sectionLabel.size: 12
 typography.spec.ramp.sectionLabel.line: 16
 typography.spec.ramp.sectionLabel.letterSpacing: 0.3
@@ -128,9 +130,12 @@ typography.spec.fontFamilyFallback: null
 typography.spec.monoFontFamily: monospace
 typography.spec.monoFontFamilyFallback: [Menlo, Consolas, Courier New]
 typography.spec.heading: w700
+typography.spec.title: null
 typography.spec.label: null
 typography.spec.strong: w600
 typography.spec.body: w400
+typography.spec.message: w500
+typography.spec.labelInk: secondary
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: true
 elevation.sm: #14000000 0,1 blur 4
@@ -293,6 +298,7 @@ typography.fieldText: Inter 13 w400 height 1.5385 spacing 0 #ffecedf2 even
 typography.fieldDescription: Inter 12 w400 height 1.3333 spacing 0 #ff9a9dad even
 typography.pageTitle: Inter 22 w700 height 1.2727 spacing 0 #ffecedf2 even
 typography.heading: Inter 16 w700 height 1.5 spacing 0 #ffecedf2 even
+typography.dialogTitle: Inter 16 w700 height 1.5 spacing 0 #ffecedf2 even
 typography.sectionLabel: Inter 12 w700 height 1.3333 spacing 0.3 #ffcdcfd9 even
 typography.body: Inter 13 w400 height 1.5385 spacing 0 #ffecedf2 even
 typography.bodyStrong: Inter 13 w600 height 1.5385 spacing 0 #ffecedf2 even
@@ -349,9 +355,10 @@ typography.sizeTitleLarge: 22
 typography.fieldLabel: Roboto 12 w400 height 1.3333 spacing 0.4 #ff49454f even
 typography.fieldText: Roboto 16 w400 height 1.5 spacing 0.5 #ff1d1b20 even
 typography.fieldDescription: Roboto 12 w400 height 1.3333 spacing 0.4 #ff49454f even
-typography.fieldMessage: Roboto 12 w500 height 1.3333 spacing 0.4 even
-typography.pageTitle: Roboto 24 w500 height 1.3333 spacing 0 #ff1d1b20 even
+typography.fieldMessage: Roboto 12 w400 height 1.3333 spacing 0.4 even
+typography.pageTitle: Roboto 24 w400 height 1.3333 spacing 0 #ff1d1b20 even
 typography.heading: Roboto 16 w500 height 1.5 spacing 0.15 #ff1d1b20 even
+typography.dialogTitle: Roboto 24 w400 height 1.3333 spacing 0 #ff1d1b20 even
 typography.sectionLabel: Roboto 12 w500 height 1.3333 spacing 0.5 #ff49454f even
 typography.body: Roboto 14 w400 height 1.4286 spacing 0.25 #ff1d1b20 even
 typography.bodyStrong: Roboto 14 w500 height 1.4286 spacing 0.25 #ff1d1b20 even
@@ -388,6 +395,9 @@ typography.spec.ramp.pageTitle.letterSpacing: 0
 typography.spec.ramp.heading.size: 16
 typography.spec.ramp.heading.line: 24
 typography.spec.ramp.heading.letterSpacing: 0.15
+typography.spec.ramp.dialogTitle.size: 24
+typography.spec.ramp.dialogTitle.line: 32
+typography.spec.ramp.dialogTitle.letterSpacing: 0
 typography.spec.ramp.sectionLabel.size: 12
 typography.spec.ramp.sectionLabel.line: 16
 typography.spec.ramp.sectionLabel.letterSpacing: 0.5
@@ -432,9 +442,12 @@ typography.spec.fontFamilyFallback: null
 typography.spec.monoFontFamily: monospace
 typography.spec.monoFontFamilyFallback: [Menlo, Consolas, Courier New]
 typography.spec.heading: w500
+typography.spec.title: w400
 typography.spec.label: w400
 typography.spec.strong: w500
 typography.spec.body: w400
+typography.spec.message: w400
+typography.spec.labelInk: secondary
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
 elevation.sm: #4d000000 0,1 blur 2; #26000000 0,1 blur 3 spread 1
@@ -603,8 +616,9 @@ palette.tabDivider: #ff49454f
 typography.fieldLabel: Roboto 12 w400 height 1.3333 spacing 0.4 #ffcac4d0 even
 typography.fieldText: Roboto 16 w400 height 1.5 spacing 0.5 #ffe6e0e9 even
 typography.fieldDescription: Roboto 12 w400 height 1.3333 spacing 0.4 #ffcac4d0 even
-typography.pageTitle: Roboto 24 w500 height 1.3333 spacing 0 #ffe6e0e9 even
+typography.pageTitle: Roboto 24 w400 height 1.3333 spacing 0 #ffe6e0e9 even
 typography.heading: Roboto 16 w500 height 1.5 spacing 0.15 #ffe6e0e9 even
+typography.dialogTitle: Roboto 24 w400 height 1.3333 spacing 0 #ffe6e0e9 even
 typography.sectionLabel: Roboto 12 w500 height 1.3333 spacing 0.5 #ffcac4d0 even
 typography.body: Roboto 14 w400 height 1.4286 spacing 0.25 #ffe6e0e9 even
 typography.bodyStrong: Roboto 14 w500 height 1.4286 spacing 0.25 #ffe6e0e9 even
@@ -655,12 +669,13 @@ typography.sizeDisplaySmall: 24
 typography.sizeHeadlineMedium: 20
 typography.sizeHeadlineSmall: 18
 typography.sizeTitleLarge: 18
-typography.fieldLabel: Inter 14 w500 height 1.4286 spacing 0 #ff27272a even
+typography.fieldLabel: Inter 14 w500 height 1.4286 spacing 0 #ff09090b even
 typography.fieldText: Inter 14 w400 height 1.4286 spacing 0 #ff09090b even
 typography.fieldDescription: Inter 14 w400 height 1.4286 spacing 0 #ff71717a even
-typography.fieldMessage: Inter 14 w500 height 1.4286 spacing 0 even
+typography.fieldMessage: Inter 14 w400 height 1.4286 spacing 0 even
 typography.pageTitle: Inter 24 w600 height 1.3333 spacing -0.6 #ff09090b even
 typography.heading: Inter 18 w600 height 1.5556 spacing -0.45 #ff09090b even
+typography.dialogTitle: Inter 18 w600 height 1.5556 spacing -0.45 #ff09090b even
 typography.sectionLabel: Inter 12 w600 height 1.3333 spacing 0 #ff27272a even
 typography.body: Inter 14 w400 height 1.4286 spacing 0 #ff09090b even
 typography.bodyStrong: Inter 14 w500 height 1.4286 spacing 0 #ff09090b even
@@ -697,6 +712,7 @@ typography.spec.ramp.pageTitle.letterSpacing: -0.6
 typography.spec.ramp.heading.size: 18
 typography.spec.ramp.heading.line: 28
 typography.spec.ramp.heading.letterSpacing: -0.45
+typography.spec.ramp.dialogTitle: null
 typography.spec.ramp.sectionLabel.size: 12
 typography.spec.ramp.sectionLabel.line: 16
 typography.spec.ramp.sectionLabel.letterSpacing: 0
@@ -741,9 +757,12 @@ typography.spec.fontFamilyFallback: null
 typography.spec.monoFontFamily: monospace
 typography.spec.monoFontFamilyFallback: [Menlo, Consolas, Courier New]
 typography.spec.heading: w600
+typography.spec.title: null
 typography.spec.label: w500
 typography.spec.strong: w500
 typography.spec.body: w400
+typography.spec.message: w400
+typography.spec.labelInk: foreground
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
 elevation.sm: #1a000000 0,1 blur 3; #1a000000 0,1 blur 2 spread -1
@@ -910,11 +929,12 @@ palette.info: #ff60a5fa
 palette.highlight: #ff2d2a1e
 palette.modifiedFill: #ff231f1a
 palette.tabDivider: #ff3f3f46
-typography.fieldLabel: Inter 14 w500 height 1.4286 spacing 0 #ffe4e4e7 even
+typography.fieldLabel: Inter 14 w500 height 1.4286 spacing 0 #fffafafa even
 typography.fieldText: Inter 14 w400 height 1.4286 spacing 0 #fffafafa even
 typography.fieldDescription: Inter 14 w400 height 1.4286 spacing 0 #ffa1a1aa even
 typography.pageTitle: Inter 24 w600 height 1.3333 spacing -0.6 #fffafafa even
 typography.heading: Inter 18 w600 height 1.5556 spacing -0.45 #fffafafa even
+typography.dialogTitle: Inter 18 w600 height 1.5556 spacing -0.45 #fffafafa even
 typography.sectionLabel: Inter 12 w600 height 1.3333 spacing 0 #ffe4e4e7 even
 typography.body: Inter 14 w400 height 1.4286 spacing 0 #fffafafa even
 typography.bodyStrong: Inter 14 w500 height 1.4286 spacing 0 #fffafafa even
@@ -998,12 +1018,13 @@ typography.sizeDisplaySmall: 24
 typography.sizeHeadlineMedium: 20
 typography.sizeHeadlineSmall: 16
 typography.sizeTitleLarge: 16
-typography.fieldLabel: 14 w400 height 1.5714 spacing 0 #ff595959 even
+typography.fieldLabel: 14 w400 height 1.5714 spacing 0 #ff1f1f1f even
 typography.fieldText: 14 w400 height 1.5714 spacing 0 #ff1f1f1f even
 typography.fieldDescription: 14 w400 height 1.5714 spacing 0 #ff707070 even
-typography.fieldMessage: 14 w500 height 1.5714 spacing 0 even
+typography.fieldMessage: 14 w400 height 1.5714 spacing 0 even
 typography.pageTitle: 20 w600 height 1.4 spacing 0 #ff1f1f1f even
 typography.heading: 16 w600 height 1.5 spacing 0 #ff1f1f1f even
+typography.dialogTitle: 16 w600 height 1.5 spacing 0 #ff1f1f1f even
 typography.sectionLabel: 12 w600 height 1.6667 spacing 0 #ff595959 even
 typography.body: 14 w400 height 1.5714 spacing 0 #ff1f1f1f even
 typography.bodyStrong: 14 w600 height 1.5714 spacing 0 #ff1f1f1f even
@@ -1040,6 +1061,7 @@ typography.spec.ramp.pageTitle.letterSpacing: 0
 typography.spec.ramp.heading.size: 16
 typography.spec.ramp.heading.line: 24
 typography.spec.ramp.heading.letterSpacing: 0
+typography.spec.ramp.dialogTitle: null
 typography.spec.ramp.sectionLabel.size: 12
 typography.spec.ramp.sectionLabel.line: 20
 typography.spec.ramp.sectionLabel.letterSpacing: 0
@@ -1084,9 +1106,12 @@ typography.spec.fontFamilyFallback: null
 typography.spec.monoFontFamily: monospace
 typography.spec.monoFontFamilyFallback: [Menlo, Consolas, Courier New]
 typography.spec.heading: w600
+typography.spec.title: null
 typography.spec.label: w400
 typography.spec.strong: w600
 typography.spec.body: w400
+typography.spec.message: w400
+typography.spec.labelInk: foreground
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
 elevation.sm: #0d000000 0,1 blur 2; #08000000 0,1 blur 6 spread -1; #08000000 0,2 blur 4
@@ -1282,11 +1307,12 @@ palette.info: #ff3c89e8
 palette.highlight: #ff2b2412
 palette.modifiedFill: #ff241f18
 palette.tabDivider: #ff303030
-typography.fieldLabel: 14 w400 height 1.5714 spacing 0 #ffc2c2c2 even
+typography.fieldLabel: 14 w400 height 1.5714 spacing 0 #ffe0e0e0 even
 typography.fieldText: 14 w400 height 1.5714 spacing 0 #ffe0e0e0 even
 typography.fieldDescription: 14 w400 height 1.5714 spacing 0 #ff8c8c8c even
 typography.pageTitle: 20 w600 height 1.4 spacing 0 #ffe0e0e0 even
 typography.heading: 16 w600 height 1.5 spacing 0 #ffe0e0e0 even
+typography.dialogTitle: 16 w600 height 1.5 spacing 0 #ffe0e0e0 even
 typography.sectionLabel: 12 w600 height 1.6667 spacing 0 #ffc2c2c2 even
 typography.body: 14 w400 height 1.5714 spacing 0 #ffe0e0e0 even
 typography.bodyStrong: 14 w600 height 1.5714 spacing 0 #ffe0e0e0 even
@@ -1338,12 +1364,13 @@ typography.sizeDisplaySmall: 28
 typography.sizeHeadlineMedium: 24
 typography.sizeHeadlineSmall: 20
 typography.sizeTitleLarge: 20
-typography.fieldLabel: Segoe UI 14 w400 height 1.4286 spacing 0 #ff424242 even
+typography.fieldLabel: Segoe UI 14 w400 height 1.4286 spacing 0 #ff242424 even
 typography.fieldText: Segoe UI 14 w400 height 1.4286 spacing 0 #ff242424 even
 typography.fieldDescription: Segoe UI 12 w400 height 1.3333 spacing 0 #ff616161 even
-typography.fieldMessage: Segoe UI 12 w500 height 1.3333 spacing 0 even
+typography.fieldMessage: Segoe UI 12 w400 height 1.3333 spacing 0 even
 typography.pageTitle: Segoe UI 24 w600 height 1.3333 spacing 0 #ff242424 even
 typography.heading: Segoe UI 16 w600 height 1.375 spacing 0 #ff242424 even
+typography.dialogTitle: Segoe UI 20 w600 height 1.4 spacing 0 #ff242424 even
 typography.sectionLabel: Segoe UI 12 w600 height 1.3333 spacing 0 #ff424242 even
 typography.body: Segoe UI 14 w400 height 1.4286 spacing 0 #ff242424 even
 typography.bodyStrong: Segoe UI 14 w600 height 1.4286 spacing 0 #ff242424 even
@@ -1380,6 +1407,9 @@ typography.spec.ramp.pageTitle.letterSpacing: 0
 typography.spec.ramp.heading.size: 16
 typography.spec.ramp.heading.line: 22
 typography.spec.ramp.heading.letterSpacing: 0
+typography.spec.ramp.dialogTitle.size: 20
+typography.spec.ramp.dialogTitle.line: 28
+typography.spec.ramp.dialogTitle.letterSpacing: 0
 typography.spec.ramp.sectionLabel.size: 12
 typography.spec.ramp.sectionLabel.line: 16
 typography.spec.ramp.sectionLabel.letterSpacing: 0
@@ -1424,9 +1454,12 @@ typography.spec.fontFamilyFallback: null
 typography.spec.monoFontFamily: monospace
 typography.spec.monoFontFamilyFallback: [Menlo, Consolas, Courier New]
 typography.spec.heading: w600
+typography.spec.title: null
 typography.spec.label: w400
 typography.spec.strong: w600
 typography.spec.body: w400
+typography.spec.message: w400
+typography.spec.labelInk: foreground
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
 elevation.sm: #1f000000 0,0 blur 2; #24000000 0,2 blur 4
@@ -1595,11 +1628,12 @@ palette.info: #ff479ef5
 palette.highlight: #ff332d17
 palette.modifiedFill: #ff2a231c
 palette.tabDivider: #ff484644
-typography.fieldLabel: Segoe UI 14 w400 height 1.4286 spacing 0 #ffd6d6d6 even
+typography.fieldLabel: Segoe UI 14 w400 height 1.4286 spacing 0 #ffffffff even
 typography.fieldText: Segoe UI 14 w400 height 1.4286 spacing 0 #ffffffff even
 typography.fieldDescription: Segoe UI 12 w400 height 1.3333 spacing 0 #ffadadad even
 typography.pageTitle: Segoe UI 24 w600 height 1.3333 spacing 0 #ffffffff even
 typography.heading: Segoe UI 16 w600 height 1.375 spacing 0 #ffffffff even
+typography.dialogTitle: Segoe UI 20 w600 height 1.4 spacing 0 #ffffffff even
 typography.sectionLabel: Segoe UI 12 w600 height 1.3333 spacing 0 #ffd6d6d6 even
 typography.body: Segoe UI 14 w400 height 1.4286 spacing 0 #ffffffff even
 typography.bodyStrong: Segoe UI 14 w600 height 1.4286 spacing 0 #ffffffff even
@@ -1656,9 +1690,10 @@ typography.sizeTitleLarge: 20
 typography.fieldLabel: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff525252 even
 typography.fieldText: IBM Plex Sans 14 w400 height 1.2857 spacing 0.16 #ff161616 even
 typography.fieldDescription: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff6f6f6f even
-typography.fieldMessage: IBM Plex Sans 12 w500 height 1.3333 spacing 0.32 even
-typography.pageTitle: IBM Plex Sans 28 w600 height 1.2857 spacing 0 #ff161616 even
+typography.fieldMessage: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 even
+typography.pageTitle: IBM Plex Sans 28 w400 height 1.2857 spacing 0 #ff161616 even
 typography.heading: IBM Plex Sans 16 w600 height 1.375 spacing 0 #ff161616 even
+typography.dialogTitle: IBM Plex Sans 20 w400 height 1.4 spacing 0 #ff161616 even
 typography.sectionLabel: IBM Plex Sans 14 w600 height 1.2857 spacing 0.16 #ff525252 even
 typography.body: IBM Plex Sans 14 w400 height 1.4286 spacing 0.16 #ff161616 even
 typography.bodyStrong: IBM Plex Sans 14 w600 height 1.4286 spacing 0.16 #ff161616 even
@@ -1695,6 +1730,9 @@ typography.spec.ramp.pageTitle.letterSpacing: 0
 typography.spec.ramp.heading.size: 16
 typography.spec.ramp.heading.line: 22
 typography.spec.ramp.heading.letterSpacing: 0
+typography.spec.ramp.dialogTitle.size: 20
+typography.spec.ramp.dialogTitle.line: 28
+typography.spec.ramp.dialogTitle.letterSpacing: 0
 typography.spec.ramp.sectionLabel.size: 14
 typography.spec.ramp.sectionLabel.line: 18
 typography.spec.ramp.sectionLabel.letterSpacing: 0.16
@@ -1739,9 +1777,12 @@ typography.spec.fontFamilyFallback: null
 typography.spec.monoFontFamily: IBM Plex Mono
 typography.spec.monoFontFamilyFallback: [monospace, Menlo, Consolas, Courier New]
 typography.spec.heading: w600
+typography.spec.title: w400
 typography.spec.label: w400
 typography.spec.strong: w600
 typography.spec.body: w400
+typography.spec.message: w400
+typography.spec.labelInk: secondary
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
 elevation.sm: #4d000000 0,2 blur 6
@@ -1935,8 +1976,9 @@ palette.tabDivider: #ff525252
 typography.fieldLabel: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ffc6c6c6 even
 typography.fieldText: IBM Plex Sans 14 w400 height 1.2857 spacing 0.16 #fff4f4f4 even
 typography.fieldDescription: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ffa8a8a8 even
-typography.pageTitle: IBM Plex Sans 28 w600 height 1.2857 spacing 0 #fff4f4f4 even
+typography.pageTitle: IBM Plex Sans 28 w400 height 1.2857 spacing 0 #fff4f4f4 even
 typography.heading: IBM Plex Sans 16 w600 height 1.375 spacing 0 #fff4f4f4 even
+typography.dialogTitle: IBM Plex Sans 20 w400 height 1.4 spacing 0 #fff4f4f4 even
 typography.sectionLabel: IBM Plex Sans 14 w600 height 1.2857 spacing 0.16 #ffc6c6c6 even
 typography.body: IBM Plex Sans 14 w400 height 1.4286 spacing 0.16 #fff4f4f4 even
 typography.bodyStrong: IBM Plex Sans 14 w600 height 1.4286 spacing 0.16 #fff4f4f4 even
@@ -1957,6 +1999,7 @@ typography.fieldDescription: 12 w400 height 1.3333 spacing 0 #ff6b7280 even
 typography.fieldMessage: 12 w500 height 1.3333 spacing 0 even
 typography.pageTitle: 22 w700 height 1.2727 spacing 0 #ff15181d even
 typography.heading: 16 w700 height 1.5 spacing 0 #ff15181d even
+typography.dialogTitle: 16 w700 height 1.5 spacing 0 #ff15181d even
 typography.sectionLabel: 12 w700 height 1.3333 spacing 0.3 #ff3a3d43 even
 typography.body: 13 w400 height 1.5385 spacing 0 #ff15181d even
 typography.bodyStrong: 13 w600 height 1.5385 spacing 0 #ff15181d even

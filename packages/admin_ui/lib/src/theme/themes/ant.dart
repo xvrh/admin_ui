@@ -265,6 +265,8 @@ final antTheme = AdminTheme.from(
   type: const AdminTypeSpec(
     heading: FontWeight.w600,
     label: FontWeight.w400, // a form item's label
+    message: FontWeight.w400, // a form item's explain line
+    labelInk: LabelInk.foreground, // labelColor: colorTextHeading
     uppercaseLabels: false,
     ramp: _ramp,
   ),

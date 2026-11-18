@@ -202,3 +202,85 @@ class _FeedbackCard extends StatelessWidget {
     );
   }
 }
+
+/// The type roles a theme weighs and inks apart from its headings, in every
+/// shipped theme at once: a page's title, a dialog's title, a field's label
+/// and its error. Each card is in its own theme's tokens, in the preview's
+/// mode, as [ThemeSheetDemo] shows the controls.
+class ThemeTypeSheetDemo extends StatelessWidget {
+  @Preview(name: 'Every theme · type', wrapper: adminUiPreview)
+  const ThemeTypeSheetDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = context.colors.brightness == Brightness.dark;
+    return DemoPage(
+      maxWidth: 820,
+      padding: const EdgeInsets.all(AdminSpacing.xl),
+      children: [
+        Wrap(
+          spacing: AdminSpacing.lg,
+          runSpacing: AdminSpacing.lg,
+          children: [
+            for (final theme in adminThemes)
+              Theme(
+                data: buildAppTheme(
+                  dark ? theme.dark ?? theme.tokens : theme.tokens,
+                ),
+                child: _TypeCard(theme.name),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// One theme's titles and field text, on that theme's page colour.
+class _TypeCard extends StatelessWidget {
+  final String name;
+
+  const _TypeCard(this.name);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final type = context.type;
+    return Container(
+      width: 372,
+      padding: const EdgeInsets.all(AdminSpacing.md),
+      decoration: BoxDecoration(
+        color: colors.background,
+        borderRadius: BorderRadius.circular(context.radii.radiusLarge),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(name, style: type.sectionLabel),
+          const Gap(AdminSpacing.sm),
+          Text('Orders', style: type.pageTitle),
+          const Gap(AdminSpacing.md),
+          Modal(
+            title: 'Delete page?',
+            message: 'It cannot be restored.',
+            onDismiss: () {},
+            actions: [
+              Button.ghost('Cancel', onPressed: () {}),
+              Button.danger('Delete', onPressed: () {}),
+            ],
+          ),
+          const Gap(AdminSpacing.md),
+          InputField(
+            value: '',
+            label: 'Price',
+            hint: '0.00',
+            errorText: 'Enter a price.',
+            onChanged: (_) {},
+          ),
+        ],
+      ),
+    );
+  }
+}

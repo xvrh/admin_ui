@@ -100,6 +100,7 @@ void describeAdminTypography(
   describeValue(v.fieldMessage, '${p}fieldMessage', out);
   describeValue(v.pageTitle, '${p}pageTitle', out);
   describeValue(v.heading, '${p}heading', out);
+  describeValue(v.dialogTitle, '${p}dialogTitle', out);
   describeValue(v.sectionLabel, '${p}sectionLabel', out);
   describeValue(v.body, '${p}body', out);
   describeValue(v.bodyStrong, '${p}bodyStrong', out);
@@ -127,9 +128,12 @@ void describeAdminTypeSpec(
   describeValue(v.monoFontFamily, '${p}monoFontFamily', out);
   describeValue(v.monoFontFamilyFallback, '${p}monoFontFamilyFallback', out);
   describeValue(v.heading, '${p}heading', out);
+  describeValue(v.title, '${p}title', out);
   describeValue(v.label, '${p}label', out);
   describeValue(v.strong, '${p}strong', out);
   describeValue(v.body, '${p}body', out);
+  describeValue(v.message, '${p}message', out);
+  describeValue(v.labelInk, '${p}labelInk', out);
   describeValue(v.tracking, '${p}tracking', out);
   describeValue(v.uppercaseLabels, '${p}uppercaseLabels', out);
 }
@@ -148,6 +152,11 @@ void describeAdminTypeRamp(
   describeAdminTypeStep(v.titleLarge, '${p}titleLarge', out);
   describeAdminTypeStep(v.pageTitle, '${p}pageTitle', out);
   describeAdminTypeStep(v.heading, '${p}heading', out);
+  if (v.dialogTitle case final f?) {
+    describeAdminTypeStep(f, '${p}dialogTitle', out);
+  } else {
+    out['${p}dialogTitle'] = 'null';
+  }
   describeAdminTypeStep(v.sectionLabel, '${p}sectionLabel', out);
   describeAdminTypeStep(v.fieldLabel, '${p}fieldLabel', out);
   describeAdminTypeStep(v.fieldText, '${p}fieldText', out);

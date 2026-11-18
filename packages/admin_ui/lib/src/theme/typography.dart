@@ -92,6 +92,11 @@ class AdminTypeRamp {
   /// [AdminTypography.heading]: a card's or a section's heading.
   final AdminTypeStep heading;
 
+  /// [AdminTypography.dialogTitle]: the title of a `Modal`. Null sets it on
+  /// [heading]'s step; a theme whose design system titles a dialog larger
+  /// than a card names the step here.
+  final AdminTypeStep? dialogTitle;
+
   /// [AdminTypography.sectionLabel]: a small label over a group.
   final AdminTypeStep sectionLabel;
 
@@ -142,6 +147,7 @@ class AdminTypeRamp {
     required this.titleLarge,
     required this.pageTitle,
     required this.heading,
+    this.dialogTitle,
     required this.sectionLabel,
     required this.fieldLabel,
     required this.fieldText,
@@ -167,6 +173,7 @@ class AdminTypeRamp {
     AdminTypeStep? titleLarge,
     AdminTypeStep? pageTitle,
     AdminTypeStep? heading,
+    AdminTypeStep? dialogTitle,
     AdminTypeStep? sectionLabel,
     AdminTypeStep? fieldLabel,
     AdminTypeStep? fieldText,
@@ -189,6 +196,7 @@ class AdminTypeRamp {
     titleLarge: titleLarge ?? this.titleLarge,
     pageTitle: pageTitle ?? this.pageTitle,
     heading: heading ?? this.heading,
+    dialogTitle: dialogTitle ?? this.dialogTitle,
     sectionLabel: sectionLabel ?? this.sectionLabel,
     fieldLabel: fieldLabel ?? this.fieldLabel,
     fieldText: fieldText ?? this.fieldText,
@@ -216,6 +224,9 @@ class AdminTypeRamp {
       titleLarge: s(a.titleLarge, b.titleLarge),
       pageTitle: s(a.pageTitle, b.pageTitle),
       heading: s(a.heading, b.heading),
+      dialogTitle: a.dialogTitle == null && b.dialogTitle == null
+          ? null
+          : s(a.dialogTitle ?? a.heading, b.dialogTitle ?? b.heading),
       sectionLabel: s(a.sectionLabel, b.sectionLabel),
       fieldLabel: s(a.fieldLabel, b.fieldLabel),
       fieldText: s(a.fieldText, b.fieldText),
@@ -232,7 +243,8 @@ class AdminTypeRamp {
     );
   }
 
-  /// Every step by its role's name, in declaration order.
+  /// Every step by its role's name, in declaration order, [dialogTitle]
+  /// resolved to the step it is drawn on.
   Map<String, AdminTypeStep> get steps => {
     'displayLarge': displayLarge,
     'displayMedium': displayMedium,
@@ -242,6 +254,7 @@ class AdminTypeRamp {
     'titleLarge': titleLarge,
     'pageTitle': pageTitle,
     'heading': heading,
+    'dialogTitle': dialogTitle ?? heading,
     'sectionLabel': sectionLabel,
     'fieldLabel': fieldLabel,
     'fieldText': fieldText,
@@ -292,6 +305,16 @@ const defaultTypeRamp = AdminTypeRamp(
   mono: AdminTypeStep(13, 20),
   monoSmall: AdminTypeStep(12, 16),
 );
+
+/// What a field's label is drawn in.
+enum LabelInk {
+  /// [AdminPalette.foregroundSecondary]: a step quieter than the value under
+  /// it.
+  secondary,
+
+  /// [AdminPalette.foreground]: the colour of the value itself.
+  foreground,
+}
 
 /// Per-theme typography knobs. Each theme picks a font family, weight scheme,
 /// [ramp], scale and tracking; [AdminTypography.from] bakes these into
@@ -348,6 +371,12 @@ class AdminTypeSpec {
   /// Weight for headings, section labels, page/section titles.
   final FontWeight heading;
 
+  /// Weight for the large titles, a page's ([AdminTypography.pageTitle]) and
+  /// a dialog's ([AdminTypography.dialogTitle]); [heading] when null.
+  /// Material and Carbon set a title of that size in regular and keep the
+  /// heavier weight for the smaller headings.
+  final FontWeight? title;
+
   /// Weight for a field's label ([AdminTypography.fieldLabel]); [heading]
   /// when null. The reference systems set it lighter than a heading: regular
   /// in Carbon, Fluent, Ant and Material, medium in shadcn.
@@ -358,6 +387,16 @@ class AdminTypeSpec {
 
   /// Weight for plain body, captions.
   final FontWeight body;
+
+  /// Weight for a field's error or warning line
+  /// ([AdminTypography.fieldMessage]): medium in the kit's own look, regular
+  /// in the reference systems.
+  final FontWeight message;
+
+  /// What a field's label ([AdminTypography.fieldLabel]) is drawn in:
+  /// [AdminPalette.foregroundSecondary] in the kit's own look, Material and
+  /// Carbon, the foreground in shadcn, Ant and Fluent.
+  final LabelInk labelInk;
 
   /// Added to every style's letter-spacing, on top of the [ramp] step's own.
   /// The shipped themes leave it at 0 and track per step.
@@ -376,9 +415,12 @@ class AdminTypeSpec {
     this.monoFontFamily = 'monospace',
     this.monoFontFamilyFallback = const ['Menlo', 'Consolas', 'Courier New'],
     this.heading = FontWeight.w700,
+    this.title,
     this.label,
     this.strong = FontWeight.w600,
     this.body = FontWeight.w400,
+    this.message = FontWeight.w500,
+    this.labelInk = LabelInk.secondary,
     this.tracking = 0.0,
     this.uppercaseLabels = true,
   });
@@ -392,9 +434,12 @@ class AdminTypeSpec {
     String? monoFontFamily,
     List<String>? monoFontFamilyFallback,
     FontWeight? heading,
+    FontWeight? title,
     FontWeight? label,
     FontWeight? strong,
     FontWeight? body,
+    FontWeight? message,
+    LabelInk? labelInk,
     double? tracking,
     bool? uppercaseLabels,
   }) => AdminTypeSpec(
@@ -406,9 +451,12 @@ class AdminTypeSpec {
     monoFontFamilyFallback:
         monoFontFamilyFallback ?? this.monoFontFamilyFallback,
     heading: heading ?? this.heading,
+    title: title ?? this.title,
     label: label ?? this.label,
     strong: strong ?? this.strong,
     body: body ?? this.body,
+    message: message ?? this.message,
+    labelInk: labelInk ?? this.labelInk,
     tracking: tracking ?? this.tracking,
     uppercaseLabels: uppercaseLabels ?? this.uppercaseLabels,
   );
@@ -517,9 +565,12 @@ class AdminTypeSpec {
       other.monoFontFamily == monoFontFamily &&
       listEquals(other.monoFontFamilyFallback, monoFontFamilyFallback) &&
       other.heading == heading &&
+      other.title == title &&
       other.label == label &&
       other.strong == strong &&
       other.body == body &&
+      other.message == message &&
+      other.labelInk == labelInk &&
       other.tracking == tracking &&
       other.uppercaseLabels == uppercaseLabels;
 
@@ -532,9 +583,12 @@ class AdminTypeSpec {
     monoFontFamily,
     Object.hashAll(monoFontFamilyFallback),
     heading,
+    title,
     label,
     strong,
     body,
+    message,
+    labelInk,
     tracking,
     uppercaseLabels,
   );
@@ -558,8 +612,9 @@ class AdminTypography {
   final double sizeHeadlineSmall;
   final double sizeTitleLarge;
 
-  /// A field's label, in [AdminPalette.foregroundSecondary] at the spec's
-  /// label weight: never the ambient text colour. Set its text with
+  /// A field's label, at the spec's label weight in the spec's
+  /// [AdminTypeSpec.labelInk] ([AdminPalette.foregroundSecondary] by
+  /// default): never the ambient text colour. Set its text with
   /// [fieldLabelText], which applies the theme's casing.
   final TextStyle fieldLabel;
 
@@ -573,13 +628,21 @@ class AdminTypography {
   /// system sets its field help at body size (shadcn, Ant).
   final TextStyle fieldDescription;
 
-  /// A field's error or warning line, at weight 500 on its fixed line, so a
-  /// leading glyph centres on its first line. Colourless: the message picks
-  /// the danger or warning text colour.
+  /// A field's error or warning line, at the spec's
+  /// [AdminTypeSpec.message] weight on its fixed line, so a leading glyph
+  /// centres on its first line. Colourless: the message picks the danger or
+  /// warning text colour.
   final TextStyle fieldMessage;
 
+  /// The title at the top of a page, at the spec's [AdminTypeSpec.title]
+  /// weight.
   final TextStyle pageTitle;
   final TextStyle heading;
+
+  /// The title of a `Modal`, at the spec's [AdminTypeSpec.title] weight on
+  /// the ramp's [AdminTypeRamp.dialogTitle] step: [heading]'s size where the
+  /// theme names none.
+  final TextStyle dialogTitle;
   final TextStyle sectionLabel;
   final TextStyle body;
   final TextStyle bodyStrong;
@@ -611,8 +674,8 @@ class AdminTypography {
   final AdminTypeSpec spec;
 
   /// A typography built by hand. [fieldDescription] defaults to [caption],
-  /// [buttonSmall] to [button], [mono] to [body] and [monoSmall] to [mono];
-  /// [AdminTypography.from] sets all four.
+  /// [dialogTitle] to [heading], [buttonSmall] to [button], [mono] to [body]
+  /// and [monoSmall] to [mono]; [AdminTypography.from] sets all five.
   const AdminTypography({
     required this.sizeDisplayLarge,
     required this.sizeDisplayMedium,
@@ -626,6 +689,7 @@ class AdminTypography {
     required this.fieldMessage,
     required this.pageTitle,
     required this.heading,
+    TextStyle? dialogTitle,
     required this.sectionLabel,
     required this.body,
     required this.bodyStrong,
@@ -639,6 +703,7 @@ class AdminTypography {
     TextStyle? monoSmall,
     required this.spec,
   }) : fieldDescription = fieldDescription ?? caption,
+       dialogTitle = dialogTitle ?? heading,
        buttonSmall = buttonSmall ?? button,
        mono = mono ?? body,
        monoSmall = monoSmall ?? mono ?? body;
@@ -683,7 +748,10 @@ class AdminTypography {
       fieldLabel: style(
         r.fieldLabel,
         weight: spec.label ?? spec.heading,
-        color: p.foregroundSecondary,
+        color: switch (spec.labelInk) {
+          LabelInk.secondary => p.foregroundSecondary,
+          LabelInk.foreground => p.foreground,
+        },
         letterSpacing: spec.uppercaseLabels ? 0.4 : 0,
       ),
       fieldText: style(r.fieldText, weight: spec.body, color: p.foreground),
@@ -692,9 +760,18 @@ class AdminTypography {
         weight: spec.body,
         color: p.foregroundMuted,
       ),
-      fieldMessage: style(r.fieldMessage, weight: FontWeight.w500),
-      pageTitle: style(r.pageTitle, weight: spec.heading, color: p.foreground),
+      fieldMessage: style(r.fieldMessage, weight: spec.message),
+      pageTitle: style(
+        r.pageTitle,
+        weight: spec.title ?? spec.heading,
+        color: p.foreground,
+      ),
       heading: style(r.heading, weight: spec.heading, color: p.foreground),
+      dialogTitle: style(
+        r.dialogTitle ?? r.heading,
+        weight: spec.title ?? spec.heading,
+        color: p.foreground,
+      ),
       sectionLabel: style(
         r.sectionLabel,
         weight: spec.heading,
@@ -746,6 +823,7 @@ class AdminTypography {
       fieldMessage: s(a.fieldMessage, b.fieldMessage),
       pageTitle: s(a.pageTitle, b.pageTitle),
       heading: s(a.heading, b.heading),
+      dialogTitle: s(a.dialogTitle, b.dialogTitle),
       sectionLabel: s(a.sectionLabel, b.sectionLabel),
       body: s(a.body, b.body),
       bodyStrong: s(a.bodyStrong, b.bodyStrong),
@@ -774,6 +852,7 @@ class AdminTypography {
     fieldMessage,
     pageTitle,
     heading,
+    dialogTitle,
     sectionLabel,
     body,
     bodyStrong,

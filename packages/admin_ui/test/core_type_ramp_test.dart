@@ -10,6 +10,7 @@ Map<String, TextStyle> _styles(AdminTypography type) => {
   'fieldMessage': type.fieldMessage,
   'pageTitle': type.pageTitle,
   'heading': type.heading,
+  'dialogTitle': type.dialogTitle,
   'sectionLabel': type.sectionLabel,
   'body': type.body,
   'bodyStrong': type.bodyStrong,
@@ -84,7 +85,10 @@ void main() {
       });
 
       test('$name: a field label, its description and its error', () {
-        expect(type.fieldLabel.color, tokens.palette.foregroundSecondary);
+        expect(type.fieldLabel.color, switch (type.spec.labelInk) {
+          LabelInk.secondary => tokens.palette.foregroundSecondary,
+          LabelInk.foreground => tokens.palette.foreground,
+        });
         expect(
           type.fieldLabel.fontWeight,
           type.spec.label ?? type.spec.heading,
@@ -92,7 +96,7 @@ void main() {
         expect(type.caption.color, tokens.palette.foregroundMuted);
         expect(type.fieldDescription.color, tokens.palette.foregroundMuted);
         expect(type.fieldDescription.fontWeight, type.spec.body);
-        expect(type.fieldMessage.fontWeight, FontWeight.w500);
+        expect(type.fieldMessage.fontWeight, type.spec.message);
         // A description and the error that replaces it are one size.
         final ramp = type.spec.ramp;
         expect(

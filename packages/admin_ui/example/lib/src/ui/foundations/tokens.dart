@@ -165,6 +165,7 @@ class TokensDemo extends StatelessWidget {
     return [
       ('pageTitle', 'Page title', t.pageTitle),
       ('heading', 'Section heading', t.heading),
+      ('dialogTitle', 'Dialog title', t.dialogTitle),
       ('sectionLabel', 'Section label', t.sectionLabel),
       (
         'fieldLabel',
