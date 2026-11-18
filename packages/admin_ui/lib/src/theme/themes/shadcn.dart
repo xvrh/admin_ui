@@ -300,8 +300,14 @@ final shadcnTheme = AdminTheme.from(
   darkShell: _shell.copyWith(sidebarPalette: shadcnDarkSidebarPalette),
   // TooltipContent's Arrow, and Radix's 10×5 arrow; the tooltip itself is
   // w-fit, so it wraps at the kit's measure
+  // TooltipContent: rounded-md px-3 py-1.5 text-xs, shown at once
+  // (delayDuration 0)
   overlay: const AdminOverlayStyle(
     tooltipArrow: true,
+    tooltipRadius: 8,
+    tooltipPaddingX: 12,
+    tooltipPaddingY: 6,
+    tooltipDelay: Duration.zero,
     arrowWidth: 10,
     arrowHeight: 5,
   ),

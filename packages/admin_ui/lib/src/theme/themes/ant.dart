@@ -332,10 +332,15 @@ final antTheme = AdminTheme.from(
   // the dark sider the classic layout draws on a light page
   shell: _shell.copyWith(sidebarPalette: antSiderPalette),
   darkShell: _shell,
-  // Tooltip: an arrow, maxWidth 250; sizePopupArrow 16
+  // Tooltip: an arrow, maxWidth 250, borderRadius 6, `6px 8px` around the
+  // body's 14/22; sizePopupArrow 16
   overlay: const AdminOverlayStyle(
     tooltipArrow: true,
     tooltipMaxWidth: 250,
+    tooltipRadius: 6,
+    tooltipPaddingX: 8,
+    tooltipPaddingY: 6,
+    tooltipText: TooltipText.body,
     arrowWidth: 16,
     arrowHeight: 8,
   ),

@@ -315,8 +315,9 @@ final materialTheme = AdminTheme.from(
     indicator: NavIndicator.none, // the secondaryContainer pill carries it
     topBarHeight: 64,
   ),
-  // the plain tooltip: no arrow, and 200dp at most (PlainTooltipMaxWidth)
-  overlay: const AdminOverlayStyle(tooltipMaxWidth: 200),
+  // the plain tooltip: no arrow, 200dp at most (PlainTooltipMaxWidth), a
+  // 4dp corner, 8×4 around bodySmall
+  overlay: const AdminOverlayStyle(tooltipMaxWidth: 200, tooltipRadius: 4),
   // the segmented button: outlined segments, the selected one in
   // secondaryContainer under a check, labelLarge
   segmented: const AdminSegmentedStyle(

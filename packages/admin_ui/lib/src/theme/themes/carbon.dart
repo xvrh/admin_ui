@@ -336,8 +336,16 @@ final carbonTheme = AdminTheme.from(
     topBarHeight: 48,
     topBarPalette: carbonShellPalette,
   ),
-  // Tooltip: a caret, max-inline-size 18rem; the caret is 0.75rem × 0.375rem
-  overlay: const AdminOverlayStyle(tooltipArrow: true, tooltipMaxWidth: 288),
+  // Tooltip: a caret, max-inline-size 18rem, a 2px corner, $spacing-05
+  // around body-01; the caret is 0.75rem × 0.375rem
+  overlay: const AdminOverlayStyle(
+    tooltipArrow: true,
+    tooltipMaxWidth: 288,
+    tooltipRadius: 2,
+    tooltipPaddingX: 16,
+    tooltipPaddingY: 16,
+    tooltipText: TooltipText.body,
+  ),
   // the high-contrast content switcher: a $border-inverse outline, the
   // selected switch in $layer-selected-inverse under $text-inverse, rounded
   // 4, body-compact-01

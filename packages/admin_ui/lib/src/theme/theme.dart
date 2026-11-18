@@ -4,9 +4,9 @@ import 'package:material_ui/material_ui.dart';
 
 import 'contrast.dart';
 import 'field_style.dart';
+import 'overlay_style.dart';
 import 'palette.dart';
 import 'sizes.dart';
-import 'spacing.dart';
 import 'stroke.dart';
 import 'tokens.dart';
 import 'typography.dart';
@@ -225,18 +225,23 @@ ThemeData buildAppTheme(AdminTokens tokens) {
     tooltipTheme: TooltipThemeData(
       // A hover delay, not motion: a timer that paces the pointer, which
       // reduced motion leaves alone.
-      waitDuration: const Duration(milliseconds: 400),
+      waitDuration: tokens.overlay.tooltipDelay,
       // A long tip wraps at a readable measure instead of spanning the view.
       constraints: BoxConstraints(maxWidth: tokens.overlay.tooltipMaxWidth),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AdminSpacing.md,
-        vertical: AdminSpacing.xs,
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.overlay.tooltipPaddingX,
+        vertical: tokens.overlay.tooltipPaddingY,
       ),
       decoration: BoxDecoration(
         color: palette.foreground,
-        borderRadius: BorderRadius.circular(radii.radiusSmall),
+        borderRadius: BorderRadius.circular(
+          tokens.overlay.tooltipRadius ?? radii.radiusSmall,
+        ),
       ),
-      textStyle: type.caption.copyWith(color: palette.surface),
+      textStyle: switch (tokens.overlay.tooltipText) {
+        TooltipText.caption => type.caption,
+        TooltipText.body => type.body,
+      }.copyWith(color: palette.surface),
     ),
   );
 

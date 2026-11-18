@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
@@ -146,8 +148,17 @@ class _Sides extends StatelessWidget {
       side: PopoverSide.start,
       child: Button('Start', onPressed: () {}),
     );
+    // Room for the theme's chip where it is taller than the kit's own 24:
+    // its padding above and below a line of its text.
+    final overlay = context.overlayStyle;
+    final text = switch (overlay.tooltipText) {
+      TooltipText.caption => context.type.caption,
+      TooltipText.body => context.type.body,
+    };
+    final line = (text.fontSize ?? 12) * (text.height ?? 1);
+    final taller = math.max(0.0, 2 * overlay.tooltipPaddingY + line - 24);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AdminSpacing.xxxl + 8),
+      padding: EdgeInsets.symmetric(vertical: AdminSpacing.xxxl + 8 + taller),
       child: Column(
         children: [
           Row(
@@ -174,7 +185,7 @@ class _Sides extends StatelessWidget {
               ),
             ],
           ),
-          const Gap(AdminSpacing.xxxl + 16),
+          Gap(AdminSpacing.xxxl + 16 + taller),
           LayoutBuilder(
             builder: (context, box) => box.maxWidth >= _besideWidth
                 ? Row(

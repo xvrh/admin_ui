@@ -156,7 +156,9 @@ class _TipState extends State<Tip> {
         TooltipTheme.of(context).decoration ??
         BoxDecoration(
           color: context.colors.foreground,
-          borderRadius: BorderRadius.circular(context.radii.radiusSmall),
+          borderRadius: BorderRadius.circular(
+            overlay.tooltipRadius ?? context.radii.radiusSmall,
+          ),
         );
     final fill = switch (chip) {
       BoxDecoration(:final color?) => color,
@@ -165,7 +167,7 @@ class _TipState extends State<Tip> {
     final radius = switch (chip) {
       BoxDecoration(:final borderRadius?) =>
         borderRadius.resolve(direction).topLeft.x,
-      _ => context.radii.radiusSmall,
+      _ => overlay.tooltipRadius ?? context.radii.radiusSmall,
     };
 
     Offset position(TooltipPositionContext at) {

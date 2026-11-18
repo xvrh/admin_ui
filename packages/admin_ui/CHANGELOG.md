@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- A theme says how its tooltips are drawn, in its `AdminOverlayStyle`:
+  `tooltipRadius` is the chip's corner, which was the theme's small radius
+  and still is where none is given; `tooltipPaddingX` and `tooltipPaddingY`
+  its padding, which was 8 by 4; `tooltipText` its text, the caption or,
+  `TooltipText.body`, the body; and `tooltipDelay` how long the pointer
+  rests on a target before the tooltip shows, which was 400ms. A `Tip` and
+  a stock `Tooltip` both take them, and a `Tip` given a `waitDuration`
+  keeps its own.
 - A `Sidebar` folds several items under one row: `NavGroup`, a third
   `NavEntry`, takes a label, an icon and its `items`. Closed, its row
   shows the number of its items and a chevron; open, the items follow it,
@@ -451,6 +459,19 @@
 
 ### Looks
 
+- A tooltip follows each reference theme, where its corner was whatever
+  the theme's small radius was for its menu items and small buttons (8, 6,
+  4, 2 and 0 in the five reference themes) around 8 by 4 of padding and
+  caption text. Iris keeps those.
+  - Material: a 4dp corner (was 8).
+  - shadcn: an 8px corner (was 6), 12 by 6 of padding, and no delay: a
+    tooltip shows as the pointer arrives (was after 400ms).
+  - Ant: a 6px corner (was 4), 8 by 6 of padding around text at the body's
+    14/22 (was the caption's 12/20), so a one-line tooltip is 34 tall (was
+    28).
+  - Fluent: a 4px corner (was 2) and 12 by 6 of padding.
+  - Carbon: a 2px corner (was square) and 16 of padding all round, around
+    text at the body's 14/20 (was the caption's 12/16).
 - A `CollectionTable`'s header and rules follow each reference theme, where
   every theme drew a `surfaceMuted` header under muted labels, over a
   `border` rule, with `borderSubtle` between the rows. Iris and Material
