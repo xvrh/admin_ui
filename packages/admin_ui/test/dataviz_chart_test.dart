@@ -813,4 +813,167 @@ void main() {
       }
     });
   });
+
+  group('ChartCard header', () {
+    const title = 'Active members';
+    const subtitle = 'Signed in at least once in the last 30 days';
+    const trailingKey = Key('trailing');
+
+    Widget chartCard({
+      String title = title,
+      String? subtitle = subtitle,
+      Widget trailing = const SizedBox(
+        key: trailingKey,
+        width: 320,
+        height: 32,
+      ),
+      bool loading = false,
+      bool isEmpty = false,
+      TextDirection textDirection = TextDirection.ltr,
+    }) => Directionality(
+      textDirection: textDirection,
+      child: ChartCard(
+        title: title,
+        subtitle: subtitle,
+        trailing: trailing,
+        loading: loading,
+        isEmpty: isEmpty,
+        bodyHeight: 120,
+        chart: const SizedBox(height: 120),
+      ),
+    );
+
+    Rect rect(WidgetTester tester, Finder finder) => tester.getRect(finder);
+    final trailing = find.byKey(trailingKey);
+
+    testWidgets('with room, the trailing widget sits beside the title', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_host(chartCard(), width: 900));
+      final bounds = rect(tester, find.byType(ChartCard));
+      final titleRect = rect(tester, find.text(title));
+      expect(rect(tester, trailing).top, titleRect.top);
+      expect(rect(tester, trailing).right, bounds.right - AdminSpacing.xl);
+      expect(
+        rect(tester, trailing).left - rect(tester, find.text(subtitle)).right,
+        greaterThanOrEqualTo(AdminSpacing.lg),
+      );
+    });
+
+    testWidgets('one that leaves the title under minTitleWidth goes under it', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_host(chartCard(), width: 900));
+      final oneLine = rect(tester, find.text(subtitle)).height;
+
+      await tester.pumpWidget(_host(chartCard(), width: 480));
+      final titleRect = rect(tester, find.text(title));
+      final subtitleRect = rect(tester, find.text(subtitle));
+      // The subtitle keeps its one line.
+      expect(subtitleRect.height, oneLine);
+      expect(rect(tester, trailing).top, subtitleRect.bottom + AdminSpacing.lg);
+      expect(rect(tester, trailing).left, titleRect.left);
+    });
+
+    testWidgets('a title shorter than minTitleWidth keeps it beside', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          chartCard(
+            title: 'Sales',
+            subtitle: null,
+            trailing: const SizedBox(key: trailingKey, width: 150, height: 32),
+          ),
+          width: 300,
+        ),
+      );
+      expect(rect(tester, trailing).top, rect(tester, find.text('Sales')).top);
+    });
+
+    testWidgets('under the title, one wider than the card takes its width', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          chartCard(
+            trailing: Segmented(
+              key: trailingKey,
+              value: 0,
+              onChanged: (_) {},
+              segments: const [
+                SegmentOption(0, 'Role'),
+                SegmentOption(1, 'Organisation'),
+                SegmentOption(2, 'Platform'),
+                SegmentOption(3, 'Language'),
+              ],
+            ),
+          ),
+          width: 260,
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final bounds = rect(tester, find.byType(ChartCard));
+      expect(rect(tester, trailing).left, bounds.left + AdminSpacing.xl);
+      expect(
+        rect(tester, trailing).right,
+        lessThanOrEqualTo(bounds.right - AdminSpacing.xl),
+      );
+    });
+
+    testWidgets('right to left, it sits at the start of either place', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(chartCard(textDirection: TextDirection.rtl), width: 900),
+      );
+      var bounds = rect(tester, find.byType(ChartCard));
+      expect(rect(tester, trailing).left, bounds.left + AdminSpacing.xl);
+
+      await tester.pumpWidget(
+        _host(chartCard(textDirection: TextDirection.rtl), width: 480),
+      );
+      bounds = rect(tester, find.byType(ChartCard));
+      expect(rect(tester, trailing).right, bounds.right - AdminSpacing.xl);
+      expect(
+        rect(tester, trailing).right,
+        rect(tester, find.text(title)).right,
+      );
+    });
+
+    for (final state in ['isEmpty', 'loading']) {
+      testWidgets('it stays in the header, usable, while $state', (
+        tester,
+      ) async {
+        int? picked;
+        await tester.pumpWidget(
+          _host(
+            chartCard(
+              isEmpty: state == 'isEmpty',
+              loading: state == 'loading',
+              trailing: Segmented(
+                key: trailingKey,
+                value: 3,
+                onChanged: (value) => picked = value,
+                segments: const [
+                  SegmentOption(0, 'Role'),
+                  SegmentOption(1, 'Organisation'),
+                  SegmentOption(2, 'Platform'),
+                  SegmentOption(3, 'Language'),
+                ],
+              ),
+            ),
+            width: 480,
+          ),
+        );
+        expect(
+          rect(tester, trailing).top,
+          greaterThan(rect(tester, find.text(subtitle)).bottom),
+        );
+        if (state == 'isEmpty') expect(find.byType(EmptyState), findsOne);
+        await tester.tap(find.text('Platform'));
+        expect(picked, 2);
+      });
+    }
+  });
 }

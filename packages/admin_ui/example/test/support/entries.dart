@@ -19,6 +19,7 @@ import 'package:admin_ui_example/src/ui/fields/translated/source_target_pair_dem
 import 'package:admin_ui_example/src/ui/foundations/appearance.dart';
 import 'package:admin_ui_example/src/ui/foundations/table_tokens.dart';
 import 'package:admin_ui_example/src/ui/primitives/button_anatomy.dart';
+import 'package:admin_ui_example/src/ui/primitives/chart.dart';
 import 'package:admin_ui_example/src/ui/primitives/command_palette.dart';
 import 'package:admin_ui_example/src/ui/primitives/control_states.dart';
 import 'package:admin_ui_example/src/ui/primitives/copy_button.dart';
@@ -88,6 +89,11 @@ const previewOnly = <PreviewOnlyDemo>[
     'CopyButtonStatesDemo',
     'Copy button — copied and error',
     CopyButtonStatesDemo.new,
+  ),
+  PreviewOnlyDemo(
+    'ChartCardDemo.phone',
+    'Chart card (phone width)',
+    ChartCardDemo.phone,
   ),
   PreviewOnlyDemo(
     'JsonViewDemo.rowActions',

@@ -393,6 +393,164 @@ class ChartDemo extends StatelessWidget {
   }
 }
 
+/// A [ChartCard] whose `trailing` is a four-option [Segmented] picking the
+/// breakdown it charts. On a card in a column of two, about 480 wide, the
+/// control goes under the title; on a card the page's width it stays beside
+/// it. It stays in the header while the card loads and when the breakdown it
+/// picked has no data, so another can be picked.
+class ChartCardDemo extends StatelessWidget {
+  /// The page's width, or null for a desktop page.
+  final double? width;
+
+  @Preview(name: 'Chart card', wrapper: adminUiPreview)
+  const ChartCardDemo({super.key}) : width = null;
+
+  /// The cards at a phone's width, one column of them, every control under
+  /// its title.
+  @Preview(name: 'Chart card (phone width)', wrapper: adminUiPreview)
+  const ChartCardDemo.phone({super.key}) : width = 375;
+
+  @override
+  Widget build(BuildContext context) {
+    final phone = width != null;
+    return DemoPage(
+      // Two columns of cards about 480 wide, a gap between them.
+      maxWidth: width ?? 1040,
+      padding: EdgeInsets.all(phone ? AdminSpacing.xl : AdminSpacing.xxxl),
+      children: [
+        DemoSection(
+          phone
+              ? "At a phone's width: the control goes under"
+              : 'In a column of two: the control goes under',
+        ),
+        const _Columns([
+          _BreakdownCard(),
+          ChartCard(
+            title: 'Sign-ups',
+            subtitle: 'Last 6 months',
+            trailing: Tag('6M'),
+            bodyHeight: 160,
+            chart: LineChart(
+              height: 160,
+              area: true,
+              showLegend: false,
+              series: [
+                ChartSeries('Sign-ups', [12, 19, 14, 23, 21, 29]),
+              ],
+              labels: _months,
+            ),
+          ),
+        ]),
+        const Gap(AdminSpacing.xxxl),
+        if (!phone) ...[
+          const DemoSection('The page wide: the control stays beside'),
+          const _BreakdownCard(),
+          const Gap(AdminSpacing.xxxl),
+        ],
+        const DemoSection('No data, and loading: the control stays'),
+        const _Columns([
+          _BreakdownCard(initial: _Breakdown.language),
+          _BreakdownCard(loading: true),
+        ]),
+      ],
+    );
+  }
+}
+
+/// [children] side by side in equal columns where each keeps 320, else one
+/// under the other.
+class _Columns extends StatelessWidget {
+  final List<Widget> children;
+
+  const _Columns(this.children);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = AdminSpacing.lg;
+        final width =
+            (constraints.maxWidth - gap * (children.length - 1)) /
+            children.length;
+        if (width < 320) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: gap,
+            children: children,
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: gap,
+          children: [for (final child in children) Expanded(child: child)],
+        );
+      },
+    );
+  }
+}
+
+enum _Breakdown { role, organisation, platform, language }
+
+/// Active members broken down by what its [Segmented] picks, starting at
+/// [initial]. No member has a language yet, so that breakdown is empty.
+class _BreakdownCard extends StatefulWidget {
+  final _Breakdown initial;
+  final bool loading;
+
+  const _BreakdownCard({this.initial = _Breakdown.role, this.loading = false});
+
+  @override
+  State<_BreakdownCard> createState() => _BreakdownCardState();
+}
+
+class _BreakdownCardState extends State<_BreakdownCard> {
+  late var _breakdown = widget.initial;
+
+  static const _items = {
+    _Breakdown.role: [
+      BarListItem('Viewer', 310),
+      BarListItem('Editor', 128),
+      BarListItem('Admin', 42),
+    ],
+    _Breakdown.organisation: [
+      BarListItem('North office', 214),
+      BarListItem('South office', 162),
+      BarListItem('Remote', 104),
+    ],
+    _Breakdown.platform: [
+      BarListItem('Web', 290),
+      BarListItem('iOS', 120),
+      BarListItem('Android', 70),
+    ],
+    _Breakdown.language: <BarListItem>[],
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final items = _items[_breakdown]!;
+    return ChartCard(
+      title: 'Active members',
+      subtitle: 'Signed in at least once in the last 30 days',
+      bodyHeight: 140,
+      loading: widget.loading,
+      isEmpty: items.isEmpty,
+      emptyMessage: 'No member has picked a language yet',
+      trailing: Segmented(
+        semanticLabel: 'Break down by',
+        value: _breakdown,
+        onChanged: (value) => setState(() => _breakdown = value),
+        segments: const [
+          SegmentOption(_Breakdown.role, 'Role'),
+          SegmentOption(_Breakdown.organisation, 'Organisation'),
+          SegmentOption(_Breakdown.platform, 'Platform'),
+          SegmentOption(_Breakdown.language, 'Language'),
+        ],
+      ),
+      chart: BarList(items: items),
+    );
+  }
+}
+
 class _Mini extends StatelessWidget {
   final String caption;
   final Widget child;

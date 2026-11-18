@@ -339,6 +339,19 @@
   lighter than the surface, where a shadow does not read. Disabled, a knob
   rests flat. A `DiffView`'s locale and unchanged toggles are drawn as lone
   segments of the `Segmented` beside them, in each theme's look.
+- A `ChartCard`'s `trailing` widget goes under the title, above the chart,
+  when beside it the title would keep less than `ChartCard.minTitleWidth`,
+  200, or its one-line width where that is less. A control as wide as a
+  four-option `Segmented`, on a card in a column of two, left the title a
+  sliver at the header's start: the title broke word by word and a one-line
+  subtitle ran to five lines. Under the title it starts at the title's
+  edge, and one wider than the card is laid out at the card's width, where
+  a `Segmented` shortens its widest labels. With room it stays beside the
+  title, now 12 from it where nothing kept them apart. It stays in the
+  header while the card is `loading` or `isEmpty`, which replace the chart
+  alone, so a control that picks what the chart shows can move off a
+  selection that has no data. The catalog's Primitives / Chart card page
+  shows the card in a column of two, at the page's width and at a phone's.
 
 ## 0.1.0
 

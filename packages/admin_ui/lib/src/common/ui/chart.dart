@@ -1,6 +1,10 @@
+/// @docImport 'segmented.dart';
+library;
+
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart' show DateFormat, Intl;
 import 'package:material_ui/material_ui.dart';
 
@@ -706,13 +710,32 @@ class BarList extends StatelessWidget {
 /// header, an optional [trailing] slot (e.g. a period selector), and built-in
 /// [loading] / [isEmpty] states so a chart drops in without each caller
 /// re-implementing them.
+///
+/// [trailing] sits at the header's end while the title keeps at least
+/// [minTitleWidth] beside it (or, when shorter, the one-line width of its
+/// title and subtitle); otherwise it goes under the title, at the start,
+/// above the chart. So a control too wide to share a narrow card, such as a
+/// four-option [Segmented] on a card in a column of two, leaves the title its
+/// lines rather than a sliver; given less than its own width there, it is
+/// laid out at the card's.
+///
+/// [trailing] belongs to the header in every state: [loading] and [isEmpty]
+/// replace the chart alone, so a control that picks what the chart shows
+/// stays where it is, and usable, while its data loads or when the selection
+/// it picked has none.
 class ChartCard extends StatelessWidget {
   final String title;
   final String? subtitle;
+
+  /// A control at the header's end, or under the title when the card is too
+  /// narrow for both; see [ChartCard].
   final Widget? trailing;
   final Widget chart;
   final bool loading;
   final bool isEmpty;
+
+  /// The narrowest the title gets before [trailing] goes under it.
+  static const minTitleWidth = 200.0;
 
   /// Shown when [isEmpty]; the localized "No data for this period" when null.
   final String? emptyMessage;
@@ -733,6 +756,12 @@ class ChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final titleStyle = context.type.bodyStrong.copyWith(
+      color: colors.foreground,
+    );
+    final subtitleStyle = context.type.caption.copyWith(
+      color: colors.foregroundMuted,
+    );
     final Widget body;
     if (loading) {
       body = SizedBox(height: bodyHeight, child: const _ChartSkeleton());
@@ -752,40 +781,234 @@ class ChartCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: context.type.bodyStrong.copyWith(
-                        color: colors.foreground,
+          // The title's width is measured from its text, which a late font
+          // load changes; a paragraph's intrinsic width can keep the
+          // fallback font's.
+          ListenableBuilder(
+            listenable: PaintingBinding.instance.systemFonts,
+            builder: (context, _) => _CardHeader(
+              textDirection: Directionality.of(context),
+              titleWidth: trailing == null
+                  ? 0
+                  : math.min(
+                      minTitleWidth,
+                      math.max(
+                        textWidthOf(context, title, titleStyle),
+                        subtitle == null
+                            ? 0.0
+                            : textWidthOf(context, subtitle!, subtitleStyle),
                       ),
                     ),
-                    if (subtitle != null) ...[
-                      const Gap(AdminSpacing.xxs),
-                      Text(
-                        subtitle!,
-                        style: context.type.caption.copyWith(
-                          color: colors.foregroundMuted,
-                        ),
-                      ),
-                    ],
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(title, style: titleStyle),
+                  if (subtitle != null) ...[
+                    const Gap(AdminSpacing.xxs),
+                    Text(subtitle!, style: subtitleStyle),
                   ],
-                ),
+                ],
               ),
-              ?trailing,
-            ],
+              trailing: trailing,
+            ),
           ),
           const Gap(AdminSpacing.xl),
           body,
         ],
       ),
     );
+  }
+}
+
+enum _CardHeaderSlot { title, trailing }
+
+/// A [ChartCard]'s title block and its trailing widget. Side by side, both
+/// at the top and the trailing widget at the end, while the title keeps
+/// [titleWidth]; otherwise the trailing widget goes under the title, at the
+/// start.
+class _CardHeader
+    extends SlottedMultiChildRenderObjectWidget<_CardHeaderSlot, RenderBox> {
+  final Widget title;
+  final Widget? trailing;
+
+  /// The least the title keeps beside the trailing widget.
+  final double titleWidth;
+  final TextDirection textDirection;
+
+  const _CardHeader({
+    required this.title,
+    required this.trailing,
+    required this.titleWidth,
+    required this.textDirection,
+  });
+
+  @override
+  Iterable<_CardHeaderSlot> get slots => _CardHeaderSlot.values;
+
+  @override
+  Widget? childForSlot(_CardHeaderSlot slot) => switch (slot) {
+    _CardHeaderSlot.title => title,
+    _CardHeaderSlot.trailing => trailing,
+  };
+
+  @override
+  _RenderCardHeader createRenderObject(BuildContext context) =>
+      _RenderCardHeader(titleWidth: titleWidth, textDirection: textDirection);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderCardHeader renderObject,
+  ) {
+    renderObject
+      ..titleWidth = titleWidth
+      ..textDirection = textDirection;
+  }
+}
+
+class _RenderCardHeader extends RenderBox
+    with SlottedContainerRenderObjectMixin<_CardHeaderSlot, RenderBox> {
+  _RenderCardHeader({required this._titleWidth, required this._textDirection});
+
+  /// Between the title and the trailing widget beside it, or under it.
+  static const _gap = AdminSpacing.lg;
+
+  double _titleWidth;
+  set titleWidth(double value) {
+    if (value == _titleWidth) return;
+    _titleWidth = value;
+    markNeedsLayout();
+  }
+
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (value == _textDirection) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  RenderBox get _title => childForSlot(_CardHeaderSlot.title)!;
+  RenderBox? get _trailing => childForSlot(_CardHeaderSlot.trailing);
+
+  @override
+  double computeMinIntrinsicWidth(double height) => math.max(
+    _title.getMinIntrinsicWidth(height),
+    _trailing?.getMinIntrinsicWidth(height) ?? 0,
+  );
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    final trailing = _trailing?.getMaxIntrinsicWidth(height);
+    return _title.getMaxIntrinsicWidth(height) +
+        (trailing == null ? 0 : _gap + trailing);
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _plan(
+    BoxConstraints(maxWidth: width),
+    ChildLayoutHelper.dryLayoutChild,
+  ).size.height;
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      computeMinIntrinsicHeight(width);
+
+  @override
+  Size computeDryLayout(covariant BoxConstraints constraints) =>
+      _plan(constraints, ChildLayoutHelper.dryLayoutChild).size;
+
+  @override
+  void performLayout() {
+    final plan = _plan(constraints, ChildLayoutHelper.layoutChild);
+    size = plan.size;
+    for (final (child, offset) in plan.offsets) {
+      (child.parentData! as BoxParentData).offset = offset;
+    }
+  }
+
+  ({Size size, List<(RenderBox, Offset)> offsets}) _plan(
+    BoxConstraints constraints,
+    ChildLayouter layoutChild,
+  ) {
+    final width = constraints.hasBoundedWidth
+        ? constraints.maxWidth
+        : computeMaxIntrinsicWidth(double.infinity);
+    final rtl = _textDirection == TextDirection.rtl;
+    // The x of a box [w] wide starting [start] in from the leading edge.
+    double x(double start, double w) => rtl ? width - start - w : start;
+
+    final title = _title;
+    final trailing = _trailing;
+    if (trailing == null) {
+      final titleSize = layoutChild(
+        title,
+        BoxConstraints.tightFor(width: width),
+      );
+      return (
+        size: constraints.constrain(Size(width, titleSize.height)),
+        offsets: [(title, Offset.zero)],
+      );
+    }
+
+    // At its own width, as a row lays out a child it does not stretch.
+    var trailingSize = layoutChild(trailing, const BoxConstraints());
+    final beside = width - trailingSize.width - _gap;
+    final inline = beside >= _titleWidth;
+    if (!inline && trailingSize.width > width) {
+      trailingSize = layoutChild(trailing, BoxConstraints(maxWidth: width));
+    }
+    final titleSize = layoutChild(
+      title,
+      BoxConstraints.tightFor(width: math.max(0, inline ? beside : width)),
+    );
+
+    final Offset trailingOffset;
+    final double height;
+    if (inline) {
+      trailingOffset = Offset(
+        x(width - trailingSize.width, trailingSize.width),
+        0,
+      );
+      height = math.max(titleSize.height, trailingSize.height);
+    } else {
+      trailingOffset = Offset(
+        x(0, trailingSize.width),
+        titleSize.height + _gap,
+      );
+      height = titleSize.height + _gap + trailingSize.height;
+    }
+    return (
+      size: constraints.constrain(Size(width, height)),
+      offsets: [
+        (title, Offset(x(0, titleSize.width), 0)),
+        (trailing, trailingOffset),
+      ],
+    );
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    for (final child in children) {
+      context.paintChild(
+        child,
+        offset + (child.parentData! as BoxParentData).offset,
+      );
+    }
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    for (final child in children.toList().reversed) {
+      final hit = result.addWithPaintOffset(
+        offset: (child.parentData! as BoxParentData).offset,
+        position: position,
+        hitTest: (result, transformed) =>
+            child.hitTest(result, position: transformed),
+      );
+      if (hit) return true;
+    }
+    return false;
   }
 }
 
