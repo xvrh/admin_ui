@@ -313,29 +313,17 @@ class _Kpi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // FRICTION(F-101): StatCard has no slot for a trend line; the
-    // sparkline is laid over the card's delta row from outside.
-    return Stack(
-      children: [
-        StatCard(
-          label: label,
-          value: value,
-          icon: icon,
-          delta: _delta(context),
-        ),
-        PositionedDirectional(
-          end: AdminSpacing.xl,
-          bottom: AdminSpacing.xl,
-          child: ExcludeSemantics(
-            child: Sparkline(
-              [for (final v in trend) v.toDouble()],
-              width: 72,
-              height: 22,
-              showDot: false,
-            ),
-          ),
-        ),
-      ],
+    return StatCard(
+      label: label,
+      value: value,
+      icon: icon,
+      delta: _delta(context),
+      trend: Sparkline(
+        [for (final v in trend) v.toDouble()],
+        width: 72,
+        height: 22,
+        showDot: false,
+      ),
     );
   }
 }

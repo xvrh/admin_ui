@@ -48,17 +48,19 @@ class ChartDemo extends StatelessWidget {
         ),
         const Gap(AdminSpacing.xxxl),
 
-        const DemoSection('Sparkline inside a StatCard'),
+        const DemoSection(
+          "A StatCard's trend: across it, or beside its figure",
+        ),
         StatGrid(
           minTileWidth: 220,
           children: [
-            _SparkStat(
+            const StatCard(
               label: 'Sessions',
               value: '24.5k',
-              delta: const StatDelta('8.2%'),
-              spark: const Sparkline([8, 9, 7, 11, 10, 14, 16], width: null),
+              delta: StatDelta('8.2%'),
+              trend: Sparkline([8, 9, 7, 11, 10, 14, 16], width: null),
             ),
-            _SparkStat(
+            StatCard(
               label: 'Errors',
               value: '312',
               delta: const StatDelta(
@@ -66,11 +68,15 @@ class ChartDemo extends StatelessWidget {
                 direction: TrendDirection.up,
                 goodWhenUp: false,
               ),
-              spark: Sparkline(
-                const [2, 5, 4, 8, 6, 9, 12],
-                color: context.colors.danger,
-                width: null,
-              ),
+              trend: Sparkline(const [
+                2,
+                5,
+                4,
+                8,
+                6,
+                9,
+                12,
+              ], color: context.colors.danger),
             ),
           ],
         ),
@@ -572,49 +578,6 @@ class _Mini extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _SparkStat extends StatelessWidget {
-  final String label;
-  final String value;
-  final StatDelta delta;
-  final Widget spark;
-
-  const _SparkStat({
-    required this.label,
-    required this.value,
-    required this.delta,
-    required this.spark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Panel(
-      padding: const EdgeInsets.all(AdminSpacing.xl),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: context.type.caption.copyWith(
-              color: context.colors.foregroundMuted,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const Gap(AdminSpacing.md),
-          Text(
-            value,
-            style: context.type.pageTitle.copyWith(
-              color: context.colors.foreground,
-            ),
-          ),
-          const Gap(AdminSpacing.lg),
-          SizedBox(width: double.infinity, child: spark),
-        ],
-      ),
     );
   }
 }

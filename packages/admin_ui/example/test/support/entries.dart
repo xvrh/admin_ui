@@ -29,6 +29,7 @@ import 'package:admin_ui_example/src/ui/primitives/json_view.dart';
 import 'package:admin_ui_example/src/ui/primitives/menu.dart';
 import 'package:admin_ui_example/src/ui/primitives/notification_center.dart';
 import 'package:admin_ui_example/src/ui/primitives/overlay_surfaces.dart';
+import 'package:admin_ui_example/src/ui/primitives/stat_card.dart';
 import 'package:admin_ui_example/src/ui/primitives/states/progress.dart';
 import 'package:admin_ui_example/src/ui/primitives/thumbnail_image.dart';
 import 'package:admin_ui_example/src/ui/primitives/zoom_view.dart';
@@ -94,6 +95,11 @@ const previewOnly = <PreviewOnlyDemo>[
     'ChartCardDemo.phone',
     'Chart card (phone width)',
     ChartCardDemo.phone,
+  ),
+  PreviewOnlyDemo(
+    'StatCardTrendDemo.phone',
+    'Stat card / trend (phone width)',
+    StatCardTrendDemo.phone,
   ),
   PreviewOnlyDemo(
     'JsonViewDemo.rowActions',
