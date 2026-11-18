@@ -172,6 +172,8 @@ void main() {
     expect(theme.inactiveTrackColor, p.softFill);
     expect(theme.thumbShape, isA<HandleThumbShape>());
     expect(theme.thumbSize!.resolve({}), const Size(4, 44));
+    // half as wide under a press, as M3's handle is
+    expect(theme.thumbSize!.resolve({WidgetState.pressed}), const Size(2, 44));
     expect(theme.trackGap, 6);
     expect(theme.trackShape, isA<GappedSliderTrackShape>());
     // the handle, 4 wide and 44 tall, in the accent, at the value

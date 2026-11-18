@@ -107,9 +107,17 @@ class ValueSlider extends StatelessWidget {
           ),
           SliderThumb.bar => const HandleThumbShape(),
         },
-        // A bar's own size, and the gap it parts the track by.
+        // A bar's own size, half as wide while pressed as M3's is, and the
+        // gap it parts the track by.
         thumbSize: bar
-            ? WidgetStatePropertyAll(Size(AdminSliderStyle.barWidth, thumbSize))
+            ? WidgetStateProperty.resolveWith(
+                (states) => Size(
+                  states.contains(WidgetState.pressed)
+                      ? AdminSliderStyle.barWidth / 2
+                      : AdminSliderStyle.barWidth,
+                  thumbSize,
+                ),
+              )
             : null,
         trackGap: bar ? AdminSliderStyle.barGap : null,
         overlayShape: RoundSliderOverlayShape(

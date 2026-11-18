@@ -359,8 +359,8 @@
   every theme drew a 4px track under an 18px disc in the accent. Iris keeps
   those.
   - Material: a 16dp track, the secondary container past the handle, parted
-    by a 4×44dp bar with 6dp on either side and ending in a stop dot. The
-    slider's row is 44 tall there (was 40).
+    by a 4×44dp bar with 6dp on either side, half as wide under a press,
+    and ending in a stop dot. The slider's row is 44 tall there (was 40).
   - shadcn: a 6px track under a 16px white thumb in a 1px ring of the
     primary, on the small shadow.
   - Ant: a 14px white thumb in a 2px ring of the primary.
