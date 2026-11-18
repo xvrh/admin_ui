@@ -183,7 +183,14 @@ export 'src/common/ui/toast.dart'
         ToastScopeState;
 export 'src/common/ui/toggle.dart' show Toggle;
 export 'src/common/ui/tree.dart'
-    show Tree, TreeDrop, TreeFlatNode, TreeNode, TreeRowBuilder, TreeRowInfo;
+    show
+        Tree,
+        TreeDrop,
+        TreeFlatNode,
+        TreeNode,
+        TreeRowBuilder,
+        TreeRowInfo,
+        TreeRowMoves;
 export 'src/common/ui/tree_editor.dart'
     show TreeEditor, TreeEditorEntry, TreeEditorLayout, TreeEntryBadge;
 export 'src/common/ui/upload.dart' show UploadItem, UploadStatus, UploadZone;

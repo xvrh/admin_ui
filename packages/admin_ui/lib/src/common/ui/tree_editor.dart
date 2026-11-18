@@ -193,49 +193,6 @@ class TreeEditor extends StatelessWidget {
     return depth;
   }
 
-  List<TreeEditorEntry> _children(String? parentId) => [
-    for (final e in entries)
-      if (e.parentId == parentId) e,
-  ];
-
-  /// Levels below [id]: 0 for a leaf.
-  int _height(String id) {
-    var height = 0;
-    for (final child in _children(id)) {
-      final h = _height(child.id) + 1;
-      if (h > height) height = h;
-    }
-    return height;
-  }
-
-  /// The keyboard and menu moves [id] can make at [depth]: one step among
-  /// its siblings, under the sibling above it, or out beside its parent.
-  _Moves _moves(String id, int depth) {
-    final entry = _entry(id)!;
-    final parent = entry.parentId;
-    final siblings = _children(parent);
-    final index = siblings.indexWhere((e) => e.id == id);
-    void move(String? to, int at) => onMove!(id, to, at);
-
-    VoidCallback? indent;
-    if (index > 0 && depth + 1 + _height(id) < maxDepth) {
-      final above = siblings[index - 1].id;
-      indent = () => move(above, _children(above).length);
-    }
-    VoidCallback? outdent;
-    if (parent != null) {
-      final grandparent = _entry(parent)?.parentId;
-      final at = _children(grandparent).indexWhere((e) => e.id == parent);
-      outdent = () => move(grandparent, at + 1);
-    }
-    return _Moves(
-      up: index > 0 ? () => move(parent, index - 1) : null,
-      down: index < siblings.length - 1 ? () => move(parent, index + 1) : null,
-      indent: indent,
-      outdent: outdent,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final hasDetail = detailBuilder != null;
@@ -250,6 +207,8 @@ class TreeEditor extends StatelessWidget {
             maxHeight: maxHeight,
             rowHeight: _rowHeight,
             onMove: onMove,
+            // Each row is a Tab stop with its own move keys and ⋯ menu.
+            rowControls: false,
             empty: empty,
             expandedId: hasDetail ? selectedId : null,
             expansionBuilder: !hasDetail
@@ -272,7 +231,7 @@ class TreeEditor extends StatelessWidget {
                 cardHeader: _focus && selected,
                 recede: _focus && selectedId != null && !selected,
                 canAddChild: onAddChild != null && info.depth < maxDepth - 1,
-                moves: onMove == null ? null : _moves(id, info.depth),
+                moves: info.moves,
                 onSelect: onSelect == null ? null : () => onSelect!(id),
                 onToggleVisible: onToggleVisible == null
                     ? null
@@ -395,17 +354,6 @@ class _ExpansionCard extends StatelessWidget {
   }
 }
 
-/// The reorder moves open to one row; a null move is not possible there.
-@immutable
-class _Moves {
-  final VoidCallback? up;
-  final VoidCallback? down;
-  final VoidCallback? indent;
-  final VoidCallback? outdent;
-
-  const _Moves({this.up, this.down, this.indent, this.outdent});
-}
-
 class _TreeEntryRow extends StatefulWidget {
   final TreeEditorEntry entry;
   final bool selected;
@@ -424,7 +372,7 @@ class _TreeEntryRow extends StatefulWidget {
   final bool recede;
 
   /// Null when the tree is read-only.
-  final _Moves? moves;
+  final TreeRowMoves? moves;
 
   final VoidCallback? onSelect;
   final VoidCallback? onToggleVisible;

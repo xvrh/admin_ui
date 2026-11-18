@@ -1,15 +1,65 @@
-import 'package:admin_ui/src/common/ui/split_view.dart';
+import 'package:admin_ui/admin_ui.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
-Widget _host(Widget child, {double width = 400}) => MaterialApp(
-  home: Scaffold(
-    body: Align(
-      alignment: Alignment.topLeft,
-      child: SizedBox(width: width, height: 300, child: child),
+Widget _host(
+  Widget child, {
+  double width = 400,
+  double height = 300,
+  TextDirection direction = TextDirection.ltr,
+}) => MaterialApp(
+  theme: buildAppTheme(defaultTokens),
+  home: Directionality(
+    textDirection: direction,
+    child: Scaffold(
+      body: Align(
+        alignment: AlignmentDirectional.topStart,
+        child: SizedBox(width: width, height: height, child: child),
+      ),
     ),
   ),
 );
+
+/// Two weighted panes keyed a and b, in 400: 390 to share, half each.
+SplitView _two({
+  SplitAxis axis = SplitAxis.horizontal,
+  double minFirst = 80,
+  double minSecond = 80,
+  ValueChanged<List<double>>? onWeightsChanged,
+}) => SplitView.two(
+  axis: axis,
+  minFirst: minFirst,
+  minSecond: minSecond,
+  onWeightsChanged: onWeightsChanged,
+  first: Container(key: const Key('a')),
+  second: Container(key: const Key('b')),
+);
+
+void _noop() {}
+
+Future<void> _press(WidgetTester tester, LogicalKeyboardKey key) async {
+  await tester.sendKeyEvent(key);
+  await tester.pump();
+}
+
+/// Right-clicks [divider], which opens its menu.
+Future<void> _rightClick(WidgetTester tester, Finder divider) async {
+  final mouse = await tester.startGesture(
+    tester.getCenter(divider),
+    kind: PointerDeviceKind.mouse,
+    buttons: kSecondaryMouseButton,
+  );
+  await mouse.up();
+  await tester.pumpAndSettle();
+}
+
+Future<void> _choose(WidgetTester tester, String item) async {
+  await tester.tap(find.text(item));
+  await tester.pumpAndSettle();
+}
 
 /// Three panes keyed a, b and c: a and c sized, b free.
 SplitView _sized({
@@ -193,6 +243,339 @@ void main() {
       );
       expect(_width(tester, const Key('b')), 120);
       expect(_width(tester, const Key('a')), 470);
+    });
+  });
+
+  group('a divider, from the keyboard', () {
+    testWidgets('is a Tab stop, a slider that says the share its pane takes', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(_two()));
+      await _press(tester, LogicalKeyboardKey.tab);
+
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Resize panes')),
+        isSemantics(
+          label: 'Resize panes',
+          value: '50%',
+          // 16 of the 390 the two panes share.
+          increasedValue: '54%',
+          decreasedValue: '46%',
+          isSlider: true,
+          isFocusable: true,
+          isFocused: true,
+          hasIncreaseAction: true,
+          hasDecreaseAction: true,
+          hasFocusAction: true,
+          customActions: [const CustomSemanticsAction(label: 'Collapse')],
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('moves the way the arrow points, 16 pixels a press, and '
+        'reports each move', (tester) async {
+      final reported = <List<double>>[];
+      await tester.pumpWidget(_host(_two(onWeightsChanged: reported.add)));
+      await _press(tester, LogicalKeyboardKey.tab);
+
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      expect(_width(tester, const Key('a')), closeTo(211, 0.01));
+      expect(_width(tester, const Key('b')), closeTo(179, 0.01));
+      expect(reported, hasLength(1));
+
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      expect(_width(tester, const Key('a')), closeTo(179, 0.01));
+      expect(reported, hasLength(3));
+      expect(reported.last.first, closeTo(179 / 390, 0.0001));
+
+      // The arrows across the divider are not its keys.
+      await _press(tester, LogicalKeyboardKey.arrowUp);
+      await _press(tester, LogicalKeyboardKey.arrowDown);
+      expect(_width(tester, const Key('a')), closeTo(179, 0.01));
+      expect(reported, hasLength(3));
+    });
+
+    testWidgets('right to left, → still moves the divider right: the start '
+        'pane, on the right, gives way', (tester) async {
+      await tester.pumpWidget(_host(_two(), direction: TextDirection.rtl));
+      expect(
+        tester.getTopLeft(find.byKey(const Key('a'))).dx,
+        greaterThan(tester.getTopLeft(find.byKey(const Key('b'))).dx),
+      );
+      await _press(tester, LogicalKeyboardKey.tab);
+      final before = tester.getCenter(_dividers).dx;
+
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      expect(tester.getCenter(_dividers).dx, closeTo(before + 16, 0.01));
+      expect(_width(tester, const Key('a')), closeTo(179, 0.01));
+
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      expect(_width(tester, const Key('a')), closeTo(211, 0.01));
+    });
+
+    testWidgets('between stacked panes, ↑ and ↓ move it', (tester) async {
+      await tester.pumpWidget(
+        _host(_two(axis: SplitAxis.vertical), height: 400),
+      );
+      double height(String key) => tester.getSize(find.byKey(Key(key))).height;
+      await _press(tester, LogicalKeyboardKey.tab);
+
+      await _press(tester, LogicalKeyboardKey.arrowDown);
+      expect(height('a'), closeTo(211, 0.01));
+      await _press(tester, LogicalKeyboardKey.arrowUp);
+      await _press(tester, LogicalKeyboardKey.arrowUp);
+      expect(height('a'), closeTo(179, 0.01));
+
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      expect(height('a'), closeTo(179, 0.01));
+    });
+
+    testWidgets('Home and End take its pane to its smallest and its largest, '
+        'where the arrows stop', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(_two(minFirst: 100, minSecond: 120)));
+      await _press(tester, LogicalKeyboardKey.tab);
+
+      await _press(tester, LogicalKeyboardKey.home);
+      expect(_width(tester, const Key('a')), closeTo(100, 0.01));
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      expect(_width(tester, const Key('a')), closeTo(100, 0.01));
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Resize panes')),
+        isSemantics(
+          label: 'Resize panes',
+          value: '26%',
+          increasedValue: '30%',
+          decreasedValue: '26%',
+          isSlider: true,
+          isFocusable: true,
+          isFocused: true,
+          hasIncreaseAction: true,
+          hasFocusAction: true,
+        ),
+      );
+
+      await _press(tester, LogicalKeyboardKey.end);
+      expect(_width(tester, const Key('a')), closeTo(270, 0.01));
+      expect(_width(tester, const Key('b')), closeTo(120, 0.01));
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      expect(_width(tester, const Key('b')), closeTo(120, 0.01));
+      handle.dispose();
+    });
+
+    testWidgets('at a limit an arrow stays the divider\'s key: focus does '
+        'not leave for a neighbour', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SplitView.two(
+            first: const Center(child: Button('Left', onPressed: _noop)),
+            second: const Center(child: Button('Right', onPressed: _noop)),
+          ),
+        ),
+      );
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.tab);
+      String? focused() => FocusManager.instance.primaryFocus?.debugLabel;
+      expect(focused(), 'split view divider');
+
+      await _press(tester, LogicalKeyboardKey.home);
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      expect(focused(), 'split view divider');
+      await _press(tester, LogicalKeyboardKey.end);
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      expect(focused(), 'split view divider');
+    });
+
+    testWidgets('Enter collapses its pane to its min size, and restores the '
+        'size it had', (tester) async {
+      final reported = <List<double>>[];
+      await tester.pumpWidget(
+        _host(_two(minFirst: 100, onWeightsChanged: reported.add)),
+      );
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_width(tester, const Key('a')), closeTo(100, 0.01));
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_width(tester, const Key('a')), closeTo(211, 0.01));
+      expect(reported, hasLength(3));
+
+      // Moved after it collapsed, it has no size to go back to: Enter
+      // collapses it again.
+      await _press(tester, LogicalKeyboardKey.enter);
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      expect(_width(tester, const Key('a')), closeTo(116, 0.01));
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_width(tester, const Key('a')), closeTo(100, 0.01));
+
+      // At its min size by another way, there is nothing to restore.
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      await _press(tester, LogicalKeyboardKey.home);
+      final count = reported.length;
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_width(tester, const Key('a')), closeTo(100, 0.01));
+      expect(reported, hasLength(count));
+    });
+
+    testWidgets('beside the free pane, resizes the sized pane: an '
+        'inspector collapses, not the content', (tester) async {
+      List<double?>? changed;
+      await tester.pumpWidget(
+        _host(
+          _sized(
+            sizes: const [100, null, 120],
+            onSizesChanged: (s) => changed = s,
+          ),
+          width: 600,
+        ),
+      );
+      expect(_widths(tester), [100, 360, 120]);
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.tab);
+
+      // → takes the divider toward the end, where its pane is.
+      await _press(tester, LogicalKeyboardKey.arrowRight);
+      expect(_widths(tester), [100, 376, 104]);
+      expect(changed, [100, null, 104]);
+
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_widths(tester), [100, 400, 80]);
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_widths(tester), [100, 376, 104]);
+
+      await _press(tester, LogicalKeyboardKey.end);
+      expect(_widths(tester), [100, 80, 400]);
+      await _press(tester, LogicalKeyboardKey.home);
+      expect(_widths(tester), [100, 400, 80]);
+      expect(changed, [100, null, 80]);
+    });
+
+    testWidgets('shows the focus ring, inside the view, on keyboard focus '
+        'only', (tester) async {
+      Finder ring() => find.byWidgetPredicate(
+        (w) =>
+            w is DecoratedBox &&
+            w.decoration is BoxDecoration &&
+            (w.decoration as BoxDecoration).border is Border &&
+            ((w.decoration as BoxDecoration).border! as Border).top.color ==
+                defaultTokens.palette.focusRing,
+      );
+      await tester.pumpWidget(_host(_two()));
+      expect(ring(), findsNothing);
+
+      await _press(tester, LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      final view = tester.getRect(find.byType(SplitView));
+      expect(ring(), findsOneWidget);
+      expect(tester.getRect(ring()).top, view.top);
+      expect(tester.getRect(ring()).bottom, view.bottom);
+
+      // A drag takes the focus without the ring, and the keys follow it.
+      await tester.drag(_dividers, const Offset(40, 0));
+      await tester.pumpAndSettle();
+      expect(ring(), findsNothing);
+      final dragged = _width(tester, const Key('a'));
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      expect(_width(tester, const Key('a')), closeTo(dragged - 16, 0.01));
+    });
+  });
+
+  group('a divider, without a drag', () {
+    testWidgets('a screen reader grows and shrinks its pane, and collapses '
+        'it', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(_two()));
+      final divider = find.semantics.byLabel('Resize panes');
+
+      tester.semantics.increase(divider);
+      await tester.pump();
+      expect(_width(tester, const Key('a')), closeTo(211, 0.01));
+      tester.semantics.decrease(divider);
+      tester.semantics.decrease(divider);
+      await tester.pump();
+      expect(_width(tester, const Key('a')), closeTo(179, 0.01));
+
+      tester.semantics.customAction(
+        divider,
+        const CustomSemanticsAction(label: 'Collapse'),
+      );
+      await tester.pump();
+      expect(_width(tester, const Key('a')), closeTo(80, 0.01));
+      tester.semantics.customAction(
+        divider,
+        const CustomSemanticsAction(label: 'Expand'),
+      );
+      await tester.pump();
+      expect(_width(tester, const Key('a')), closeTo(179, 0.01));
+      handle.dispose();
+    });
+
+    testWidgets('a right-click opens a menu of the same moves, each beside '
+        'its key', (tester) async {
+      await tester.pumpWidget(_host(_two(minFirst: 100)));
+      await _rightClick(tester, _dividers);
+      expect(find.text('Move left'), findsOneWidget);
+      expect(find.text('←'), findsOneWidget);
+      expect(find.text('Move right'), findsOneWidget);
+      expect(find.text('→'), findsOneWidget);
+      expect(find.text('Collapse'), findsOneWidget);
+
+      await _choose(tester, 'Move right');
+      expect(_width(tester, const Key('a')), closeTo(211, 0.01));
+
+      await _rightClick(tester, _dividers);
+      await _choose(tester, 'Collapse');
+      expect(_width(tester, const Key('a')), closeTo(100, 0.01));
+
+      // Collapsed, the pane has no further to go left, and expands back.
+      await _rightClick(tester, _dividers);
+      expect(find.text('Collapse'), findsNothing);
+      await _choose(tester, 'Move left');
+      expect(_width(tester, const Key('a')), closeTo(100, 0.01));
+      await _choose(tester, 'Expand');
+      expect(_width(tester, const Key('a')), closeTo(211, 0.01));
+    });
+
+    testWidgets('between stacked panes the menu moves it up and down', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(_two(axis: SplitAxis.vertical), height: 400),
+      );
+      await _rightClick(tester, _dividers);
+      expect(find.text('Move left'), findsNothing);
+      await _choose(tester, 'Move down');
+      expect(
+        tester.getSize(find.byKey(const Key('a'))).height,
+        closeTo(211, 0.01),
+      );
+      await _rightClick(tester, _dividers);
+      await _choose(tester, 'Move up');
+      expect(
+        tester.getSize(find.byKey(const Key('a'))).height,
+        closeTo(195, 0.01),
+      );
+    });
+
+    testWidgets('a long press with a finger opens the menu, and a drag '
+        'still follows the finger from where it landed', (tester) async {
+      await tester.pumpWidget(_host(_two()));
+      await tester.longPress(_dividers);
+      await tester.pumpAndSettle();
+      expect(find.text('Move right'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Move right'), findsNothing);
+
+      await tester.drag(_dividers, const Offset(60, 0));
+      await tester.pump();
+      expect(_width(tester, const Key('a')), closeTo(255, 0.01));
     });
   });
 }

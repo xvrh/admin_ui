@@ -226,6 +226,8 @@ void main() {
                 children: [TreeNode(id: 'b')],
               ),
             ],
+            // The caret is a Tab stop where the rows are the caller's own.
+            rowControls: false,
             itemBuilder: (_, id, _) => Text(id),
           ),
         ),

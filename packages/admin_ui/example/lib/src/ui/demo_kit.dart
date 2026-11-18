@@ -350,6 +350,56 @@ class _PinnedHoverState extends State<PinnedHover> {
   Widget build(BuildContext context) => widget.child;
 }
 
+/// Gives the keyboard focus to the first Tab stop below it once mounted, so
+/// a static preview shows focused a control that has no `autofocus` of its
+/// own: a tree's row, a split view's divider. Under a [KeyboardHighlight]
+/// the control draws its ring.
+class PinnedFocus extends StatefulWidget {
+  final Widget child;
+
+  const PinnedFocus({super.key, required this.child});
+
+  @override
+  State<PinnedFocus> createState() => _PinnedFocusState();
+}
+
+class _PinnedFocusState extends State<PinnedFocus> {
+  final _scope = FocusNode(
+    debugLabel: 'pinned focus',
+    canRequestFocus: false,
+    skipTraversal: true,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _firstStop(_scope)?.requestFocus();
+    });
+  }
+
+  /// The first Tab stop below [node], a control before the controls inside
+  /// it: a row before its menu.
+  static FocusNode? _firstStop(FocusNode node) {
+    if (!node.descendantsAreTraversable) return null;
+    for (final child in node.children) {
+      if (child.canRequestFocus && !child.skipTraversal) return child;
+      if (_firstStop(child) case final inner?) return inner;
+    }
+    return null;
+  }
+
+  @override
+  void dispose() {
+    _scope.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      Focus(focusNode: _scope, child: widget.child);
+}
+
 /// Shows the keyboard focus highlight while mounted, as a Tab press would,
 /// so a control below holding focus — real, or pinned through its states
 /// controller — draws its ring in a static preview. Switched after the first

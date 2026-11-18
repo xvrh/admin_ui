@@ -5,15 +5,56 @@ import 'package:material_ui/material_ui.dart';
 import '../../preview_shell.dart';
 import '../demo_kit.dart';
 
+/// [SplitView]: weighted and sized panes, side by side and stacked. A
+/// divider drags, and never needs to: it is a Tab stop that the arrow keys
+/// move, Home and End take to its limits and Enter collapses, and a
+/// right-click or a long press on it opens a menu of the same moves.
 class SplitViewDemo extends StatelessWidget {
+  final bool _focused;
+
   @Preview(name: 'Split view (resizable)', wrapper: adminUiPreview)
-  const SplitViewDemo({super.key});
+  const SplitViewDemo({super.key}) : _focused = false;
+
+  /// A divider as Tab leaves it: lit, and ringed inside the view.
+  @Preview(name: 'Split view · a focused divider', wrapper: adminUiPreview)
+  const SplitViewDemo.focused({super.key}) : _focused = true;
 
   @override
   Widget build(BuildContext context) {
+    if (_focused) {
+      return DemoPage(
+        maxWidth: 900,
+        children: [
+          DemoVariant(
+            'Tab stops on the divider: lit and ringed, it takes ← →, Home, '
+            'End and Enter',
+            KeyboardHighlight(
+              child: PinnedFocus(
+                child: _Frame(
+                  height: 220,
+                  child: SplitView.two(
+                    initialWeight: 0.35,
+                    first: const _Pane('List', tone: 0),
+                    second: const _Pane('Detail', tone: 1),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     return DemoPage(
       maxWidth: 900,
       children: [
+        Text(
+          'Drag a divider, or Tab to it: ← → (↑ ↓ between stacked panes) '
+          'move it, Home and End take its pane to its smallest and its '
+          'largest, Enter collapses the pane and restores it. A right-click '
+          'or a long press on a divider opens a menu of the same moves.',
+          style: context.type.bodyMuted,
+        ),
+        const Gap(AdminSpacing.xxl),
         const DemoSection('Two panes · horizontal (master / detail)'),
         _Frame(
           height: 280,
@@ -23,6 +64,24 @@ class SplitViewDemo extends StatelessWidget {
             minSecond: 220,
             first: const _Pane('List', tone: 0),
             second: const _Pane('Detail', tone: 1),
+          ),
+        ),
+        const Gap(AdminSpacing.xxl),
+
+        const DemoSection('A divider\'s menu, in place of a drag'),
+        DemoVariant(
+          'A right-click or a long press on a divider: a step either way, '
+          'and collapse or expand, each beside its key',
+          PinnedOpen(
+            reserve: 130,
+            child: _Frame(
+              height: 120,
+              child: SplitView.two(
+                initialWeight: 0.35,
+                first: const _Pane('List', tone: 0),
+                second: const _Pane('Detail', tone: 1),
+              ),
+            ),
           ),
         ),
         const Gap(AdminSpacing.xxl),
@@ -56,7 +115,7 @@ class SplitViewDemo extends StatelessWidget {
 
         const DemoSection(
           'Sized side panes · list │ content │ inspector (only the content '
-          'follows the width)',
+          'follows the width; Enter on a divider collapses its side pane)',
         ),
         _Frame(
           height: 320,

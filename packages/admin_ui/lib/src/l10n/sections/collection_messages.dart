@@ -243,6 +243,10 @@ abstract class CollectionMessages extends AdminMessages {
   /// The accessible action that moves a card to [column].
   String moveTo(String column);
 
+  /// The accessible name and tooltip of the menu on a kanban card that
+  /// moves it to another column.
+  String get moveCard;
+
   /// A search match found in [field], a field's label as the form shows
   /// it, capitalised or not: "Matched: Name".
   String matchedIn(String field);
@@ -491,6 +495,9 @@ class CollectionMessagesEn extends CollectionMessages {
 
   @override
   String moveTo(String column) => 'Move to $column';
+
+  @override
+  String get moveCard => 'Move to…';
 
   @override
   String matchedIn(String field) => 'Matched: $field';
@@ -743,6 +750,9 @@ class CollectionMessagesFr extends CollectionMessages {
 
   @override
   String moveTo(String column) => 'Déplacer vers $column';
+
+  @override
+  String get moveCard => 'Déplacer vers…';
 
   @override
   String matchedIn(String field) => 'Correspondance : $field';
@@ -1010,6 +1020,9 @@ class CollectionMessagesAr extends CollectionMessages {
 
   @override
   String moveTo(String column) => 'نقل إلى $column';
+
+  @override
+  String get moveCard => 'نقل إلى…';
 
   @override
   String matchedIn(String field) => 'مطابقة في: $field';

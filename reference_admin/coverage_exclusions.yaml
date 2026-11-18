@@ -146,6 +146,7 @@ deferred:
     - TreeNode
     - TreeRowBuilder
     - TreeRowInfo
+    - TreeRowMoves
     - UploadItem
     - UploadStatus
     - UploadZone
