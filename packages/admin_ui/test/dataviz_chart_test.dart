@@ -595,6 +595,136 @@ void main() {
     });
   });
 
+  group('BarList figures', () {
+    const funnel = [
+      BarListItem('Invited', 96, detail: '100%'),
+      BarListItem('Signed up', 81, detail: '84%'),
+      BarListItem('Joined a team', 64, detail: '67%'),
+      BarListItem('Shared a document', 7, detail: '7%'),
+    ];
+    Rect rect(WidgetTester tester, String text) =>
+        tester.getRect(find.text(text));
+
+    testWidgets('a detail stands after its value, muted, in a column', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_host(const BarList(sort: false, items: funnel)));
+      final list = tester.getRect(find.byType(BarList));
+      final values = [
+        for (final v in ['96', '81', '64', '7']) rect(tester, v),
+      ];
+      final details = [for (final item in funnel) rect(tester, item.detail!)];
+      for (final column in [values, details]) {
+        for (final cell in column) {
+          expect(cell.left, column.first.left);
+          expect(cell.right, column.first.right);
+        }
+      }
+      expect(details.first.right, list.right);
+      expect(details.first.left - values.first.right, AdminSpacing.md);
+      final context = tester.element(find.byType(BarList));
+      expect(
+        tester.widget<Text>(find.text('84%')).style!.color,
+        context.colors.foregroundMuted,
+      );
+    });
+
+    testWidgets('every bar runs along the same track', (tester) async {
+      // Both bars full: a short value no longer lends its row a longer one.
+      await tester.pumpWidget(
+        _host(
+          const BarList(
+            max: 10,
+            items: [BarListItem('Many', 12000), BarListItem('Few', 10)],
+          ),
+        ),
+      );
+      final bars = find.descendant(
+        of: find.byType(BarList),
+        matching: find.byType(Container),
+      );
+      expect(bars, findsNWidgets(2));
+      expect(tester.getSize(bars.first).width, tester.getSize(bars.last).width);
+      expect(rect(tester, '10').left, rect(tester, '12K').left);
+    });
+
+    testWidgets('a row without a detail keeps the column for it', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const BarList(
+            items: [
+              BarListItem('Exported a report', 288, detail: '4,120 times'),
+              BarListItem('Shared a link', 164),
+            ],
+          ),
+        ),
+      );
+      expect(rect(tester, '164').right, rect(tester, '288').right);
+      expect(
+        rect(tester, '288').right,
+        lessThan(rect(tester, '4,120 times').left),
+      );
+    });
+
+    testWidgets('a list with no detail ends on its values', (tester) async {
+      await tester.pumpWidget(
+        _host(const BarList(items: [BarListItem('Signed up', 81)])),
+      );
+      expect(
+        rect(tester, '81').right,
+        tester.getRect(find.byType(BarList)).right,
+      );
+    });
+
+    testWidgets('right to left, the details stand at the left', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const Directionality(
+            textDirection: TextDirection.rtl,
+            child: BarList(sort: false, items: funnel),
+          ),
+        ),
+      );
+      final list = tester.getRect(find.byType(BarList));
+      expect(rect(tester, '84%').left, list.left);
+      expect(rect(tester, '84%').right, lessThan(rect(tester, '81').left));
+    });
+
+    for (final scale in [1.0, 2.0]) {
+      testWidgets('loading, a detail is a pulsing bar, text x$scale', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(const BarList(sort: false, items: funnel), textScale: scale),
+        );
+        final loaded = tester.getSize(find.byType(BarList)).height;
+
+        await tester.pumpWidget(
+          _host(
+            const BarList(
+              sort: false,
+              loading: true,
+              items: [
+                BarListItem('Invited', 0, detail: ''),
+                BarListItem('Signed up', 0, detail: ''),
+                BarListItem('', 0, detail: ''),
+                BarListItem('', 0),
+              ],
+            ),
+            textScale: scale,
+          ),
+        );
+        expect(tester.takeException(), isNull);
+        expect(tester.getSize(find.byType(BarList)).height, loaded);
+        expect(find.text('100%'), findsNothing);
+        // A value for each row and a detail for the three given one.
+        expect(find.byType(SkeletonText), findsNWidgets(7));
+      });
+    }
+  });
+
   group('series colours', () {
     for (final (name, palette) in [
       ('Iris Light', irisPalette),

@@ -212,9 +212,23 @@
   selected label, `inverse` fills a joined selection with the foreground
   inside a foreground outline, `radius` gives the control a corner of its
   own, and `labelWeight` weighs every label alike.
+- A `BarListItem` takes a `detail`, a second figure after its value, muted,
+  as the app formats it: a funnel step's share of the first ("84%") beside
+  its count, or a second count ("4,120 times") beside the number of people.
+  The details stand in a column of their own after the values, each at its
+  end edge, so they read down the rows; baked into the label, a figure was
+  the first thing a narrow card cut and lined up with nothing. While the
+  list loads, a row given a detail shows a pulsing bar in its place.
 
 ### Looks
 
+- A `BarList`'s values stand in a column as wide as the widest, each at its
+  end edge, and every row's bar runs along the same track. Each row's track
+  ended where its own value began, so a row with a short value had a longer
+  track, and its bar drew longer than its share beside a row with a long
+  one. The bar of a row whose value is narrower than the widest is now
+  shorter by the difference, and the figures are measured again when a
+  font loads.
 - A loading `StatCard` keeps room for the delta and the caption it is given,
   and for no other. It kept room for both whatever it was given, so a card
   that loads into one with a caption alone stood taller by the height of
