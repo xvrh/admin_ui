@@ -171,6 +171,7 @@ Map<String, dynamic> genericCatalog() => {
     'Stat card / dashboard': const StatCardDemo(),
     'Attention tiles': const AttentionGridDemo(),
     'Charts / sparklines': const ChartDemo(),
+    'Chart card': const ChartCardDemo(),
     'Heat table / retention': const HeatTableDemo(),
     'Timeline / activity': const TimelineDemo(),
     'Search field': const SearchFieldDemo(),
