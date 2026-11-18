@@ -399,10 +399,10 @@ class _TokensState extends State<_Tokens> {
             label: o.label,
             description: o.description,
             leading: o.swatch != null || o.icon != null
-                ? Check.size +
+                ? context.selectionStyle.checkSize +
                       context.sizes.fieldIconGap +
                       context.sizes.fieldIcon
-                : Check.size,
+                : context.selectionStyle.checkSize,
             checkbox: true,
           ),
         ),

@@ -9,6 +9,7 @@ import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
 import '../segmented_style.dart';
+import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -291,9 +292,14 @@ final antTheme = AdminTheme.from(
     exit: Cubic(0.55, 0.055, 0.675, 0.19),
     emphasized: Cubic(0.08, 0.82, 0.17, 1),
   ),
-  // lineWidth 1 in every state; focus shows as the outline's colour and a
-  // 2px activeShadow ring
-  stroke: const AdminStroke(fieldFocus: 1, fieldError: 1, fieldFocusHalo: 2),
+  // lineWidth 1 in every state, a Checkbox's and a Radio's included; focus
+  // shows as the outline's colour and a 2px activeShadow ring
+  stroke: const AdminStroke(
+    fieldFocus: 1,
+    fieldError: 1,
+    fieldFocusHalo: 2,
+    controlStrong: 1,
+  ),
   elevation: _elevation,
   darkElevation: _elevation,
   // Input: activeBorderColor colorPrimary, hoverBorderColor
@@ -333,5 +339,16 @@ final antTheme = AdminTheme.from(
     inset: 2,
     knobOutline: false,
     labelWeight: FontWeight.w400,
+  ),
+  // Switch: trackMinWidth 44, trackHeight 22, an 18px handle. Checkbox:
+  // controlInteractiveSize, 16. Radio: radioSize 16, a colorPrimary disc
+  // around a dotSize 6 dot
+  selection: const AdminSelectionStyle(
+    toggleWidth: 44,
+    toggleHeight: 22,
+    toggleKnob: 18,
+    checkSize: 16,
+    radioSize: 16,
+    radioDot: 6,
   ),
 );

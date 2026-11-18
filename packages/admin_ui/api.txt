@@ -385,6 +385,7 @@ theme.dart AdminOverlayStyle
 theme.dart AdminPalette
 theme.dart AdminRadii
 theme.dart AdminSegmentedStyle
+theme.dart AdminSelectionStyle
 theme.dart AdminShellStyle
 theme.dart AdminSpacing
 theme.dart AdminStateLayer
@@ -411,9 +412,14 @@ theme.dart FieldRequiredMark
 theme.dart FieldVariant
 theme.dart Gap
 theme.dart NavIndicator
+theme.dart RadioMark
 theme.dart SegmentedVariant
+theme.dart SelectionInk
+theme.dart SelectionOutline
 theme.dart TableDensity
 theme.dart TableHeaderText
+theme.dart ToggleOffStyle
+theme.dart ToggleOnColor
 theme.dart TopBarSpan
 theme.dart adminAccents
 theme.dart adminThemes

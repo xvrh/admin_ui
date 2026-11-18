@@ -9,6 +9,7 @@ import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
 import '../segmented_style.dart';
+import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../state_layer.dart';
@@ -235,6 +236,7 @@ final materialTheme = AdminTheme.from(
     radiusPill: 8, // chips: corner.small
     radiusField: 4, // text fields: corner.extraSmall
     radiusButton: 999, // common buttons: corner.full
+    radiusCheck: 2, // the checkbox's container
   ),
   type: const AdminTypeSpec(
     fontFamily: 'Roboto',
@@ -318,5 +320,20 @@ final materialTheme = AdminTheme.from(
   segmented: const AdminSegmentedStyle(
     variant: SegmentedVariant.joined,
     checkmark: true,
+  ),
+  // Switch: a 52×32 track outlined in `outline` over
+  // surfaceContainerHighest, its handle 16 off and 24 on. Checkbox: an 18dp
+  // container outlined in onSurfaceVariant. Radio button: a 20dp icon, the
+  // 2dp ring around a 10dp dot, both primary when selected
+  selection: const AdminSelectionStyle(
+    toggleWidth: 52,
+    toggleHeight: 32,
+    toggleKnob: 16,
+    toggleKnobOn: 24,
+    toggleOff: ToggleOffStyle.tonal,
+    radioSize: 20,
+    radioMark: RadioMark.dot,
+    radioDot: 10,
+    outline: SelectionOutline.secondary,
   ),
 );

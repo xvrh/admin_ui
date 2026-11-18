@@ -371,9 +371,10 @@ class AdminPalette {
   Color get controlBorder => _controlBorder ?? _derived.controlBorder;
 
   /// The fill or ring that marks a control as on: a checked Check, a selected
-  /// radio, an on Toggle track, a Slider's active track and thumb, a picked
-  /// calendar day or media tile, and a field's focused edge where the theme
-  /// draws it in the accent. At least 3:1 against [surface], [background]
+  /// radio and an on Toggle track (where the theme's `AdminSelectionStyle`
+  /// draws them in the accent, as all but Carbon's do), a Slider's active
+  /// track and thumb, a picked calendar day or media tile, and a field's
+  /// focused edge where the theme draws it in the accent. At least 3:1 against [surface], [background]
   /// and [fieldFill]: authored, or [primary] when [primary] already reaches
   /// that, otherwise [primary] with its HSL lightness moved (hue kept) until
   /// it does.

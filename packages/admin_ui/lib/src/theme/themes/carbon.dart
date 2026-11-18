@@ -9,6 +9,7 @@ import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
 import '../segmented_style.dart';
+import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -234,13 +235,15 @@ final carbonTheme = AdminTheme.from(
   palette: carbonPalette,
   dark: carbonDarkPalette,
   // Square throughout: buttons, fields, tiles, menus, modals and
-  // notifications. Tags keep their pill (radiusPill).
+  // notifications. Tags keep their pill (radiusPill), and a checkbox its
+  // 2px corner.
   radii: const AdminRadii(
     radiusSmall: 0,
     radius: 0,
     radiusLarge: 0,
     radiusMenu: 0,
     radiusDialog: 0,
+    radiusCheck: 2,
   ),
   type: const AdminTypeSpec(
     fontFamily: 'IBM Plex Sans',
@@ -284,8 +287,9 @@ final carbonTheme = AdminTheme.from(
     exit: Cubic(0.2, 0, 1, 0.9),
     emphasized: Cubic(0.4, 0.14, 0.3, 1),
   ),
-  // the 2px $focus and $support-error outlines
-  stroke: const AdminStroke(fieldFocus: 2, fieldError: 2),
+  // the 2px $focus and $support-error outlines; a checkbox's and a radio
+  // button's 1px border
+  stroke: const AdminStroke(fieldFocus: 2, fieldError: 2, controlStrong: 1),
   elevation: _elevation(const Color(0x4D000000)), // $shadow: black at 30%
   darkElevation: _elevation(const Color(0xCC000000)), // g100: black at 80%
   // TextInput: a $field-01 box with a $border-strong-01 bottom rule, and
@@ -335,5 +339,20 @@ final carbonTheme = AdminTheme.from(
     inverse: true,
     radius: 4,
     labelWeight: FontWeight.w400,
+  ),
+  // Toggle: a 48×24 track, $toggle-off while off and $support-success
+  // while on, under an 18px knob. Checkbox: a 16px box bordered and, when
+  // checked, filled in $icon-primary. Radio button: an 18px $icon-primary
+  // ring, the selected one around a dot half its inside, 8
+  selection: const AdminSelectionStyle(
+    toggleWidth: 48,
+    toggleHeight: 24,
+    toggleKnob: 18,
+    toggleOn: ToggleOnColor.success,
+    checkSize: 16,
+    radioMark: RadioMark.dot,
+    radioDot: 8,
+    ink: SelectionInk.foreground,
+    outline: SelectionOutline.foreground,
   ),
 );

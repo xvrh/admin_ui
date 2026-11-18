@@ -9,6 +9,7 @@ import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
 import '../segmented_style.dart';
+import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -308,5 +309,20 @@ final fluentTheme = AdminTheme.from(
     trackOutline: true,
     indicator: true,
     labelWeight: FontWeight.w400,
+  ),
+  // Switch: a 40×20 track with a 1px colorNeutralStrokeAccessible border,
+  // clear while off, around a thumb in the border's colour; the thumb is an
+  // 18px CircleFilled glyph, whose disc is 14. Checkbox and Radio: a 16px
+  // indicator; a checked Radio keeps its ring, in the brand stroke, around
+  // a 12px CircleFilled, a 10px dot
+  selection: const AdminSelectionStyle(
+    toggleWidth: 40,
+    toggleHeight: 20,
+    toggleKnob: 14,
+    toggleOff: ToggleOffStyle.outlined,
+    checkSize: 16,
+    radioSize: 16,
+    radioMark: RadioMark.dot,
+    radioDot: 10,
   ),
 );

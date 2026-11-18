@@ -1,24 +1,10 @@
 import 'package:flutter/rendering.dart' show OverflowBoxFit;
 import 'package:material_ui/material_ui.dart';
 
-import '../../theme/contrast.dart';
-import '../../theme/palette.dart';
 import '../../theme/tokens.dart';
 
-// The label row and hover outline shared by the selection controls (Check,
-// Toggle, Choice and the boolean field body). Internal: left out of the
-// public barrels.
-
-/// The outline of an unchecked box or radio under the pointer:
-/// [AdminPalette.controlAccent] where it stands out from the surface at least
-/// as much as the resting [AdminPalette.controlBorder], otherwise that border
-/// deepened by the pressed overlay, so hovering never makes the control
-/// fainter.
-Color offHoverOutline(AdminPalette colors) =>
-    contrastRatio(colors.controlAccent, colors.surface) >=
-        contrastRatio(colors.controlBorder, colors.surface)
-    ? colors.controlAccent
-    : Color.alphaBlend(colors.pressedOverlay, colors.controlBorder);
+// The label row shared by the selection controls (Check, Toggle, Choice and
+// the boolean field body). Internal: left out of the public barrels.
 
 /// [row] centred in a target at least 24px tall, whatever the label's line.
 Widget minTarget(Widget row) => ConstrainedBox(

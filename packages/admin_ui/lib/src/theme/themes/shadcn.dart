@@ -8,6 +8,7 @@ import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
 import '../segmented_style.dart';
+import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -268,8 +269,14 @@ final shadcnTheme = AdminTheme.from(
     emphasized: Cubic(0.4, 0, 0.2, 1),
   ),
   // focus-visible:border-ring ring-[3px] ring-ring/50: a 1px border in the
-  // ring colour and a 3px halo around it
-  stroke: const AdminStroke(fieldFocus: 1, fieldError: 1, fieldFocusHalo: 3),
+  // ring colour and a 3px halo around it. A checkbox's and a radio's
+  // `border`, 1px
+  stroke: const AdminStroke(
+    fieldFocus: 1,
+    fieldError: 1,
+    fieldFocusHalo: 3,
+    controlStrong: 1,
+  ),
   elevation: _elevation,
   // disabled:opacity-50 on every variant, which keeps a disabled destructive
   // button red. px-3, px-4 and px-6 at sm, default and lg; a button holding
@@ -295,4 +302,15 @@ final shadcnTheme = AdminTheme.from(
   // the tabs list: bg-muted rounded-lg p-[3px] behind a bg-background
   // trigger lifted by shadow-sm, font-medium
   segmented: const AdminSegmentedStyle(knobOutline: false, radius: 10),
+  // Switch: h-[1.15rem] w-8 around a size-4 thumb. Checkbox: size-4.
+  // Radio group: a size-4 item, filled when checked around a size-2 dot,
+  // as the Vega style draws it (new-york keeps the ring around a dot)
+  selection: const AdminSelectionStyle(
+    toggleWidth: 32,
+    toggleHeight: 18,
+    toggleKnob: 16,
+    checkSize: 16,
+    radioSize: 16,
+    radioDot: 8,
+  ),
 );

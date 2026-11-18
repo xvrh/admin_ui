@@ -2,6 +2,28 @@
 
 ## 0.2.0
 
+- A theme says how its switches, checkboxes and radios are drawn, as it
+  does its fields, buttons and segmented controls: `AdminTokens.selection`,
+  an `AdminSelectionStyle` read through `context.selectionStyle` and given
+  to `AdminTheme.from` as `selection`. `toggleWidth`, `toggleHeight` and
+  `toggleKnob` size a `Toggle`'s track and knob, and `toggleKnobOn` a knob
+  that grows as it turns on. `toggleOff` draws the off track filled
+  (`ToggleOffStyle.filled`), as a clear track ringed in `controlBorder`
+  around a knob in the same colour (`outlined`), or as that ring over a wash
+  of the foreground (`tonal`); `toggleOn` fills the on track with the accent
+  or, `ToggleOnColor.success`, with the success colour whatever the brand.
+  `checkSize` is a `Check`'s box and `radioSize` a radio's; `radioMark`
+  marks the selected radio with a disc around a `radioDot` dot in its
+  on-colour (`RadioMark.disc`) or keeps its ring around a dot
+  (`RadioMark.dot`). `ink` draws a checked box and a selected radio in the
+  accent or in the foreground (`SelectionInk`), and `outline` rings the
+  unchecked ones in `controlBorder`, `foregroundSecondary` or the foreground
+  (`SelectionOutline`). `AdminRadii` takes a `radiusCheck`, a checkbox's
+  corner; left out, it is `radiusSmall` capped at 4, as before. The stock
+  Material `Checkbox`, `Radio` and `Switch` under `buildAppTheme` take the
+  same ink, outline and on-colour.
+- `Check.size` is deprecated: a box's size is the theme's,
+  `context.selectionStyle.checkSize`.
 - A drag is never the only way to resize a `SplitView`. Each divider is a
   Tab stop, announced as a slider whose value is the share its pane takes
   of the two panes it parts. ← and → move a divider between side-by-side
@@ -321,6 +343,38 @@
 
 ### Looks
 
+- Each reference theme draws its switch, checkbox and radio at its design
+  system's sizes and with its marks, where every theme drew a 36×20 switch,
+  an 18px box and an 18px radio filled around a light dot. Iris keeps those.
+  - Material: a 52×32 switch whose off track is outlined in `outline` over a
+    wash, around a 16dp handle that grows to 24dp as it turns on; a
+    checkbox with a 2dp corner (was 4) outlined in on-surface-variant (was
+    `outline`); a 20dp radio button that keeps its 2dp ring around a 10dp
+    dot when selected.
+  - shadcn: a 32×18 switch around its 16px thumb, and a 16px checkbox and
+    radio.
+  - Ant: a 44×22 switch around an 18px handle, a 16px checkbox, and a 16px
+    radio around a 6px dot (was 8).
+  - Fluent: a 40×20 switch, off a clear track ringed in the neutral stroke
+    around a 14px thumb of the same grey; a 16px checkbox; a 16px radio
+    that keeps its ring around a 10px dot when selected.
+  - Carbon: a 48×24 toggle around an 18px knob, `$support-success` green
+    when on (was Blue 60); a 16px checkbox with a 2px corner (was square)
+    and an 18px radio button, both in `$icon-primary`, near-black on a light
+    page and near-white on a dark one (were Blue 60): the outline, the
+    checked box's fill, and the selected radio's ring and 8px dot.
+- In the shadcn, Ant and Carbon themes `AdminStroke.controlStrong` is 1 (was
+  1.5), each system's own border width. Beside the outline of an unchecked
+  box and radio, what else is drawn with it is as much thinner there: the
+  edge of a selected choice card, of a selected option in a `SelectBody` and
+  a `MultiSelectBody` drawn as pills or cards and of a selected import
+  source, the ring of an outlined `StatusPill`, of the current `Steps`
+  marker, of a field's help button and of a `MediaTile`'s check, and a
+  `Tree`'s landing slot. A selected edge there is told from a resting one by
+  its colour, no longer by its width as well.
+- A `Check`'s glyph is never larger than its box less 2, so it keeps a pixel
+  clear of the edge of a box smaller than the theme's small icon.
+- A knob in an outlined `Toggle` track casts no shadow.
 - A `Tree` with `onMove` ends each row in a ⋯ button, after the row's own
   content, which is narrower by its 28px and a 4px margin. A tree whose
   rows carry their own menu passes `rowControls: false` to go without it,

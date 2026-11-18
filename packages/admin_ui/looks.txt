@@ -219,6 +219,18 @@ segmented.checkmark: false
 segmented.inverse: false
 segmented.radius: null
 segmented.labelWeight: w500
+selection.toggleWidth: 36
+selection.toggleHeight: 20
+selection.toggleKnob: 16
+selection.toggleKnobOn: null
+selection.toggleOff: filled
+selection.toggleOn: accent
+selection.checkSize: 18
+selection.radioSize: 18
+selection.radioMark: disc
+selection.radioDot: 8
+selection.ink: accent
+selection.outline: control
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -487,6 +499,18 @@ segmented.checkmark: true
 segmented.inverse: false
 segmented.radius: null
 segmented.labelWeight: w500
+selection.toggleWidth: 52
+selection.toggleHeight: 32
+selection.toggleKnob: 16
+selection.toggleKnobOn: 24
+selection.toggleOff: tonal
+selection.toggleOn: accent
+selection.checkSize: 18
+selection.radioSize: 20
+selection.radioMark: dot
+selection.radioDot: 10
+selection.ink: accent
+selection.outline: secondary
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -690,7 +714,7 @@ motion.exit: cubic(0.4, 0, 1, 1)
 motion.emphasized: cubic(0.4, 0, 0.2, 1)
 stroke.hairline: 1
 stroke.control: 1
-stroke.controlStrong: 1.5
+stroke.controlStrong: 1
 stroke.fieldFocus: 1
 stroke.fieldError: 1
 stroke.fieldFocusHalo: 3
@@ -752,6 +776,18 @@ segmented.checkmark: false
 segmented.inverse: false
 segmented.radius: 10
 segmented.labelWeight: w500
+selection.toggleWidth: 32
+selection.toggleHeight: 18
+selection.toggleKnob: 16
+selection.toggleKnobOn: null
+selection.toggleOff: filled
+selection.toggleOn: accent
+selection.checkSize: 16
+selection.radioSize: 16
+selection.radioMark: disc
+selection.radioDot: 8
+selection.ink: accent
+selection.outline: control
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -989,7 +1025,7 @@ motion.exit: cubic(0.55, 0.055, 0.675, 0.19)
 motion.emphasized: cubic(0.08, 0.82, 0.17, 1)
 stroke.hairline: 1
 stroke.control: 1
-stroke.controlStrong: 1.5
+stroke.controlStrong: 1
 stroke.fieldFocus: 1
 stroke.fieldError: 1
 stroke.fieldFocusHalo: 2
@@ -1080,6 +1116,18 @@ segmented.checkmark: false
 segmented.inverse: false
 segmented.radius: null
 segmented.labelWeight: w400
+selection.toggleWidth: 44
+selection.toggleHeight: 22
+selection.toggleKnob: 18
+selection.toggleKnobOn: null
+selection.toggleOff: filled
+selection.toggleOn: accent
+selection.checkSize: 16
+selection.radioSize: 16
+selection.radioMark: disc
+selection.radioDot: 6
+selection.ink: accent
+selection.outline: control
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1349,6 +1397,18 @@ segmented.checkmark: false
 segmented.inverse: false
 segmented.radius: null
 segmented.labelWeight: w400
+selection.toggleWidth: 40
+selection.toggleHeight: 20
+selection.toggleKnob: 14
+selection.toggleKnobOn: null
+selection.toggleOff: outlined
+selection.toggleOn: accent
+selection.checkSize: 16
+selection.radioSize: 16
+selection.radioMark: dot
+selection.radioDot: 10
+selection.ink: accent
+selection.outline: control
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1556,7 +1616,7 @@ motion.exit: cubic(0.2, 0, 1, 0.9)
 motion.emphasized: cubic(0.4, 0.14, 0.3, 1)
 stroke.hairline: 1
 stroke.control: 1
-stroke.controlStrong: 1.5
+stroke.controlStrong: 1
 stroke.fieldFocus: 2
 stroke.fieldError: 2
 stroke.fieldFocusHalo: 0
@@ -1647,6 +1707,18 @@ segmented.checkmark: false
 segmented.inverse: true
 segmented.radius: 4
 segmented.labelWeight: w400
+selection.toggleWidth: 48
+selection.toggleHeight: 24
+selection.toggleKnob: 18
+selection.toggleKnobOn: null
+selection.toggleOff: filled
+selection.toggleOn: success
+selection.checkSize: 16
+selection.radioSize: 18
+selection.radioMark: dot
+selection.radioDot: 8
+selection.ink: foreground
+selection.outline: foreground
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 

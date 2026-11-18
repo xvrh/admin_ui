@@ -1804,10 +1804,11 @@ class _SkeletonCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (check) {
+      final size = context.selectionStyle.checkSize;
       return Center(
         child: Skeleton(
-          width: 18,
-          height: 18,
+          width: size,
+          height: size,
           borderRadius: BorderRadius.circular(context.radii.radiusCheck),
         ),
       );

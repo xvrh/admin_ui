@@ -9,10 +9,11 @@ import 'sizes.dart';
 ///
 /// [radiusSmall], [radius] and [radiusLarge] are the base scale. The role
 /// radii ([radiusMenu], [radiusDialog], [radiusPill], [radiusField],
-/// [radiusButton]) default to a step of that scale; a theme authors one only
-/// where its design system gives that component a corner of its own
-/// (Material's 4dp menus and fields, 28dp dialogs and full-round buttons,
-/// Carbon's square overlays).
+/// [radiusButton], [radiusCheck]) default to a step of that scale; a theme
+/// authors one only where its design system gives that component a corner
+/// of its own (Material's 4dp menus and fields, 28dp dialogs and full-round
+/// buttons, Carbon's square overlays and the 2px corner its checkbox
+/// keeps).
 ///
 /// A radius of 999 is full: a pill, or a stadium on a button.
 @immutable
@@ -27,6 +28,7 @@ class AdminRadii {
   final double? _radiusPill;
   final double? _radiusField;
   final double? _radiusButton;
+  final double? _radiusCheck;
 
   const AdminRadii({
     required this.radiusSmall,
@@ -37,6 +39,7 @@ class AdminRadii {
     this._radiusPill,
     this._radiusField,
     this._radiusButton,
+    this._radiusCheck,
   });
 
   /// Menus, popovers, pickers, the command palette and toasts: authored, or
@@ -67,9 +70,9 @@ class AdminRadii {
         ControlSize.medium || ControlSize.large => radius,
       };
 
-  /// Checkbox corners: [radiusSmall], capped at 4 so an 18px box never reads
-  /// as a radio.
-  double get radiusCheck => math.min(radiusSmall, 4);
+  /// A checkbox's corner: authored, or [radiusSmall] capped at 4, so that a
+  /// box never reads as a radio.
+  double get radiusCheck => _radiusCheck ?? math.min(radiusSmall, 4);
 
   AdminRadii copyWith({
     double? radiusSmall,
@@ -80,6 +83,7 @@ class AdminRadii {
     double? radiusPill,
     double? radiusField,
     double? radiusButton,
+    double? radiusCheck,
   }) {
     return AdminRadii(
       radiusSmall: radiusSmall ?? this.radiusSmall,
@@ -90,6 +94,7 @@ class AdminRadii {
       radiusPill: radiusPill ?? _radiusPill,
       radiusField: radiusField ?? _radiusField,
       radiusButton: radiusButton ?? _radiusButton,
+      radiusCheck: radiusCheck ?? _radiusCheck,
     );
   }
 
@@ -128,6 +133,12 @@ class AdminRadii {
         a.button(ControlSize.medium),
         b.button(ControlSize.medium),
       ),
+      radiusCheck: o(
+        a._radiusCheck,
+        b._radiusCheck,
+        a.radiusCheck,
+        b.radiusCheck,
+      ),
     );
   }
 
@@ -143,7 +154,8 @@ class AdminRadii {
       other._radiusDialog == _radiusDialog &&
       other._radiusPill == _radiusPill &&
       other._radiusField == _radiusField &&
-      other._radiusButton == _radiusButton;
+      other._radiusButton == _radiusButton &&
+      other._radiusCheck == _radiusCheck;
 
   @override
   int get hashCode => Object.hash(
@@ -155,6 +167,7 @@ class AdminRadii {
     _radiusPill,
     _radiusField,
     _radiusButton,
+    _radiusCheck,
   );
 }
 
