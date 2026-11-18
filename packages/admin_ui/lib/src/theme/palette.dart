@@ -156,6 +156,8 @@ class AdminPalette {
   final Color? _neutralFillHover;
   final Color? _neutralFillActive;
   final Color? _onNeutralFill;
+  final Color? _inverseSurface;
+  final Color? _onInverseSurface;
 
   const AdminPalette({
     required this.primary,
@@ -220,6 +222,8 @@ class AdminPalette {
     this._neutralFillHover,
     this._neutralFillActive,
     this._onNeutralFill,
+    this._inverseSurface,
+    this._onInverseSurface,
   });
 
   /// Brightness inferred from [surface] — drives the Material [colorScheme]
@@ -532,6 +536,23 @@ class AdminPalette {
   /// authored, or [foregroundOn] [neutralFill].
   Color get onNeutralFill => _onNeutralFill ?? foregroundOn(neutralFill);
 
+  // ── the inverse surface ── (a tooltip, a stock snack bar)
+
+  /// A small surface drawn against the page's scheme, so it stands out from
+  /// whatever it floats over: a tooltip's chip, a stock snack bar. Authored,
+  /// or [foreground]. The reference systems give it a tone of its own (M3's
+  /// `inverseSurface`, Ant's `colorBgSpotlight`, Fluent's
+  /// `colorNeutralBackgroundStatic`, Carbon's `$background-inverse`), and
+  /// two of them keep it dark in dark mode. It does not follow the brand.
+  Color get inverseSurface => _inverseSurface ?? foreground;
+
+  /// Content on [inverseSurface]: authored; or, where the surface is
+  /// authored alone, [foregroundOn] it; or [surface], the page's own card
+  /// colour, on the derived one.
+  Color get onInverseSurface =>
+      _onInverseSurface ??
+      (_inverseSurface == null ? surface : foregroundOn(inverseSurface));
+
   // ── status surfaces ── (soft fill / border derived from a status accent like
   // [success]/[warning]/[danger]/[info], so themes only author the accent)
   Color statusFill(Color accent) => Color.lerp(accent, surface, 0.88)!;
@@ -599,9 +620,9 @@ class AdminPalette {
       outlineVariant: border,
       shadow: shadow,
       scrim: scrim,
-      inverseSurface: foreground,
-      onInverseSurface: surface,
-      inversePrimary: readableOn(primary, surfaces: [foreground]),
+      inverseSurface: inverseSurface,
+      onInverseSurface: onInverseSurface,
+      inversePrimary: readableOn(primary, surfaces: [inverseSurface]),
       surfaceTint: _transparent,
     );
   }
@@ -669,6 +690,8 @@ class AdminPalette {
     Color? neutralFillHover,
     Color? neutralFillActive,
     Color? onNeutralFill,
+    Color? inverseSurface,
+    Color? onInverseSurface,
   }) {
     return AdminPalette(
       primary: primary ?? this.primary,
@@ -733,6 +756,8 @@ class AdminPalette {
       neutralFillHover: neutralFillHover ?? _neutralFillHover,
       neutralFillActive: neutralFillActive ?? _neutralFillActive,
       onNeutralFill: onNeutralFill ?? _onNeutralFill,
+      inverseSurface: inverseSurface ?? _inverseSurface,
+      onInverseSurface: onInverseSurface ?? _onInverseSurface,
     );
   }
 
@@ -929,6 +954,18 @@ class AdminPalette {
         a.onNeutralFill,
         b.onNeutralFill,
       ),
+      inverseSurface: o(
+        a._inverseSurface,
+        b._inverseSurface,
+        a.inverseSurface,
+        b.inverseSurface,
+      ),
+      onInverseSurface: o(
+        a._onInverseSurface,
+        b._onInverseSurface,
+        a.onInverseSurface,
+        b.onInverseSurface,
+      ),
     );
   }
 
@@ -954,8 +991,9 @@ class AdminPalette {
   /// [tableRowStripe] and [tableRowHover] are kept, as is a transparent
   /// [navIndicator]. The soft fill ([softFill], [onSoft]) re-derives from
   /// the brand's tint; the field roles ([fieldFill], [fieldFillHover],
-  /// [fieldRule]) and the neutral fill ([neutralFill] and its states,
-  /// [onNeutralFill]) are kept. [chart] is kept: charts don't follow the
+  /// [fieldRule]), the neutral fill ([neutralFill] and its states,
+  /// [onNeutralFill]) and the inverse surface ([inverseSurface],
+  /// [onInverseSurface]) are kept. [chart] is kept: charts don't follow the
   /// brand. So is the [stateLayer].
   AdminPalette branded(Color seed) {
     final fill = _withReadableForeground(seed);
@@ -1023,6 +1061,8 @@ class AdminPalette {
       neutralFillHover: _neutralFillHover,
       neutralFillActive: _neutralFillActive,
       onNeutralFill: _onNeutralFill,
+      inverseSurface: _inverseSurface,
+      onInverseSurface: _onInverseSurface,
     );
   }
 
@@ -1106,6 +1146,8 @@ class AdminPalette {
     _neutralFillHover,
     _neutralFillActive,
     _onNeutralFill,
+    _inverseSurface,
+    _onInverseSurface,
   ];
 
   /// Two palettes are equal when they author the same colours: the same

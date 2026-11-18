@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../preview_shell.dart';
 import '../demo_kit.dart';
 import '../primitives/feedback/toast.dart' show PinnedToastStack;
+import '../primitives/tip.dart' show PinnedTips;
 
 /// The controls a theme's anatomy tokens draw, in every shipped theme at
 /// once: a tab strip, a switch, a checkbox, a radio and a slider, each card
@@ -356,6 +357,101 @@ class _SizesCard extends StatelessWidget {
               ],
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// A tooltip pinned open in every shipped theme at once: the chip each
+/// theme fills with its inverse surface, its corner, padding and text. Each
+/// card is in its own theme's tokens, in the preview's mode, as
+/// [ThemeSheetDemo] shows the controls.
+class ThemeTooltipSheetDemo extends StatelessWidget {
+  @Preview(name: 'Every theme · tooltip', wrapper: adminUiPreview)
+  const ThemeTooltipSheetDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = context.colors.brightness == Brightness.dark;
+    final pageFont = context.type.spec.fontFamily;
+    return DemoPage(
+      maxWidth: 720,
+      children: [
+        PinnedTips(
+          child: Wrap(
+            spacing: AdminSpacing.lg,
+            runSpacing: AdminSpacing.lg,
+            children: [
+              for (final theme in adminThemes)
+                Theme(
+                  data: buildAppTheme(
+                    _inFont(
+                      dark ? theme.dark ?? theme.tokens : theme.tokens,
+                      pageFont,
+                    ),
+                  ),
+                  child: _TooltipCard(theme.name),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// [tokens], set in [family] where its theme names no font (Ant). Text in
+  /// a card of such a theme inherits the page's font; a tooltip is drawn in
+  /// the overlay, where it would inherit none.
+  static AdminTokens _inFont(AdminTokens tokens, String? family) {
+    final spec = tokens.typography.spec;
+    if (spec.fontFamily != null || family == null) return tokens;
+    return tokens.copyWith(
+      typography: AdminTypography.from(
+        tokens.palette,
+        spec.copyWith(fontFamily: family),
+      ),
+    );
+  }
+}
+
+/// One theme's tooltip under its trigger, on that theme's page colour.
+class _TooltipCard extends StatelessWidget {
+  final String name;
+
+  const _TooltipCard(this.name);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      width: 204,
+      // Room under the trigger for the tallest chip, Carbon's.
+      height: 168,
+      padding: const EdgeInsets.all(AdminSpacing.lg),
+      decoration: BoxDecoration(
+        color: colors.background,
+        borderRadius: BorderRadius.circular(context.radii.radiusLarge),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name, style: context.type.sectionLabel),
+          const Gap(AdminSpacing.md),
+          Center(
+            child: Tip(
+              message: 'Archive',
+              shortcut: 'E',
+              side: PopoverSide.bottom,
+              child: IconAction(
+                Icons.archive_outlined,
+                label: '$name archive',
+                tooltip: false,
+                onPressed: () {},
+              ),
+            ),
+          ),
         ],
       ),
     );

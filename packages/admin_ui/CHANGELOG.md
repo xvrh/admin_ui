@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- A palette says what a tooltip and a stock snack bar are filled with:
+  `AdminPalette.inverseSurface`, and `onInverseSurface` for what reads on
+  it. Both are optional. A palette that gives neither has its `foreground`
+  under its `surface`, as every tooltip was drawn until now; one that gives
+  the surface alone has white or near-black on it. A `Tip`, the stock
+  tooltip and snack bar themes, and the stock `ColorScheme`'s
+  `inverseSurface`, `onInverseSurface` and `inversePrimary` take them, and
+  a brand keeps them.
 - A control's text follows its size. An `AdminTypeRamp` names
   `fieldTextLarge` and `buttonLarge`, the steps of the text inside a large
   control and of a large button's label, and a ramp that names neither sets
@@ -497,6 +505,20 @@
 
 ### Looks
 
+- A tooltip's chip, and a stock snack bar, follow each reference theme's
+  inverse surface, where every theme filled them with its foreground under
+  its card colour. Iris and shadcn keep that.
+  - Material: `#322F35` under `#F5EFF7` (was `#1D1B20` under `#FEF8FF`);
+    in dark mode the chip is unchanged and its text is `#322F35` (was
+    `#211F26`).
+  - Ant: `#262626` under white (was `#1F1F1F`); in dark mode a dark chip,
+    `#424242` under white, where it was light, `#E0E0E0` under `#141414`.
+    The dark sider's tooltips are `#262626` under white too, where they
+    were white under the sider's navy.
+  - Fluent: `#333333` under white (was `#242424`); in dark mode a dark
+    chip, `#3D3D3D` under white, where it was white under `#292929`.
+  - Carbon: `#393939` under white (was `#161616`); in dark mode the chip
+    is unchanged and its text is `#161616` (was `#262626`).
 - A large control's text, and a small button's weight, follow Ant and
   Fluent, where every theme set a large button and a large field in the
   text of the medium ones, and a button's label in one weight at every
