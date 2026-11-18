@@ -401,6 +401,10 @@ not_needed:
     - DashedBorder
     - DateField
     - DelayedLoading
+    - HeatTable
+    - HeatTableCell
+    - HeatTableLabel
+    - HeatTableRow
     - HelpButton
     - InMemorySavedViewsStore
     - ListboxMenu

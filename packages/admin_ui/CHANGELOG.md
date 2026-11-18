@@ -2,6 +2,23 @@
 
 ## 0.2.0
 
+- A cohort retention grid, or any matrix read by intensity, is a
+  `HeatTable`: a header row over a few leading `labels` columns
+  (`HeatTableLabel`: "Week of", "People") and a value column for each of
+  its `columns` ("+1", "+2", …). A `HeatTableRow` holds a text per leading
+  column and a `HeatTableCell` per value column, whose `share`, 0 to 1,
+  sets how strongly it is tinted, under its `text`, by default the share as
+  a percentage. A null cell, such as a week not reached yet, is left blank,
+  which a 0% is not: it keeps a faint wash. The columns are as wide as their
+  text, the value columns sharing the width left over; narrower than that,
+  the value columns scroll sideways, with a scroll bar shown, under the
+  leading ones, which stay put behind a rule. It mirrors right to left.
+- `AdminPalette.heatFill` is a heat map cell's fill at a share of the
+  strongest: an accent, by default the first chart colour, at an opacity
+  rising with the share from a faint wash to the strongest at which
+  `foreground` text still reads at 4.5:1 over `surface` and `background`,
+  so a cell's figure stays legible on every step in every theme and mode.
+
 - A `ListboxMenu` takes `optionsWidth`, the width its widest option needs,
   which `ListboxOption.widthOf` measures, and grows past its trigger to
   hold it, up to `ListboxMenu.maxWidth` and the screen's width. `Check.size`

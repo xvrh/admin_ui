@@ -536,6 +536,24 @@ class AdminPalette {
   Color statusFill(Color accent) => Color.lerp(accent, surface, 0.88)!;
   Color statusBorder(Color accent) => Color.lerp(accent, surface, 0.62)!;
 
+  // ── heat ──
+
+  /// The fill of a heat map's cell at [share] of the strongest, 0 to 1:
+  /// [accent], by default the first [chart] colour, laid at an opacity that
+  /// rises in proportion to [share]. At 0 it is a faint wash, so a cell
+  /// worth nothing still reads as a cell, set apart from one with no value;
+  /// at 1 it is as strong as [foreground] text on it keeps 4.5:1 over both
+  /// [surface] and [background], so a cell's figure stays [foreground] on
+  /// every step. Translucent, it composes over either surface.
+  Color heatFill(double share, {Color? accent}) {
+    final color = (accent ?? (chart.isEmpty ? primary : chart.first))
+        .withValues(alpha: 1);
+    final ceiling = _derived.heatCeiling(color);
+    final floor = math.min(_heatFloor, ceiling);
+    final t = share.isNaN ? 0.0 : share.clamp(0.0, 1.0);
+    return color.withValues(alpha: floor + (ceiling - floor) * t);
+  }
+
   /// Material scheme derived from this palette — light or dark per
   /// [brightness]. Every role is set, so stock Material widgets draw from the
   /// palette rather than from Material's fallbacks.
@@ -1112,6 +1130,9 @@ class AdminPalette {
 const _textContrast = 4.5;
 const _uiContrast = 3.0;
 
+/// The opacity [AdminPalette.heatFill] lays its accent at for a share of 0.
+const _heatFloor = 0.06;
+
 /// Under this contrast two colours read as one: a selection filled with the
 /// primary itself.
 const _sameColour = 1.1;
@@ -1189,8 +1210,35 @@ class _ReadableQuery {
 class _DerivedRoles {
   final AdminPalette p;
   final readable = <_ReadableQuery, Color>{};
+  final _heatCeilings = <Color, double>{};
 
   _DerivedRoles(this.p);
+
+  /// The strongest opacity [AdminPalette.heatFill] lays opaque [accent] at:
+  /// the highest at which [AdminPalette.foreground] keeps 4.5:1 on it over
+  /// both the surface and the background.
+  double heatCeiling(Color accent) => _heatCeilings[accent] ??= () {
+    bool reads(double alpha) {
+      final wash = accent.withValues(alpha: alpha);
+      return _worst(p.foreground, [
+            Color.alphaBlend(wash, p.surface),
+            Color.alphaBlend(wash, p.background),
+          ]) >=
+          _textContrast;
+    }
+
+    if (reads(1)) return 1.0;
+    var (lo, hi) = (0.0, 1.0);
+    for (var i = 0; i < 12; i++) {
+      final mid = (lo + hi) / 2;
+      if (reads(mid)) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    return lo;
+  }();
 
   late final Color primaryText = p.readableOn(
     p.primary,
