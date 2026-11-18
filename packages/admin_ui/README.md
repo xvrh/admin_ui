@@ -1182,8 +1182,9 @@ only its colours: `AdminFieldStyle` (`context.fieldStyle`),
 `AdminButtonStyle` (`context.buttonStyle`), `AdminShellStyle`
 (`context.shellStyle`), `AdminOverlayStyle` (`context.overlayStyle`),
 `AdminSegmentedStyle` (`context.segmentedStyle`), `AdminSelectionStyle`
-(`context.selectionStyle`), `AdminSliderStyle` (`context.sliderStyle`) and
-`AdminTabsStyle` (`context.tabsStyle`), beside the role radii `radiusField`, `radiusButton`
+(`context.selectionStyle`), `AdminSliderStyle` (`context.sliderStyle`),
+`AdminTabsStyle` (`context.tabsStyle`) and `AdminFeedbackStyle`
+(`context.feedbackStyle`), beside the role radii `radiusField`, `radiusButton`
 (`context.radii.button(size)`) and `radiusCheck`. A component reads them; it
 never asks which theme it is in.
 
@@ -1274,6 +1275,24 @@ indicator stroke where the style gives none. A line strip stands on a
 | Ant | 38 / 46 / 56 | w400, the foreground, the selected one in the accent | 2, as wide as the label | hairline |
 | Fluent | 32 / 44 / 52 | w400, secondary; the selected one w600 in the foreground | 3, as wide as the label, round | none |
 | Carbon | 32 / 40 / 48 | w400, secondary; the selected one w600 in the foreground | 2, as wide as the tab | 2 |
+
+`AdminFeedbackStyle` draws an `Alert` and a toast. `alertFill` and
+`toastFill` fill them with the status washed into the surface, inside its
+border (`FeedbackFill.tint`), or with the surface colour inside the neutral
+border, the status left to the icon (`surface`). `alertBar` and `toastBar`
+are the width of a bar in the status colour on the leading edge, zero for
+none; `alertRadius` gives an alert a corner of its own, the theme's radius
+where none is given; and `toastOutline` rings a toast in a hairline, which a
+dark palette always does, since a shadow does not read there.
+
+| Theme | Alert | Toast |
+|---|---|---|
+| Iris | tinted | the surface, outlined, a 4 bar |
+| Material | tinted | the surface, outlined, a 4 bar |
+| shadcn | a card in the surface colour, corner 10 | the surface, outlined, no bar |
+| Ant | tinted, corner 8 | the surface, no outline, no bar |
+| Fluent | tinted | the surface, no outline, no bar |
+| Carbon | tinted, a 3 bar | tinted, outlined, a 3 bar |
 
 `AdminOverlayStyle` sets whether a tooltip points at its target with an
 arrow, the width it wraps at, and the size of the arrow a tooltip or a

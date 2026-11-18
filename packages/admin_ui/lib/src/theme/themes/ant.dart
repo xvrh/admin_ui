@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../button_style.dart';
 import '../elevation.dart';
+import '../feedback_style.dart';
 import '../field_style.dart';
 import '../focus.dart';
 import '../motion.dart';
@@ -381,5 +382,12 @@ final antTheme = AdminTheme.from(
     restInk: TabsRestInk.foreground,
     labelWeight: FontWeight.w400,
     indicatorWidth: TabsIndicatorWidth.label,
+  ),
+  // Alert: borderRadiusLG over the status's background and border.
+  // Notification: colorBgElevated on its shadow, with no border and no bar
+  feedback: const AdminFeedbackStyle(
+    alertRadius: 8,
+    toastBar: 0,
+    toastOutline: false,
   ),
 );

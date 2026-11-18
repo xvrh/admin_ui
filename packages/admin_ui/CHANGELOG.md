@@ -2,6 +2,17 @@
 
 ## 0.2.0
 
+- A theme says how its alerts and toasts are drawn: `AdminTokens.feedback`,
+  an `AdminFeedbackStyle` read through `context.feedbackStyle` and given to
+  `AdminTheme.from` as `feedback`. `alertFill` and `toastFill` fill an
+  `Alert` and a toast with the status washed into the surface, inside its
+  border (`FeedbackFill.tint`), or with the surface colour inside the
+  neutral border, the status left to the icon (`FeedbackFill.surface`).
+  `alertBar` and `toastBar` are the width of a bar in the status colour on
+  the leading edge, zero for none: a toast's was 4 in every theme, and an
+  alert had none. `alertRadius` is an alert's corner, the theme's radius
+  where none is given, and `toastOutline` whether a toast is ringed in a
+  hairline, which it always was.
 - A theme says how its tooltips are drawn, in its `AdminOverlayStyle`:
   `tooltipRadius` is the chip's corner, which was the theme's small radius
   and still is where none is given; `tooltipPaddingX` and `tooltipPaddingY`
@@ -459,6 +470,21 @@
 
 ### Looks
 
+- An `Alert` and a toast follow each reference theme, where every theme
+  drew an alert tinted with its status at the theme's radius, and a toast
+  as an outlined card in the surface colour behind a 4px status bar. Iris
+  and Material keep those.
+  - shadcn: an alert is a card in the surface colour inside the neutral
+    border, its icon alone in the status colour, with a 10px corner (was
+    8); a toast has no status bar.
+  - Ant: an alert's corner is 8 (was 6); a toast has no status bar and, on
+    a light page, no outline.
+  - Fluent: a toast has no status bar and, on a light page, no outline.
+  - Carbon: an alert carries a 3px bar in the status colour on its leading
+    edge; a toast is tinted with its status (was the surface colour) behind
+    a 3px bar (was 4).
+  A toast keeps its outline in every theme's dark mode, where its shadow
+  does not read.
 - A tooltip follows each reference theme, where its corner was whatever
   the theme's small radius was for its menu items and small buttons (8, 6,
   4, 2 and 0 in the five reference themes) around 8 by 4 of padding and

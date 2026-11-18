@@ -377,6 +377,7 @@ theme.dart AdminButtonPadding
 theme.dart AdminButtonStyle
 theme.dart AdminControlSizes
 theme.dart AdminElevation
+theme.dart AdminFeedbackStyle
 theme.dart AdminFieldStyle
 theme.dart AdminFocusSpec
 theme.dart AdminFonts
@@ -407,6 +408,7 @@ theme.dart ButtonDisabledStyle
 theme.dart ButtonIconPlacement
 theme.dart ButtonLabelAlignment
 theme.dart ControlSize
+theme.dart FeedbackFill
 theme.dart FieldBorder
 theme.dart FieldChromeSpec
 theme.dart FieldFocusIndicator

@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../button_style.dart';
 import '../elevation.dart';
+import '../feedback_style.dart';
 import '../field_style.dart';
 import '../focus.dart';
 import '../motion.dart';
@@ -365,4 +366,8 @@ final fluentTheme = AdminTheme.from(
     indicatorShape: TabsIndicatorShape.pill,
     rule: TabsRule.none,
   ),
+  // MessageBar: the status's background1 inside its border1, at
+  // borderRadiusMedium. Toast: colorNeutralBackground1 on its shadow, its
+  // border transparent, with no bar
+  feedback: const AdminFeedbackStyle(toastBar: 0, toastOutline: false),
 );

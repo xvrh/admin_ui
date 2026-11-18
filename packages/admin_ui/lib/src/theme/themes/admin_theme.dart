@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../breakpoints.dart';
 import '../button_style.dart';
 import '../elevation.dart';
+import '../feedback_style.dart';
 import '../field_style.dart';
 import '../focus.dart';
 import '../motion.dart';
@@ -43,8 +44,8 @@ class AdminTheme {
   /// [defaultControlSizes]), [table] metrics (left out,
   /// [defaultTableMetrics]), [motion] (left out, [defaultMotion]), [stroke]
   /// widths, [iconSizes], the [field], [button], [overlay], [segmented],
-  /// [selection], [slider] and [tabs] anatomy, and the layout [breakpoints]
-  /// (left out, [AdminBreakpoints]' defaults).
+  /// [selection], [slider], [tabs] and [feedback] anatomy, and the layout
+  /// [breakpoints] (left out, [AdminBreakpoints]' defaults).
   /// The light set takes [elevation] and [shell], the dark set
   /// [darkElevation] and [darkShell]; left out, each mode gets the shadows
   /// that suit its palette's brightness ([defaultElevation] or
@@ -77,6 +78,7 @@ class AdminTheme {
     AdminSelectionStyle? selection,
     AdminSliderStyle? slider,
     AdminTabsStyle? tabs,
+    AdminFeedbackStyle? feedback,
     AdminBreakpoints? breakpoints,
   }) = _PaletteTheme;
 
@@ -138,6 +140,7 @@ class _PaletteTheme implements AdminTheme {
   final AdminSelectionStyle? selection;
   final AdminSliderStyle? slider;
   final AdminTabsStyle? tabs;
+  final AdminFeedbackStyle? feedback;
   final AdminBreakpoints? breakpoints;
 
   _PaletteTheme({
@@ -163,6 +166,7 @@ class _PaletteTheme implements AdminTheme {
     this.selection,
     this.slider,
     this.tabs,
+    this.feedback,
     this.breakpoints,
   }) : darkPalette = dark;
 
@@ -198,6 +202,7 @@ class _PaletteTheme implements AdminTheme {
     selection: selection,
     slider: slider,
     tabs: tabs,
+    feedback: feedback,
     breakpoints: breakpoints,
   );
 
@@ -230,6 +235,7 @@ class _PaletteTheme implements AdminTheme {
     selection: selection,
     slider: slider,
     tabs: tabs,
+    feedback: feedback,
     breakpoints: breakpoints,
   );
 

@@ -140,6 +140,7 @@ Map<String, dynamic> genericCatalog() => {
     'Tokens': const TokensDemo(),
     'Anatomy': const AnatomyDemo(),
     'Every theme': const ThemeSheetDemo(),
+    'Every theme, feedback': const ThemeFeedbackSheetDemo(),
     'Control sizes': const ControlSizesDemo(),
     'Appearance picker': const AppearanceDemo(),
     'Status pill': const StatusPillDemo(),
