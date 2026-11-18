@@ -387,6 +387,7 @@ theme.dart AdminRadii
 theme.dart AdminSegmentedStyle
 theme.dart AdminSelectionStyle
 theme.dart AdminShellStyle
+theme.dart AdminSliderStyle
 theme.dart AdminSpacing
 theme.dart AdminStateLayer
 theme.dart AdminStroke
@@ -416,6 +417,8 @@ theme.dart RadioMark
 theme.dart SegmentedVariant
 theme.dart SelectionInk
 theme.dart SelectionOutline
+theme.dart SliderRail
+theme.dart SliderThumb
 theme.dart TableDensity
 theme.dart TableHeaderText
 theme.dart ToggleOffStyle

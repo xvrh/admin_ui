@@ -42,6 +42,8 @@ export 'src/theme/shell_style.dart'
     show AdminShellStyle, NavIndicator, TopBarSpan;
 export 'src/theme/sizes.dart'
     show AdminControlSizes, AdminIconSizes, ControlSize, defaultControlSizes;
+export 'src/theme/slider_style.dart'
+    show AdminSliderStyle, SliderRail, SliderThumb;
 export 'src/theme/spacing.dart' show AdminSpacing, Gap;
 export 'src/theme/state_layer.dart' show AdminStateLayer;
 export 'src/theme/stroke.dart' show AdminStroke;

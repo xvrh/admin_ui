@@ -12,6 +12,7 @@ import '../segmented_style.dart';
 import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
+import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
 import '../typography.dart';
@@ -354,5 +355,12 @@ final carbonTheme = AdminTheme.from(
     radioDot: 8,
     ink: SelectionInk.foreground,
     outline: SelectionOutline.foreground,
+  ),
+  // Slider: a 2px $border-subtle track, $layer-selected-inverse up to a
+  // 14px thumb of the same
+  slider: const AdminSliderStyle(
+    trackHeight: 2,
+    thumbSize: 14,
+    ink: SelectionInk.foreground,
   ),
 );
