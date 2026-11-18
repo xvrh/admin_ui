@@ -17,5 +17,5 @@ export 'src/shell/ui/save_bar.dart'
 export 'src/shell/ui/save_cluster.dart' show SaveCluster;
 export 'src/shell/ui/shell.dart' show Shell;
 export 'src/shell/ui/sidebar.dart'
-    show NavEntry, NavItem, NavSection, Sidebar, SidebarAccount;
+    show NavEntry, NavGroup, NavItem, NavSection, Sidebar, SidebarAccount;
 export 'src/shell/ui/top_bar.dart' show TopBar;

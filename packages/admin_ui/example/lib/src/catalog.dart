@@ -127,6 +127,7 @@ import 'ui/screens/save_bar.dart';
 import 'ui/screens/settings_form.dart';
 import 'ui/screens/shell.dart';
 import 'ui/screens/sidebar_account.dart';
+import 'ui/screens/sidebar_group.dart';
 
 /// The catalog's demo pages, one insertion-ordered group tree.
 ///
@@ -304,6 +305,7 @@ Map<String, dynamic> genericCatalog() => {
     'Shell (app frame)': const ShellDemo(),
     'Shell (no sidebar)': const ShellWithoutSidebarDemo(),
     'Sidebar account': const SidebarAccountDemo(),
+    'Sidebar group': const SidebarGroupDemo(),
     'Page scaffold': const PageScaffoldDemo(),
     'Page scaffold with tabs': const PageScaffoldDemo.tabs(),
     'Edit layouts (compare)': const EditLayoutsDemo(),

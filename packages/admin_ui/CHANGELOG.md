@@ -2,6 +2,25 @@
 
 ## 0.2.0
 
+- A `Sidebar` folds several items under one row: `NavGroup`, a third
+  `NavEntry`, takes a label, an icon and its `items`. Closed, its row
+  shows the number of its items and a chevron; open, the items follow it,
+  a step in. It opens as the current item becomes one of its items, and
+  while it is closed over that item its row is drawn, and announced, as
+  the current one. `initiallyExpanded` says how it starts,
+  `onExpandedChanged` reports each click or key on its row, and `expanded`
+  controls it, whatever the current item. In the rail it is its icon
+  alone, and a click there opens the rail over the page with the group
+  open; in the open rail and in the navigation drawer it is as in the
+  whole sidebar. Its row is a Tab stop announced as expanded or collapsed,
+  which Enter or Space toggles. ArrowUp, ArrowDown, Home and End step over
+  the rows on the screen, so past a closed group's items, and focus on an
+  item goes to its group's row as the group closes or the rail folds. A
+  group asks no leave guard; its items ask as any item does.
+- A press outside a `Sidebar`'s rail closes it while it is open over the
+  page. Until now only the pointer leaving it, focus leaving it, Escape
+  and an item did, so a rail a key had opened stayed open under a click on
+  the page.
 - A theme says what a table's chrome is drawn with, in its
   `AdminTableMetrics`: `headerFill` fills the header row with
   `surfaceMuted` (`TableHeaderFill.muted`), with the surface as the rows are

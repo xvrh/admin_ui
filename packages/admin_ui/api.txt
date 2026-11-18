@@ -345,6 +345,7 @@ l10n.dart shortcutLabel
 shell.dart AdminModule
 shell.dart AppearancePicker
 shell.dart NavEntry
+shell.dart NavGroup
 shell.dart NavItem
 shell.dart NavSection
 shell.dart PageHeader

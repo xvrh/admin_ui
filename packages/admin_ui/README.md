@@ -345,6 +345,20 @@ A sidebar's `header` and `footer` fit the rail by reading
 signed-in account goes in the footer as a `SidebarAccount`, which does
 this itself.
 
+A `NavGroup` folds the pages few people open under one row of the sidebar:
+`NavGroup('Developer', icon: …, items: [NavItem(…), …])`. Closed, the row
+shows the number of its items and a chevron; open, the items follow it, a
+step in. It opens and closes on a click, or on Enter or Space, and opens
+by itself as the current item becomes one of its items, so a deep link
+shows where the user is. Closed over the current item, its row is drawn as
+the current one. In the rail it is its icon alone, and a click there opens
+the rail over the page with the group open; in the drawer it is as in the
+whole sidebar. `initiallyExpanded` says how it starts, and
+`onExpandedChanged` reports each click, for an app that remembers the
+state and hands it back; `expanded` controls it outright, whatever the
+current item. Opening or closing a group keeps the page, so it asks no
+leave guard.
+
 The top bar runs across the window, its `leading` (the logo) over the
 sidebar's icons. A theme whose `AdminShellStyle.topBarSpan` is
 `TopBarSpan.page` turns that around, as Ant's side layout does: the

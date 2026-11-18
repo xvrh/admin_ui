@@ -17,6 +17,7 @@ import '../../common/ui/popover.dart';
 import '../../common/ui/tappable.dart';
 import '../../common/ui/tip.dart';
 import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/formats.dart';
 import '../../theme/contrast.dart';
 import '../../theme/shell_style.dart';
 import '../../theme/spacing.dart';
@@ -24,7 +25,8 @@ import '../../theme/tokens.dart';
 import 'navigation_drawer.dart';
 import 'shell.dart';
 
-/// One entry in a [Sidebar]: a [NavItem] or a [NavSection] header.
+/// One entry in a [Sidebar]: a [NavItem], a [NavGroup] that folds several
+/// items under one row, or a [NavSection] header.
 sealed class NavEntry {
   const NavEntry();
 }
@@ -76,11 +78,91 @@ class NavItem extends NavEntry {
       selected || (value != null && value == current);
 }
 
+/// A row that folds its [items] under it, for the pages few people open.
+/// Closed, it is one row: its [icon], its [label], the number of its items
+/// and a chevron. Open, the items follow it, a step in.
+///
+/// The sidebar keeps whether it is open, from [initiallyExpanded] on, and
+/// opens it as the current item becomes one of its [items], so a deep link
+/// shows where the user is. It can then be closed like any other, and
+/// while it hides the current item its own row is drawn as the current
+/// one. Pass [expanded] to control it instead, applying what
+/// [onExpandedChanged] reports.
+///
+/// In the collapsed rail it is its icon alone, with its label in a tooltip
+/// and none of its items; a click there opens the rail over the page, and
+/// the group with it. In the open rail and in a navigation drawer it is as
+/// in the whole sidebar.
+///
+/// Its row is a button announced as expanded or collapsed, which Enter or
+/// Space toggles. Opening or closing it keeps the page, so it asks no leave
+/// guard; its items ask as any item does.
+class NavGroup extends NavEntry {
+  final String label;
+  final IconData icon;
+
+  /// The rows folded under this one.
+  final List<NavItem> items;
+
+  /// Whether it starts open, when uncontrolled.
+  final bool initiallyExpanded;
+
+  /// Whether it is open, when controlled: then exactly as this says,
+  /// whatever the current item. Null leaves it to the sidebar.
+  final bool? expanded;
+
+  /// Reports the state a click or a key on the row asks for. Required to
+  /// change a controlled group; an uncontrolled one calls it too, for an
+  /// app that remembers the state and hands it back as [initiallyExpanded].
+  final ValueChanged<bool>? onExpandedChanged;
+
+  /// Reports, and can seed, the row's hovered, pressed and focused states,
+  /// as [NavItem.statesController] does.
+  final WidgetStatesController? statesController;
+
+  /// The key of the row built for this group, to find it by in a test. The
+  /// sidebar also knows the group by it across rebuilds, or by its [label]
+  /// without one: two groups under one label each need a key.
+  final Key? key;
+
+  const NavGroup(
+    this.label, {
+    this.key,
+    required this.icon,
+    required this.items,
+    this.initiallyExpanded = false,
+    this.expanded,
+    this.onExpandedChanged,
+    this.statesController,
+  });
+
+  Object get _id => key ?? label;
+
+  /// The place among [items] of the current one in a sidebar whose
+  /// selection is [current], or -1.
+  int _currentIn(Object? current) =>
+      items.indexWhere((item) => item._isSelected(current));
+}
+
 /// A small uppercase caption grouping items below it. Hidden when collapsed.
 class NavSection extends NavEntry {
   final String label;
   const NavSection(this.label);
 }
+
+/// What a [Sidebar] keeps of a [NavGroup].
+class _GroupState {
+  bool open;
+
+  /// [NavGroup._currentIn], as of the last build.
+  int current;
+
+  _GroupState({required this.open, required this.current});
+}
+
+/// A row a key can stand on: [item], on its own or under [group], or with
+/// no item [group]'s own row.
+typedef _Row = ({NavItem? item, NavGroup? group});
 
 /// The navigation column at the [Shell]'s leading edge: an optional [header]
 /// (workspace / logo), the scrolling [entries], and an optional pinned
@@ -92,10 +174,12 @@ class NavSection extends NavEntry {
 /// The rail opens over the page, expanded, with a shadow on its edge, and the
 /// page does not move. It opens when the pointer rests on it for
 /// [railOpenDelay], and when keyboard focus enters it. It closes when the
-/// pointer leaves it, when focus leaves it, on Escape, and as an item opens.
-/// While a menu opened from it (a [SidebarAccount]'s) holds focus, it stays
-/// open. A click on the rail before it opens keeps it shut until the pointer
-/// leaves. Between a [Shell]'s breakpoints the rail also gives the top bar
+/// pointer leaves it, when focus leaves it, on Escape, on a press outside
+/// it, and as an item opens. While a menu opened from it (a
+/// [SidebarAccount]'s) holds focus, it stays open. A click on the rail
+/// before it opens keeps it shut until the pointer leaves, unless it is on
+/// a [NavGroup]'s icon, which opens the rail at once to show the group's
+/// items. Between a [Shell]'s breakpoints the rail also gives the top bar
 /// its menu button, which opens the navigation drawer, for a touch screen.
 ///
 /// The current item is the one whose [NavItem.value] equals [selected], so
@@ -122,16 +206,19 @@ class NavSection extends NavEntry {
 /// [footer] included: build those with a context below the sidebar (a
 /// [Builder]) for them to read it.
 ///
-/// The column is a navigation landmark named [semanticLabel]. Every item is a
-/// Tab stop announced as a button, the current one as selected; ArrowUp and
-/// ArrowDown (Home and End) move focus between the items, and Enter or Space
-/// opens one.
+/// The column is a navigation landmark named [semanticLabel]. Every item on
+/// the screen is a Tab stop announced as a button, the current one as
+/// selected; ArrowUp and ArrowDown (Home and End) move focus between them,
+/// and Enter or Space opens one. A [NavGroup]'s row is one more such
+/// button, announced as expanded or collapsed, which Enter or Space
+/// toggles; its items are stops only while it is open, and focus on one
+/// goes to the group's row as they fold away.
 ///
 /// An item leaves the page only as the page lets it: opening one, by
 /// pointer or key, first awaits [LeaveGuardScope.confirmLeave], so a form
 /// with unsaved edits asks whether to discard them. Cancelling keeps the
 /// page, and keeps focus on the item. An item with [NavItem.guarded] false
-/// opens at once.
+/// opens at once, as a group opens and closes: it keeps the page.
 class Sidebar extends StatefulWidget {
   final List<NavEntry> entries;
 
@@ -244,9 +331,13 @@ enum _Rail {
 }
 
 class _SidebarState extends State<Sidebar> {
-  /// One node per [NavItem], in order, so the arrow keys can step between
-  /// them.
+  /// One node per row of [_rows], in order, so the arrow keys can step
+  /// between them. An item folded away keeps its node, so the rows after
+  /// it keep theirs as a group opens and closes.
   final _nodes = <FocusNode>[];
+
+  /// What is kept of each [NavGroup], by its [NavGroup._id].
+  final _groups = <Object, _GroupState>{};
 
   /// The column, which moves to the overlay while the rail is open and back
   /// to its place after, keeping its scroll, focus and hover.
@@ -266,6 +357,14 @@ class _SidebarState extends State<Sidebar> {
   /// Whether the sidebar draws as a collapsed rail, as of its last build.
   var _isRail = false;
 
+  /// Whether the column is drawn at the rail's width, as of its last build:
+  /// the items of its groups are then out of sight.
+  var _columnCollapsed = false;
+
+  /// Focus is going to a group's row as the rail folds over the item that
+  /// held it: no key moved it, so it does not open the rail again.
+  var _foldingFocus = false;
+
   /// Runs while the pointer rests on the shut rail, until it opens it.
   Timer? _rest;
 
@@ -284,17 +383,109 @@ class _SidebarState extends State<Sidebar> {
   /// desktop starts in its keyboard mode and a mouse never leaves it.
   var _byKeyboard = false;
 
-  List<NavItem> get _items => [
+  /// Every row a key can stand on, in order: each item, and each group's
+  /// own row ahead of its items, shown or not.
+  List<_Row> get _rows => [
     for (final entry in widget.entries)
-      if (entry is NavItem) entry,
+      if (entry is NavItem)
+        (item: entry, group: null)
+      else if (entry is NavGroup) ...[
+        (item: null, group: entry),
+        for (final item in entry.items) (item: item, group: entry),
+      ],
   ];
 
   @override
   void initState() {
     super.initState();
+    _syncGroups();
     FocusManager.instance.addListener(_onFocus);
     HardwareKeyboard.instance.addHandler(_onKey);
     GestureBinding.instance.pointerRouter.addGlobalRoute(_onPointer);
+  }
+
+  @override
+  void didUpdateWidget(Sidebar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncGroups();
+    _refocusFolded();
+  }
+
+  /// Takes each group's state from the entries: a new group starts as it
+  /// says, a controlled one is as it says, and the others open as the
+  /// current item becomes one of theirs. A group that is gone is forgotten.
+  void _syncGroups() {
+    final seen = <Object>{};
+    for (final entry in widget.entries) {
+      if (entry is! NavGroup) continue;
+      seen.add(entry._id);
+      final current = entry._currentIn(widget.selected);
+      final state = _groups[entry._id];
+      if (state == null) {
+        _groups[entry._id] = _GroupState(
+          open: entry.expanded ?? (entry.initiallyExpanded || current >= 0),
+          current: current,
+        );
+        continue;
+      }
+      if (entry.expanded case final expanded?) {
+        state.open = expanded;
+      } else if (current >= 0 && current != state.current) {
+        state.open = true;
+      }
+      state.current = current;
+    }
+    _groups.removeWhere((id, _) => !seen.contains(id));
+  }
+
+  bool _isOpen(NavGroup group) => _groups[group._id]!.open;
+
+  /// Whether [row] is on the screen and takes a key: a group's own row, or
+  /// a live item that no closed group, and no rail, folds away.
+  bool _reachable(_Row row) {
+    final (:item, :group) = row;
+    if (item == null) return true;
+    if (item.onTap == null) return false;
+    return group == null || (!_columnCollapsed && _isOpen(group));
+  }
+
+  /// Moves focus from an item that is folding away to its group's row, so
+  /// it stays on the screen: an item of a closed group, or with [rail] of
+  /// any group, as the column folds to the rail. Returns whether it did.
+  bool _refocusFolded({bool rail = false}) {
+    final rows = _rows;
+    var groupRow = 0;
+    for (var i = 0; i < rows.length && i < _nodes.length; i++) {
+      final (:item, :group) = rows[i];
+      if (item == null) groupRow = i;
+      if (item == null || group == null || !_nodes[i].hasPrimaryFocus) continue;
+      if (!rail && _isOpen(group)) return false;
+      _nodes[groupRow].requestFocus();
+      return true;
+    }
+    return false;
+  }
+
+  /// Opens or closes [group]; a controlled one only asks its app to.
+  void _setGroup(NavGroup group, bool open) {
+    final state = _groups[group._id]!;
+    if (state.open == open) return;
+    if (group.expanded == null) {
+      setState(() => state.open = open);
+      _refocusFolded();
+    }
+    group.onExpandedChanged?.call(open);
+  }
+
+  /// A click or a key on [group]'s row. In the rail, where its items are
+  /// out of sight, it opens the rail over the page and the group with it.
+  void _onGroupTap(NavGroup group) {
+    if (!_columnCollapsed) {
+      _setGroup(group, !_isOpen(group));
+      return;
+    }
+    _setGroup(group, true);
+    _open();
   }
 
   @override
@@ -316,7 +507,21 @@ class _SidebarState extends State<Sidebar> {
   }
 
   void _onPointer(PointerEvent event) {
-    if (event is PointerDownEvent) _byKeyboard = false;
+    if (event is! PointerDownEvent) return;
+    _byKeyboard = false;
+    // A press outside the open rail closes it: a finger, which never
+    // leaves it as a mouse does, or a mouse beside a rail a key opened. A
+    // press in a menu opened from it is not one.
+    if (_rail != _Rail.open || _inColumn(event.position)) return;
+    if (_focus.hasFocus && _focusInMenu) return;
+    _close();
+  }
+
+  /// Whether [position], in the window, is on the column.
+  bool _inColumn(Offset position) {
+    final column = _column.currentContext?.findRenderObject();
+    if (column is! RenderBox || !column.hasSize) return false;
+    return column.size.contains(column.globalToLocal(position));
   }
 
   void _onRailEnter(PointerEnterEvent _) {
@@ -356,7 +561,7 @@ class _SidebarState extends State<Sidebar> {
   /// focus leaving it, or coming back from a menu with the pointer
   /// elsewhere, closes it.
   void _onFocus() {
-    if (!mounted || !_isRail) return;
+    if (!mounted || !_isRail || _foldingFocus) return;
     if (_focus.hasFocus && _byKeyboard) {
       _open();
     } else if (!_overOpen && !_keptOpen) {
@@ -398,6 +603,11 @@ class _SidebarState extends State<Sidebar> {
   void _close({bool held = false}) {
     if (_rail != _Rail.open) return;
     if (held) _held = _overOpen || _overRail;
+    if (_refocusFolded(rail: true)) {
+      _foldingFocus = true;
+      // After the focus manager's own microtask, which tells [_onFocus].
+      scheduleMicrotask(() => _foldingFocus = false);
+    }
     final animates =
         context.motion.medium > Duration.zero &&
         Sidebar.widthOf(context) != Sidebar.widthOf(context, collapsed: true);
@@ -439,13 +649,14 @@ class _SidebarState extends State<Sidebar> {
     }
   }
 
-  /// Moves focus [delta] live items on from the focused one, or with [toEnd]
-  /// to the last (true) or first (false) live item.
+  /// Moves focus [delta] rows on from the focused one, or with [toEnd] to
+  /// the last (true) or first (false) row, among the rows on the screen
+  /// that take a key ([_reachable]).
   void _move({int delta = 0, bool? toEnd}) {
-    final items = _items;
+    final rows = _rows;
     final live = [
-      for (var i = 0; i < items.length; i++)
-        if (items[i].onTap != null) i,
+      for (var i = 0; i < rows.length; i++)
+        if (_reachable(rows[i])) i,
     ];
     if (live.isEmpty) return;
     final int target;
@@ -463,7 +674,7 @@ class _SidebarState extends State<Sidebar> {
 
   @override
   Widget build(BuildContext context) {
-    _syncNodes(_items.length);
+    _syncNodes(_rows.length);
     final palette = context.shellStyle.sidebarPalette;
     final framed = Builder(builder: _framed);
     return palette == null
@@ -572,7 +783,56 @@ class _SidebarState extends State<Sidebar> {
     final colors = context.colors;
     final drawer = NavigationDrawerScope.maybeOf(context);
     final leading = drawer == null ? Shell.sidebarLeadingOf(context) : null;
-    var itemIndex = 0;
+    _columnCollapsed = collapsed;
+    final rows = <Widget>[];
+    var node = 0;
+    for (final entry in widget.entries) {
+      switch (entry) {
+        case NavItem():
+          rows.add(
+            _NavTile(
+              item: entry,
+              selected: entry._isSelected(widget.selected),
+              collapsed: collapsed,
+              focusNode: _nodes[node++],
+            ),
+          );
+        case NavSection():
+          rows.add(_NavSectionLabel(entry, collapsed: collapsed));
+        case NavGroup():
+          final open = !collapsed && _isOpen(entry);
+          rows.add(
+            _NavGroupTile(
+              group: entry,
+              open: open,
+              // It stands for the current item while it hides it.
+              selected: !open && entry._currentIn(widget.selected) >= 0,
+              collapsed: collapsed,
+              focusNode: _nodes[node++],
+              onTap: () => _onGroupTap(entry),
+            ),
+          );
+          final first = node;
+          node += entry.items.length;
+          // Kept in the rail too, folded, so the rows after it keep their
+          // place in the list as the rail opens.
+          rows.add(
+            _NavGroupItems(
+              open: open,
+              children: [
+                for (final (i, item) in entry.items.indexed)
+                  _NavTile(
+                    item: item,
+                    selected: item._isSelected(widget.selected),
+                    collapsed: false,
+                    nested: true,
+                    focusNode: _nodes[first + i],
+                  ),
+              ],
+            ),
+          );
+      }
+    }
 
     final column = Semantics(
       container: true,
@@ -629,21 +889,7 @@ class _SidebarState extends State<Sidebar> {
                         ),
                         vertical: AdminSpacing.md,
                       ),
-                      children: [
-                        for (final entry in widget.entries)
-                          switch (entry) {
-                            NavItem() => _NavTile(
-                              item: entry,
-                              selected: entry._isSelected(widget.selected),
-                              collapsed: collapsed,
-                              focusNode: _nodes[itemIndex++],
-                            ),
-                            NavSection() => _NavSectionLabel(
-                              entry,
-                              collapsed: collapsed,
-                            ),
-                          },
-                      ],
+                      children: rows,
                     ),
                   ),
                 ),
@@ -751,12 +997,16 @@ class _NavTile extends StatelessWidget {
   final NavItem item;
   final bool selected;
   final bool collapsed;
+
+  /// Under a [NavGroup]'s row.
+  final bool nested;
   final FocusNode focusNode;
 
   const _NavTile({
     required this.item,
     required this.selected,
     required this.collapsed,
+    this.nested = false,
     required this.focusNode,
   });
 
@@ -809,6 +1059,139 @@ class _NavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _NavRow(
+      tileKey: item.key,
+      label: item.label,
+      icon: item.icon,
+      // One name whether the label shows or the rail is collapsed, and for
+      // an inert item too.
+      semanticLabel: item.badge == null
+          ? item.label
+          : context.adminL10n.shell.navItemWithBadge(item.label, item.badge!),
+      badge: item.badge,
+      selected: selected,
+      collapsed: collapsed,
+      nested: nested,
+      focusNode: focusNode,
+      statesController: item.statesController,
+      onTap: item.onTap == null ? null : () => _open(context),
+    );
+  }
+}
+
+/// A [NavGroup]'s own row: closed, it trails the number of its items, and
+/// either way a chevron that turns as it opens.
+class _NavGroupTile extends StatelessWidget {
+  final NavGroup group;
+
+  /// Its items show under it.
+  final bool open;
+  final bool selected;
+  final bool collapsed;
+  final FocusNode focusNode;
+  final VoidCallback onTap;
+
+  const _NavGroupTile({
+    required this.group,
+    required this.open,
+    required this.selected,
+    required this.collapsed,
+    required this.focusNode,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final count = context.adminFormats.integer(group.items.length);
+    return _NavRow(
+      tileKey: group.key,
+      label: group.label,
+      icon: group.icon,
+      // One name open or closed, with the count the open row leaves out.
+      semanticLabel: context.adminL10n.shell.navItemWithBadge(
+        group.label,
+        count,
+      ),
+      badge: open ? null : count,
+      selected: selected,
+      collapsed: collapsed,
+      expanded: open,
+      focusNode: focusNode,
+      statesController: group.statesController,
+      onTap: onTap,
+    );
+  }
+}
+
+/// A [NavGroup]'s items under its row, which take their room as it opens
+/// and give it back as it closes.
+class _NavGroupItems extends StatelessWidget {
+  final bool open;
+  final List<Widget> children;
+
+  const _NavGroupItems({required this.open, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final motion = context.motion;
+    final items = open
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: children,
+          )
+        : const SizedBox(width: double.infinity);
+    // An AnimatedSize cannot run at zero: under reduced motion the items
+    // just appear.
+    if (motion.medium == Duration.zero) return items;
+    return AnimatedSize(
+      duration: motion.medium,
+      curve: motion.standard,
+      alignment: Alignment.topCenter,
+      child: items,
+    );
+  }
+}
+
+/// One row of the sidebar's list, a [NavItem]'s or a [NavGroup]'s own: its
+/// glyph, and in the expanded column its label and what trails it.
+class _NavRow extends StatelessWidget {
+  /// The key of the row's tap target.
+  final Key? tileKey;
+  final String label;
+  final IconData icon;
+  final String semanticLabel;
+  final String? badge;
+  final bool selected;
+  final bool collapsed;
+
+  /// Under a [NavGroup]'s row: its content starts a step in, its glyph
+  /// under the group's label.
+  final bool nested;
+
+  /// For a group's row, whether its items show: it then ends in a chevron
+  /// and is announced as expanded or collapsed. Null for an item.
+  final bool? expanded;
+  final FocusNode focusNode;
+  final WidgetStatesController? statesController;
+  final VoidCallback? onTap;
+
+  const _NavRow({
+    required this.tileKey,
+    required this.label,
+    required this.icon,
+    required this.semanticLabel,
+    required this.badge,
+    required this.selected,
+    required this.collapsed,
+    this.nested = false,
+    this.expanded,
+    required this.focusNode,
+    required this.statesController,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colors;
     final style = context.shellStyle;
     final radius = style.itemRadiusOf(context.radii);
@@ -816,22 +1199,20 @@ class _NavTile extends StatelessWidget {
     final mark = colors.navIndicator.a > 0
         ? style.indicatorOf(colors, context.radii)
         : NavIndicator.none;
-    final enabled = item.onTap != null;
-    final height = _heightOf(context);
-    final contentWidth = _contentWidth(context);
+    final enabled = onTap != null;
+    final height = _NavTile._heightOf(context);
+    final indent = nested ? glyph + AdminSpacing.md : 0.0;
+    final contentWidth = _NavTile._contentWidth(context) - indent;
 
     Widget tile = Tappable.states(
-      key: item.key,
-      onTap: enabled ? () => _open(context) : null,
+      key: tileKey,
+      onTap: onTap,
       focusNode: focusNode,
-      statesController: item.statesController,
+      statesController: statesController,
       focusRadius: radius,
       selected: selected ? true : null,
-      // One name whether the label shows or the rail is collapsed, and for
-      // an inert item too.
-      semanticLabel: item.badge == null
-          ? item.label
-          : context.adminL10n.shell.navItemWithBadge(item.label, item.badge!),
+      expanded: expanded,
+      semanticLabel: semanticLabel,
       excludeSemantics: true,
       builder: (context, states) {
         final lit =
@@ -851,12 +1232,12 @@ class _NavTile extends StatelessWidget {
               ? MainAxisAlignment.center
               : MainAxisAlignment.start,
           children: [
-            Icon(item.icon, size: glyph, color: fg),
+            Icon(icon, size: glyph, color: fg),
             if (!collapsed) ...[
               const Gap(AdminSpacing.md),
               Expanded(
                 child: Text(
-                  item.label,
+                  label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style:
@@ -864,8 +1245,20 @@ class _NavTile extends StatelessWidget {
                           .copyWith(color: fg),
                 ),
               ),
-              if (item.badge != null)
-                _NavBadge(item.badge!, selected: selected),
+              if (badge case final badge?) _NavBadge(badge, selected: selected),
+              if (expanded case final expanded?) ...[
+                const Gap(AdminSpacing.sm),
+                AnimatedRotation(
+                  turns: expanded ? 0.5 : 0,
+                  duration: context.motion.fast,
+                  curve: context.motion.standard,
+                  child: Icon(
+                    Icons.expand_more_rounded,
+                    size: context.iconSizes.sm,
+                    color: fg,
+                  ),
+                ),
+              ],
             ],
           ],
         );
@@ -885,7 +1278,10 @@ class _NavTile extends StatelessWidget {
                 row
               else
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: style.itemPaddingX),
+                  padding: EdgeInsetsDirectional.only(
+                    start: style.itemPaddingX + indent,
+                    end: style.itemPaddingX,
+                  ),
                   // While the rail animates open, lay the row out at its
                   // final width and clip to the (narrower) current width —
                   // so it reveals instead of squishing the label to zero
@@ -921,7 +1317,7 @@ class _NavTile extends StatelessWidget {
     );
 
     if (collapsed) {
-      tile = Tip(message: item.label, excludeFromSemantics: true, child: tile);
+      tile = Tip(message: label, excludeFromSemantics: true, child: tile);
     }
     return Padding(
       padding: EdgeInsets.only(bottom: style.itemGap),
