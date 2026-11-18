@@ -280,6 +280,10 @@ final antTheme = AdminTheme.from(
     headerHeight: 48,
     cellPaddingX: 8,
     selectionColumnWidth: 32,
+    // headerBg colorFillAlter under headerColor colorTextHeading; the header
+    // and the rows end in colorBorderSecondary
+    headerInk: TableHeaderInk.foreground,
+    headerRule: TableRule.subtle,
   ),
   // motionDurationFast / Mid / Slow on motionEaseInOut and motionEaseOut;
   // the exit curve is CSS's ease-in cubic, which no Ant token names;

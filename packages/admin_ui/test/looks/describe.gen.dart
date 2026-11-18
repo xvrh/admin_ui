@@ -225,6 +225,10 @@ void describeAdminTableMetrics(
   describeValue(v.sortIconSize, '${p}sortIconSize', out);
   describeValue(v.sortIconGap, '${p}sortIconGap', out);
   describeValue(v.headerText, '${p}headerText', out);
+  describeValue(v.headerFill, '${p}headerFill', out);
+  describeValue(v.headerInk, '${p}headerInk', out);
+  describeValue(v.headerRule, '${p}headerRule', out);
+  describeValue(v.rowRule, '${p}rowRule', out);
 }
 
 void describeAdminMotion(AdminMotion v, String path, Map<String, String> out) {

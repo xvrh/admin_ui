@@ -250,7 +250,8 @@ final shadcnTheme = AdminTheme.from(
   ),
   focus: const AdminFocusSpec(width: 3, offset: 0),
   sizes: const AdminControlSizes(small: 32, medium: 36, large: 40), // h-8/9/10
-  // TableHead h-10 px-2 font-medium, TableCell p-2
+  // TableHead h-10 px-2 font-medium text-foreground on no fill, TableCell
+  // p-2; the header row and every row end in border-b, the --border colour
   table: const AdminTableMetrics(
     rowCompact: 40,
     rowStandard: 48,
@@ -258,6 +259,9 @@ final shadcnTheme = AdminTheme.from(
     headerHeight: 40,
     cellPaddingX: 8,
     selectionColumnWidth: 40,
+    headerFill: TableHeaderFill.surface,
+    headerInk: TableHeaderInk.foreground,
+    rowRule: TableRule.border,
   ),
   // duration-150 / 200 / 300 on Tailwind's ease-in-out, ease-out and ease-in
   motion: const AdminMotion(

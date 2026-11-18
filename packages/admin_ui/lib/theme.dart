@@ -49,7 +49,14 @@ export 'src/theme/state_layer.dart' show AdminStateLayer;
 export 'src/theme/stroke.dart' show AdminStroke;
 export 'src/theme/syntax.dart' show AdminSyntaxColors;
 export 'src/theme/table_metrics.dart'
-    show AdminTableMetrics, TableDensity, TableHeaderText, defaultTableMetrics;
+    show
+        AdminTableMetrics,
+        TableDensity,
+        TableHeaderFill,
+        TableHeaderInk,
+        TableHeaderText,
+        TableRule,
+        defaultTableMetrics;
 export 'src/theme/tabs_style.dart'
     show
         AdminTabsStyle,

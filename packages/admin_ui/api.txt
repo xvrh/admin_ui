@@ -421,7 +421,10 @@ theme.dart SelectionOutline
 theme.dart SliderRail
 theme.dart SliderThumb
 theme.dart TableDensity
+theme.dart TableHeaderFill
+theme.dart TableHeaderInk
 theme.dart TableHeaderText
+theme.dart TableRule
 theme.dart TabsIndicatorShape
 theme.dart TabsIndicatorWidth
 theme.dart TabsRestInk

@@ -24,8 +24,9 @@ class TableTokensDemo extends StatelessWidget {
         Text(
           'rows ${_px(m.rowCompact)} / ${_px(m.rowStandard)} / '
           '${_px(m.rowComfortable)} · header ${_px(m.headerHeight)} '
-          '(${m.headerText.name}) · padding ${_px(m.cellPaddingX)} · '
-          'selection ${_px(m.selectionColumnWidth)}',
+          '(${m.headerText.name}, ${m.headerInk.name} on ${m.headerFill.name}) '
+          '· rules ${m.headerRule.name} / ${m.rowRule.name} · padding '
+          '${_px(m.cellPaddingX)} · selection ${_px(m.selectionColumnWidth)}',
           style: context.type.bodyMuted,
         ),
         const Gap(AdminSpacing.xl),
@@ -86,16 +87,7 @@ class _Grid extends StatelessWidget {
       c.foregroundMuted,
       surfaces: [c.tableRowStripe, c.tableRowSelected],
     );
-    final headerStyle =
-        switch (m.headerText) {
-          TableHeaderText.caption => type.weighted(
-            type.caption,
-            FontWeight.w600,
-          ),
-          TableHeaderText.label => type.bodyStrong,
-        }.copyWith(
-          color: c.readableOn(c.foregroundMuted, surfaces: [c.surfaceMuted]),
-        );
+    final headerStyle = m.headerStyleOf(type).copyWith(color: m.headerInkOf(c));
 
     Widget cell(Widget child, {double? width, bool end = false}) {
       final padded = Padding(
@@ -120,7 +112,7 @@ class _Grid extends StatelessWidget {
       height: height + textGrowthOf(context, type.body),
       decoration: BoxDecoration(
         color: fill,
-        border: Border(bottom: BorderSide(color: c.borderSubtle)),
+        border: Border(bottom: BorderSide(color: m.rowRuleOf(c))),
       ),
       child: Row(children: children),
     );
@@ -137,8 +129,8 @@ class _Grid extends StatelessWidget {
           Container(
             height: m.headerHeight + textGrowthOf(context, headerStyle),
             decoration: BoxDecoration(
-              color: c.surfaceMuted,
-              border: Border(bottom: BorderSide(color: c.border)),
+              color: m.headerFillOf(c),
+              border: Border(bottom: BorderSide(color: m.headerRuleOf(c))),
             ),
             child: Row(
               children: [
