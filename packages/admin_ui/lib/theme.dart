@@ -30,6 +30,14 @@ export 'src/theme/palette.dart' show AdminPalette;
 export 'src/theme/radii.dart' show AdminRadii, defaultRadii;
 export 'src/theme/segmented_style.dart'
     show AdminSegmentedStyle, SegmentedVariant;
+export 'src/theme/selection_style.dart'
+    show
+        AdminSelectionStyle,
+        RadioMark,
+        SelectionInk,
+        SelectionOutline,
+        ToggleOffStyle,
+        ToggleOnColor;
 export 'src/theme/shell_style.dart'
     show AdminShellStyle, NavIndicator, TopBarSpan;
 export 'src/theme/sizes.dart'

@@ -458,23 +458,26 @@ void main() {
 
   group('role radii', () {
     const expected = {
-      // theme: (menu, dialog, pill, field, button small / medium / large)
-      'Iris': (9.0, 12.0, 999.0, 9.0, (7.0, 9.0, 9.0)),
-      // M3: 4dp fields (corner.extraSmall), full-round buttons
-      'Material': (4.0, 28.0, 8.0, 4.0, (999.0, 999.0, 999.0)),
+      // theme: (menu, dialog, pill, field, button small / medium / large,
+      // check)
+      'Iris': (9.0, 12.0, 999.0, 9.0, (7.0, 9.0, 9.0), 4.0),
+      // M3: 4dp fields (corner.extraSmall), full-round buttons, a 2dp
+      // checkbox
+      'Material': (4.0, 28.0, 8.0, 4.0, (999.0, 999.0, 999.0), 2.0),
       // shadcn: rounded-lg dialogs, rounded-md buttons at every size
-      'shadcn': (8.0, 10.0, 999.0, 8.0, (8.0, 8.0, 8.0)),
+      'shadcn': (8.0, 10.0, 999.0, 8.0, (8.0, 8.0, 8.0), 4.0),
       // Ant: borderRadius 6, borderRadiusSM 4 on a small button
-      'Ant': (8.0, 8.0, 4.0, 6.0, (4.0, 6.0, 6.0)),
+      'Ant': (8.0, 8.0, 4.0, 6.0, (4.0, 6.0, 6.0), 4.0),
       // Fluent: borderRadiusMedium on inputs and every button
-      'Fluent': (4.0, 8.0, 4.0, 4.0, (4.0, 4.0, 4.0)),
-      // Carbon: square, tags aside
-      'Carbon': (0.0, 0.0, 999.0, 0.0, (0.0, 0.0, 0.0)),
+      'Fluent': (4.0, 8.0, 4.0, 4.0, (4.0, 4.0, 4.0), 2.0),
+      // Carbon: square, tags and the checkbox's 2px corner aside
+      'Carbon': (0.0, 0.0, 999.0, 0.0, (0.0, 0.0, 0.0), 2.0),
     };
     for (final theme in adminThemes) {
       test(theme.name, () {
         final r = theme.tokens.radii;
-        final (menu, dialog, pill, field, button) = expected[theme.name]!;
+        final (menu, dialog, pill, field, button, check) =
+            expected[theme.name]!;
         expect(r.radiusMenu, menu, reason: 'radiusMenu');
         expect(r.radiusDialog, dialog, reason: 'radiusDialog');
         expect(r.radiusPill, pill, reason: 'radiusPill');
@@ -484,8 +487,10 @@ void main() {
           r.button(ControlSize.medium),
           r.button(ControlSize.large),
         ), button);
+        // A box never reads as a radio, whoever sets its corner.
+        expect(r.radiusCheck, check, reason: 'radiusCheck');
         expect(r.radiusCheck, lessThanOrEqualTo(4));
-        expect(r.radiusCheck, lessThanOrEqualTo(r.radiusSmall));
+        expect(theme.dark!.radii.radiusCheck, check, reason: 'dark');
       });
     }
 
@@ -495,6 +500,13 @@ void main() {
       expect(r.radiusDialog, 14);
       expect(r.radiusPill, 999);
       expect(r.radiusCheck, 4);
+      expect(r.copyWith(radiusSmall: 2).radiusCheck, 2);
+      expect(r.copyWith(radiusCheck: 2).radiusCheck, 2);
+      expect(r.copyWith(radiusCheck: 2), isNot(r));
+      expect(
+        r.copyWith(radiusCheck: 2).hashCode,
+        r.copyWith(radiusCheck: 2).hashCode,
+      );
       expect(r.copyWith(radiusMenu: 2).radiusMenu, 2);
       expect(r.copyWith(radius: 12).radiusMenu, 12);
     });
@@ -511,6 +523,14 @@ void main() {
       expect(mid.radiusMenu, mid.radius);
       expect(mid.radiusDialog, 16);
       expect(AdminRadii.lerp(a, b, 1).radiusDialog, 28);
+      // unauthored on both sides: the cap on the small radius, 0 and 4
+      expect(mid.radiusCheck, 4);
+      expect(mid.copyWith(radiusSmall: 3).radiusCheck, 3);
+      // authored on one side: the two resolved corners, 0 and 2
+      expect(
+        AdminRadii.lerp(a, a.copyWith(radiusCheck: 2), 0.5).radiusCheck,
+        1,
+      );
     });
 
     testWidgets('Material dialogs and menus take the role radii', (

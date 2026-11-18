@@ -1,3 +1,4 @@
+/// @docImport '../../theme/stroke.dart';
 /// @docImport 'checkbox.dart';
 library;
 
@@ -7,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/palette.dart';
+import '../../theme/selection_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'control_label.dart';
@@ -336,7 +338,7 @@ class _Option<T> extends StatelessWidget {
             context,
             FocusRing(
               focused: focused,
-              radius: 9,
+              radius: context.selectionStyle.radioSize / 2,
               child: _dot(hovered: hovered),
             ),
             option.label,
@@ -453,12 +455,14 @@ class _Option<T> extends StatelessWidget {
   }
 }
 
-/// The radio ring: an [AdminPalette.controlBorder] outline, the
-/// [offHoverOutline] under the pointer; selected, a thick
-/// [AdminPalette.controlAccent] ring around an [AdminPalette.onControlAccent]
-/// centre, as a checked Check's glyph and an on Toggle's knob. Otherwise the
-/// centre is the page colour. Disabled, the ring drops to the disabled grey —
-/// the stronger one when selected, as a disabled Check's fill does.
+/// The radio: a ring ([AdminSelectionStyle.outlineOf],
+/// [AdminStroke.controlStrong] wide) that takes
+/// [AdminSelectionStyle.hoverOutlineOf] under the pointer. Selected, the
+/// theme's [RadioMark]: a disc in the ink around a dot in its on-colour, as a
+/// checked Check's glyph and an on Toggle's knob, or the ring in the ink
+/// around a dot in the ink. Otherwise the centre is the surface colour.
+/// Disabled, the mark drops to the disabled grey — the stronger one when
+/// selected, as a disabled Check's fill does.
 class _Dot extends StatelessWidget {
   final bool selected;
   final bool enabled;
@@ -473,28 +477,44 @@ class _Dot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final style = context.selectionStyle;
     final Color ring;
     if (!enabled) {
       ring = selected ? colors.foregroundSubtle : colors.foregroundFaint;
     } else if (selected) {
-      ring = colors.controlAccent;
+      ring = style.inkOf(colors);
     } else if (hovered) {
-      ring = offHoverOutline(colors);
+      ring = style.hoverOutlineOf(colors);
     } else {
-      ring = colors.controlBorder;
+      ring = style.outlineOf(colors);
     }
+    final disc = style.radioMark == RadioMark.disc;
+    final size = style.radioSize;
     return Container(
-      width: 18,
-      height: 18,
+      width: size,
+      height: size,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: enabled && selected ? colors.onControlAccent : colors.surface,
-        // Selected, a thick ring around the on-colour dot.
+        color: disc && selected && enabled
+            ? style.onInkOf(colors)
+            : colors.surface,
+        // A selected disc is a ring as thick as leaves its dot showing.
         border: Border.all(
           color: ring,
-          width: selected ? 5 : context.stroke.controlStrong,
+          width: disc && selected
+              ? (size - style.radioDot) / 2
+              : context.stroke.controlStrong,
         ),
       ),
+      child: !disc && selected
+          ? SizedBox.square(
+              dimension: style.radioDot,
+              child: DecoratedBox(
+                decoration: BoxDecoration(shape: BoxShape.circle, color: ring),
+              ),
+            )
+          : null,
     );
   }
 }

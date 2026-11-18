@@ -481,7 +481,7 @@ class _OptionsEditorState extends State<_OptionsEditor> {
             context,
             label: o.label,
             description: o.description,
-            leading: Check.size,
+            leading: context.selectionStyle.checkSize,
             checkbox: true,
           ),
         ),

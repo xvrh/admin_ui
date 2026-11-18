@@ -936,7 +936,7 @@ is not the look you want:
 | `dangerHover`, `dangerActive` | `danger`, stepped the way the primary is |
 | `focusRing` | `primary` where it reaches 3:1 (on `fieldFill` too), otherwise `primaryText` |
 | `controlBorder` | `border` moved toward `foreground` until it reaches 3:1; for input outlines and unchecked controls |
-| `controlAccent` | `primary` where it reaches 3:1 (on `fieldFill` too), otherwise `primary` lightened or darkened (hue kept) until it does; for checked, selected and on controls, and an accent-focused field |
+| `controlAccent` | `primary` where it reaches 3:1 (on `fieldFill` too), otherwise `primary` lightened or darkened (hue kept) until it does; for checked, selected and on controls where the theme draws them in the accent (see [Anatomy](#anatomy)), and an accent-focused field |
 | `fieldFill`, `fieldFillHover`, `fieldRule` | `surface`, `hoverOverlay` over it, and `controlBorder` held to 3:1 on the fill and the page: a field's box and the bottom rule of a filled or underlined one |
 | `softFill`, `onSoft` | `primarySubtle`, and `primaryText` held to 4.5:1 on it: a soft (tonal) button |
 | `neutralFill`, `neutralFillHover`, `neutralFillActive`, `onNeutralFill` | `foregroundSecondary`, `surface` over it at the hover and pressed opacities, and white or near-black on it: a filled neutral button (Carbon's secondary) |
@@ -1104,8 +1104,9 @@ duration.
 `AdminStroke` sets line widths, read through `context.stroke`: `hairline`
 (dividers, card edges) and `control` (a resting outline) are 1,
 `controlStrong` (an unchecked checkbox or radio) 1.5 and `indicator` (a
-selection bar or underline) 2. Material draws `controlStrong` at 2; Fluent
-draws it at 1, and its `indicator` at 3. A field's focused and invalid outlines follow
+selection bar or underline) 2. Material draws `controlStrong` at 2; shadcn,
+Ant, Fluent and Carbon draw it at 1, and Fluent its `indicator` at 3. A
+field's focused and invalid outlines follow
 each design system; a focused invalid field takes the wider of the two.
 `resolveFieldChrome` draws them in the theme's field anatomy (see
 [Anatomy](#anatomy)); `fieldBorderSide(palette, states, stroke:
@@ -1143,13 +1144,14 @@ drag.
 
 ### Anatomy
 
-Four anatomy tokens give each theme the shapes of its reference system, not
+Anatomy tokens give each theme the shapes of its reference system, not
 only its colours: `AdminFieldStyle` (`context.fieldStyle`),
 `AdminButtonStyle` (`context.buttonStyle`), `AdminShellStyle`
-(`context.shellStyle`) and `AdminOverlayStyle` (`context.overlayStyle`),
-beside the role radii `radiusField` and `radiusButton`
-(`context.radii.button(size)`). A component reads them; it never asks which
-theme it is in.
+(`context.shellStyle`), `AdminOverlayStyle` (`context.overlayStyle`),
+`AdminSegmentedStyle` (`context.segmentedStyle`) and `AdminSelectionStyle`
+(`context.selectionStyle`), beside the role radii `radiusField`,
+`radiusButton` (`context.radii.button(size)`) and `radiusCheck`. A component
+reads them; it never asks which theme it is in.
 
 A field's box is `outlined` (stroked on every side), `filled` (a
 `fieldFill` box with only a bottom `fieldRule`, square at the bottom) or
@@ -1170,6 +1172,33 @@ a box.
 | Ant | outlined, 6px corner, colorPrimary focus with a 2px ring, a primary hover | w400, 16px padding, a primary hover | 200 / 80 / 40 / 64, the dark #001529 sider in light mode |
 | Fluent | underlined, a 2px brand underline on focus | radius 4, w600, 12px padding, 96px wide at least | 260 / 48 / 40 / 48, a 4px bar |
 | Carbon | filled, square, a 2px inset `$focus` | square, label at the start and icon at the end (16 / 64), w400, a Gray 80 filled secondary, a `$link-primary` ghost | 256 / 48 / 32 / 48, a 3px edge rule, the g100 header in both modes |
+
+`AdminSelectionStyle` draws a `Toggle`, a `Check` and a radio as the
+reference system does. It sizes the switch's track and knob
+(`toggleWidth`, `toggleHeight`, `toggleKnob`, and `toggleKnobOn` for a knob
+that grows as it turns on), the box (`checkSize`) and the radio
+(`radioSize`). `toggleOff` draws the off track `filled`, `outlined` (a
+clear track ringed in `controlBorder` around a knob in the same colour) or
+`tonal` (that ring over a wash of the foreground). `radioMark` marks the
+selected radio with a `disc` around a `radioDot` dot in its on-colour, or
+keeps the ring around a `dot`. `ink` draws a checked box and a selected
+radio in the accent or in the `foreground`, `outline` rings the unchecked
+ones in `controlBorder`, `foregroundSecondary` or the `foreground`, and
+`toggleOn` fills the on track with the accent or with `success`, whatever
+the brand. A box's corner is `radiusCheck`, which Material and Carbon
+author at 2, and its outline is `controlStrong` wide. The tests hold every
+shipped theme, in both modes and under each demo brand, to 3:1: an outline,
+an on track and a filled box against the surface and the page, a knob and a
+glyph against what they are drawn on.
+
+| Theme | Switch | Checkbox | Radio |
+|---|---|---|---|
+| Iris | 36×20, a 16 knob, filled off | 18, corner 4 | 18, a disc around an 8 dot |
+| Material | 52×32, a knob 16 off and 24 on, outlined off over a wash | 18, corner 2, a 2dp on-surface-variant outline | 20, a 2dp ring around a 10 dot |
+| shadcn | 32×18, a 16 knob | 16, corner 4 | 16, a disc around an 8 dot |
+| Ant | 44×22, an 18 knob | 16, corner 4 | 16, a disc around a 6 dot |
+| Fluent | 40×20, a 14 knob, outlined off | 16, corner 2 | 16, a ring around a 10 dot |
+| Carbon | 48×24, an 18 knob, `success` when on | 16, corner 2, in the foreground | 18, a ring around an 8 dot, in the foreground |
 
 `AdminOverlayStyle` sets whether a tooltip points at its target with an
 arrow, the width it wraps at, and the size of the arrow a tooltip or a

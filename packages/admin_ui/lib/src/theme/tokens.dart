@@ -10,6 +10,7 @@ import 'overlay_style.dart';
 import 'palette.dart';
 import 'radii.dart';
 import 'segmented_style.dart';
+import 'selection_style.dart';
 import 'shell_style.dart';
 import 'sizes.dart';
 import 'stroke.dart';
@@ -24,14 +25,14 @@ import 'typography.dart';
 /// building a [ThemeData] with a different [AdminTokens] (see
 /// `buildAppTheme`).
 ///
-/// Beside the scales, five anatomy members give each theme the shapes of
+/// Beside the scales, six anatomy members give each theme the shapes of
 /// its reference system, so a component reads them rather than asking which
 /// theme it is in: [field] (outlined, filled or underlined boxes), [button]
 /// (alignment, padding, weight, disabled look), [shell] (the sidebar's and
 /// top bar's geometry and palettes), [overlay] (tooltip and popover
-/// arrows, a tooltip's measure) and [segmented] (a track and knob, or joined
-/// segments). [breakpoints] are the window widths where
-/// the layouts change.
+/// arrows, a tooltip's measure), [segmented] (a track and knob, or joined
+/// segments) and [selection] (a switch's track, a checkbox's box, a radio's
+/// mark). [breakpoints] are the window widths where the layouts change.
 @immutable
 class AdminTokens extends ThemeExtension<AdminTokens> {
   final AdminPalette palette;
@@ -70,6 +71,10 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
   /// `context.segmentedStyle`.
   final AdminSegmentedStyle segmented;
 
+  /// The anatomy of a switch, a checkbox and a radio. Read through
+  /// `context.selectionStyle`.
+  final AdminSelectionStyle selection;
+
   /// The widths where the compact, medium and expanded layouts start. Read
   /// through `context.breakpoints`, or classify the window with
   /// [AdminBreakpoint.of].
@@ -91,16 +96,15 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     this.shell = const AdminShellStyle(),
     this.overlay = const AdminOverlayStyle(),
     this.segmented = const AdminSegmentedStyle(),
+    this.selection = const AdminSelectionStyle(),
     this.breakpoints = const AdminBreakpoints(),
   });
 
   /// Builds a token set from a [palette], with optional [radii], typography
   /// [type] spec, [elevation], [focus] ring, control [sizes], [table]
   /// metrics, [motion], [stroke] widths, [iconSizes], the [field],
-  /// [button], [shell], [overlay] and [segmented] anatomy, and the layout
-  /// [breakpoints].
-  /// Typography colours
-  /// are derived from the palette so they stay in sync (and [copyWith] keeps
+  /// [button], [shell], [overlay], [segmented] and [selection] anatomy, and
+  /// the layout [breakpoints]. Typography colours are derived from the palette so they stay in sync (and [copyWith] keeps
   /// them so). Without an [elevation], a dark palette gets
   /// [defaultDarkElevation] (shadows must be denser to read on a dark page)
   /// and a light one [defaultElevation].
@@ -120,6 +124,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     AdminShellStyle? shell,
     AdminOverlayStyle? overlay,
     AdminSegmentedStyle? segmented,
+    AdminSelectionStyle? selection,
     AdminBreakpoints? breakpoints,
   }) {
     return AdminTokens(
@@ -142,6 +147,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       shell: shell ?? const AdminShellStyle(),
       overlay: overlay ?? const AdminOverlayStyle(),
       segmented: segmented ?? const AdminSegmentedStyle(),
+      selection: selection ?? const AdminSelectionStyle(),
       breakpoints: breakpoints ?? const AdminBreakpoints(),
     );
   }
@@ -178,6 +184,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     AdminShellStyle? shell,
     AdminOverlayStyle? overlay,
     AdminSegmentedStyle? segmented,
+    AdminSelectionStyle? selection,
     AdminBreakpoints? breakpoints,
   }) {
     return AdminTokens(
@@ -196,6 +203,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       shell: shell ?? this.shell,
       overlay: overlay ?? this.overlay,
       segmented: segmented ?? this.segmented,
+      selection: selection ?? this.selection,
       breakpoints: breakpoints ?? this.breakpoints,
     );
   }
@@ -228,6 +236,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       shell: AdminShellStyle.lerp(shell, other.shell, t),
       overlay: AdminOverlayStyle.lerp(overlay, other.overlay, t),
       segmented: AdminSegmentedStyle.lerp(segmented, other.segmented, t),
+      selection: AdminSelectionStyle.lerp(selection, other.selection, t),
       breakpoints: AdminBreakpoints.lerp(breakpoints, other.breakpoints, t),
     );
   }
@@ -251,6 +260,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
           other.shell == shell &&
           other.overlay == overlay &&
           other.segmented == segmented &&
+          other.selection == selection &&
           other.breakpoints == breakpoints;
 
   @override
@@ -270,6 +280,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     shell,
     overlay,
     segmented,
+    selection,
     breakpoints,
   );
 }
@@ -411,6 +422,10 @@ extension AdminTokensContext on BuildContext {
   /// The active segmented-control anatomy. `context.segmentedStyle.variant`,
   /// …
   AdminSegmentedStyle get segmentedStyle => adminTokens.segmented;
+
+  /// The active switch, checkbox and radio anatomy.
+  /// `context.selectionStyle.checkSize`, …
+  AdminSelectionStyle get selectionStyle => adminTokens.selection;
 
   /// The active layout breakpoints. `context.breakpoints.medium`, … (the
   /// window's class is [AdminBreakpoint.of]).
