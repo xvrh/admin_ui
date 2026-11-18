@@ -29,6 +29,7 @@ import 'package:admin_ui_example/src/ui/primitives/json_view.dart';
 import 'package:admin_ui_example/src/ui/primitives/menu.dart';
 import 'package:admin_ui_example/src/ui/primitives/notification_center.dart';
 import 'package:admin_ui_example/src/ui/primitives/overlay_surfaces.dart';
+import 'package:admin_ui_example/src/ui/primitives/stat_card.dart';
 import 'package:admin_ui_example/src/ui/primitives/states/progress.dart';
 import 'package:admin_ui_example/src/ui/primitives/thumbnail_image.dart';
 import 'package:admin_ui_example/src/ui/primitives/zoom_view.dart';
@@ -89,6 +90,11 @@ const previewOnly = <PreviewOnlyDemo>[
     'CopyButtonStatesDemo',
     'Copy button — copied and error',
     CopyButtonStatesDemo.new,
+  ),
+  PreviewOnlyDemo(
+    'StatCardDemo.phone',
+    'Stat card / dashboard (phone width)',
+    StatCardDemo.phone,
   ),
   PreviewOnlyDemo(
     'ChartCardDemo.phone',

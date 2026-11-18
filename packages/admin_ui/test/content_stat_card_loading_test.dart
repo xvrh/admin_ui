@@ -154,46 +154,49 @@ void main() {
       );
     });
 
-    testWidgets('the delta bar is the chip: its height and its pill', (
-      tester,
-    ) async {
-      await _pump(
-        tester,
-        const Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: StatCard(
-                label: 'Revenue',
-                value: '1',
-                delta: StatDelta('12%'),
+    testWidgets('the delta bar is the chip of a short delta: its size and '
+        'its pill, at any text size', (tester) async {
+      for (final scale in [1.0, 2.0]) {
+        await _pump(
+          tester,
+          const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: StatCard(
+                  label: 'Revenue',
+                  value: '1',
+                  delta: StatDelta('12%'),
+                ),
               ),
-            ),
-            Expanded(
-              child: StatCard(
-                label: 'Revenue',
-                delta: StatDelta(''),
-                loading: true,
+              Expanded(
+                child: StatCard(
+                  label: 'Revenue',
+                  delta: StatDelta(''),
+                  loading: true,
+                ),
               ),
-            ),
-          ],
-        ),
-        tokens: irisTheme.tokens,
-      );
-      final chip = find.ancestor(
-        of: find.text('12%'),
-        matching: find.byWidgetPredicate(
-          (w) => w is Container && w.decoration is BoxDecoration,
-        ),
-      );
-      final pill = tester
-          .widgetList<Skeleton>(find.byType(Skeleton))
-          .firstWhere((s) => s.borderRadius != null);
-      expect(pill.height, tester.getSize(chip.first).height);
-      expect(
-        pill.borderRadius,
-        BorderRadius.circular(irisTheme.tokens.radii.radiusPill),
-      );
+            ],
+          ),
+          tokens: irisTheme.tokens,
+          textScale: scale,
+        );
+        final chip = find.ancestor(
+          of: find.text('12%'),
+          matching: find.byWidgetPredicate(
+            (w) => w is Container && w.decoration is BoxDecoration,
+          ),
+        );
+        final pill = tester
+            .widgetList<Skeleton>(find.byType(Skeleton))
+            .firstWhere((s) => s.borderRadius != null);
+        final size = tester.getSize(chip.first);
+        expect(Size(pill.width!, pill.height), size, reason: 'text x$scale');
+        expect(
+          pill.borderRadius,
+          BorderRadius.circular(irisTheme.tokens.radii.radiusPill),
+        );
+      }
     });
 
     testWidgets('reads as its label and "Loading…", in every language', (
