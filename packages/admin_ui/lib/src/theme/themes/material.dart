@@ -17,15 +17,30 @@ import '../table_metrics.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
-/// Material 3 (light) — tonal purple, tinted surfaces, soft ink.
+// Audited on 18 November 2026 against baseline Material 3: Material Web's
+// tokens v0_192, Compose Material 3's generated tokens and material_ui
+// 1.11.1. Material 3 Expressive (May 2025) is not drawn: no 56, 96 and 136
+// buttons, shape morphing or spring motion.
+//
+// The kit's contrast rules move no Material colour: the accents reach their
+// targets as authored, and the control outline is M3's own `outline`, past
+// 3:1. They show in a disabled button's label, held to 2.5:1 where M3 lays
+// on-surface at 38%, and in the light chart colours, deepened to 3:1.
+
+/// Material 3 (light) — tonal purple, tinted surfaces, soft ink. The page is
+/// `surfaceContainer`, cards and inputs the `surface` above it and wells the
+/// `surfaceContainerLow` between them: the kit keeps a card lighter than its
+/// page, where M3 sets its darker containers on a `surface` page.
 const materialPalette = AdminPalette(
   primary: Color(0xFF6750A4),
   primaryStrong: Color(0xFF4F378B),
   primarySubtle: Color(0xFFEADDFF),
   primaryFaint: Color(0xFFF6EDFF),
-  surface: Color(0xFFFFFBFE),
-  background: Color(0xFFF3EDF7),
-  surfaceMuted: Color(0xFFFEF7FF),
+  // surface, #FEF7FF, one step short of it in green: mixed into M3's own
+  // value, the selected table row of a teal brand leaves the brand's hue.
+  surface: Color(0xFFFEF8FF),
+  background: Color(0xFFF3EDF7), // surfaceContainer
+  surfaceMuted: Color(0xFFF7F2FA), // surfaceContainerLow
   foreground: Color(0xFF1D1B20),
   foregroundSecondary: Color(0xFF49454F),
   // onSurfaceVariant: M3's supporting text (outline #79747E is a border role).
@@ -42,11 +57,23 @@ const materialPalette = AdminPalette(
   modifiedFill: Color(0xFFF6EDFF),
   tabDivider: Color(0xFFCAC4D0),
   info: Color(0xFF1565C0),
+  // A filled button under the pointer takes its content's state layer and
+  // lightens: onPrimary over primary at 8%, 10% pressed, and onError over
+  // error likewise.
+  primaryHover: Color(0xFF735EAB),
+  primaryActive: Color(0xFF7662AD),
+  dangerHover: Color(0xFFB93730),
+  dangerActive: Color(0xFFBB3C35),
   stateLayer: _stateLayer,
   controlBorder: Color(0xFF79747E), // M3 outline
   focusRing: Color(0xFF625B71), // M3 focus indicator: secondary
   chart: _chartLight,
   navSelectedFill: Color(0xFFE8DEF8), // secondaryContainer
+  // onSurface at just under 6%. M3's hover layer is 8% (#E2DCE6), which
+  // stands further from the page than the selection does; the kit keeps a
+  // hovered item no stronger than the selected one, so the layer stops where
+  // the two meet.
+  navHoverFill: Color(0xFFE6E1EA),
   navSelectedText: Color(0xFF1D192B), // onSecondaryContainer
   navIndicator: Color(0x00000000),
   softFill: Color(0xFFE8DEF8), // the tonal button: secondaryContainer
@@ -80,6 +107,8 @@ const materialDarkPalette = AdminPalette(
   info: Color(0xFF9CCAFF),
   onPrimary: Color(0xFF381E72), // M3 onPrimary
   onDanger: Color(0xFF601410), // M3 onError
+  primaryHover: Color(0xFFC4AFF4), // primary + onPrimary at 8% (hover layer)
+  primaryActive: Color(0xFFC1ACF1), // primary + onPrimary at 10% (pressed)
   dangerHover: Color(0xFFE6ABA8), // error + onError at 8% (hover layer)
   dangerActive: Color(0xFFE3A8A4), // error + onError at 10% (pressed layer)
   stateLayer: _stateLayer,
@@ -209,14 +238,23 @@ final materialTheme = AdminTheme.from(
   ),
   type: const AdminTypeSpec(
     fontFamily: 'Roboto',
-    heading: FontWeight.w600,
+    heading: FontWeight.w500, // the title and label styles: Medium
     label: FontWeight.w400, // bodySmall
+    strong: FontWeight.w500, // labelLarge, labelSmall, titleSmall
     uppercaseLabels: false,
     ramp: _ramp,
   ),
   focus: const AdminFocusSpec(width: 3, offset: 2),
-  // M3 buttons are 40 (small 32, large 48); fields follow them
-  sizes: const AdminControlSizes(small: 32, medium: 40, large: 48),
+  // M3 buttons are 40, the extra-small one 32; 48 is the kit's large step.
+  // Fields follow them. A text field's leading and trailing icons are 24dp
+  // in M3; 20 is the largest the kit's fields hold, in a colour field's
+  // swatch column and a 32dp field.
+  sizes: const AdminControlSizes(
+    small: 32,
+    medium: 40,
+    large: 48,
+    fieldIcon: 20,
+  ),
   // data table: 52 rows under a 56 header, 16 cell padding; the compact and
   // comfortable rows are the MUI DataGrid densities (36 / 67) on the grid
   table: const AdminTableMetrics(
@@ -237,8 +275,9 @@ final materialTheme = AdminTheme.from(
     exit: Cubic(0.3, 0, 0.8, 0.15), // emphasizedAccelerate
     emphasized: Curves.easeInOutCubicEmphasized,
   ),
-  // a focused text field's 2dp outline; a focused invalid one keeps it
-  stroke: const AdminStroke(fieldFocus: 2, fieldError: 1),
+  // a focused text field's 2dp outline; a focused invalid one keeps it. An
+  // unchecked checkbox's and radio's 2dp outline
+  stroke: const AdminStroke(fieldFocus: 2, fieldError: 1, controlStrong: 2),
   elevation: _elevation,
   darkElevation: _elevation,
   // the outlined text field: an outline #79747E, 2dp primary on focus; a

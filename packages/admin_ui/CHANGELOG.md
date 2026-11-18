@@ -315,6 +315,9 @@
   as its `value` when given one, so a loading card given the trend the
   loaded one will have, with any values, is as tall as it. It mirrors
   right to left.
+- `shadcnDarkSidebarPalette` is the palette the shadcn theme's sidebar draws
+  with in dark mode, as `antSiderPalette` is Ant's sider: the dark palette
+  on the `--sidebar` rail.
 
 ### Looks
 
@@ -432,6 +435,80 @@
   alone, so a control that picks what the chart shows can move off a
   selection that has no data. The catalog's Primitives / Chart card page
   shows the card in a column of two, at the page's width and at a phone's.
+
+- The five themes drawn after a design system were checked against its
+  published tokens on 18 November 2026, and their values moved where the two
+  differed. Each theme's file now names the version it was checked against
+  and the contrast rules of the kit that take it away from that system. A
+  value the kit's contrast, hue or ordering rules refuse is the nearest one
+  they accept, and the file says so beside it.
+- Material sets its titles and labels at weight 500, Material 3's Medium:
+  `heading` and `strong` were 600. That is the page title, a heading, a
+  section label, a table's header, a tab, the selected sidebar item,
+  `bodyStrong`, `micro`, `button`, and the title and label styles of the
+  Material text theme. A filled button lightens under the pointer by its
+  content's state layer, 8% and 10% pressed, as M3's does: `primaryHover`
+  #735EAB and `primaryActive` #7662AD, the danger pair #B93730 and #BB3C35,
+  and in dark mode a pressed #C1ACF1, 10% where it was 12%. It darkened to
+  `primaryStrong`, #4F378B. The light surfaces are current roles: cards and
+  inputs are `surface`, #FEF8FF, one step from M3's #FEF7FF so that a
+  brand's selected table row keeps its hue (was #FFFBFE), and the wells and
+  a table's header `surfaceContainerLow`, #F7F2FA (was #FEF7FF). A sidebar
+  item under the pointer is on-surface at just under 6%, #E6E1EA: as far
+  toward M3's 8% as leaves it no stronger than the selection (was 5%). A
+  field's icons are 20 (were 16), the largest the kit's fields hold of M3's
+  24, and the outline of an unchecked checkbox or radio is 2 wide (was
+  1.5).
+- shadcn draws Tailwind's `shadow-sm`, `shadow-md` and `shadow-lg` in light
+  mode, under the selected segment, a menu or popover, and a dialog; it drew
+  the kit's own softer shadows. Dark mode keeps the kit's dark set. Its
+  corners follow `--radius` at 0.625rem: a card, `radiusLarge`, is 14 (was
+  12), a dialog 10 (was 12), a small button 8 as the others are (was 6), the
+  segmented track 10 around a knob of 7 (were 8 and 5), and a sidebar item 8
+  (was 6). The sidebar is 256 wide over 32px items and folds to a 48px rail
+  (were 240, 36 and 64). In dark mode it is `--sidebar`, #18181B, a step
+  above the page, where it was the page's #09090B. A button pads 12, 16 and
+  24 at its three sizes, and 10, 12 and 16 on the side of a leading icon
+  (was 12, 14 and 16 either side). Dark `primary` is #E4E4E7 (was #FAFAFA)
+  and dark `border` #2F2F32 (was #27272A).
+- Ant's page is `colorBgLayout`, #F5F5F5, and its wells and table header
+  #FAFAFA; the two were the other way round. On the darker page five of the
+  light chart colours and `warningText`, now #A26100, deepen by a step or
+  two to keep their 3:1 and 4.5:1. The rule under a row of tabs is
+  `colorBorderSecondary`, #F0F0F0 and in dark mode #303030 (were #D9D9D9 and
+  #424242). The dark selection tint, `primarySubtle`, is #15325B, the dark
+  algorithm's `colorPrimaryBg` (was #112545). `elevation.sm`, under the
+  selected segment, takes the alphas of Ant 6.4.4: 5%, 3% and 3% (were 3%,
+  2% and 2%). The focus ring is 3 wide, 1 from the control (was 2 and 2). In
+  the sider a group's title is white at 65%, #A6ADB4 (was 55%), and an
+  item's icon 14 (was 16).
+- Fluent takes Fluent 2's neutral greys where it had the warm ones of
+  Fluent UI v8: the page #FAFAFA, the wells #F5F5F5, `border` #D1D1D1,
+  `borderSubtle` #E0E0E0, `foregroundSubtle` #707070 and `foregroundFaint`
+  #BDBDBD, and in dark mode `border` #666666 and `borderSubtle` #525252. An
+  input, a secondary button and a divider are framed a step stronger for
+  it. The icon in a button, a menu item or a tab, `iconSizes.md`, is 20
+  (was 16), and a field's icon 20, 6 from its text (were 16 and 8). A tab's
+  indicator and the segmented control's pill are 3 thick (were 2), the
+  outline of an unchecked checkbox or radio 1 wide (was 1.5), and a card's
+  corner, `radiusLarge`, 4 (was 8). A primary button hovers and presses to
+  the brand ramp, #115EA3 and #0C3B5E. The warning is Fluent 2's orange
+  where it was v8's yellow: #F7820C under `warningText` #AA5908 (were
+  #FFB900 and #8A5300), each 8° of hue from Fluent's own #F7630C and
+  #BC4B09, which stand too near the danger for a changed line to be told
+  from a removed one. In dark mode `success` is #54B054, `warning` and
+  `warningText` #FAB16B and `danger` #DC626D (were #6BB700, #FCE100, #D9B400
+  and #F1707B).
+- Carbon's field labels, section labels and sidebar items are
+  `$text-secondary`, #525252 (was #393939), and its helper text, captions
+  and placeholders `$text-helper`, #6F6F6F (was #525252). A field's text
+  starts 16 from its edge (was 12). Dark `border` is #525252, the present
+  `$border-subtle-01` (was #393939). The scrim behind a modal in light mode
+  is `$overlay`, black at 60% (was 45%). A danger button hovers and presses
+  to `$button-danger-hover` and `-active`, #B81921 and #750E13. A selected
+  table row is `$layer-selected-01` with 5% of the primary in it, #D5D9E2
+  and in dark mode #373B42; it was the primary at 10% in the surface. Code
+  is set in IBM Plex Mono where the app bundles the family.
 
 ## 0.1.0
 

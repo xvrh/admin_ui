@@ -230,7 +230,7 @@ void main() {
     for (final (theme, radius) in const [
       ('Material', 28.0),
       ('Carbon', 0.0),
-      ('shadcn', 12.0),
+      ('shadcn', 10.0),
     ]) {
       testWidgets('$theme: the card takes the dialog radius ($radius)', (
         tester,

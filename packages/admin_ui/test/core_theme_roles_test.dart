@@ -217,7 +217,11 @@ void main() {
     });
 
     test('shadcn: a hovered row never matches the selected one', () {
-      for (final p in [shadcnPalette, shadcnDarkPalette]) {
+      for (final p in [
+        shadcnPalette,
+        shadcnDarkPalette,
+        shadcnDarkSidebarPalette,
+      ]) {
         expect(
           contrastRatio(p.navSelectedFill, p.background),
           greaterThan(contrastRatio(p.navHoverFill, p.background) + 0.05),
@@ -423,14 +427,26 @@ void main() {
     });
 
     test('is foregroundMuted where that already reads on every tint', () {
-      for (final p in [
-        materialPalette,
-        materialDarkPalette,
-        fluentPalette,
-        carbonPalette,
-      ]) {
+      for (final p in [materialPalette, materialDarkPalette, fluentPalette]) {
         expect(p.foregroundMutedOnTint, p.foregroundMuted);
       }
+    });
+
+    test('deepens in Carbon Light on its grey fills', () {
+      const p = carbonPalette;
+      expect(
+        relativeLuminance(p.foregroundMutedOnTint),
+        lessThan(relativeLuminance(p.foregroundMuted)),
+      );
+      // \$text-helper is under 4.5:1 on \$layer-selected-01.
+      expect(
+        contrastRatio(p.foregroundMuted, p.tableRowSelected),
+        lessThan(4.5),
+      );
+      expect(
+        contrastRatio(p.foregroundMutedOnTint, p.tableRowSelected),
+        greaterThanOrEqualTo(4.5),
+      );
     });
 
     test('leaves the authored foregroundMuted alone', () {
@@ -446,7 +462,8 @@ void main() {
       'Iris': (9.0, 12.0, 999.0, 9.0, (7.0, 9.0, 9.0)),
       // M3: 4dp fields (corner.extraSmall), full-round buttons
       'Material': (4.0, 28.0, 8.0, 4.0, (999.0, 999.0, 999.0)),
-      'shadcn': (8.0, 12.0, 999.0, 8.0, (6.0, 8.0, 8.0)),
+      // shadcn: rounded-lg dialogs, rounded-md buttons at every size
+      'shadcn': (8.0, 10.0, 999.0, 8.0, (8.0, 8.0, 8.0)),
       // Ant: borderRadius 6, borderRadiusSM 4 on a small button
       'Ant': (8.0, 8.0, 4.0, 6.0, (4.0, 6.0, 6.0)),
       // Fluent: borderRadiusMedium on inputs and every button

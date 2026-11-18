@@ -14,9 +14,10 @@ final shippedPalettes = <String, AdminPalette>{
 
 /// The sidebar and top-bar palettes the shipped themes' [AdminShellStyle]s
 /// carry, keyed by what they draw.
-const shippedChromePalettes = <String, AdminPalette>{
+final shippedChromePalettes = <String, AdminPalette>{
   'Carbon Header': carbonShellPalette,
   'Ant Sider': antSiderPalette,
+  'shadcn Dark Sidebar': shadcnDarkSidebarPalette,
 };
 
 /// The dark palette of every shipped theme, keyed by theme name.
