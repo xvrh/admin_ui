@@ -347,9 +347,14 @@ class _TreeState extends State<Tree> {
   /// first row stands in while it is null or off screen.
   String? _current;
 
-  /// Where each node of [_placedRoots] sits among its siblings.
-  Map<String, _Place> _places = const {};
-  List<TreeNode>? _placedRoots;
+  /// Where each node sat among its siblings at the last build, or null
+  /// until something asks. Read from [Tree.roots] again at every build,
+  /// and not kept for as long as the list is the same object: a host may
+  /// reorder its list in place.
+  Map<String, _Place>? _places;
+
+  /// The move keys as the row menus show them, written once a build.
+  _MoveKeyLabels? _keyLabels;
 
   /// The caret's and the drag handle's cells: the smallest target an icon
   /// action takes.
@@ -393,14 +398,19 @@ class _TreeState extends State<Tree> {
 
   void _toggle(String id) {
     final closing = !_collapsed.contains(id);
-    if (widget.rowControls) {
+    if (widget.rowControls && closing) {
       // A row about to go from under the focus hands it to the parent that
-      // closes over it.
+      // closes over it, which is then the Tab stop. So is a parent that
+      // closes over the Tab stop while focus is out of the tree. Any other
+      // press of a caret, with the mouse while the keyboard is on another
+      // row, leaves the Tab stop to the row that holds focus: a row that
+      // stopped being it could not be tabbed on from to its own controls.
       final focused = _focusedRow;
-      if (closing && focused != null && _isUnder(focused, id)) {
+      if (focused != null && _isUnder(focused, id)) {
         _rowNodes[id]?.requestFocus();
+      } else if (focused == null && _isUnder(_current ?? '', id)) {
+        _current = id;
       }
-      _current = id;
     }
     setState(() {
       if (!_collapsed.remove(id)) _collapsed.add(id);
@@ -416,21 +426,24 @@ class _TreeState extends State<Tree> {
     return null;
   }
 
-  Map<String, _Place> get _placeOf {
-    if (!identical(_placedRoots, widget.roots)) {
-      final places = <String, _Place>{};
-      void walk(List<TreeNode> nodes, String? parent) {
-        for (final (index, node) in nodes.indexed) {
-          places[node.id] = _Place(node, parent, nodes, index);
-          walk(node.children, node.id);
-        }
-      }
+  Map<String, _Place> get _placeOf => _places ??= _placesOf(widget.roots);
 
-      walk(widget.roots, null);
-      _places = places;
-      _placedRoots = widget.roots;
+  /// Every node's place, in one walk that also measures what is under it.
+  static Map<String, _Place> _placesOf(List<TreeNode> roots) {
+    final places = <String, _Place>{};
+    // The levels under the tallest of [nodes], itself counted.
+    int walk(List<TreeNode> nodes, String? parent) {
+      var tallest = 0;
+      for (final (index, node) in nodes.indexed) {
+        final height = walk(node.children, node.id);
+        places[node.id] = _Place(parent, nodes, index, height);
+        tallest = math.max(tallest, height + 1);
+      }
+      return tallest;
     }
-    return _places;
+
+    walk(roots, null);
+    return places;
   }
 
   /// Whether [id] sits somewhere under [ancestor].
@@ -442,27 +455,17 @@ class _TreeState extends State<Tree> {
     return false;
   }
 
-  /// Levels under [node]: 0 for a leaf.
-  static int _heightOf(TreeNode node) {
-    var height = 0;
-    for (final child in node.children) {
-      height = math.max(height, _heightOf(child) + 1);
-    }
-    return height;
-  }
-
   /// The moves open to the row [id] at [depth] without a drag; see
   /// [TreeRowMoves].
   TreeRowMoves? _movesOf(String id, int depth) {
     final onMove = widget.onMove;
     final place = _placeOf[id];
     if (onMove == null || place == null) return null;
-    final _Place(:node, :parentId, :siblings, :index) = place;
+    final _Place(:parentId, :siblings, :index, :height) = place;
     final maxDepth = widget.maxDepth;
 
     VoidCallback? indent;
-    if (index > 0 &&
-        (maxDepth == null || depth + 1 + _heightOf(node) <= maxDepth)) {
+    if (index > 0 && (maxDepth == null || depth + 1 + height <= maxDepth)) {
       final above = siblings[index - 1];
       indent = () => onMove(id, above.id, above.children.length);
     }
@@ -758,6 +761,9 @@ class _TreeState extends State<Tree> {
 
   @override
   Widget build(BuildContext context) {
+    // Read again from the list and the context as they are now.
+    _places = null;
+    _keyLabels = null;
     final all = flattenTree(widget.roots, collapsed: _collapsed);
     if (all.isEmpty) {
       return SizedBox(
@@ -989,6 +995,19 @@ class _TreeState extends State<Tree> {
   Widget _moveMenu(BuildContext context, TreeRowMoves moves) {
     final l10n = context.adminL10n;
     final strings = l10n.display;
+    // The same four labels on every row's menu.
+    final keys = _keyLabels ??= _MoveKeyLabels(
+      up: shortcutLabel(context, _upKey),
+      down: shortcutLabel(context, _downKey),
+      indent: shortcutLabel(
+        context,
+        SingleActivator(_inward(context), alt: true),
+      ),
+      outdent: shortcutLabel(
+        context,
+        SingleActivator(_outward(context), alt: true),
+      ),
+    );
     return Padding(
       padding: const EdgeInsetsDirectional.only(end: AdminSpacing.xs),
       child: MenuButton(
@@ -998,31 +1017,25 @@ class _TreeState extends State<Tree> {
           MenuItem(
             l10n.moveUp,
             icon: Icons.arrow_upward_rounded,
-            shortcut: shortcutLabel(context, _upKey),
+            shortcut: keys.up,
             onSelect: _announced(moves.up, strings.rowMovedUp),
           ),
           MenuItem(
             l10n.moveDown,
             icon: Icons.arrow_downward_rounded,
-            shortcut: shortcutLabel(context, _downKey),
+            shortcut: keys.down,
             onSelect: _announced(moves.down, strings.rowMovedDown),
           ),
           MenuItem(
             strings.indent,
             icon: Icons.format_indent_increase_rounded,
-            shortcut: shortcutLabel(
-              context,
-              SingleActivator(_inward(context), alt: true),
-            ),
+            shortcut: keys.indent,
             onSelect: _announced(moves.indent, strings.rowIndented),
           ),
           MenuItem(
             strings.outdent,
             icon: Icons.format_indent_decrease_rounded,
-            shortcut: shortcutLabel(
-              context,
-              SingleActivator(_outward(context), alt: true),
-            ),
+            shortcut: keys.outdent,
             onSelect: _announced(moves.outdent, strings.rowOutdented),
           ),
         ],
@@ -1210,14 +1223,29 @@ class _MeasureSizeRender extends RenderProxyBox {
 }
 
 /// Where a node sits in a tree: under [parentId], at [index] among
-/// [siblings].
+/// [siblings], with [height] levels under it, 0 for a leaf.
 class _Place {
-  final TreeNode node;
   final String? parentId;
   final List<TreeNode> siblings;
   final int index;
+  final int height;
 
-  const _Place(this.node, this.parentId, this.siblings, this.index);
+  const _Place(this.parentId, this.siblings, this.index, this.height);
+}
+
+/// The four move keys as a row's menu shows them: "Alt+↑".
+class _MoveKeyLabels {
+  final String up;
+  final String down;
+  final String indent;
+  final String outdent;
+
+  const _MoveKeyLabels({
+    required this.up,
+    required this.down,
+    required this.indent,
+    required this.outdent,
+  });
 }
 
 /// One row of a tree that operates its rows: the focus node the arrow keys

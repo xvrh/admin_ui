@@ -225,6 +225,58 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('a caret clicked on another row leaves the Tab stop on the '
+        'row that holds focus', (tester) async {
+      final handle = tester.ensureSemantics();
+      await _pump(tester);
+      await _enter(tester);
+      expect(_focused(tester), 'row m1');
+
+      // The mouse closes m2 while the keyboard is on m1.
+      await tester.tap(find.byIcon(Icons.chevron_right_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('m2a'), findsNothing);
+      expect(_focused(tester), 'row m1');
+
+      // m1 is the Tab stop still: Tab goes on to its own menu.
+      await _press(tester, LogicalKeyboardKey.tab);
+      expect(_focused(tester), 'More actions');
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('tree-row-m1')),
+          matching: find.byElementPredicate(
+            (e) => e == FocusManager.instance.primaryFocus!.context,
+          ),
+        ),
+        findsOneWidget,
+      );
+      await _press(tester, LogicalKeyboardKey.tab);
+      expect(_focused(tester), 'After');
+      await _press(tester, LogicalKeyboardKey.tab, shift: true);
+      await _press(tester, LogicalKeyboardKey.tab, shift: true);
+      expect(_focused(tester), 'row m1');
+      handle.dispose();
+    });
+
+    testWidgets('a parent closed over the Tab stop, with focus out of the '
+        'tree, is the stop', (tester) async {
+      final handle = tester.ensureSemantics();
+      await _pump(tester, movable: false);
+      await _enter(tester);
+      await _press(tester, LogicalKeyboardKey.arrowDown);
+      await _press(tester, LogicalKeyboardKey.arrowDown);
+      await _press(tester, LogicalKeyboardKey.tab);
+      expect(_focused(tester), 'After');
+
+      await tester.tap(find.byIcon(Icons.chevron_right_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('m2a'), findsNothing);
+      expect(_focused(tester), 'After');
+      await _press(tester, LogicalKeyboardKey.tab, shift: true);
+      expect(_focused(tester), 'row m2');
+      handle.dispose();
+    });
+
     testWidgets('the focused row shows the ring inside its edge, on '
         'keyboard focus', (tester) async {
       Finder ring() => find.byWidgetPredicate(
@@ -440,6 +492,49 @@ void main() {
       // And goes no deeper.
       await _press(tester, LogicalKeyboardKey.arrowRight, alt: true);
       expect(model.moves, hasLength(1));
+    });
+
+    testWidgets('a host that reorders its own list in place gets the next '
+        'move from the list as it is', (tester) async {
+      final roots = [
+        const TreeNode(id: 'a'),
+        const TreeNode(id: 'b'),
+        const TreeNode(id: 'c'),
+      ];
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildAppTheme(defaultTokens),
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              child: StatefulBuilder(
+                builder: (context, setState) => Tree(
+                  roots: roots,
+                  onMove: (id, parent, index) => setState(() {
+                    final node = roots.removeAt(
+                      roots.indexWhere((n) => n.id == id),
+                    );
+                    roots.insert(index, node);
+                  }),
+                  itemBuilder: (_, id, _) => Text(id),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await _press(tester, LogicalKeyboardKey.tab);
+      expect(_focused(tester), 'row a');
+
+      await _press(tester, LogicalKeyboardKey.arrowDown, alt: true);
+      expect([for (final node in roots) node.id], ['b', 'a', 'c']);
+      await _press(tester, LogicalKeyboardKey.arrowDown, alt: true);
+      expect([for (final node in roots) node.id], ['b', 'c', 'a']);
+      // The last row has no place below it.
+      await _press(tester, LogicalKeyboardKey.arrowDown, alt: true);
+      expect([for (final node in roots) node.id], ['b', 'c', 'a']);
+      await _press(tester, LogicalKeyboardKey.arrowUp, alt: true);
+      expect([for (final node in roots) node.id], ['b', 'a', 'c']);
     });
 
     testWidgets('each row ends in a menu of the moves, each beside its key', (

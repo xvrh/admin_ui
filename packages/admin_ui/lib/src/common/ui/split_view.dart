@@ -150,7 +150,8 @@ class _SplitViewState extends State<SplitView> {
   double _paneExtent = 0;
 
   /// By divider, the size its pane had as Enter collapsed it, which Enter
-  /// restores. Forgotten once the divider moves any other way.
+  /// restores. Forgotten once the pane is resized any other way, by this
+  /// divider or by the one on its other side.
   final _collapsedFrom = <int, double>{};
 
   /// How far an arrow key, a screen reader's increase or decrease, or a
@@ -258,7 +259,18 @@ class _SplitViewState extends State<SplitView> {
       final sizes? => _dragSized(sizes, divider, deltaPx),
       null => _drag(divider, deltaPx, _paneExtent),
     };
-    if (moved) _collapsedFrom.remove(divider);
+    if (moved) _forgetCollapsed(divider);
+  }
+
+  /// Forgets the collapsed size of the panes on either side of [divider],
+  /// which a move of it has just resized, whichever divider collapsed
+  /// them: a pane that was resized since is not collapsed any more, and
+  /// has no size to go back to.
+  void _forgetCollapsed(int divider) {
+    _collapsedFrom.removeWhere((collapsedBy, _) {
+      final pane = _paneOf(collapsedBy);
+      return pane == divider || pane == divider + 1;
+    });
   }
 
   /// The pane the keys and the menu of the divider after pane [divider]
@@ -290,7 +302,7 @@ class _SplitViewState extends State<SplitView> {
       null => _drag(divider, towardEnd, _paneExtent),
     };
     if (!moved) return false;
-    _collapsedFrom.remove(divider);
+    _forgetCollapsed(divider);
     _commit();
     return true;
   }

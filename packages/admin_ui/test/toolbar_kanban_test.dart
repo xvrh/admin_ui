@@ -405,6 +405,47 @@ void main() {
     expect(_menuOpacity(tester, 'a2'), 1);
   });
 
+  testWidgets('hidden, the menu is not read to a screen reader, which '
+      'moves the card by the card\'s own actions', (tester) async {
+    final handle = tester.ensureSemantics();
+    final moves = <String>[];
+    await _pump(
+      tester,
+      [_column('a'), _column('b', cards: const [])],
+      onMove: (item, from, to) => moves.add('${item.id} $from→$to'),
+      onCardTap: (_) {},
+    );
+    // A mouse has landed, elsewhere: the menu waits for it, hidden.
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    addTearDown(mouse.removePointer);
+    await mouse.down(const Offset(5, 5));
+    await mouse.up();
+    await tester.pumpAndSettle();
+    expect(_menuOpacity(tester, 'a1'), 0);
+    expect(find.semantics.byLabel('Move to…'), findsNothing);
+
+    // The card carries the move itself.
+    tester.semantics.customAction(
+      find.semantics.byLabel('card a1'),
+      const CustomSemanticsAction(label: 'Move to Column b'),
+    );
+    expect(moves, ['a1 a→b']);
+
+    // Shown, the menu is a button that opens.
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    expect(_menuOpacity(tester, 'a1'), 1);
+    expect(
+      find.semantics.byLabel('Move to…').evaluate().single,
+      isSemantics(label: 'Move to…', isButton: true, hasTapAction: true),
+    );
+    tester.semantics.tap(find.semantics.byLabel('Move to…'));
+    await tester.pumpAndSettle();
+    expect(find.text('Move to Column b'), findsOneWidget);
+    handle.dispose();
+  });
+
   testWidgets('under a finger, which has no hover, the menus stay up', (
     tester,
   ) async {

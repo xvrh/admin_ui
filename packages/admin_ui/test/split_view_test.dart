@@ -423,6 +423,93 @@ void main() {
       expect(reported, hasLength(count));
     });
 
+    testWidgets('a collapsed pane resized by its other divider is no longer '
+        'collapsed: Enter collapses it again, and the menu says so', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      // Three weighted panes of 200: the second is the pane of the second
+      // divider, and the first divider resizes it too.
+      await tester.pumpWidget(
+        _host(
+          SplitView(
+            children: [
+              Container(key: const Key('a')),
+              Container(key: const Key('b')),
+              Container(key: const Key('c')),
+            ],
+          ),
+          width: 620,
+        ),
+      );
+      List<String?> actions(Finder divider) => [
+        for (final id
+            in tester
+                    .getSemantics(divider)
+                    .getSemanticsData()
+                    .customSemanticsActionIds ??
+                const <int>[])
+          CustomSemanticsAction.getAction(id)!.label,
+      ];
+      final second = find.bySemanticsLabel('Resize panes').last;
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_widths(tester)[1], closeTo(80, 0.01));
+      expect(actions(second), ['Expand']);
+
+      // The first divider gives the pane 16 more.
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await _press(tester, LogicalKeyboardKey.tab);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await _press(tester, LogicalKeyboardKey.arrowLeft);
+      expect(_widths(tester)[0], closeTo(184, 0.01));
+      expect(_widths(tester)[1], closeTo(96, 0.01));
+      expect(actions(second), ['Collapse']);
+
+      await _rightClick(tester, _dividers.last);
+      expect(find.text('Collapse'), findsOneWidget);
+      expect(find.text('Expand'), findsNothing);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      // Enter on its own divider collapses it, and does not jump to the
+      // 200 it had before.
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_widths(tester)[1], closeTo(80, 0.01));
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_widths(tester)[1], closeTo(96, 0.01));
+      handle.dispose();
+    });
+
+    testWidgets('a collapsed pane dragged by its other divider is no longer '
+        'collapsed', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SplitView(
+            children: [
+              Container(key: const Key('a')),
+              Container(key: const Key('b')),
+              Container(key: const Key('c')),
+            ],
+          ),
+          width: 620,
+        ),
+      );
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.tab);
+      await _press(tester, LogicalKeyboardKey.enter);
+      expect(_widths(tester)[1], closeTo(80, 0.01));
+
+      await tester.drag(_dividers.first, const Offset(-40, 0));
+      await tester.pumpAndSettle();
+      expect(_widths(tester)[1], closeTo(120, 0.01));
+      await _rightClick(tester, _dividers.last);
+      expect(find.text('Collapse'), findsOneWidget);
+      expect(find.text('Expand'), findsNothing);
+    });
+
     testWidgets('beside the free pane, resizes the sized pane: an '
         'inspector collapses, not the content', (tester) async {
       List<double?>? changed;

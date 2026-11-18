@@ -68,7 +68,8 @@ class KanbanColumn<T> {
 /// - a ⋯ in the card's top end corner opens a menu with a "Move to …" item
 ///   per other column. It shows while the pointer is over the card or focus
 ///   is on or in it, and for good where the pointer is a finger, which has
-///   no hover; it is the Tab stop after its card either way. It lies over
+///   no hover; it is the Tab stop after its card either way, and a screen
+///   reader is read it while it shows. It lies over
 ///   the card, on a chip of its own, 28px square and [AdminSpacing.sm] in
 ///   from the corner: a card keeps what must stay readable out of there;
 /// - assistive technology is offered the same "Move to …" actions on the
@@ -600,7 +601,9 @@ class _MovableCardState extends State<_MovableCard> {
 
   /// The ⋯ over the card's top end corner, on a chip of its own so that it
   /// reads over whatever the card draws there. Hidden, it keeps its place
-  /// in the Tab order and its name, and takes no pointer.
+  /// in the Tab order, where focus shows it, and takes no pointer. A screen
+  /// reader is not read it then, as its press would do nothing: the card's
+  /// own "Move to …" actions move it.
   Widget _menu(BuildContext context) {
     final colors = context.colors;
     return Menu(
@@ -614,25 +617,29 @@ class _MovableCardState extends State<_MovableCard> {
             widget.menuRevealed || _hover || _focusWithin || menu.isOpen;
         return IgnorePointer(
           ignoring: !shown,
-          child: AnimatedOpacity(
-            opacity: shown ? 1 : 0,
-            duration: context.motion.fast,
-            curve: context.motion.standard,
-            alwaysIncludeSemantics: true,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(
-                  context.radii.button(ControlSize.small),
+          child: ExcludeSemantics(
+            excluding: !shown,
+            child: AnimatedOpacity(
+              opacity: shown ? 1 : 0,
+              duration: context.motion.fast,
+              curve: context.motion.standard,
+              // Read for as long as it takes the pointer, its fade in too.
+              alwaysIncludeSemantics: true,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(
+                    context.radii.button(ControlSize.small),
+                  ),
+                  border: Border.all(color: colors.border),
                 ),
-                border: Border.all(color: colors.border),
-              ),
-              child: IconAction(
-                Icons.more_horiz_rounded,
-                label: context.adminL10n.collection.moveCard,
-                size: IconActionSize.small,
-                expanded: menu.isOpen,
-                onPressed: menu.toggle,
+                child: IconAction(
+                  Icons.more_horiz_rounded,
+                  label: context.adminL10n.collection.moveCard,
+                  size: IconActionSize.small,
+                  expanded: menu.isOpen,
+                  onPressed: menu.toggle,
+                ),
               ),
             ),
           ),
