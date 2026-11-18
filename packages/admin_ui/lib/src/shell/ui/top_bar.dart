@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 
 import '../../common/text_metrics.dart';
+import '../../common/ui/chrome_theme.dart';
 import '../../common/ui/icon_action.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';

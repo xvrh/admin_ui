@@ -1314,16 +1314,24 @@ border, the status left to the icon (`surface`). `alertBar` and `toastBar`
 are the width of a bar in the status colour on the leading edge, zero for
 none; `alertRadius` gives an alert a corner of its own, the theme's radius
 where none is given; and `toastOutline` rings a toast in a hairline, which a
-dark palette always does, since a shadow does not read there.
+dark card on a dark page always is, since a shadow does not read there.
+
+`toastPalette` draws a toast in a palette of its own in place of the page's:
+its fill and edge, its text, its status colours, its action and its close
+button, as `AdminShellStyle`'s palettes draw a sidebar or a top bar. M3's
+snackbar and Carbon's high-contrast notification are a card in the opposite
+scheme, so Material and Carbon give one per mode (`AdminTheme.from` takes a
+`darkFeedback` beside `feedback`), built from the other mode's palette on the
+system's inverse surface. A brand reaches it as it does the shell's.
 
 | Theme | Alert | Toast |
 |---|---|---|
 | Iris | tinted | the surface, outlined, a 4 bar |
-| Material | tinted | the surface, outlined, a 4 bar |
+| Material | tinted | the inverse scheme, no outline, no bar |
 | shadcn | a card in the surface colour, corner 10 | the surface, outlined, no bar |
 | Ant | tinted, corner 8 | the surface, no outline, no bar |
 | Fluent | tinted | the surface, no outline, no bar |
-| Carbon | tinted, a 3 bar | tinted, outlined, a 3 bar |
+| Carbon | tinted, a 3 bar | the inverse scheme, no outline, a 3 bar |
 
 `AdminOverlayStyle` sets whether a tooltip points at its target with an
 arrow, the width it wraps at, and the size of the arrow a tooltip or a

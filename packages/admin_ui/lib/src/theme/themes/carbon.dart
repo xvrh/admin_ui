@@ -399,9 +399,34 @@ final carbonTheme = AdminTheme.from(
   // The low-contrast notification, inline and toast: the status's
   // notification background behind a 3px bar of the support colour on the
   // leading edge, a 1px border on the other three
-  feedback: const AdminFeedbackStyle(
+  // an inline notification in its low-contrast form, tinted behind a 3px
+  // bar; a toast in the default, high-contrast one: a card in the inverse
+  // scheme behind the bar, with no outline
+  feedback: AdminFeedbackStyle(
     alertBar: 3,
-    toastFill: FeedbackFill.tint,
     toastBar: 3,
+    toastOutline: false,
+    toastPalette: _notification,
   ),
+  darkFeedback: AdminFeedbackStyle(
+    alertBar: 3,
+    toastBar: 3,
+    toastOutline: false,
+    toastPalette: _darkNotification,
+  ),
+);
+
+/// A high-contrast notification on the Gray 10 page: Gray 100's colours,
+/// which are Gray 10's inverse ones, on `$background-inverse` under
+/// `$text-inverse`, with `$support-error-inverse` for the error bar.
+final _notification = carbonDarkPalette.copyWith(
+  surface: const Color(0xFF393939),
+  foreground: const Color(0xFFFFFFFF),
+  danger: const Color(0xFFFA4D56),
+);
+
+/// A high-contrast notification on the Gray 100 page: Gray 10's colours on
+/// `$background-inverse`.
+final _darkNotification = carbonPalette.copyWith(
+  surface: const Color(0xFFF4F4F4),
 );

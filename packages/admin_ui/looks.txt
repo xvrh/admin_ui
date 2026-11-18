@@ -273,6 +273,7 @@ feedback.alertRadius: null
 feedback.toastFill: surface
 feedback.toastBar: 4
 feedback.toastOutline: true
+feedback.toastPalette: null
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -597,8 +598,38 @@ feedback.alertFill: tint
 feedback.alertBar: 0
 feedback.alertRadius: null
 feedback.toastFill: surface
-feedback.toastBar: 4
-feedback.toastOutline: true
+feedback.toastBar: 0
+feedback.toastOutline: false
+feedback.toastPalette.primary: #ffd0bcff
+feedback.toastPalette.primaryStrong: #ffb69df8
+feedback.toastPalette.primarySubtle: #ff4a4458
+feedback.toastPalette.primaryFaint: #ff2f2c37
+feedback.toastPalette.surface: #ff322f35
+feedback.toastPalette.background: #ff141218
+feedback.toastPalette.surfaceMuted: #ff1d1b20
+feedback.toastPalette.foreground: #fff5eff7
+feedback.toastPalette.foregroundSecondary: #ffcac4d0
+feedback.toastPalette.foregroundMuted: #ffcac4d0
+feedback.toastPalette.foregroundSubtle: #ff938f99
+feedback.toastPalette.foregroundFaint: #ff605d64
+feedback.toastPalette.border: #ff49454f
+feedback.toastPalette.borderSubtle: #ff36343b
+feedback.toastPalette.success: #ff7dd389
+feedback.toastPalette.warning: #ffebc062
+feedback.toastPalette.danger: #fff2b8b5
+feedback.toastPalette.warningText: #ffd89e3c
+feedback.toastPalette.info: #ff9ccaff
+feedback.toastPalette.highlight: #ff3b3422
+feedback.toastPalette.modifiedFill: #ff272019
+feedback.toastPalette.tabDivider: #ff49454f
+feedback.toastPalette.stateLayer.hover: 0.08
+feedback.toastPalette.stateLayer.focus: 0.1
+feedback.toastPalette.stateLayer.pressed: 0.1
+feedback.toastPalette.stateLayer.selected: 0.08
+feedback.toastPalette.stateLayer.dragged: 0.16
+feedback.toastPalette.stateLayer.tintHover: 0.08
+feedback.toastPalette.stateLayer.tintPressed: 0.1
+feedback.toastPalette.stateLayer.disabledContent: 0.38
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -640,6 +671,27 @@ typography.caption: Roboto 12 w400 height 1.3333 spacing 0.4 #ffcac4d0 even
 typography.micro: Roboto 11 w500 height 1.4545 spacing 0.5 #ffcac4d0 even
 typography.mono: monospace fallback [Menlo, Consolas, Courier New] 14 w400 height 1.4286 spacing 0 #ffe6e0e9 even
 typography.monoSmall: monospace fallback [Menlo, Consolas, Courier New] 12 w400 height 1.3333 spacing 0 #ffe6e0e9 even
+feedback.toastPalette.primary: #ff6750a4
+feedback.toastPalette.primaryStrong: #ff4f378b
+feedback.toastPalette.primarySubtle: #ffeaddff
+feedback.toastPalette.primaryFaint: #fff6edff
+feedback.toastPalette.surface: #ffe6e0e9
+feedback.toastPalette.background: #fff3edf7
+feedback.toastPalette.surfaceMuted: #fff7f2fa
+feedback.toastPalette.foreground: #ff322f35
+feedback.toastPalette.foregroundSecondary: #ff49454f
+feedback.toastPalette.foregroundMuted: #ff49454f
+feedback.toastPalette.foregroundFaint: #ffcac4d0
+feedback.toastPalette.border: #ffcac4d0
+feedback.toastPalette.borderSubtle: #ffe7e0ec
+feedback.toastPalette.success: #ff2e7d32
+feedback.toastPalette.warning: #fff9a825
+feedback.toastPalette.danger: #ffb3261e
+feedback.toastPalette.warningText: #ff7d5c00
+feedback.toastPalette.info: #ff1565c0
+feedback.toastPalette.highlight: #fffdeeb8
+feedback.toastPalette.modifiedFill: #fff6edff
+feedback.toastPalette.tabDivider: #ffcac4d0
 
 ## shadcn light
 palette.primary: #ff18181b
@@ -920,6 +972,7 @@ feedback.alertRadius: 10
 feedback.toastFill: surface
 feedback.toastBar: 0
 feedback.toastOutline: true
+feedback.toastPalette: null
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1308,6 +1361,7 @@ feedback.alertRadius: 8
 feedback.toastFill: surface
 feedback.toastBar: 0
 feedback.toastOutline: false
+feedback.toastPalette: null
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1639,6 +1693,7 @@ feedback.alertRadius: null
 feedback.toastFill: surface
 feedback.toastBar: 0
 feedback.toastOutline: false
+feedback.toastPalette: null
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1992,9 +2047,39 @@ tabs.rule: indicator
 feedback.alertFill: tint
 feedback.alertBar: 3
 feedback.alertRadius: null
-feedback.toastFill: tint
+feedback.toastFill: surface
 feedback.toastBar: 3
-feedback.toastOutline: true
+feedback.toastOutline: false
+feedback.toastPalette.primary: #ff0f62fe
+feedback.toastPalette.primaryStrong: #ff0050e6
+feedback.toastPalette.primarySubtle: #ff213251
+feedback.toastPalette.primaryFaint: #ff232d40
+feedback.toastPalette.surface: #ff393939
+feedback.toastPalette.background: #ff161616
+feedback.toastPalette.surfaceMuted: #ff1c1c1c
+feedback.toastPalette.foreground: #ffffffff
+feedback.toastPalette.foregroundSecondary: #ffc6c6c6
+feedback.toastPalette.foregroundMuted: #ffa8a8a8
+feedback.toastPalette.foregroundSubtle: #ff6f6f6f
+feedback.toastPalette.foregroundFaint: #ff525252
+feedback.toastPalette.border: #ff525252
+feedback.toastPalette.borderSubtle: #ff333333
+feedback.toastPalette.success: #ff42be65
+feedback.toastPalette.warning: #fff1c21b
+feedback.toastPalette.danger: #fffa4d56
+feedback.toastPalette.warningText: #ffd2a800
+feedback.toastPalette.info: #ff4589ff
+feedback.toastPalette.highlight: #ff332c12
+feedback.toastPalette.modifiedFill: #ff26201a
+feedback.toastPalette.tabDivider: #ff525252
+feedback.toastPalette.stateLayer.hover: 0.05
+feedback.toastPalette.stateLayer.focus: 0.05
+feedback.toastPalette.stateLayer.pressed: 0.1
+feedback.toastPalette.stateLayer.selected: 0.08
+feedback.toastPalette.stateLayer.dragged: 0.1
+feedback.toastPalette.stateLayer.tintHover: 0.08
+feedback.toastPalette.stateLayer.tintPressed: 0.14
+feedback.toastPalette.stateLayer.disabledContent: 0.38
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -2035,6 +2120,24 @@ typography.monoSmall: IBM Plex Mono fallback [monospace, Menlo, Consolas, Courie
 elevation.sm: #cc000000 0,2 blur 6
 elevation.md: #cc000000 0,2 blur 6
 elevation.lg: #cc000000 0,2 blur 6
+feedback.toastPalette.primarySubtle: #ffedf5ff
+feedback.toastPalette.primaryFaint: #fff6faff
+feedback.toastPalette.surface: #fff4f4f4
+feedback.toastPalette.background: #fff4f4f4
+feedback.toastPalette.surfaceMuted: #fffafafa
+feedback.toastPalette.foreground: #ff161616
+feedback.toastPalette.foregroundSecondary: #ff525252
+feedback.toastPalette.foregroundMuted: #ff6f6f6f
+feedback.toastPalette.foregroundFaint: #ffa8a8a8
+feedback.toastPalette.border: #ffe0e0e0
+feedback.toastPalette.borderSubtle: #fff4f4f4
+feedback.toastPalette.success: #ff24a148
+feedback.toastPalette.danger: #ffda1e28
+feedback.toastPalette.warningText: #ff8e6a00
+feedback.toastPalette.info: #ff0043ce
+feedback.toastPalette.highlight: #fffcf4d6
+feedback.toastPalette.modifiedFill: #fffcf4d6
+feedback.toastPalette.tabDivider: #ffe0e0e0
 
 ## defaultTokens, where they differ from Iris light
 typography.fieldLabel: 12 w700 height 1.3333 spacing 0.4 #ff3a3d43 even
