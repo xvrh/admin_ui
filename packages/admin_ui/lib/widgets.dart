@@ -22,6 +22,7 @@ export 'src/common/ui/breadcrumbs.dart' show Breadcrumbs, Crumb;
 export 'src/common/ui/browser_swipe_guard.dart' show BrowserSwipeGuard;
 export 'src/common/ui/button.dart' show Button, ButtonVariant, SplitButton;
 export 'src/common/ui/calendar.dart' show Calendar, CalendarMode;
+export 'src/common/ui/calendar_heat_grid.dart' show CalendarHeatGrid;
 export 'src/common/ui/chart.dart'
     show
         BarChart,
