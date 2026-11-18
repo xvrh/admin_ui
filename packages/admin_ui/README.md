@@ -1032,8 +1032,8 @@ from its step: the size times `AdminTypeSpec.scale`, `height` set to line over
 size with the leading split evenly, and the step's letter spacing plus
 `AdminTypeSpec.tracking`, which the shipped themes leave at 0. A line of text
 therefore takes the same box in every font, and a control sized from the line
-centres its text. Weights come from the spec (`heading`, `label`, `strong`,
-`body`), colours from the palette.
+centres its text. Weights come from the spec (`heading`, `title`, `label`,
+`strong`, `body`, `message`), colours from the palette.
 
 Each theme takes its steps from its design system. Values are size/line, with
 the letter spacing after them where it is not 0:
@@ -1042,6 +1042,7 @@ the letter spacing after them where it is not 0:
 |---|---|---|---|---|---|---|
 | `pageTitle` | 22/28 | 24/32 | 24/32 −0.6 | 20/28 | 24/32 | 28/36 |
 | `heading` | 16/24 | 16/24 +0.15 | 18/28 −0.45 | 16/24 | 16/22 | 16/22 |
+| `dialogTitle` | 16/24 | 24/32 | 18/28 −0.45 | 16/24 | 20/28 | 20/28 |
 | `sectionLabel` | 12/16 +0.3 | 12/16 +0.5 | 12/16 | 12/20 | 12/16 | 14/18 +0.16 |
 | `fieldLabel` | 12/16 | 12/16 +0.4 | 14/20 | 14/22 | 14/20 | 12/16 +0.32 |
 | `fieldText` | 13/20 | 16/24 +0.5 | 14/20 | 14/22 | 14/20 | 14/18 +0.16 |
@@ -1063,8 +1064,8 @@ the letter spacing after them where it is not 0:
 - **Material** is M3's type scale: `bodyMedium` for body, `bodySmall` for
   captions and labels, `labelLarge` for buttons, `labelMedium` and
   `labelSmall` for section labels and micro text, `titleMedium` for headings,
-  `headlineSmall` for page titles, and `bodyLarge` for a field's text, as in
-  an M3 text field.
+  `headlineSmall` for page titles and a dialog's headline, and `bodyLarge`
+  for a field's text, as in an M3 text field.
 - **shadcn** is Tailwind's: `text-sm` (14/20) for body, controls, labels and
   a form's description and message, `text-xs` (12/16) below it, `text-lg` and
   `text-2xl` headings. Headings take `tracking-tight` (−0.025em); nothing
@@ -1073,18 +1074,35 @@ the letter spacing after them where it is not 0:
   lines included, `fontSizeSM` (12/20) below it, and the `fontSizeHeading`
   steps above.
 - **Fluent** is the Fluent 2 ramp: `body1` (14/20), `caption1` (12/16),
-  `caption2` (10/14) for micro text, `subtitle2` for headings and `title3` for
-  page titles.
+  `caption2` (10/14) for micro text, `subtitle2` for headings, `subtitle1`
+  for a dialog's title and `title3` for page titles.
 - **Carbon** is the productive set: `body-01` for body, `body-compact-01` in
   controls and buttons, `label-01` and `helper-text-01` for labels, captions
   and messages, `heading-compact-01` for section labels, `heading-compact-02`
-  for headings, `heading-04` for page titles, `code-01` and `code-02` for mono.
+  for headings, `heading-03` for a modal's title, `heading-04` for page
+  titles, `code-01` and `code-02` for mono.
 
-A field's label is `fieldLabel` in `foregroundSecondary`, at the spec's
-`label` weight: regular in Material, Ant, Fluent and Carbon, medium (500) in
-shadcn, and the heading weight in Iris, which sets none. Its description is
-`fieldDescription` in `foregroundMuted`, and its error `fieldMessage` at weight
-500. The description and the message take one step in every theme, so a
+`dialogTitle` is the title of a `Modal`. A ramp that names no step for it
+sets it on `heading`'s, as Iris, shadcn and Ant do; Material, Fluent and
+Carbon title a dialog a step larger than a card.
+
+A page's title and a dialog's are at the spec's `title` weight, which is the
+`heading` weight where a theme sets none. Material and Carbon set it to
+regular: their headlines of that size are regular, and only the smaller
+headings are medium or semibold. A `StatCard`'s value is in the page title's
+style, and follows it.
+
+A field's label is `fieldLabel`, at the spec's `label` weight: regular in
+Material, Ant, Fluent and Carbon, medium (500) in shadcn, and the heading
+weight in Iris, which sets none. The spec's `labelInk` says what it is drawn
+in: `LabelInk.secondary`, a step quieter than the value under it, in Iris,
+Material and Carbon; `LabelInk.foreground`, the colour of the value, in
+shadcn, Ant and Fluent. `LabelInk.secondary` is `foregroundSecondary` over a
+`LabeledField`, and over a form's `Field` the still quieter `foregroundMuted`
+where that reads at 4.5:1 on the page and on a card. Its description is
+`fieldDescription` in `foregroundMuted`, and its error `fieldMessage` at the
+spec's `message` weight: medium (500) in Iris, regular in the five reference
+themes. The description and the message take one step in every theme, so a
 description and the error that replaces it are one size: the caption's, or
 the body's in shadcn and Ant, whose forms set both at body size. `fieldText`'s
 line fits every theme's small control height (24 in Ant and Fluent).

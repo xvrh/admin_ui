@@ -416,6 +416,7 @@ theme.dart FieldOutlineBorder
 theme.dart FieldRequiredMark
 theme.dart FieldVariant
 theme.dart Gap
+theme.dart LabelInk
 theme.dart NavIndicator
 theme.dart RadioMark
 theme.dart SegmentedVariant

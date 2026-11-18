@@ -246,6 +246,8 @@ final shadcnTheme = AdminTheme.from(
     heading: FontWeight.w600,
     label: FontWeight.w500, // Label: font-medium
     strong: FontWeight.w500,
+    message: FontWeight.w400, // FieldError: font-normal
+    labelInk: LabelInk.foreground, // Label sets no colour of its own
     uppercaseLabels: false,
     ramp: _ramp,
   ),

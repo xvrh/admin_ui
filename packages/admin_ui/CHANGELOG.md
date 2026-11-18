@@ -2,6 +2,19 @@
 
 ## 0.2.0
 
+- A theme weighs its large titles and a field's error line apart from its
+  headings, and says what a field's label is drawn in, in its
+  `AdminTypeSpec`. `title` is the weight of a page's title and a dialog's,
+  the `heading` weight where none is given; `message` the weight of
+  `AdminTypography.fieldMessage`, which was 500 in every theme; and
+  `labelInk` what `AdminTypography.fieldLabel` and a form field's resting
+  label are drawn in: `LabelInk.secondary`, as before, or
+  `LabelInk.foreground`.
+- `AdminTypography.dialogTitle` is the title of a `Modal`, which was the
+  `heading` on a line of one and a half times its size. It is at the
+  `title` weight on the step an `AdminTypeRamp` names as `dialogTitle`, and
+  on `heading`'s step where the ramp names none. A typography built by hand
+  that gives none titles a dialog in its `heading`.
 - A theme says how its alerts and toasts are drawn: `AdminTokens.feedback`,
   an `AdminFeedbackStyle` read through `context.feedbackStyle` and given to
   `AdminTheme.from` as `feedback`. `alertFill` and `toastFill` fill an
@@ -470,6 +483,29 @@
 
 ### Looks
 
+- Titles, a field's label and its error follow each reference theme, where
+  every theme set a page's title and a `Modal`'s in its heading weight, a
+  field's error at weight 500 and a field's label in `foregroundSecondary`.
+  Iris keeps those.
+  - Material: a page's title is regular (was 500), as `headlineSmall` is; a
+    `Modal`'s title is `headlineSmall` too, 24/32 regular (was 16/24 at
+    500), so its header is 8 taller; a field's error is regular.
+  - shadcn: a field's label is in the foreground (was `#27272A`, and
+    `#E4E4E7` in dark); a field's error is regular; a `Modal`'s title is on
+    its own 28px line (was 27), so its header is 1 taller.
+  - Ant: a field's label is in the foreground (was `#595959`, and `#C2C2C2`
+    in dark); a field's error is regular.
+  - Fluent: a field's label is in the foreground (was `#424242`, and
+    `#D6D6D6` in dark); a field's error is regular; a `Modal`'s title is
+    `subtitle1`, 20/28 (was 16 on a 24px line), so its header is 4 taller.
+  - Carbon: a page's title is regular (was 600), as `heading-04` is; a
+    `Modal`'s title is `heading-03`, 20/28 regular (was 16 on a 24px line
+    at 600), so its header is 4 taller; a field's error is regular.
+  In shadcn, Ant and Fluent the label of a form's `Field` is in the
+  foreground at rest too, where it was in `foregroundMuted` (`#71717A`,
+  `#707070` and `#616161` on a light page). In Material and Carbon a
+  `StatCard`'s value, which is in the page title's style, is regular with
+  it.
 - An `Alert` and a toast follow each reference theme, where every theme
   drew an alert tinted with its status at the theme's radius, and a toast
   as an outlined card in the surface colour behind a 4px status bar. Iris

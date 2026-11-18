@@ -148,6 +148,7 @@ const _ramp = AdminTypeRamp(
   titleLarge: AdminTypeStep(22, 28),
   pageTitle: AdminTypeStep(24, 32), // headlineSmall
   heading: AdminTypeStep(16, 24, letterSpacing: 0.15), // titleMedium
+  dialogTitle: AdminTypeStep(24, 32), // headlineSmall, a dialog's headline
   sectionLabel: AdminTypeStep(12, 16, letterSpacing: 0.5), // labelMedium
   fieldLabel: AdminTypeStep(12, 16, letterSpacing: 0.4), // bodySmall
   fieldText: AdminTypeStep(16, 24, letterSpacing: 0.5), // bodyLarge
@@ -244,8 +245,10 @@ final materialTheme = AdminTheme.from(
   type: const AdminTypeSpec(
     fontFamily: 'Roboto',
     heading: FontWeight.w500, // the title and label styles: Medium
+    title: FontWeight.w400, // the headline styles: Regular
     label: FontWeight.w400, // bodySmall
     strong: FontWeight.w500, // labelLarge, labelSmall, titleSmall
+    message: FontWeight.w400, // a text field's supporting text: bodySmall
     uppercaseLabels: false,
     ramp: _ramp,
   ),

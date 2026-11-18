@@ -136,6 +136,7 @@ const _ramp = AdminTypeRamp(
   titleLarge: AdminTypeStep(20, 28), // subtitle1
   pageTitle: AdminTypeStep(24, 32), // title3
   heading: AdminTypeStep(16, 22), // subtitle2
+  dialogTitle: AdminTypeStep(20, 28), // DialogTitle: subtitle1
   sectionLabel: AdminTypeStep(12, 16), // caption1Strong
   fieldLabel: AdminTypeStep(14, 20), // body1
   fieldText: AdminTypeStep(14, 20),
@@ -217,6 +218,8 @@ final fluentTheme = AdminTheme.from(
     fontFamily: 'Segoe UI',
     heading: FontWeight.w600,
     label: FontWeight.w400, // Label
+    message: FontWeight.w400, // a Field's validation message: caption1
+    labelInk: LabelInk.foreground, // Label: colorNeutralForeground1
     uppercaseLabels: false,
     ramp: _ramp,
   ),

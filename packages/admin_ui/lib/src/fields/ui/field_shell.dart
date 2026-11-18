@@ -20,6 +20,7 @@ import '../../theme/contrast.dart';
 import '../../theme/palette.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
+import '../../theme/typography.dart';
 import 'change_scope.dart';
 import 'history_button.dart';
 
@@ -439,7 +440,7 @@ class _FieldShellState extends State<FieldShell> {
         ? colors.foregroundSubtle
         : _active
         ? colors.primaryText
-        : _labelColor(colors);
+        : _labelColor(colors, context.type.spec.labelInk);
     final history = widget.history;
     final historyShowsEdit = history is HistoryButton && history.modified;
     final capabilities = [
@@ -706,11 +707,16 @@ class _RenderLabelRow extends RenderBox
   }
 }
 
-/// The resting label colour: [AdminPalette.foregroundMuted] where it reads at
-/// 4.5:1 on both the page and a boxed group, otherwise the stronger
-/// [AdminPalette.foregroundSecondary].
-Color _labelColor(AdminPalette c) =>
+/// The resting label colour. Where the theme inks a field's label in the
+/// foreground ([AdminTypeSpec.labelInk]), that; otherwise
+/// [AdminPalette.foregroundMuted] where it reads at 4.5:1 on both the page
+/// and a boxed group, and the stronger [AdminPalette.foregroundSecondary]
+/// where it does not.
+Color _labelColor(AdminPalette c, LabelInk ink) => switch (ink) {
+  LabelInk.foreground => c.foreground,
+  LabelInk.secondary =>
     contrastRatio(c.foregroundMuted, c.surface) >= 4.5 &&
-        contrastRatio(c.foregroundMuted, c.background) >= 4.5
-    ? c.foregroundMuted
-    : c.foregroundSecondary;
+            contrastRatio(c.foregroundMuted, c.background) >= 4.5
+        ? c.foregroundMuted
+        : c.foregroundSecondary,
+};

@@ -89,4 +89,5 @@ export 'src/theme/typography.dart'
         AdminTypeSpec,
         AdminTypeStep,
         AdminTypography,
+        LabelInk,
         defaultTypeRamp;

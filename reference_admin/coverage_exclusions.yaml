@@ -69,6 +69,7 @@ theme_internals:
     - FieldOutlineBorder
     - FieldRequiredMark
     - FieldVariant
+    - LabelInk
     - NavIndicator
     - RadioMark
     - SegmentedVariant
