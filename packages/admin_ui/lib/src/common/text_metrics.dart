@@ -36,8 +36,14 @@ double textGrowthOf(BuildContext context, TextStyle style) {
 
 /// The width [text] takes on one line as a [Text] of [style] under [context]
 /// lays it out, rounded up to a whole pixel so a box that wide holds it.
+/// [exact] leaves it unrounded, for a box as wide as the text and no wider.
 @internal
-double textWidthOf(BuildContext context, String text, TextStyle style) {
+double textWidthOf(
+  BuildContext context,
+  String text,
+  TextStyle style, {
+  bool exact = false,
+}) {
   if (text.isEmpty) return 0;
   final painter = TextPainter(
     text: TextSpan(
@@ -48,7 +54,7 @@ double textWidthOf(BuildContext context, String text, TextStyle style) {
     textScaler: MediaQuery.textScalerOf(context),
     maxLines: 1,
   )..layout();
-  final width = painter.width.ceilToDouble();
+  final width = exact ? painter.width : painter.width.ceilToDouble();
   painter.dispose();
   return width;
 }

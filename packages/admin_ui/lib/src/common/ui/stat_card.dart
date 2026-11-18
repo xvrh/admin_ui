@@ -1,5 +1,9 @@
+/// @docImport 'sparkline.dart';
+library;
+
 import 'dart:math' as math;
 
+import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../l10n/admin_ui_localizations.dart';
@@ -32,18 +36,35 @@ class StatDelta {
 }
 
 /// A dashboard KPI tile: a muted [label], a large [value], an optional trend
-/// [delta] and a [caption] beneath. Fills its slot — lay several out with
-/// [StatGrid]. Pass [onTap] to make the whole tile a drill-in target: a
-/// focusable button, activated with Enter or Space.
+/// [delta] and a [caption] beneath, and a small [trend] chart. Fills its slot
+/// — lay several out with [StatGrid]. Pass [onTap] to make the whole tile a
+/// drill-in target: a focusable button, activated with Enter or Space.
+///
+/// The [trend], a [Sparkline] or a [BarSparkline] of the figure's recent
+/// history, stands beside the figure, at the card's end and at its own width,
+/// while it is no taller than the figure's line and the figure keeps beside
+/// it its one-line width, and at least [minValueWidth]: the card is then as
+/// tall as one without a trend. Otherwise it goes under the delta and the
+/// caption, across the card, along its bottom edge. Either way the label, the
+/// figure and the delta of the cards in a [StatGrid] row stay level, trend
+/// or not, and the trends under their figures line up along the row's
+/// bottom. A trend that fills the width it is given, such as a
+/// `Sparkline(width: null)`, always goes under.
 ///
 /// Assistive technology reads the tile as one sentence — "Revenue: $48.2k, up
-/// 12%, vs last month" — so the trend arrow is spoken too.
+/// 12%, vs last month" — so the trend arrow is spoken too. The [trend] chart
+/// is not: the delta already speaks the change it draws.
 ///
 /// While [loading], the figure is a pulsing bar, and so are the [delta] and
-/// the [caption] the card is given, each as tall as what it stands in for.
-/// Their words are not shown, so give a loading card the delta and caption
-/// the loaded card will have, with any words: it is then exactly as tall as
-/// the loaded card, and nothing moves when the figures land. The [label] and
+/// the [caption] the card is given, each as tall as what it stands in for,
+/// and the [trend] is a pulsing block of its size, where the loaded card puts
+/// it. Their words and values are not shown, so give a loading card the
+/// delta, the caption and the trend the loaded card will have, with any
+/// words and values (`Sparkline(const [])`): it is then exactly as tall as
+/// the loaded card, and nothing moves when the figures land. It places the
+/// trend for a figure [minValueWidth] wide: where the figure to come may be
+/// wider, give it as the loading card's [value], such as the figure last
+/// shown, and the trend stands where the loaded card's will. The [label] and
 /// [icon] still show when given, so the page names what is coming; an empty
 /// [label] is a bar too. A loading card takes no taps and reads as the label
 /// and "Loading…".
@@ -57,11 +78,21 @@ class StatCard extends StatelessWidget {
   final IconData? icon;
   final StatDelta? delta;
   final String? caption;
+
+  /// A small chart of the figure's recent history, such as a [Sparkline] of
+  /// the last 30 days: beside the figure or under the delta and caption,
+  /// as [StatCard] says. Decorative to assistive technology. Like any tile of
+  /// a [StatGrid], it is built without a [LayoutBuilder].
+  final Widget? trend;
   final VoidCallback? onTap;
 
-  /// Draws the figure, and the delta and caption it is given, as skeleton
-  /// bars; see [StatCard].
+  /// Draws the figure, and the delta, caption and trend it is given, as
+  /// skeletons; see [StatCard].
   final bool loading;
+
+  /// The least width the figure keeps beside a [trend]; with less room, the
+  /// trend goes under.
+  static const minValueWidth = 96.0;
 
   const StatCard({
     super.key,
@@ -70,6 +101,7 @@ class StatCard extends StatelessWidget {
     this.icon,
     this.delta,
     this.caption,
+    this.trend,
     this.onTap,
     this.loading = false,
   }) : assert(
@@ -88,12 +120,7 @@ class StatCard extends StatelessWidget {
             ? l10n.loading
             : l10n.display.joinParts([label, l10n.loading]),
         excludeSemantics: true,
-        // A bar is measured from a line of text, which a late font load
-        // changes.
-        child: ListenableBuilder(
-          listenable: PaintingBinding.instance.systemFonts,
-          builder: (context, _) => _card(context, false),
-        ),
+        child: _measured(context, false),
       );
     }
     final name = _semanticLabel(context.adminL10n.display);
@@ -102,7 +129,7 @@ class StatCard extends StatelessWidget {
         container: true,
         label: name,
         excludeSemantics: true,
-        child: _card(context, false),
+        child: _measured(context, false),
       );
     }
     return Tappable.builder(
@@ -110,7 +137,18 @@ class StatCard extends StatelessWidget {
       semanticLabel: name,
       excludeSemantics: true,
       focusRadius: context.radii.radiusLarge,
-      builder: (context, hover) => _card(context, hover),
+      builder: (context, hover) => _measured(context, hover),
+    );
+  }
+
+  /// The card, built again when a font loads if it measures text: a loading
+  /// card's bars are measured from a line of text, and a trend's place from
+  /// the figure's width, which a late font load changes.
+  Widget _measured(BuildContext context, bool hover) {
+    if (!loading && trend == null) return _card(context, hover);
+    return ListenableBuilder(
+      listenable: PaintingBinding.instance.systemFonts,
+      builder: (context, _) => _card(context, hover),
     );
   }
 
@@ -137,103 +175,378 @@ class StatCard extends StatelessWidget {
     );
     final valueStyle = type.pageTitle.copyWith(color: colors.foreground);
     final captionStyle = type.caption.copyWith(color: colors.foregroundMuted);
+    final trend = this.trend;
     return Panel(
       padding: const EdgeInsets.all(AdminSpacing.xl),
       color: hover ? colors.background : colors.surface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: loading && label.isEmpty
-                    ? SkeletonText(style: labelStyle, widthFactor: 0.4)
-                    : Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: labelStyle,
-                      ),
-              ),
-              if (icon != null)
-                Icon(
-                  icon,
-                  size: context.iconSizes.md,
-                  color: colors.foregroundMuted,
-                ),
-            ],
-          ),
-          const Gap(AdminSpacing.md),
-          if (loading)
-            SkeletonText(style: valueStyle, widthFactor: 0.55)
-          else
-            Text(
-              value,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: valueStyle,
-            ),
-          if (loading && (delta != null || caption != null)) ...[
-            const Gap(AdminSpacing.md),
-            Row(
-              children: [
-                if (delta != null) const _SkeletonDeltaChip(),
-                if (delta != null && caption != null)
-                  const Gap(AdminSpacing.md),
-                if (caption != null)
-                  Expanded(
-                    child: SkeletonText(style: captionStyle, widthFactor: 0.5),
-                  ),
-              ],
-            ),
-          ] else if (!loading && (delta != null || caption != null)) ...[
-            const Gap(AdminSpacing.md),
-            Row(
-              children: [
-                if (delta != null) ...[
-                  _DeltaChip(delta: delta!),
-                  if (caption != null) const Gap(AdminSpacing.md),
-                ],
-                if (caption != null)
-                  Flexible(
-                    child: Text(
-                      caption!,
+      child: _StatBody(
+        textDirection: Directionality.of(context),
+        figureWidth: trend == null
+            ? 0
+            : math.max(minValueWidth, textWidthOf(context, value, valueStyle)),
+        label: Row(
+          children: [
+            Expanded(
+              child: loading && label.isEmpty
+                  ? SkeletonText(style: labelStyle, widthFactor: 0.4)
+                  : Text(
+                      label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: captionStyle,
+                      style: labelStyle,
                     ),
-                  ),
-              ],
             ),
+            if (icon != null)
+              Icon(
+                icon,
+                size: context.iconSizes.md,
+                color: colors.foregroundMuted,
+              ),
           ],
-        ],
+        ),
+        figure: loading
+            ? SkeletonText(style: valueStyle, widthFactor: 0.55)
+            : Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: valueStyle,
+              ),
+        details: delta == null && caption == null
+            ? null
+            : loading
+            ? Row(
+                children: [
+                  if (delta != null) const _SkeletonDeltaChip(),
+                  if (delta != null && caption != null)
+                    const Gap(AdminSpacing.md),
+                  if (caption != null)
+                    Expanded(
+                      child: SkeletonText(
+                        style: captionStyle,
+                        widthFactor: 0.5,
+                      ),
+                    ),
+                ],
+              )
+            : Row(
+                children: [
+                  if (delta != null) ...[
+                    _DeltaChip(delta: delta!),
+                    if (caption != null) const Gap(AdminSpacing.md),
+                  ],
+                  if (caption != null)
+                    Flexible(
+                      child: Text(
+                        caption!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: captionStyle,
+                      ),
+                    ),
+                ],
+              ),
+        trend: trend == null
+            ? null
+            : loading
+            ? _SkeletonTrend(trend)
+            : trend,
       ),
     );
   }
 }
 
+enum _StatSlot { label, figure, details, trend }
+
+/// A [StatCard]'s contents, one under the other: its [label] row, its
+/// [figure], its [details] (the delta and the caption) and its [trend], which
+/// stands beside the figure while it is no taller than the figure and the
+/// figure keeps [figureWidth] beside it, and otherwise goes under the rest,
+/// along the bottom edge of the height the card is given.
+class _StatBody
+    extends SlottedMultiChildRenderObjectWidget<_StatSlot, RenderBox> {
+  final Widget label;
+  final Widget figure;
+  final Widget? details;
+  final Widget? trend;
+
+  /// The least the figure keeps beside the trend.
+  final double figureWidth;
+  final TextDirection textDirection;
+
+  const _StatBody({
+    required this.label,
+    required this.figure,
+    required this.details,
+    required this.trend,
+    required this.figureWidth,
+    required this.textDirection,
+  });
+
+  @override
+  Iterable<_StatSlot> get slots => _StatSlot.values;
+
+  @override
+  Widget? childForSlot(_StatSlot slot) => switch (slot) {
+    _StatSlot.label => label,
+    _StatSlot.figure => figure,
+    _StatSlot.details => details,
+    _StatSlot.trend => trend,
+  };
+
+  @override
+  _RenderStatBody createRenderObject(BuildContext context) =>
+      _RenderStatBody(figureWidth: figureWidth, textDirection: textDirection);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderStatBody renderObject) {
+    renderObject
+      ..figureWidth = figureWidth
+      ..textDirection = textDirection;
+  }
+}
+
+class _RenderStatBody extends RenderBox
+    with SlottedContainerRenderObjectMixin<_StatSlot, RenderBox> {
+  _RenderStatBody({required this._figureWidth, required this._textDirection});
+
+  /// Between the label, the figure and the details.
+  static const _gap = AdminSpacing.md;
+
+  /// Between the figure and the trend beside it, or the details and the
+  /// trend under them.
+  static const _trendGap = AdminSpacing.lg;
+
+  double _figureWidth;
+  set figureWidth(double value) {
+    if (value == _figureWidth) return;
+    _figureWidth = value;
+    markNeedsLayout();
+  }
+
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (value == _textDirection) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  RenderBox get _label => childForSlot(_StatSlot.label)!;
+  RenderBox get _figure => childForSlot(_StatSlot.figure)!;
+  RenderBox? get _details => childForSlot(_StatSlot.details);
+  RenderBox? get _trend => childForSlot(_StatSlot.trend);
+
+  @override
+  double computeMinIntrinsicWidth(double height) =>
+      [for (final child in children) child.getMinIntrinsicWidth(height)]
+          .fold(0, math.max);
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    final trend = _trend?.getMaxIntrinsicWidth(height);
+    return math.max(
+      math.max(
+        _label.getMaxIntrinsicWidth(height),
+        _details?.getMaxIntrinsicWidth(height) ?? 0,
+      ),
+      _figure.getMaxIntrinsicWidth(height) +
+          (trend == null ? 0 : _trendGap + trend),
+    );
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _plan(
+    BoxConstraints(maxWidth: width),
+    ChildLayoutHelper.dryLayoutChild,
+  ).size.height;
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      computeMinIntrinsicHeight(width);
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) =>
+      _label.getDistanceToActualBaseline(baseline);
+
+  @override
+  double? computeDryBaseline(
+    covariant BoxConstraints constraints,
+    TextBaseline baseline,
+  ) => _label.getDryBaseline(
+    BoxConstraints.tightFor(width: _width(constraints)),
+    baseline,
+  );
+
+  @override
+  Size computeDryLayout(covariant BoxConstraints constraints) =>
+      _plan(constraints, ChildLayoutHelper.dryLayoutChild).size;
+
+  @override
+  void performLayout() {
+    final plan = _plan(constraints, ChildLayoutHelper.layoutChild);
+    size = plan.size;
+    for (final (child, offset) in plan.offsets) {
+      (child.parentData! as BoxParentData).offset = offset;
+    }
+  }
+
+  double _width(BoxConstraints constraints) => constraints.hasBoundedWidth
+      ? constraints.maxWidth
+      : computeMaxIntrinsicWidth(double.infinity);
+
+  ({Size size, List<(RenderBox, Offset)> offsets}) _plan(
+    BoxConstraints constraints,
+    ChildLayouter layoutChild,
+  ) {
+    final width = _width(constraints);
+    final rtl = _textDirection == TextDirection.rtl;
+    // The x of a box [w] wide starting [start] in from the leading edge.
+    double x(double start, double w) => rtl ? width - start - w : start;
+    final across = BoxConstraints.tightFor(width: width);
+    final offsets = <(RenderBox, Offset)>[];
+
+    final label = _label;
+    var y = layoutChild(label, across).height + _gap;
+    offsets.add((label, Offset(x(0, width), 0)));
+
+    final figure = _figure;
+    var figureSize = layoutChild(figure, across);
+    final trend = _trend;
+    var beside = false;
+    if (trend != null) {
+      // At its own width, as a row lays out a child it does not stretch.
+      final trendSize = layoutChild(trend, BoxConstraints(maxWidth: width));
+      final room = width - _trendGap - trendSize.width;
+      beside = trendSize.height <= figureSize.height && room >= _figureWidth;
+      if (beside) {
+        figureSize = layoutChild(figure, BoxConstraints.tightFor(width: room));
+        offsets.add((
+          trend,
+          Offset(
+            x(width - trendSize.width, trendSize.width),
+            y + (figureSize.height - trendSize.height) / 2,
+          ),
+        ));
+      }
+    }
+    offsets.add((figure, Offset(x(0, figureSize.width), y)));
+    y += figureSize.height;
+
+    final details = _details;
+    if (details != null) {
+      y += _gap;
+      final detailsSize = layoutChild(details, across);
+      offsets.add((details, Offset(x(0, detailsSize.width), y)));
+      y += detailsSize.height;
+    }
+
+    if (trend == null || beside) {
+      return (size: constraints.constrain(Size(width, y)), offsets: offsets);
+    }
+    y += _trendGap;
+    final trendSize = layoutChild(trend, across);
+    final size = constraints.constrain(Size(width, y + trendSize.height));
+    // On the bottom edge of a card stretched to its row's height.
+    offsets.add((
+      trend,
+      Offset(
+        x(0, trendSize.width),
+        math.max(y, size.height - trendSize.height),
+      ),
+    ));
+    return (size: size, offsets: offsets);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    for (final child in children) {
+      context.paintChild(
+        child,
+        offset + (child.parentData! as BoxParentData).offset,
+      );
+    }
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    for (final child in children.toList().reversed) {
+      final hit = result.addWithPaintOffset(
+        offset: (child.parentData! as BoxParentData).offset,
+        position: position,
+        hitTest: (result, transformed) =>
+            child.hitTest(result, position: transformed),
+      );
+      if (hit) return true;
+    }
+    return false;
+  }
+}
+
+/// A loading [StatCard.trend]: a pulsing block the size the trend lays out
+/// at, in its place. The trend itself is laid out, not shown.
+class _SkeletonTrend extends StatelessWidget {
+  final Widget trend;
+
+  const _SkeletonTrend(this.trend);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.passthrough,
+      children: [
+        Visibility.maintain(visible: false, child: trend),
+        const Positioned.fill(child: Skeleton(height: double.infinity)),
+      ],
+    );
+  }
+}
+
 /// A loading [_DeltaChip]: a pill of its height, its padding around the
-/// taller of its arrow and its text.
+/// taller of its arrow and its words, and as wide as the chip of a short
+/// delta, [_sample]. It is measured as the chip is laid out: only the words
+/// grow with the text size, not the padding or the arrow, so a pill drawn in
+/// proportion to its height would outgrow the chip, and a narrow card, at a
+/// large text size.
 class _SkeletonDeltaChip extends StatelessWidget {
+  /// The words of a short delta, which the pill is as wide as.
+  static const _sample = '12%';
+
   const _SkeletonDeltaChip();
 
   @override
   Widget build(BuildContext context) {
-    final line = lineHeightOf(
-      context,
-      context.type.weighted(context.type.caption, FontWeight.w700),
-    );
-    final height = 2 * AdminSpacing.xxs + math.max(context.iconSizes.xs, line);
+    final style = _DeltaChip.labelStyle(context);
+    final arrow = context.iconSizes.xs;
     return Skeleton(
-      width: 3 * height,
-      height: height,
+      width:
+          _DeltaChip.padding.horizontal +
+          arrow +
+          _DeltaChip.gap +
+          textWidthOf(context, _sample, style, exact: true),
+      height:
+          _DeltaChip.padding.vertical +
+          math.max(arrow, lineHeightOf(context, style)),
       borderRadius: BorderRadius.circular(context.radii.radiusPill),
     );
   }
 }
 
 class _DeltaChip extends StatelessWidget {
+  /// A Tag's padding, so the two read as one kind of chip.
+  static const padding = EdgeInsetsDirectional.fromSTEB(
+    AdminSpacing.sm,
+    AdminSpacing.xxs,
+    AdminSpacing.md,
+    AdminSpacing.xxs,
+  );
+
+  /// Between the arrow and the words.
+  static const gap = AdminSpacing.xxs;
+
+  /// The words' style, before their colour.
+  static TextStyle labelStyle(BuildContext context) =>
+      context.type.weighted(context.type.caption, FontWeight.w700);
+
   final StatDelta delta;
 
   const _DeltaChip({required this.delta});
@@ -260,14 +573,9 @@ class _DeltaChip extends StatelessWidget {
       TrendDirection.flat => Icons.remove_rounded,
     };
 
-    // A Tag's padding and pill, so the two read as one kind of chip.
+    // A Tag's pill, as it has a Tag's padding.
     return Container(
-      padding: const EdgeInsetsDirectional.fromSTEB(
-        AdminSpacing.sm,
-        AdminSpacing.xxs,
-        AdminSpacing.md,
-        AdminSpacing.xxs,
-      ),
+      padding: padding,
       decoration: BoxDecoration(
         color: surface,
         borderRadius: BorderRadius.circular(context.radii.radiusPill),
@@ -276,13 +584,10 @@ class _DeltaChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: context.iconSizes.xs, color: foreground),
-          const Gap(AdminSpacing.xxs),
+          const Gap(gap),
           Text(
             delta.label,
-            style: context.type.weighted(
-              context.type.caption.copyWith(color: foreground),
-              FontWeight.w700,
-            ),
+            style: labelStyle(context).copyWith(color: foreground),
           ),
         ],
       ),
@@ -297,8 +602,9 @@ class _DeltaChip extends StatelessWidget {
 /// 3 + 1.
 ///
 /// Tiles in a row share its height — the tallest tile's — so a card with a
-/// delta row doesn't stand taller than its neighbours. That takes the tiles'
-/// intrinsic heights, so a tile can't be built by a [LayoutBuilder].
+/// delta row, or a trend under its figure, doesn't stand taller than its
+/// neighbours. That takes the tiles' intrinsic heights, so a tile can't be
+/// built by a [LayoutBuilder].
 ///
 /// While the figures load, give it the same cards with `loading: true`,
 /// labelled or not; they pulse in step:

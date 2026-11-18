@@ -170,6 +170,7 @@ Map<String, dynamic> genericCatalog() => {
     'Log view': const LogViewDemo(),
     'Zoom view': const ZoomViewDemo(),
     'Stat card / dashboard': const StatCardDemo(),
+    'Stat card / trend': const StatCardTrendDemo(),
     'Attention tiles': const AttentionGridDemo(),
     'Charts / sparklines': const ChartDemo(),
     'Chart card': const ChartCardDemo(),
