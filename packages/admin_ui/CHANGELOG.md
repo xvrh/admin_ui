@@ -254,6 +254,24 @@
   end edge, so they read down the rows; baked into the label, a figure was
   the first thing a narrow card cut and lined up with nothing. While the
   list loads, a row given a detail shows a pulsing bar in its place.
+- A `StatCard` takes a `trend`, a small chart of its figure's recent
+  history such as a `Sparkline` or a `BarSparkline` of the last 30 days.
+  It stands beside the figure, at the card's end and at its own width,
+  while it is no taller than the figure's line and the figure keeps beside
+  it its one-line width, and at least `StatCard.minValueWidth` (96): the
+  card is then as tall as one without. Otherwise, on a narrow tile such as
+  one of two across a phone, or with a figure too wide to share its line,
+  it goes under the delta and the caption, across the card, along its
+  bottom edge, so the label, figure and delta of the cards in a `StatGrid`
+  row stay level, trend or not, and trends under their figures line up
+  along the row's bottom. A trend that fills its width, such as
+  `Sparkline(width: null)`, always goes under. The chart is left out of
+  the card's sentence for assistive technology, where the delta already
+  speaks the change. While loading, the card shows a pulsing block of the
+  trend's size in its place, for a figure `minValueWidth` wide or as wide
+  as its `value` when given one, so a loading card given the trend the
+  loaded one will have, with any values, is as tall as it. It mirrors
+  right to left.
 
 ### Looks
 

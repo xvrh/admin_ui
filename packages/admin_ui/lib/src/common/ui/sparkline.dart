@@ -5,7 +5,8 @@ import 'package:material_ui/material_ui.dart';
 import '../../theme/tokens.dart';
 
 /// A compact inline line chart — no axes, no labels, no interaction. Drop it
-/// into a table cell or beside a [StatCard] value to show a trend at a glance.
+/// into a table cell, or into a [StatCard] as its [StatCard.trend], to show a
+/// trend at a glance.
 /// Drawn in the first chart colour unless given a [color], so it matches the
 /// charts beside it. Pass the same [width] everywhere to keep a column aligned.
 /// Right to left it runs from the right, like the charts.

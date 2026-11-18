@@ -31,12 +31,16 @@ Future<void> _pump(
 }
 
 /// A loaded card, beside the same card loading: with a delta and a caption
-/// unless told otherwise, the loading one's in other words.
+/// unless told otherwise, the loading one's in other words, and the [trend]
+/// given, the loading one's with no values. A loading card with a trend is
+/// given the figure to come, so it places the trend where the loaded one
+/// does.
 Widget _pair({
   String loadingLabel = 'Revenue',
   IconData? icon,
   bool delta = true,
   bool caption = true,
+  _Trend trend = _Trend.none,
 }) => Row(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
@@ -48,6 +52,7 @@ Widget _pair({
         icon: icon,
         delta: delta ? const StatDelta('12%') : null,
         caption: caption ? 'vs last month' : null,
+        trend: trend.build(const [3, 5, 4, 8, 7, 9]),
       ),
     ),
     const SizedBox(width: 16),
@@ -55,14 +60,30 @@ Widget _pair({
       child: StatCard(
         key: const ValueKey('loading'),
         label: loadingLabel,
+        value: trend == _Trend.none ? '' : r'$48.2k',
         icon: icon,
         delta: delta ? const StatDelta('') : null,
         caption: caption ? '' : null,
+        trend: trend.build(const []),
         loading: true,
       ),
     ),
   ],
 );
+
+/// A card's trend: none, a line beside its figure where it fits, or bars
+/// across the card under the rest.
+enum _Trend {
+  none,
+  beside,
+  under;
+
+  Widget? build(List<double> values) => switch (this) {
+    none => null,
+    beside => Sparkline(values),
+    under => BarSparkline(values, width: null),
+  };
+}
 
 double _height(WidgetTester tester, String key) =>
     tester.getSize(find.byKey(ValueKey(key))).height;
@@ -100,24 +121,27 @@ void main() {
                 (false, true),
                 (false, false),
               ]) {
-                await _pump(
-                  tester,
-                  _pair(
-                    loadingLabel: label,
-                    icon: icon,
-                    delta: delta,
-                    caption: caption,
-                  ),
-                  tokens: tokens,
-                  textScale: scale,
-                );
-                expect(
-                  _height(tester, 'loading'),
-                  _height(tester, 'loaded'),
-                  reason:
-                      'label "$label", icon $icon, delta $delta, '
-                      'caption $caption',
-                );
+                for (final trend in _Trend.values) {
+                  await _pump(
+                    tester,
+                    _pair(
+                      loadingLabel: label,
+                      icon: icon,
+                      delta: delta,
+                      caption: caption,
+                      trend: trend,
+                    ),
+                    tokens: tokens,
+                    textScale: scale,
+                  );
+                  expect(
+                    _height(tester, 'loading'),
+                    _height(tester, 'loaded'),
+                    reason:
+                        'label "$label", icon $icon, delta $delta, '
+                        'caption $caption, trend ${trend.name}',
+                  );
+                }
               }
             }
           },

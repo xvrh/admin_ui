@@ -39,7 +39,7 @@ two together.
 | F-029 | A click on a submenu row with no level of the menu under it closes the menu and chooses nothing | bug | S2 | fixed |
 | F-030 | A script fallback set a field's baseline where the theme's own family is absent, lifting field text | bug | S2 | fixed |
 | F-100 | `SignInForm` can say a server refusal only above the form: no per-field error, so `AuthFieldError` has nowhere to go | missing-api | S3 | open |
-| F-101 | `StatCard` has no slot for a trend line, though the kit ships `Sparkline` for exactly that dashboard | missing-api | S3 | open |
+| F-101 | `StatCard` has no slot for a trend line, though the kit ships `Sparkline` for exactly that dashboard | missing-api | S3 | fixed |
 | F-102 | No rule and no wizard step can name a `RecordListCell`: "at least one row" needs a borrowed cell | missing-api | S2 | fixed |
 | F-103 | Server field errors are keyed by cell id, and a record-list row's cell ids are opaque (minted from the wall clock) | doc-gap | S3 | open |
 | F-104 | `DecimalField` takes a prefix but no unit, though its `NumberBody` has one | missing-api | S3 | open |
@@ -471,12 +471,12 @@ Owned by WP-A.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `widgets.dart › StatCard` (`lib/src/common/ui/stat_card.dart:37`): label, value, icon, delta and a `String` caption only.
 - **App:** `lib/src/screens/dashboard/dashboard_view.dart` `_Kpi` (~20 lines): a `Stack` lays the `Sparkline` over the card's delta row with `PositionedDirectional`, guessing the card's padding (`AdminSpacing.xl`).
 - **Evidence:** `02_home` "The dashboard at a glance" › "Dashboard": the four KPI tiles. The overlay only holds while the delta chip and the sparkline both fit on the row (≥150 px tiles).
 - **Workaround:** the overlay, with the caption dropped (the period moved to the page subtitle) so nothing runs under the sparkline.
-- **Proposal:** `StatCard(trend: Widget?)` (or `sparkline: List<double>`), laid out at the end of the delta row.
+- **Proposal:** done: `StatCard.trend` (`widgets.dart`) takes the `Sparkline`: beside the figure where the tile has room for both, and under the delta, across the card, where it has not, as on a phone's two-across tiles. A loading tile shows a block in its place, and the card's sentence for assistive technology leaves the chart out. `_Kpi` passes it there; the `Stack`, the padding it guessed and its `ExcludeSemantics` are gone.
 
 ### F-102 · No rule and no wizard step can name a `RecordListCell`: "at least one row" needs a borrowed cell
 
