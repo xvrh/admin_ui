@@ -2,6 +2,20 @@
 
 ## 0.2.0
 
+- A control's text follows its size. An `AdminTypeRamp` names
+  `fieldTextLarge` and `buttonLarge`, the steps of the text inside a large
+  control and of a large button's label, and a ramp that names neither sets
+  them on `fieldText`'s and `button`'s. `AdminTypography.fieldTextOf(size)`
+  and `buttonOf(size)` give the style for a `ControlSize`. A `Button`, an
+  `InputField`, a `SearchField`, a `PasswordField`, a `Combobox`, a
+  `MentionField` and a `DateRangePicker` take theirs from it.
+  `fieldInputDecoration` sizes its hint and pads its text for the `size` it
+  is given, and `fieldTextStyle` and `fieldPaddingY` take a `size` too: a
+  body that draws a large field gives all three the same one.
+- `AdminButtonStyle.smallLabelWeight` is the weight of a small button's
+  label, `labelWeight` where none is given, and `labelWeightOf(size)` the
+  weight at a size. A `labelWeight` in a `Button`'s own `style` is its
+  weight at every size.
 - A theme weighs its large titles and a field's error line apart from its
   headings, and says what a field's label is drawn in, in its
   `AdminTypeSpec`. `title` is the weight of a page's title and a dialog's,
@@ -483,6 +497,17 @@
 
 ### Looks
 
+- A large control's text, and a small button's weight, follow Ant and
+  Fluent, where every theme set a large button and a large field in the
+  text of the medium ones, and a button's label in one weight at every
+  size. The other four themes keep that: their design systems do.
+  - Ant: a large button's label and a large field's text are 16/24 (were
+    14/22).
+  - Fluent: a large button's label and a large field's text are 16/22
+    (were 14/20); a small button's label is regular (was semibold).
+  The kit draws small buttons of its own (a toast's action, the
+  notification centre's "mark all read", a `CopyButton`), so in Fluent
+  those are regular too.
 - Titles, a field's label and its error follow each reference theme, where
   every theme set a page's title and a `Modal`'s in its heading weight, a
   field's error at weight 500 and a field's label in `foregroundSecondary`.

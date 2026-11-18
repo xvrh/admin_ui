@@ -902,10 +902,16 @@ class _FieldSpecBorder extends OutlineInputBorder {
   int get hashCode => Object.hash(spec, borderRadius);
 }
 
-/// The vertical padding that centres one [AdminTypography.fieldText] line in
-/// a control [height].
-double fieldPaddingY(AdminTypography type, double height) {
-  final text = type.fieldText;
+/// The vertical padding that centres one line of a field's text in a control
+/// [height]: [AdminTypography.fieldText]'s line, or the line of the text a
+/// control of [size] holds ([AdminTypography.fieldTextOf]) when the height
+/// is that size's.
+double fieldPaddingY(
+  AdminTypography type,
+  double height, {
+  ControlSize size = ControlSize.medium,
+}) {
+  final text = type.fieldTextOf(size);
   final line = text.fontSize! * (text.height ?? 1);
   return height > line ? (height - line) / 2 : 0;
 }

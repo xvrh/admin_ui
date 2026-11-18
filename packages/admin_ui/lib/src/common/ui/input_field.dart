@@ -228,7 +228,7 @@ class _InputFieldState extends State<InputField> {
         textInputAction: widget.textInputAction,
         autofillHints: widget.autofillHints,
         textDirection: direction,
-        style: fieldTextStyle(context),
+        style: fieldTextStyle(context, size: widget.size),
         decoration: fieldInputDecoration(
           context,
           hint: widget.hint,

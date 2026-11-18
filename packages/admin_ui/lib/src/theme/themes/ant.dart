@@ -152,6 +152,7 @@ const _ramp = AdminTypeRamp(
   sectionLabel: AdminTypeStep(12, 20),
   fieldLabel: AdminTypeStep(14, 22),
   fieldText: AdminTypeStep(14, 22),
+  fieldTextLarge: AdminTypeStep(16, 24), // inputFontSizeLG at lineHeightLG
   fieldDescription: AdminTypeStep(14, 22), // a form item's extra line
   fieldMessage: AdminTypeStep(14, 22), // a form item's explain line
   body: AdminTypeStep(14, 22),
@@ -160,6 +161,7 @@ const _ramp = AdminTypeRamp(
   micro: AdminTypeStep(12, 20),
   button: AdminTypeStep(14, 22),
   buttonSmall: AdminTypeStep(14, 22), // a small button keeps fontSize
+  buttonLarge: AdminTypeStep(16, 24), // contentFontSizeLG: fontSizeLG
   mono: AdminTypeStep(14, 22),
   monoSmall: AdminTypeStep(12, 20),
 );

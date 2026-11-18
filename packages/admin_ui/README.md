@@ -1046,6 +1046,7 @@ the letter spacing after them where it is not 0:
 | `sectionLabel` | 12/16 +0.3 | 12/16 +0.5 | 12/16 | 12/20 | 12/16 | 14/18 +0.16 |
 | `fieldLabel` | 12/16 | 12/16 +0.4 | 14/20 | 14/22 | 14/20 | 12/16 +0.32 |
 | `fieldText` | 13/20 | 16/24 +0.5 | 14/20 | 14/22 | 14/20 | 14/18 +0.16 |
+| `fieldTextLarge` | 13/20 | 16/24 +0.5 | 14/20 | 16/24 | 16/22 | 14/18 +0.16 |
 | `fieldDescription` | 12/16 | 12/16 +0.4 | 14/20 | 14/22 | 12/16 | 12/16 +0.32 |
 | `fieldMessage` | 12/16 | 12/16 +0.4 | 14/20 | 14/22 | 12/16 | 12/16 +0.32 |
 | `body` | 13/20 | 14/20 +0.25 | 14/20 | 14/22 | 14/20 | 14/20 +0.16 |
@@ -1054,6 +1055,7 @@ the letter spacing after them where it is not 0:
 | `micro` | 11/14 +0.2 | 11/16 +0.5 | 12/16 | 12/20 | 10/14 | 12/16 +0.32 |
 | `button` | 13/20 | 14/20 +0.1 | 14/20 | 14/22 | 14/20 | 14/18 +0.16 |
 | `buttonSmall` | 12/16 | 14/20 +0.1 | 14/20 | 14/22 | 12/16 | 14/18 +0.16 |
+| `buttonLarge` | 13/20 | 14/20 +0.1 | 14/20 | 16/24 | 16/22 | 14/18 +0.16 |
 | `mono` | 13/20 | 14/20 | 14/20 | 14/22 | 14/20 | 14/20 +0.32 |
 | `monoSmall` | 12/16 | 12/16 | 12/16 | 12/20 | 12/16 | 12/16 +0.32 |
 
@@ -1106,6 +1108,16 @@ themes. The description and the message take one step in every theme, so a
 description and the error that replaces it are one size: the caption's, or
 the body's in shadcn and Ant, whose forms set both at body size. `fieldText`'s
 line fits every theme's small control height (24 in Ant and Fluent).
+
+A control's text follows its size where the theme's design system sizes it.
+`context.type.fieldTextOf(size)` is the text inside a control of that
+`ControlSize` and `context.type.buttonOf(size)` a button's label:
+`fieldTextLarge` and `buttonLarge` in a large one, which a ramp that names
+neither sets on `fieldText`'s and `button`'s steps. Ant and Fluent name both,
+at 16px (`fontSizeLG` on a 24px line; `body2` and `fontSizeBase400` on a
+22px one). A field pads its text from that line, so `fieldInputDecoration`,
+`fieldTextStyle` and `fieldPaddingY` each take the control's size: give the
+box and its text the same one.
 
 `mono` and `monoSmall` use `AdminTypeSpec.monoFontFamily` (`monospace`, with
 `monoFontFamilyFallback` for platforms without one; `IBM Plex Mono` in
@@ -1223,7 +1235,7 @@ a box.
 | Material | outlined, 4dp corner, 2dp primary on focus | stadium, 24dp padding (16 on the icon side), w500, outlined in `controlBorder`, a primary text button | 360 / 80 / 56 / 64, a stadium pill |
 | shadcn | outlined, a 3px ring at 50% | 12 / 16 / 24px padding by size (10 / 12 / 16 on the icon side), faded to 50% when disabled | 256 / 48 / 32 / 56, the #18181B sidebar in dark mode |
 | Ant | outlined, 6px corner, colorPrimary focus with a 2px ring, a primary hover | w400, 16px padding, a primary hover | 200 / 80 / 40 / 64, the dark #001529 sider in light mode |
-| Fluent | underlined, a 2px brand underline on focus | radius 4, w600, 12px padding, 96px wide at least | 260 / 48 / 40 / 48, a 4px bar |
+| Fluent | underlined, a 2px brand underline on focus | radius 4, w600 (w400 when small), 12px padding, 96px wide at least | 260 / 48 / 40 / 48, a 4px bar |
 | Carbon | filled, square, a 2px inset `$focus` | square, label at the start and icon at the end (16 / 64), w400, a Gray 80 filled secondary, a `$link-primary` ghost | 256 / 48 / 32 / 48, a 3px edge rule, the g100 header in both modes |
 
 `AdminSelectionStyle` draws a `Toggle`, a `Check` and a radio as the

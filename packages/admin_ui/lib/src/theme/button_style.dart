@@ -263,6 +263,10 @@ class AdminButtonStyle {
   /// a Google font in step.
   final FontWeight? labelWeight;
 
+  /// The weight of a small button's label; null keeps [labelWeight]. Fluent
+  /// sets its small button in regular and the larger two in semibold.
+  final FontWeight? smallLabelWeight;
+
   /// How a disabled button draws.
   final ButtonDisabledStyle disabled;
 
@@ -293,6 +297,7 @@ class AdminButtonStyle {
     this.padding,
     this.minWidth,
     this.labelWeight,
+    this.smallLabelWeight,
     this.disabled = ButtonDisabledStyle.neutral,
     this.fadedOpacity = 0.5,
     this.filledSecondary = false,
@@ -309,15 +314,22 @@ class AdminButtonStyle {
   /// The minimum width at [size]: [minWidth]'s, or 0.
   double minWidthOf(ControlSize size) => minWidth?.of(size) ?? 0;
 
+  /// The label's weight at [size]: [smallLabelWeight] on a small button
+  /// where the style gives one, otherwise [labelWeight]. Null keeps the
+  /// weight of the type role.
+  FontWeight? labelWeightOf(ControlSize size) =>
+      size == ControlSize.small ? smallLabelWeight ?? labelWeight : labelWeight;
+
   /// A copy with the given members replaced. A null argument keeps the
-  /// current value, so [padding], [minWidth] and [labelWeight] cannot be
-  /// cleared here; build a new style for that.
+  /// current value, so [padding], [minWidth], [labelWeight] and
+  /// [smallLabelWeight] cannot be cleared here; build a new style for that.
   AdminButtonStyle copyWith({
     ButtonLabelAlignment? labelAlignment,
     ButtonIconPlacement? iconPlacement,
     AdminButtonPadding? padding,
     AdminButtonMinWidth? minWidth,
     FontWeight? labelWeight,
+    FontWeight? smallLabelWeight,
     ButtonDisabledStyle? disabled,
     double? fadedOpacity,
     bool? filledSecondary,
@@ -330,6 +342,7 @@ class AdminButtonStyle {
     padding: padding ?? this.padding,
     minWidth: minWidth ?? this.minWidth,
     labelWeight: labelWeight ?? this.labelWeight,
+    smallLabelWeight: smallLabelWeight ?? this.smallLabelWeight,
     disabled: disabled ?? this.disabled,
     fadedOpacity: fadedOpacity ?? this.fadedOpacity,
     filledSecondary: filledSecondary ?? this.filledSecondary,
@@ -371,6 +384,7 @@ class AdminButtonStyle {
       labelWeight: a.labelWeight == null || b.labelWeight == null
           ? near.labelWeight
           : FontWeight.lerp(a.labelWeight, b.labelWeight, t),
+      smallLabelWeight: near.smallLabelWeight,
       disabled: near.disabled,
       fadedOpacity: d(a.fadedOpacity, b.fadedOpacity),
       filledSecondary: near.filledSecondary,
@@ -388,6 +402,7 @@ class AdminButtonStyle {
       other.padding == padding &&
       other.minWidth == minWidth &&
       other.labelWeight == labelWeight &&
+      other.smallLabelWeight == smallLabelWeight &&
       other.disabled == disabled &&
       other.fadedOpacity == fadedOpacity &&
       other.filledSecondary == filledSecondary &&
@@ -402,6 +417,7 @@ class AdminButtonStyle {
     padding,
     minWidth,
     labelWeight,
+    smallLabelWeight,
     disabled,
     fadedOpacity,
     filledSecondary,
@@ -420,7 +436,8 @@ class AdminButtonStyle {
     ];
     return 'AdminButtonStyle(${labelAlignment.name}, icon '
         '${iconPlacement.name}, padding ${padding ?? 'height / 2 - 4'}, '
-        'min width ${minWidth ?? 'none'}, weight ${labelWeight ?? 'strong'}, '
+        'min width ${minWidth ?? 'none'}, weight ${labelWeight ?? 'strong'}'
+        '${smallLabelWeight == null ? '' : ' ($smallLabelWeight small)'}, '
         'disabled ${disabled.name}'
         '${disabled == ButtonDisabledStyle.faded ? ' at $fadedOpacity' : ''}'
         '${flags.isEmpty ? '' : ', ${flags.join(', ')}'})';
