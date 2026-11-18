@@ -300,6 +300,42 @@ class ChartDemo extends StatelessWidget {
         ),
         const Gap(AdminSpacing.xxxl),
 
+        const DemoSection("Bar list — a funnel, each step's share beside it"),
+        _Funnel(formats: context.adminFormats),
+        const Gap(AdminSpacing.lg),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 300),
+            child: ChartCard(
+              title: 'Onboarding',
+              subtitle: 'In a narrow card the labels give way',
+              bodyHeight: 120,
+              chart: _Funnel(formats: context.adminFormats),
+            ),
+          ),
+        ),
+        const Gap(AdminSpacing.xxxl),
+
+        const DemoSection('Bar list — a second count: people, then times'),
+        BarList(
+          formatValue: (v) => context.adminFormats.integer(v.round()),
+          items: [
+            for (final (label, people, times) in const [
+              ('Exported a report', 288, 4120),
+              ('Shared a link', 164, 1302),
+              ('Left a comment', 97, 655),
+              ('Invited a teammate', 41, 58),
+            ])
+              BarListItem(
+                label,
+                people.toDouble(),
+                detail: '${context.adminFormats.integer(times)} times',
+              ),
+          ],
+        ),
+        const Gap(AdminSpacing.xxxl),
+
         const DemoSection('Bar list and line chart — loading'),
         const BarList(
           sort: false,
@@ -421,6 +457,38 @@ class _SparkStat extends StatelessWidget {
           SizedBox(width: double.infinity, child: spark),
         ],
       ),
+    );
+  }
+}
+
+/// An onboarding funnel: each step's count, and its share of the first step
+/// as the row's detail.
+class _Funnel extends StatelessWidget {
+  final AdminFormats formats;
+
+  const _Funnel({required this.formats});
+
+  static const _steps = [
+    ('Invited', 96),
+    ('Signed up', 81),
+    ('Joined a team', 64),
+    ('Shared a first document with the team', 22),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final first = _steps.first.$2;
+    return BarList(
+      sort: false,
+      formatValue: (v) => formats.integer(v.round()),
+      items: [
+        for (final (label, count) in _steps)
+          BarListItem(
+            label,
+            count.toDouble(),
+            detail: formats.percent(count / first),
+          ),
+      ],
     );
   }
 }

@@ -474,7 +474,19 @@ class BarListItem {
   final Color? color;
   final Widget? leading;
 
-  const BarListItem(this.label, this.value, {this.color, this.leading});
+  /// A second figure after the value, muted, as the app formats it: a funnel
+  /// step's share of the first ('84%'), or a second count ('4,120 times').
+  /// The list lines the details up in a column of their own, as it does the
+  /// values, so they read down the rows and never cut into the label.
+  final String? detail;
+
+  const BarListItem(
+    this.label,
+    this.value, {
+    this.color,
+    this.leading,
+    this.detail,
+  });
 }
 
 /// A ranked horizontal-bar list — the "top N" dashboard pattern (top pages,
@@ -484,11 +496,18 @@ class BarListItem {
 /// its own. Sorted descending unless [sort] is false; capped at [maxItems] if
 /// set. Values default to the app's locale in compact form.
 ///
+/// The values stand in a column at the end, each at its end edge, and a
+/// [BarListItem.detail] in a muted column after them, so every row's bar
+/// runs along the same track and a bar's length compares with every other.
+/// A narrow list cuts its labels, never its figures.
+///
 /// While [loading], each row's bar and value are pulsing bars, and the list
 /// is exactly as tall as it is loaded, so nothing moves when the values land.
 /// A row's [BarListItem.label] still shows, so the list names what is coming;
 /// for rows not known yet, give as many items as are expected with empty
-/// labels. The values are ignored and the rows keep their order.
+/// labels. The values are ignored and the rows keep their order. A row given
+/// a [BarListItem.detail], whatever its text, shows a pulsing bar in its
+/// place too.
 class BarList extends StatelessWidget {
   final List<BarListItem> items;
   final double? max;
@@ -515,8 +534,28 @@ class BarList extends StatelessWidget {
   /// the last for the rest: falling, as a ranked list does.
   static const _loadingBars = [0.92, 0.74, 0.6, 0.48, 0.38, 0.3];
 
+  /// The width of a loading value's bar, and of a loading detail's, at the
+  /// normal text size.
+  static const _loadingValueWidth = 40.0;
+  static const _loadingDetailWidth = 32.0;
+
   @override
   Widget build(BuildContext context) {
+    // The figures' columns are measured from their text, which a late font
+    // load changes.
+    final list = ListenableBuilder(
+      listenable: PaintingBinding.instance.systemFonts,
+      builder: (context, _) => _list(context),
+    );
+    if (!loading) return list;
+    return Semantics(
+      container: true,
+      label: context.adminL10n.loading,
+      child: SkeletonGroup(child: list),
+    );
+  }
+
+  Widget _list(BuildContext context) {
     final colors = context.colors;
     final format = formatValue ?? context.adminFormats.compact;
 
@@ -535,6 +574,33 @@ class BarList extends StatelessWidget {
     final valueStyle = context.type.bodyStrong.copyWith(
       color: colors.foregroundSecondary,
     );
+    final detailStyle = context.type.body.copyWith(
+      color: colors.foregroundMuted,
+    );
+    final scaler = MediaQuery.textScalerOf(context);
+
+    // Each figure column is as wide as its widest figure, so the figures end
+    // on one edge and every bar runs along the same track.
+    var valueWidth = 0.0;
+    var detailWidth = 0.0;
+    var details = false;
+    for (final item in rows) {
+      valueWidth = math.max(
+        valueWidth,
+        loading
+            ? scaler.scale(_loadingValueWidth)
+            : textWidthOf(context, format(item.value), valueStyle),
+      );
+      final detail = item.detail;
+      if (detail == null) continue;
+      details = true;
+      detailWidth = math.max(
+        detailWidth,
+        loading
+            ? scaler.scale(_loadingDetailWidth)
+            : textWidthOf(context, detail, detailStyle),
+      );
+    }
 
     Widget bar(int index, BarListItem item) {
       if (loading) {
@@ -559,7 +625,22 @@ class BarList extends StatelessWidget {
       );
     }
 
-    final list = Column(
+    // A figure in its column: its text at the column's end edge, or a
+    // pulsing bar while the list loads.
+    Widget figure(String text, TextStyle style, double width) => SizedBox(
+      width: width,
+      child: loading
+          ? SkeletonText(style: style, width: width)
+          : Text(
+              text,
+              style: style,
+              textAlign: TextAlign.end,
+              maxLines: 1,
+              softWrap: false,
+            ),
+    );
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -601,23 +682,22 @@ class BarList extends StatelessWidget {
                   ),
                 ),
                 const Gap(AdminSpacing.lg),
-                if (loading)
-                  SkeletonText(
-                    style: valueStyle,
-                    width: MediaQuery.textScalerOf(context).scale(40),
-                  )
-                else
-                  Text(format(item.value), style: valueStyle),
+                figure(
+                  loading ? '' : format(item.value),
+                  valueStyle,
+                  valueWidth,
+                ),
+                if (details) ...[
+                  const Gap(AdminSpacing.md),
+                  if (item.detail case final detail?)
+                    figure(detail, detailStyle, detailWidth)
+                  else
+                    SizedBox(width: detailWidth),
+                ],
               ],
             ),
           ),
       ],
-    );
-    if (!loading) return list;
-    return Semantics(
-      container: true,
-      label: context.adminL10n.loading,
-      child: SkeletonGroup(child: list),
     );
   }
 }
