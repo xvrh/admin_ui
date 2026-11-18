@@ -537,6 +537,10 @@ widgets.dart FormFieldEntry
 widgets.dart FormFieldRegistry
 widgets.dart FormFieldScope
 widgets.dart FuzzyMatch
+widgets.dart HeatTable
+widgets.dart HeatTableCell
+widgets.dart HeatTableLabel
+widgets.dart HeatTableRow
 widgets.dart HighlightedText
 widgets.dart HoverCard
 widgets.dart IconAction

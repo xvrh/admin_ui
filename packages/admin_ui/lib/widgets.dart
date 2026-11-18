@@ -93,6 +93,8 @@ export 'src/common/ui/field_registry.dart'
         FormFieldRegistry,
         FormFieldScope;
 export 'src/common/ui/focus_ring.dart' show FocusRing;
+export 'src/common/ui/heat_table.dart'
+    show HeatTable, HeatTableCell, HeatTableLabel, HeatTableRow;
 export 'src/common/ui/highlighted_text.dart' show HighlightedText;
 export 'src/common/ui/hover_card.dart' show HoverCard;
 export 'src/common/ui/icon_action.dart' show IconAction, IconActionSize;

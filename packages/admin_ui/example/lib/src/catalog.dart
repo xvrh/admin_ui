@@ -78,6 +78,7 @@ import 'ui/primitives/description_list.dart';
 import 'ui/primitives/feedback/alert.dart';
 import 'ui/primitives/feedback/modal.dart';
 import 'ui/primitives/feedback/toast.dart';
+import 'ui/primitives/heat_table.dart';
 import 'ui/primitives/hover_card.dart';
 import 'ui/primitives/input_field.dart';
 import 'ui/primitives/json_view.dart';
@@ -170,6 +171,7 @@ Map<String, dynamic> genericCatalog() => {
     'Stat card / dashboard': const StatCardDemo(),
     'Attention tiles': const AttentionGridDemo(),
     'Charts / sparklines': const ChartDemo(),
+    'Heat table / retention': const HeatTableDemo(),
     'Timeline / activity': const TimelineDemo(),
     'Search field': const SearchFieldDemo(),
     'Input field': const InputFieldDemo(),
