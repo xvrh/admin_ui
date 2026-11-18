@@ -5,7 +5,6 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 import '../../l10n/formats.dart';
 import '../../theme/spacing.dart';
-import '../../theme/table_metrics.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
 
@@ -92,10 +91,9 @@ class _HeatTableState extends State<HeatTable> {
     final formats = context.adminFormats;
     final rtl = Directionality.of(context) == TextDirection.rtl;
 
-    final header = switch (metrics.headerText) {
-      TableHeaderText.caption => type.weighted(type.caption, FontWeight.w600),
-      TableHeaderText.label => type.bodyStrong,
-    }.copyWith(color: colors.foregroundMuted);
+    final header = metrics
+        .headerStyleOf(type)
+        .copyWith(color: colors.foregroundMuted);
     final body = type.body.copyWith(color: colors.foreground);
     final figures = body.copyWith(
       fontFeatures: const [FontFeature.tabularFigures()],

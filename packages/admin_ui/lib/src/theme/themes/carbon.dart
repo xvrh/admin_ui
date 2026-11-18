@@ -276,6 +276,11 @@ final carbonTheme = AdminTheme.from(
     headerHeight: 48,
     cellPaddingX: 16,
     selectionColumnWidth: 48,
+    // The header is $layer-accent under heading-compact-01 in $text-primary;
+    // every row ends in $border-subtle-01, the same grey
+    headerFill: TableHeaderFill.strong,
+    headerInk: TableHeaderInk.foreground,
+    rowRule: TableRule.border,
   ),
   // fast-02 / moderate-01 / moderate-02 on the productive curves; the
   // expressive standard curve for a larger move

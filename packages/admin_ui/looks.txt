@@ -155,6 +155,10 @@ table.resizeHandleWidth: 8
 table.sortIconSize: 16
 table.sortIconGap: 4
 table.headerText: caption
+table.headerFill: muted
+table.headerInk: muted
+table.headerRule: border
+table.rowRule: subtle
 motion.fast: 120ms
 motion.medium: 180ms
 motion.slow: 240ms
@@ -444,6 +448,10 @@ table.resizeHandleWidth: 8
 table.sortIconSize: 16
 table.sortIconGap: 4
 table.headerText: label
+table.headerFill: muted
+table.headerInk: muted
+table.headerRule: border
+table.rowRule: subtle
 motion.fast: 100ms
 motion.medium: 200ms
 motion.slow: 300ms
@@ -738,6 +746,10 @@ table.resizeHandleWidth: 8
 table.sortIconSize: 16
 table.sortIconGap: 4
 table.headerText: label
+table.headerFill: surface
+table.headerInk: foreground
+table.headerRule: border
+table.rowRule: border
 motion.fast: 150ms
 motion.medium: 200ms
 motion.slow: 300ms
@@ -1066,6 +1078,10 @@ table.resizeHandleWidth: 8
 table.sortIconSize: 16
 table.sortIconGap: 4
 table.headerText: label
+table.headerFill: muted
+table.headerInk: foreground
+table.headerRule: subtle
+table.rowRule: subtle
 motion.fast: 100ms
 motion.medium: 200ms
 motion.slow: 300ms
@@ -1390,7 +1406,11 @@ table.selectionColumnWidth: 44
 table.resizeHandleWidth: 8
 table.sortIconSize: 16
 table.sortIconGap: 4
-table.headerText: label
+table.headerText: body
+table.headerFill: surface
+table.headerInk: foreground
+table.headerRule: subtle
+table.rowRule: subtle
 motion.fast: 100ms
 motion.medium: 200ms
 motion.slow: 250ms
@@ -1691,6 +1711,10 @@ table.resizeHandleWidth: 8
 table.sortIconSize: 16
 table.sortIconGap: 4
 table.headerText: label
+table.headerFill: strong
+table.headerInk: foreground
+table.headerRule: border
+table.rowRule: border
 motion.fast: 110ms
 motion.medium: 150ms
 motion.slow: 240ms

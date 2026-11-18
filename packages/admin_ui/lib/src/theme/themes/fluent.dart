@@ -242,6 +242,12 @@ final fluentTheme = AdminTheme.from(
     headerHeight: 44,
     cellPaddingX: 8,
     selectionColumnWidth: 44,
+    // TableHeaderCell: fontWeightRegular on no background; the header row
+    // and every row end in colorNeutralStroke2
+    headerText: TableHeaderText.body,
+    headerFill: TableHeaderFill.surface,
+    headerInk: TableHeaderInk.foreground,
+    headerRule: TableRule.subtle,
   ),
   // durationFaster / Normal / Gentle on curveEasyEase, curveDecelerateMid
   // and curveAccelerateMid; curveEasyEaseMax for a larger move

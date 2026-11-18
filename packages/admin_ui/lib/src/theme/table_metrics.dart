@@ -1,6 +1,10 @@
-import 'dart:ui' show lerpDouble;
+import 'dart:ui' show Color, FontWeight, lerpDouble;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart' show TextStyle;
+
+import 'palette.dart';
+import 'typography.dart';
 
 /// How tightly a table packs its rows; see [AdminTableMetrics.rowHeight].
 enum TableDensity { compact, standard, comfortable }
@@ -15,12 +19,53 @@ enum TableHeaderText {
   /// Body size at the theme's strong weight (`bodyStrong`): shadcn, Material,
   /// Ant and Carbon set their headers as a label the size of the cells.
   label,
+
+  /// Body size at the body's own weight: Fluent's header cells are regular.
+  body,
 }
 
-/// Data-table geometry for the admin UI: the row height at each
-/// [TableDensity], the header, the cell insets and the fixed columns and
-/// affordances a table draws. Provided via [AdminTokens]; read through
-/// `context.tableMetrics`.
+/// What a table's header row is filled with; see
+/// [AdminTableMetrics.headerFill].
+enum TableHeaderFill {
+  /// [AdminPalette.surfaceMuted], a quiet band: the kit's own, Material's,
+  /// Ant's `headerBg`.
+  muted,
+
+  /// [AdminPalette.surface], as the rows are: shadcn's and Fluent's headers
+  /// have no fill of their own.
+  surface,
+
+  /// [AdminPalette.border], the divider colour as a fill: Carbon's header is
+  /// `$layer-accent`, the grey of its rules.
+  strong,
+}
+
+/// What a table's column headers are written in; see
+/// [AdminTableMetrics.headerInk].
+enum TableHeaderInk {
+  /// [AdminPalette.foregroundMuted], and [AdminPalette.foregroundSecondary]
+  /// for the sorted column: the header is apart from the body.
+  muted,
+
+  /// [AdminPalette.foreground]: shadcn's `text-foreground`, Ant's
+  /// `colorTextHeading`, Fluent's first neutral, Carbon's `$text-primary`.
+  foreground,
+}
+
+/// The colour of a rule under a table's header or between its rows; see
+/// [AdminTableMetrics.headerRule] and [AdminTableMetrics.rowRule].
+enum TableRule {
+  /// [AdminPalette.borderSubtle].
+  subtle,
+
+  /// [AdminPalette.border], a card's edge.
+  border,
+}
+
+/// Data-table geometry and chrome for the admin UI: the row height at each
+/// [TableDensity], the header and what it is filled and written with, the
+/// rules, the cell insets and the fixed columns and affordances a table
+/// draws. Provided via [AdminTokens]; read through `context.tableMetrics`.
 ///
 /// Each theme picks the sizes its design system ships, on the 4px grid; a
 /// standard row leaves room for a medium control and its breathing space, so
@@ -59,6 +104,18 @@ class AdminTableMetrics {
   /// The style the column headers are set in.
   final TableHeaderText headerText;
 
+  /// What the header row is filled with.
+  final TableHeaderFill headerFill;
+
+  /// What the column headers are written in.
+  final TableHeaderInk headerInk;
+
+  /// The rule under the header row.
+  final TableRule headerRule;
+
+  /// The rule under each body row.
+  final TableRule rowRule;
+
   const AdminTableMetrics({
     required this.rowCompact,
     required this.rowStandard,
@@ -70,7 +127,50 @@ class AdminTableMetrics {
     this.sortIconSize = 16,
     this.sortIconGap = 4,
     this.headerText = TableHeaderText.label,
+    this.headerFill = TableHeaderFill.muted,
+    this.headerInk = TableHeaderInk.muted,
+    this.headerRule = TableRule.border,
+    this.rowRule = TableRule.subtle,
   });
+
+  /// The style of a column header in [type], before its colour: the caption
+  /// at semibold, or the body at the strong or at its own weight.
+  TextStyle headerStyleOf(AdminTypography type) => switch (headerText) {
+    TableHeaderText.caption => type.weighted(type.caption, FontWeight.w600),
+    TableHeaderText.label => type.bodyStrong,
+    TableHeaderText.body => type.body,
+  };
+
+  /// The header row's fill in [colors].
+  Color headerFillOf(AdminPalette colors) => switch (headerFill) {
+    TableHeaderFill.muted => colors.surfaceMuted,
+    TableHeaderFill.surface => colors.surface,
+    TableHeaderFill.strong => colors.border,
+  };
+
+  /// A column header's ink in [colors], readable at 4.5:1 on
+  /// [headerFillOf]: a muted ink is moved toward the foreground until it
+  /// reads there. With [sorted], the sorted column's: a step stronger where
+  /// the rest is muted.
+  Color headerInkOf(AdminPalette colors, {bool sorted = false}) {
+    final ink = switch (headerInk) {
+      TableHeaderInk.muted =>
+        sorted ? colors.foregroundSecondary : colors.foregroundMuted,
+      TableHeaderInk.foreground => colors.foreground,
+    };
+    return colors.readableOn(ink, surfaces: [headerFillOf(colors)]);
+  }
+
+  /// The rule under the header row in [colors].
+  Color headerRuleOf(AdminPalette colors) => _ruleOf(headerRule, colors);
+
+  /// The rule under a body row in [colors].
+  Color rowRuleOf(AdminPalette colors) => _ruleOf(rowRule, colors);
+
+  static Color _ruleOf(TableRule rule, AdminPalette colors) => switch (rule) {
+    TableRule.subtle => colors.borderSubtle,
+    TableRule.border => colors.border,
+  };
 
   /// The row height at [density].
   double rowHeight(TableDensity density) => switch (density) {
@@ -90,6 +190,10 @@ class AdminTableMetrics {
     double? sortIconSize,
     double? sortIconGap,
     TableHeaderText? headerText,
+    TableHeaderFill? headerFill,
+    TableHeaderInk? headerInk,
+    TableRule? headerRule,
+    TableRule? rowRule,
   }) {
     return AdminTableMetrics(
       rowCompact: rowCompact ?? this.rowCompact,
@@ -102,6 +206,10 @@ class AdminTableMetrics {
       sortIconSize: sortIconSize ?? this.sortIconSize,
       sortIconGap: sortIconGap ?? this.sortIconGap,
       headerText: headerText ?? this.headerText,
+      headerFill: headerFill ?? this.headerFill,
+      headerInk: headerInk ?? this.headerInk,
+      headerRule: headerRule ?? this.headerRule,
+      rowRule: rowRule ?? this.rowRule,
     );
   }
 
@@ -122,6 +230,10 @@ class AdminTableMetrics {
       sortIconSize: d(a.sortIconSize, b.sortIconSize),
       sortIconGap: d(a.sortIconGap, b.sortIconGap),
       headerText: t < 0.5 ? a.headerText : b.headerText,
+      headerFill: t < 0.5 ? a.headerFill : b.headerFill,
+      headerInk: t < 0.5 ? a.headerInk : b.headerInk,
+      headerRule: t < 0.5 ? a.headerRule : b.headerRule,
+      rowRule: t < 0.5 ? a.rowRule : b.rowRule,
     );
   }
 
@@ -137,7 +249,11 @@ class AdminTableMetrics {
       other.resizeHandleWidth == resizeHandleWidth &&
       other.sortIconSize == sortIconSize &&
       other.sortIconGap == sortIconGap &&
-      other.headerText == headerText;
+      other.headerText == headerText &&
+      other.headerFill == headerFill &&
+      other.headerInk == headerInk &&
+      other.headerRule == headerRule &&
+      other.rowRule == rowRule;
 
   @override
   int get hashCode => Object.hash(
@@ -151,12 +267,18 @@ class AdminTableMetrics {
     sortIconSize,
     sortIconGap,
     headerText,
+    headerFill,
+    headerInk,
+    headerRule,
+    rowRule,
   );
 
   @override
   String toString() =>
       'AdminTableMetrics(rows $rowCompact/$rowStandard/$rowComfortable, '
-      'header $headerHeight ${headerText.name}, padding $cellPaddingX, '
+      'header $headerHeight ${headerText.name} in ${headerInk.name} on '
+      '${headerFill.name} over a ${headerRule.name} rule, '
+      '${rowRule.name} row rules, padding $cellPaddingX, '
       'selection $selectionColumnWidth, resize $resizeHandleWidth, '
       'sort $sortIconSize + $sortIconGap)';
 }

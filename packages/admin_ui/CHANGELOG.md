@@ -2,6 +2,17 @@
 
 ## 0.2.0
 
+- A theme says what a table's chrome is drawn with, in its
+  `AdminTableMetrics`: `headerFill` fills the header row with
+  `surfaceMuted` (`TableHeaderFill.muted`), with the surface as the rows are
+  (`surface`) or with the divider colour (`strong`); `headerInk` writes the
+  column headers in the muted grey, a step stronger for the sorted column,
+  or in the foreground (`TableHeaderInk`); `headerRule` and `rowRule` draw
+  the rule under the header and under each row in `borderSubtle` or in
+  `border` (`TableRule`). `TableHeaderText.body`, new, sets the headers at
+  the body's own weight. `headerStyleOf`, `headerFillOf`, `headerInkOf`,
+  `headerRuleOf` and `rowRuleOf` resolve them against a typography and a
+  palette; a header's ink is held to 4.5:1 on its fill.
 - A theme says how its tab strips are drawn: `AdminTokens.tabs`, an
   `AdminTabsStyle` read through `context.tabsStyle` and given to
   `AdminTheme.from` as `tabs`. `heightSmall`, `heightMedium` and
@@ -421,6 +432,23 @@
 
 ### Looks
 
+- A `CollectionTable`'s header and rules follow each reference theme, where
+  every theme drew a `surfaceMuted` header under muted labels, over a
+  `border` rule, with `borderSubtle` between the rows. Iris and Material
+  keep those.
+  - shadcn: no fill behind the header, its labels in the foreground; the
+    rule under every row is the `--border` grey (was the fainter muted
+    grey).
+  - Ant: header labels in the heading colour (were the muted grey); the
+    rule under the header is the split grey the rows use (was the darker
+    control border).
+  - Fluent: no fill behind the header, its labels regular (were semibold)
+    in the foreground; the rule under the header is the one under the rows.
+  - Carbon: the header is `$layer-accent`, the grey of its rules (was the
+    near-white muted surface), under labels in `$text-primary`; the rule
+    under every row is `$border-subtle-01` (was a grey barely off the
+    surface).
+  A `HeatTable`'s header takes the header's weight and keeps its muted ink.
 - Each reference theme draws a `Tabs` line strip as its design system does,
   where every theme drew a strip 32, 40 or 48 tall, its labels at the
   button weight in the muted grey, the selected one in the accent over a

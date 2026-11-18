@@ -1011,10 +1011,7 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
         textGrowthOf(context, context.type.body);
     _headerHeight =
         (widget.headerHeight ?? metrics.headerHeight) +
-        textGrowthOf(context, switch (metrics.headerText) {
-          TableHeaderText.caption => context.type.caption,
-          TableHeaderText.label => context.type.bodyStrong,
-        });
+        textGrowthOf(context, metrics.headerStyleOf(context.type));
     if (_cols.isEmpty) return const SizedBox.shrink();
 
     return Focus(
@@ -1297,9 +1294,9 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
             return TableSpan(
               extent: FixedTableSpanExtent(_headerHeight),
               backgroundDecoration: TableSpanDecoration(
-                color: colors.surfaceMuted,
+                color: metrics.headerFillOf(colors),
                 border: TableSpanBorder(
-                  trailing: BorderSide(color: colors.border),
+                  trailing: BorderSide(color: metrics.headerRuleOf(colors)),
                 ),
               ),
             );
@@ -1323,7 +1320,7 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
             backgroundDecoration: TableSpanDecoration(
               color: fill(i - 1),
               border: TableSpanBorder(
-                trailing: BorderSide(color: colors.borderSubtle),
+                trailing: BorderSide(color: metrics.rowRuleOf(colors)),
               ),
             ),
           );
@@ -2249,26 +2246,17 @@ class _HeaderCellState extends State<_HeaderCell>
     // rest from the padding.
     final inset = padX - (size.box - size.glyph) / 2;
 
-    // The header strip is surfaceMuted, not the surface foregroundMuted is
-    // tuned for; nudge it just enough to read on it.
-    final idle = colors.readableOn(
-      colors.foregroundMuted,
-      surfaces: [colors.surfaceMuted],
-    );
-    final base = switch (metrics.headerText) {
-      TableHeaderText.caption => context.type.weighted(
-        context.type.caption,
-        FontWeight.w600,
-      ),
-      TableHeaderText.label => context.type.bodyStrong,
-    };
+    // The theme's header ink, nudged just enough to read on its header
+    // fill where that is not the surface a muted ink is tuned for.
+    final idle = metrics.headerInkOf(colors);
+    final base = metrics.headerStyleOf(context.type);
     // Bold text draws the label bold: in the font's own bold face, so the
     // measure below and the Text agree.
     final face = MediaQuery.boldTextOf(context)
         ? context.type.weighted(base, FontWeight.bold)
         : base;
     final style = face.copyWith(
-      color: widget.active ? colors.foregroundSecondary : idle,
+      color: widget.active ? metrics.headerInkOf(colors, sorted: true) : idle,
     );
     // Measured as the Text below will lay it out.
     final effective = DefaultTextStyle.of(context).style.merge(style);
@@ -2452,7 +2440,7 @@ class _HeaderCellState extends State<_HeaderCell>
             // Backed by the header fill, so a long label runs under it
             // rather than through it.
             child: ColoredBox(
-              color: context.colors.surfaceMuted,
+              color: context.tableMetrics.headerFillOf(context.colors),
               child: IconAction(
                 Icons.more_vert,
                 label: context.adminL10n.collection.columnOptionsFor(

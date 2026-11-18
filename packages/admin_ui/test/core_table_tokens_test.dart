@@ -21,7 +21,8 @@ const _metrics = {
   'Material': (36.0, 52.0, 64.0, 56.0, 16.0, 48.0, TableHeaderText.label),
   'shadcn': (40.0, 48.0, 56.0, 40.0, 8.0, 40.0, TableHeaderText.label),
   'Ant': (40.0, 48.0, 56.0, 48.0, 8.0, 32.0, TableHeaderText.label),
-  'Fluent': (32.0, 44.0, 52.0, 44.0, 8.0, 44.0, TableHeaderText.label),
+  // TableHeaderCell is fontWeightRegular
+  'Fluent': (32.0, 44.0, 52.0, 44.0, 8.0, 44.0, TableHeaderText.body),
   'Carbon': (40.0, 48.0, 64.0, 48.0, 16.0, 48.0, TableHeaderText.label),
 };
 

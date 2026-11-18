@@ -74,7 +74,10 @@ theme_internals:
     - SelectionOutline
     - SliderRail
     - SliderThumb
+    - TableHeaderFill
+    - TableHeaderInk
     - TableHeaderText
+    - TableRule
     - TabsIndicatorShape
     - TabsIndicatorWidth
     - TabsRestInk

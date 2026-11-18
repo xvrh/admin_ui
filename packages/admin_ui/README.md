@@ -991,6 +991,24 @@ with `context.tableMetrics`.
 | Fluent | 32 / 44 / 52 | 44 | 8 |
 | Carbon | 40 / 48 / 64 | 48 | 16 |
 
+It also sets the table's chrome: the header's text (`headerText`: the
+caption at semibold, the body at the strong weight or the body as it is),
+what the header row is filled with (`headerFill`: `surfaceMuted`, the
+surface as the rows are, or the divider colour), what its labels are written
+in (`headerInk`: the muted grey, a step stronger for the sorted column, or
+the foreground), and the rules under the header and under each row
+(`headerRule`, `rowRule`: `borderSubtle` or `border`). A header's ink is held
+to 4.5:1 on its fill.
+
+| Theme | header text | header fill | header ink | header rule / row rule |
+|---|---|---|---|---|
+| Iris | caption | `surfaceMuted` | muted | `border` / `borderSubtle` |
+| Material | label | `surfaceMuted` | muted | `border` / `borderSubtle` |
+| shadcn | label | the surface | foreground | `border` / `border` |
+| Ant | label | `surfaceMuted` | foreground | `borderSubtle` / `borderSubtle` |
+| Fluent | body | the surface | foreground | `borderSubtle` / `borderSubtle` |
+| Carbon | label | `border` | foreground | `border` / `border` |
+
 ### Type ramp
 
 `AdminTypeSpec.ramp` is the theme's type scale: an `AdminTypeRamp` holding one
