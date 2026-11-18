@@ -267,9 +267,9 @@ palette.primary: #ff6750a4
 palette.primaryStrong: #ff4f378b
 palette.primarySubtle: #ffeaddff
 palette.primaryFaint: #fff6edff
-palette.surface: #fffffbfe
+palette.surface: #fffef8ff
 palette.background: #fff3edf7
-palette.surfaceMuted: #fffef7ff
+palette.surfaceMuted: #fff7f2fa
 palette.foreground: #ff1d1b20
 palette.foregroundSecondary: #ff49454f
 palette.foregroundMuted: #ff49454f
@@ -306,17 +306,17 @@ typography.fieldLabel: Roboto 12 w400 height 1.3333 spacing 0.4 #ff49454f even
 typography.fieldText: Roboto 16 w400 height 1.5 spacing 0.5 #ff1d1b20 even
 typography.fieldDescription: Roboto 12 w400 height 1.3333 spacing 0.4 #ff49454f even
 typography.fieldMessage: Roboto 12 w500 height 1.3333 spacing 0.4 even
-typography.pageTitle: Roboto 24 w600 height 1.3333 spacing 0 #ff1d1b20 even
-typography.heading: Roboto 16 w600 height 1.5 spacing 0.15 #ff1d1b20 even
-typography.sectionLabel: Roboto 12 w600 height 1.3333 spacing 0.5 #ff49454f even
+typography.pageTitle: Roboto 24 w500 height 1.3333 spacing 0 #ff1d1b20 even
+typography.heading: Roboto 16 w500 height 1.5 spacing 0.15 #ff1d1b20 even
+typography.sectionLabel: Roboto 12 w500 height 1.3333 spacing 0.5 #ff49454f even
 typography.body: Roboto 14 w400 height 1.4286 spacing 0.25 #ff1d1b20 even
-typography.bodyStrong: Roboto 14 w600 height 1.4286 spacing 0.25 #ff1d1b20 even
+typography.bodyStrong: Roboto 14 w500 height 1.4286 spacing 0.25 #ff1d1b20 even
 typography.bodyMuted: Roboto 14 w400 height 1.4286 spacing 0.25 #ff49454f even
 typography.bodySmall: Roboto 12 w400 height 1.3333 spacing 0.4 #ff1d1b20 even
 typography.caption: Roboto 12 w400 height 1.3333 spacing 0.4 #ff49454f even
-typography.micro: Roboto 11 w600 height 1.4545 spacing 0.5 #ff49454f even
-typography.button: Roboto 14 w600 height 1.4286 spacing 0.1 even
-typography.buttonSmall: Roboto 14 w600 height 1.4286 spacing 0.1 even
+typography.micro: Roboto 11 w500 height 1.4545 spacing 0.5 #ff49454f even
+typography.button: Roboto 14 w500 height 1.4286 spacing 0.1 even
+typography.buttonSmall: Roboto 14 w500 height 1.4286 spacing 0.1 even
 typography.mono: monospace fallback [Menlo, Consolas, Courier New] 14 w400 height 1.4286 spacing 0 #ff1d1b20 even
 typography.monoSmall: monospace fallback [Menlo, Consolas, Courier New] 12 w400 height 1.3333 spacing 0 #ff1d1b20 even
 typography.spec.scale: 1
@@ -387,9 +387,9 @@ typography.spec.fontFamily: Roboto
 typography.spec.fontFamilyFallback: null
 typography.spec.monoFontFamily: monospace
 typography.spec.monoFontFamilyFallback: [Menlo, Consolas, Courier New]
-typography.spec.heading: w600
+typography.spec.heading: w500
 typography.spec.label: w400
-typography.spec.strong: w600
+typography.spec.strong: w500
 typography.spec.body: w400
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
@@ -403,7 +403,7 @@ sizes.small: 32
 sizes.medium: 40
 sizes.large: 48
 sizes.fieldPaddingX: 12
-sizes.fieldIcon: 16
+sizes.fieldIcon: 20
 sizes.fieldIconGap: 8
 table.rowCompact: 36
 table.rowStandard: 52
@@ -425,7 +425,7 @@ motion.exit: cubic(0.3, 0, 0.8, 0.15)
 motion.emphasized: cubic3(0.05,0, 0.1333,0.06, 0.1667,0.4, 0.2083,0.82, 0.25,1)
 stroke.hairline: 1
 stroke.control: 1
-stroke.controlStrong: 1.5
+stroke.controlStrong: 2
 stroke.fieldFocus: 2
 stroke.fieldError: 1
 stroke.fieldFocusHalo: 0
@@ -515,15 +515,15 @@ palette.tabDivider: #ff49454f
 typography.fieldLabel: Roboto 12 w400 height 1.3333 spacing 0.4 #ffcac4d0 even
 typography.fieldText: Roboto 16 w400 height 1.5 spacing 0.5 #ffe6e0e9 even
 typography.fieldDescription: Roboto 12 w400 height 1.3333 spacing 0.4 #ffcac4d0 even
-typography.pageTitle: Roboto 24 w600 height 1.3333 spacing 0 #ffe6e0e9 even
-typography.heading: Roboto 16 w600 height 1.5 spacing 0.15 #ffe6e0e9 even
-typography.sectionLabel: Roboto 12 w600 height 1.3333 spacing 0.5 #ffcac4d0 even
+typography.pageTitle: Roboto 24 w500 height 1.3333 spacing 0 #ffe6e0e9 even
+typography.heading: Roboto 16 w500 height 1.5 spacing 0.15 #ffe6e0e9 even
+typography.sectionLabel: Roboto 12 w500 height 1.3333 spacing 0.5 #ffcac4d0 even
 typography.body: Roboto 14 w400 height 1.4286 spacing 0.25 #ffe6e0e9 even
-typography.bodyStrong: Roboto 14 w600 height 1.4286 spacing 0.25 #ffe6e0e9 even
+typography.bodyStrong: Roboto 14 w500 height 1.4286 spacing 0.25 #ffe6e0e9 even
 typography.bodyMuted: Roboto 14 w400 height 1.4286 spacing 0.25 #ffcac4d0 even
 typography.bodySmall: Roboto 12 w400 height 1.3333 spacing 0.4 #ffe6e0e9 even
 typography.caption: Roboto 12 w400 height 1.3333 spacing 0.4 #ffcac4d0 even
-typography.micro: Roboto 11 w600 height 1.4545 spacing 0.5 #ffcac4d0 even
+typography.micro: Roboto 11 w500 height 1.4545 spacing 0.5 #ffcac4d0 even
 typography.mono: monospace fallback [Menlo, Consolas, Courier New] 14 w400 height 1.4286 spacing 0 #ffe6e0e9 even
 typography.monoSmall: monospace fallback [Menlo, Consolas, Courier New] 12 w400 height 1.3333 spacing 0 #ffe6e0e9 even
 
@@ -560,7 +560,7 @@ palette.stateLayer.tintPressed: 0.14
 palette.stateLayer.disabledContent: 0.38
 radii.radiusSmall: 6
 radii.radius: 8
-radii.radiusLarge: 12
+radii.radiusLarge: 14
 typography.sizeDisplayLarge: 36
 typography.sizeDisplayMedium: 30
 typography.sizeDisplaySmall: 24
@@ -658,9 +658,9 @@ typography.spec.strong: w500
 typography.spec.body: w400
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
-elevation.sm: #14000000 0,1 blur 4
-elevation.md: #1f000000 0,4 blur 12
-elevation.lg: #29000000 0,12 blur 28
+elevation.sm: #1a000000 0,1 blur 3; #1a000000 0,1 blur 2 spread -1
+elevation.md: #1a000000 0,4 blur 6 spread -1; #1a000000 0,2 blur 4 spread -2
+elevation.lg: #1a000000 0,10 blur 15 spread -3; #1a000000 0,4 blur 6 spread -4
 focus.width: 3
 focus.offset: 0
 focus.innerWidth: 0
@@ -708,7 +708,15 @@ field.haloOpacity: 0.5
 field.requiredMark: trailing
 button.labelAlignment: center
 button.iconPlacement: leading
-button.padding: null
+button.padding.small.start: 12
+button.padding.small.end: 12
+button.padding.small.startWithIcon: 10
+button.padding.medium.start: 16
+button.padding.medium.end: 16
+button.padding.medium.startWithIcon: 12
+button.padding.large.start: 24
+button.padding.large.end: 24
+button.padding.large.startWithIcon: 16
 button.minWidth: null
 button.labelWeight: null
 button.disabled: faded
@@ -717,13 +725,13 @@ button.filledSecondary: false
 button.strongOutline: false
 button.accentGhost: false
 button.accentHover: false
-shell.sidebarWidth: 240
-shell.railWidth: 64
-shell.itemHeight: 36
+shell.sidebarWidth: 256
+shell.railWidth: 48
+shell.itemHeight: 32
 shell.itemGap: 4
 shell.itemPaddingX: 8
 shell.itemMarginX: null
-shell.itemRadius: null
+shell.itemRadius: 8
 shell.itemIconSize: null
 shell.indicator: null
 shell.indicatorWidth: 3
@@ -742,13 +750,13 @@ segmented.knobOutline: false
 segmented.indicator: false
 segmented.checkmark: false
 segmented.inverse: false
-segmented.radius: null
+segmented.radius: 10
 segmented.labelWeight: w500
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
 ## shadcn dark, where it differs from light
-palette.primary: #fffafafa
+palette.primary: #ffe4e4e7
 palette.primaryStrong: #ffd4d4d8
 palette.primarySubtle: #ff27272a
 palette.primaryFaint: #ff1f1f22
@@ -760,7 +768,7 @@ palette.foregroundSecondary: #ffe4e4e7
 palette.foregroundMuted: #ffa1a1aa
 palette.foregroundSubtle: #ff71717a
 palette.foregroundFaint: #ff52525b
-palette.border: #ff27272a
+palette.border: #ff2f2f32
 palette.borderSubtle: #ff1f1f22
 palette.success: #ff4ade80
 palette.warning: #fffbbf24
@@ -787,6 +795,36 @@ typography.monoSmall: monospace fallback [Menlo, Consolas, Courier New] 12 w400 
 elevation.sm: #66000000 0,1 blur 6
 elevation.md: #80000000 0,6 blur 18
 elevation.lg: #99000000 0,16 blur 40
+shell.sidebarPalette.primary: #ffe4e4e7
+shell.sidebarPalette.primaryStrong: #ffd4d4d8
+shell.sidebarPalette.primarySubtle: #ff27272a
+shell.sidebarPalette.primaryFaint: #ff1f1f22
+shell.sidebarPalette.surface: #ff18181b
+shell.sidebarPalette.background: #ff18181b
+shell.sidebarPalette.surfaceMuted: #ff111113
+shell.sidebarPalette.foreground: #fffafafa
+shell.sidebarPalette.foregroundSecondary: #ffe4e4e7
+shell.sidebarPalette.foregroundMuted: #ffa1a1aa
+shell.sidebarPalette.foregroundSubtle: #ff71717a
+shell.sidebarPalette.foregroundFaint: #ff52525b
+shell.sidebarPalette.border: #ff2f2f32
+shell.sidebarPalette.borderSubtle: #ff1f1f22
+shell.sidebarPalette.success: #ff4ade80
+shell.sidebarPalette.warning: #fffbbf24
+shell.sidebarPalette.danger: #fff87171
+shell.sidebarPalette.warningText: #ffd9a036
+shell.sidebarPalette.info: #ff60a5fa
+shell.sidebarPalette.highlight: #ff2d2a1e
+shell.sidebarPalette.modifiedFill: #ff231f1a
+shell.sidebarPalette.tabDivider: #ff3f3f46
+shell.sidebarPalette.stateLayer.hover: 0.05
+shell.sidebarPalette.stateLayer.focus: 0.05
+shell.sidebarPalette.stateLayer.pressed: 0.1
+shell.sidebarPalette.stateLayer.selected: 0.08
+shell.sidebarPalette.stateLayer.dragged: 0.1
+shell.sidebarPalette.stateLayer.tintHover: 0.08
+shell.sidebarPalette.stateLayer.tintPressed: 0.14
+shell.sidebarPalette.stateLayer.disabledContent: 0.38
 
 ## Ant light
 palette.primary: #ff136ff6
@@ -794,8 +832,8 @@ palette.primaryStrong: #ff0958d9
 palette.primarySubtle: #ffe6f4ff
 palette.primaryFaint: #fff0f7ff
 palette.surface: #ffffffff
-palette.background: #fffafafa
-palette.surfaceMuted: #fff5f5f5
+palette.background: #fff5f5f5
+palette.surfaceMuted: #fffafafa
 palette.foreground: #ff1f1f1f
 palette.foregroundSecondary: #ff595959
 palette.foregroundMuted: #ff707070
@@ -806,11 +844,11 @@ palette.borderSubtle: #fff0f0f0
 palette.success: #ff52c41a
 palette.warning: #fffaad14
 palette.danger: #ffdb373f
-palette.warningText: #ffa36200
+palette.warningText: #ffa26100
 palette.info: #ff0958d9
 palette.highlight: #fffff1b8
 palette.modifiedFill: #fffff7e6
-palette.tabDivider: #ffd9d9d9
+palette.tabDivider: #fff0f0f0
 palette.stateLayer.hover: 0.05
 palette.stateLayer.focus: 0.05
 palette.stateLayer.pressed: 0.1
@@ -919,11 +957,11 @@ typography.spec.strong: w600
 typography.spec.body: w400
 typography.spec.tracking: 0
 typography.spec.uppercaseLabels: false
-elevation.sm: #08000000 0,1 blur 2; #05000000 0,1 blur 6 spread -1; #05000000 0,2 blur 4
+elevation.sm: #0d000000 0,1 blur 2; #08000000 0,1 blur 6 spread -1; #08000000 0,2 blur 4
 elevation.md: #14000000 0,6 blur 16; #1f000000 0,3 blur 6 spread -4; #0d000000 0,9 blur 28 spread 8
 elevation.lg: #14000000 0,6 blur 16; #1f000000 0,3 blur 6 spread -4; #0d000000 0,9 blur 28 spread 8
-focus.width: 2
-focus.offset: 2
+focus.width: 3
+focus.offset: 1
 focus.innerWidth: 0
 sizes.small: 24
 sizes.medium: 32
@@ -993,7 +1031,7 @@ shell.itemGap: 4
 shell.itemPaddingX: 24
 shell.itemMarginX: 4
 shell.itemRadius: 8
-shell.itemIconSize: null
+shell.itemIconSize: 14
 shell.indicator: none
 shell.indicatorWidth: 3
 shell.topBarHeight: 64
@@ -1007,7 +1045,7 @@ shell.sidebarPalette.background: #ff001529
 shell.sidebarPalette.surfaceMuted: #ff001b35
 shell.sidebarPalette.foreground: #ffffffff
 shell.sidebarPalette.foregroundSecondary: #ffa6adb4
-shell.sidebarPalette.foregroundMuted: #ff8c969f
+shell.sidebarPalette.foregroundMuted: #ffa6adb4
 shell.sidebarPalette.foregroundSubtle: #ff40505e
 shell.sidebarPalette.foregroundFaint: #ff263849
 shell.sidebarPalette.border: #ff1f3143
@@ -1048,7 +1086,7 @@ breakpoints.expanded: 1200
 ## Ant dark, where it differs from light
 palette.primary: #ff1668dc
 palette.primaryStrong: #ff1554ad
-palette.primarySubtle: #ff112545
+palette.primarySubtle: #ff15325b
 palette.primaryFaint: #ff111a2c
 palette.surface: #ff141414
 palette.background: #ff000000
@@ -1067,7 +1105,7 @@ palette.warningText: #ffc08612
 palette.info: #ff3c89e8
 palette.highlight: #ff2b2412
 palette.modifiedFill: #ff241f18
-palette.tabDivider: #ff424242
+palette.tabDivider: #ff303030
 typography.fieldLabel: 14 w400 height 1.5714 spacing 0 #ffc2c2c2 even
 typography.fieldText: 14 w400 height 1.5714 spacing 0 #ffe0e0e0 even
 typography.fieldDescription: 14 w400 height 1.5714 spacing 0 #ff8c8c8c even
@@ -1090,19 +1128,19 @@ palette.primaryStrong: #ff0c5a9e
 palette.primarySubtle: #ffebf3fc
 palette.primaryFaint: #fff5fafe
 palette.surface: #ffffffff
-palette.background: #fffaf9f8
-palette.surfaceMuted: #fff3f2f1
+palette.background: #fffafafa
+palette.surfaceMuted: #fff5f5f5
 palette.foreground: #ff242424
 palette.foregroundSecondary: #ff424242
 palette.foregroundMuted: #ff616161
-palette.foregroundSubtle: #ff8a8886
-palette.foregroundFaint: #ffc8c6c4
-palette.border: #ffe1dfdd
-palette.borderSubtle: #ffedebe9
+palette.foregroundSubtle: #ff707070
+palette.foregroundFaint: #ffbdbdbd
+palette.border: #ffd1d1d1
+palette.borderSubtle: #ffe0e0e0
 palette.success: #ff107c10
-palette.warning: #ffffb900
+palette.warning: #fff7820c
 palette.danger: #ffc50f1f
-palette.warningText: #ff8a5300
+palette.warningText: #ffaa5908
 palette.info: #ff0078d4
 palette.highlight: #fffff4ce
 palette.modifiedFill: #fffdf6e3
@@ -1117,7 +1155,7 @@ palette.stateLayer.tintPressed: 0.14
 palette.stateLayer.disabledContent: 0.38
 radii.radiusSmall: 2
 radii.radius: 4
-radii.radiusLarge: 8
+radii.radiusLarge: 4
 typography.sizeDisplayLarge: 40
 typography.sizeDisplayMedium: 32
 typography.sizeDisplaySmall: 28
@@ -1225,8 +1263,8 @@ sizes.small: 24
 sizes.medium: 32
 sizes.large: 40
 sizes.fieldPaddingX: 12
-sizes.fieldIcon: 16
-sizes.fieldIconGap: 8
+sizes.fieldIcon: 20
+sizes.fieldIconGap: 6
 table.rowCompact: 32
 table.rowStandard: 44
 table.rowComfortable: 52
@@ -1247,14 +1285,14 @@ motion.exit: cubic(1, 0, 1, 1)
 motion.emphasized: cubic(0.8, 0, 0.2, 1)
 stroke.hairline: 1
 stroke.control: 1
-stroke.controlStrong: 1.5
+stroke.controlStrong: 1
 stroke.fieldFocus: 2
 stroke.fieldError: 1
 stroke.fieldFocusHalo: 0
-stroke.indicator: 2
+stroke.indicator: 3
 iconSizes.xs: 12
 iconSizes.sm: 14
-iconSizes.md: 16
+iconSizes.md: 20
 iconSizes.lg: 20
 iconSizes.xl: 24
 field.variant: underlined
@@ -1327,12 +1365,12 @@ palette.foregroundSecondary: #ffd6d6d6
 palette.foregroundMuted: #ffadadad
 palette.foregroundSubtle: #ff858585
 palette.foregroundFaint: #ff5c5c5c
-palette.border: #ff404040
-palette.borderSubtle: #ff333333
-palette.success: #ff6bb700
-palette.warning: #fffce100
-palette.danger: #fff1707b
-palette.warningText: #ffd9b400
+palette.border: #ff666666
+palette.borderSubtle: #ff525252
+palette.success: #ff54b054
+palette.warning: #fffab16b
+palette.danger: #ffdc626d
+palette.warningText: #fffab16b
 palette.info: #ff479ef5
 palette.highlight: #ff332d17
 palette.modifiedFill: #ff2a231c
@@ -1364,8 +1402,8 @@ palette.surface: #ffffffff
 palette.background: #fff4f4f4
 palette.surfaceMuted: #fffafafa
 palette.foreground: #ff161616
-palette.foregroundSecondary: #ff393939
-palette.foregroundMuted: #ff525252
+palette.foregroundSecondary: #ff525252
+palette.foregroundMuted: #ff6f6f6f
 palette.foregroundSubtle: #ff6f6f6f
 palette.foregroundFaint: #ffa8a8a8
 palette.border: #ffe0e0e0
@@ -1395,23 +1433,23 @@ typography.sizeDisplaySmall: 28
 typography.sizeHeadlineMedium: 20
 typography.sizeHeadlineSmall: 20
 typography.sizeTitleLarge: 20
-typography.fieldLabel: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff393939 even
+typography.fieldLabel: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff525252 even
 typography.fieldText: IBM Plex Sans 14 w400 height 1.2857 spacing 0.16 #ff161616 even
-typography.fieldDescription: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff525252 even
+typography.fieldDescription: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff6f6f6f even
 typography.fieldMessage: IBM Plex Sans 12 w500 height 1.3333 spacing 0.32 even
 typography.pageTitle: IBM Plex Sans 28 w600 height 1.2857 spacing 0 #ff161616 even
 typography.heading: IBM Plex Sans 16 w600 height 1.375 spacing 0 #ff161616 even
-typography.sectionLabel: IBM Plex Sans 14 w600 height 1.2857 spacing 0.16 #ff393939 even
+typography.sectionLabel: IBM Plex Sans 14 w600 height 1.2857 spacing 0.16 #ff525252 even
 typography.body: IBM Plex Sans 14 w400 height 1.4286 spacing 0.16 #ff161616 even
 typography.bodyStrong: IBM Plex Sans 14 w600 height 1.4286 spacing 0.16 #ff161616 even
-typography.bodyMuted: IBM Plex Sans 14 w400 height 1.4286 spacing 0.16 #ff525252 even
+typography.bodyMuted: IBM Plex Sans 14 w400 height 1.4286 spacing 0.16 #ff6f6f6f even
 typography.bodySmall: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff161616 even
-typography.caption: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff525252 even
-typography.micro: IBM Plex Sans 12 w600 height 1.3333 spacing 0.32 #ff525252 even
+typography.caption: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ff6f6f6f even
+typography.micro: IBM Plex Sans 12 w600 height 1.3333 spacing 0.32 #ff6f6f6f even
 typography.button: IBM Plex Sans 14 w600 height 1.2857 spacing 0.16 even
 typography.buttonSmall: IBM Plex Sans 14 w600 height 1.2857 spacing 0.16 even
-typography.mono: monospace fallback [Menlo, Consolas, Courier New] 14 w400 height 1.4286 spacing 0.32 #ff161616 even
-typography.monoSmall: monospace fallback [Menlo, Consolas, Courier New] 12 w400 height 1.3333 spacing 0.32 #ff161616 even
+typography.mono: IBM Plex Mono fallback [monospace, Menlo, Consolas, Courier New] 14 w400 height 1.4286 spacing 0.32 #ff161616 even
+typography.monoSmall: IBM Plex Mono fallback [monospace, Menlo, Consolas, Courier New] 12 w400 height 1.3333 spacing 0.32 #ff161616 even
 typography.spec.scale: 1
 typography.spec.ramp.displayLarge.size: 42
 typography.spec.ramp.displayLarge.line: 50
@@ -1478,8 +1516,8 @@ typography.spec.ramp.monoSmall.line: 16
 typography.spec.ramp.monoSmall.letterSpacing: 0.32
 typography.spec.fontFamily: IBM Plex Sans
 typography.spec.fontFamilyFallback: null
-typography.spec.monoFontFamily: monospace
-typography.spec.monoFontFamilyFallback: [Menlo, Consolas, Courier New]
+typography.spec.monoFontFamily: IBM Plex Mono
+typography.spec.monoFontFamilyFallback: [monospace, Menlo, Consolas, Courier New]
 typography.spec.heading: w600
 typography.spec.label: w400
 typography.spec.strong: w600
@@ -1495,7 +1533,7 @@ focus.innerWidth: 0
 sizes.small: 32
 sizes.medium: 40
 sizes.large: 48
-sizes.fieldPaddingX: 12
+sizes.fieldPaddingX: 16
 sizes.fieldIcon: 16
 sizes.fieldIconGap: 8
 table.rowCompact: 40
@@ -1622,7 +1660,7 @@ palette.foreground: #fff4f4f4
 palette.foregroundSecondary: #ffc6c6c6
 palette.foregroundMuted: #ffa8a8a8
 palette.foregroundFaint: #ff525252
-palette.border: #ff393939
+palette.border: #ff525252
 palette.borderSubtle: #ff333333
 palette.success: #ff42be65
 palette.warningText: #ffd2a800
@@ -1642,8 +1680,8 @@ typography.bodyMuted: IBM Plex Sans 14 w400 height 1.4286 spacing 0.16 #ffa8a8a8
 typography.bodySmall: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #fff4f4f4 even
 typography.caption: IBM Plex Sans 12 w400 height 1.3333 spacing 0.32 #ffa8a8a8 even
 typography.micro: IBM Plex Sans 12 w600 height 1.3333 spacing 0.32 #ffa8a8a8 even
-typography.mono: monospace fallback [Menlo, Consolas, Courier New] 14 w400 height 1.4286 spacing 0.32 #fff4f4f4 even
-typography.monoSmall: monospace fallback [Menlo, Consolas, Courier New] 12 w400 height 1.3333 spacing 0.32 #fff4f4f4 even
+typography.mono: IBM Plex Mono fallback [monospace, Menlo, Consolas, Courier New] 14 w400 height 1.4286 spacing 0.32 #fff4f4f4 even
+typography.monoSmall: IBM Plex Mono fallback [monospace, Menlo, Consolas, Courier New] 12 w400 height 1.3333 spacing 0.32 #fff4f4f4 even
 elevation.sm: #cc000000 0,2 blur 6
 elevation.md: #cc000000 0,2 blur 6
 elevation.lg: #cc000000 0,2 blur 6

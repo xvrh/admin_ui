@@ -96,6 +96,7 @@ theme_internals:
     - materialPalette
     - resolveFieldChrome
     - shadcnDarkPalette
+    - shadcnDarkSidebarPalette
     - shadcnPalette
 
 context_extensions:

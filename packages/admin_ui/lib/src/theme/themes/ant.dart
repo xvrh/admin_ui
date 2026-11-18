@@ -16,7 +16,25 @@ import '../table_metrics.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
-/// Ant Design (light) — enterprise blue, opacity-based grays, dense.
+// Audited on 18 November 2026 against Ant Design 6.7.1, whose seed tokens
+// are v5's.
+//
+// The kit's contrast rules, where they leave Ant's tokens:
+// - a control's outline is `border` deepened to 3:1 (#8E8E8E, dark #626262),
+//   where colorBorder is #D9D9D9 (1.41:1 on white) and #424242;
+// - a placeholder is the muted text's grey, at 4.5:1, where
+//   colorTextPlaceholder is #BFBFBF;
+// - a filled button darkens under the pointer, toward colorPrimaryActive,
+//   where Ant's lightens to colorPrimaryHover #4096FF, on which white is
+//   2.99:1;
+// - the focus ring is the primary at 3:1, where Ant's outline is
+//   colorPrimaryBorder #91CAFF;
+// - a disabled button's label is held to 2.5:1, where Ant's is #BFBFBF;
+// - the light chart colours are deepened to 3:1.
+
+/// Ant Design (light) — enterprise blue, opacity-based grays, dense. The page
+/// is colorBgLayout, cards and inputs colorBgContainer, and a table's header
+/// and the wells colorFillAlter, #FAFAFA.
 ///
 /// Deviates from Ant's tokens where they miss WCAG AA. White text on
 /// colorPrimary #1677FF and colorError #FF4D4F is under 4.5:1 (and near-black
@@ -29,9 +47,9 @@ const antPalette = AdminPalette(
   primaryStrong: Color(0xFF0958D9),
   primarySubtle: Color(0xFFE6F4FF),
   primaryFaint: Color(0xFFF0F7FF),
-  surface: Color(0xFFFFFFFF),
-  background: Color(0xFFFAFAFA),
-  surfaceMuted: Color(0xFFF5F5F5),
+  surface: Color(0xFFFFFFFF), // colorBgContainer
+  background: Color(0xFFF5F5F5), // colorBgLayout
+  surfaceMuted: Color(0xFFFAFAFA), // colorFillAlter: a table's header
   foreground: Color(0xFF1F1F1F),
   foregroundSecondary: Color(0xFF595959),
   foregroundMuted: Color(0xFF707070),
@@ -42,10 +60,10 @@ const antPalette = AdminPalette(
   success: Color(0xFF52C41A),
   warning: Color(0xFFFAAD14),
   danger: Color(0xFFDB373F),
-  warningText: Color(0xFFA36200),
+  warningText: Color(0xFFA26100), // 4.5:1 on the page as on its tint
   highlight: Color(0xFFFFF1B8),
   modifiedFill: Color(0xFFFFF7E6),
-  tabDivider: Color(0xFFD9D9D9),
+  tabDivider: Color(0xFFF0F0F0), // colorBorderSecondary
   info: Color(0xFF0958D9), // blue-7: Ant's colorInfo is the primary itself
   chart: _chartLight,
   navIndicator: Color(0x00000000),
@@ -56,10 +74,14 @@ const antPalette = AdminPalette(
 const antDarkPalette = AdminPalette(
   primary: Color(0xFF1668DC),
   primaryStrong: Color(0xFF1554AD),
-  primarySubtle: Color(0xFF112545), // colorPrimaryBgHover
-  primaryFaint: Color(0xFF111A2C), // colorPrimaryBg
+  // colorPrimaryBg, which the dark algorithm sets to the blue ramp's third
+  // step, and the ramp's first step, which it was before that.
+  primarySubtle: Color(0xFF15325B),
+  primaryFaint: Color(0xFF111A2C),
   surface: Color(0xFF141414), // colorBgContainer
   background: Color(0xFF000000), // colorBgLayout
+  // Between the page and the card. A dark table's header is colorFillAlter,
+  // #1D1D1D, lighter than the card; the kit keeps a well under its surface.
   surfaceMuted: Color(0xFF0A0A0A),
   foreground: Color(0xFFE0E0E0),
   foregroundSecondary: Color(0xFFC2C2C2),
@@ -74,7 +96,7 @@ const antDarkPalette = AdminPalette(
   warningText: Color(0xFFC08612),
   highlight: Color(0xFF2B2412),
   modifiedFill: Color(0xFF241F18),
-  tabDivider: Color(0xFF424242),
+  tabDivider: Color(0xFF303030), // colorBorderSecondary
   info: Color(0xFF3C89E8), // blue-7 (dark)
   chart: _chartDark,
   navIndicator: Color(0x00000000),
@@ -94,8 +116,7 @@ const antSiderPalette = AdminPalette(
   surfaceMuted: Color(0xFF001B35),
   foreground: Color(0xFFFFFFFF), // darkItemHoverColor
   foregroundSecondary: Color(0xFFA6ADB4), // darkItemColor: white at 65%
-  // A group title's white at 45% is under 4.5:1 here; white at 55%.
-  foregroundMuted: Color(0xFF8C969F),
+  foregroundMuted: Color(0xFFA6ADB4), // darkGroupTitleColor: white at 65%
   foregroundSubtle: Color(0xFF40505E), // darkItemDisabledColor: white at 25%
   foregroundFaint: Color(0xFF263849), // white at 15%
   border: Color(0xFF1F3143), // colorSplit: white at 12%
@@ -143,13 +164,13 @@ const _ramp = AdminTypeRamp(
 // protanopia and deuteranopia (AntV's own order puts red beside yellow); the
 // light steps are deepened to 3:1 on surface and background.
 const _chartLight = [
-  Color(0xFF5A8EF8),
-  Color(0xFF0CA576),
+  Color(0xFF558AF8),
+  Color(0xFF0CA173),
   Color(0xFF945FB9),
-  Color(0xFFB68A03),
+  Color(0xFFB38703),
   Color(0xFF5D7092),
-  Color(0xFFDA7718),
-  Color(0xFF3E9BBE),
+  Color(0xFFD67518),
+  Color(0xFF3D98BB),
   Color(0xFFE86452),
 ];
 const _chartDark = [
@@ -165,19 +186,21 @@ const _chartDark = [
 
 /// Ant's shadows: boxShadowTertiary for a resting lift, boxShadowSecondary
 /// for a dropdown or popover, and boxShadow, the same three layers, for a
-/// modal. The dark algorithm keeps them.
+/// modal. Dark mode keeps them in black: since 6.3.6 Ant's dark algorithm
+/// draws them from a light colorShadow, white at 20%, a glow the kit does
+/// not take.
 const _elevation = AdminElevation(
-  // 0 1px 2px rgba(0,0,0,.03), 0 1px 6px -1px rgba(0,0,0,.02),
-  // 0 2px 4px rgba(0,0,0,.02)
+  // 0 1px 2px rgba(0,0,0,.05), 0 1px 6px -1px rgba(0,0,0,.03),
+  // 0 2px 4px rgba(0,0,0,.03), as deepened in 6.4.4
   sm: [
-    BoxShadow(color: Color(0x08000000), offset: Offset(0, 1), blurRadius: 2),
+    BoxShadow(color: Color(0x0D000000), offset: Offset(0, 1), blurRadius: 2),
     BoxShadow(
-      color: Color(0x05000000),
+      color: Color(0x08000000),
       offset: Offset(0, 1),
       blurRadius: 6,
       spreadRadius: -1,
     ),
-    BoxShadow(color: Color(0x05000000), offset: Offset(0, 2), blurRadius: 4),
+    BoxShadow(color: Color(0x08000000), offset: Offset(0, 2), blurRadius: 4),
   ],
   md: _secondary,
   lg: _secondary,
@@ -204,8 +227,8 @@ const _secondary = [
 /// Layout.Sider at 200px, collapsing to 80, over a Menu of 40px items
 /// (itemHeight) 4px apart (itemMarginBlock) and 4px in from the Sider's
 /// edges (itemMarginInline), indented 24 (inlineIndent) and rounded 8
-/// (itemBorderRadius), the selection carried by the fill alone;
-/// Layout.Header at 64.
+/// (itemBorderRadius), their icons at fontSize 14, the selection carried by
+/// the fill alone; Layout.Header at 64.
 const _shell = AdminShellStyle(
   sidebarWidth: 200,
   railWidth: 80,
@@ -214,6 +237,7 @@ const _shell = AdminShellStyle(
   itemPaddingX: 24,
   itemMarginX: 4,
   itemRadius: 8,
+  itemIconSize: 14,
   indicator: NavIndicator.none,
   topBarHeight: 64,
 );
@@ -240,7 +264,8 @@ final antTheme = AdminTheme.from(
     uppercaseLabels: false,
     ramp: _ramp,
   ),
-  focus: const AdminFocusSpec(width: 2, offset: 2),
+  // lineWidthFocus 3, outlineOffset 1
+  focus: const AdminFocusSpec(width: 3, offset: 1),
   // controlHeightSM / controlHeight / controlHeightLG
   sizes: const AdminControlSizes(small: 24, medium: 32, large: 40),
   // Table size small / middle / large; the middle cell's paddingXS inline and
@@ -253,8 +278,9 @@ final antTheme = AdminTheme.from(
     cellPaddingX: 8,
     selectionColumnWidth: 32,
   ),
-  // motionDurationFast / Mid / Slow on motionEaseInOut, motionEaseOut and
-  // motionEaseIn; motionEaseOutCirc for a modal's zoom
+  // motionDurationFast / Mid / Slow on motionEaseInOut and motionEaseOut;
+  // the exit curve is CSS's ease-in cubic, which no Ant token names;
+  // motionEaseOutCirc for a larger move
   motion: const AdminMotion(
     fast: Duration(milliseconds: 100),
     medium: Duration(milliseconds: 200),

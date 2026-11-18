@@ -360,22 +360,52 @@ void main() {
   });
 
   group('the shipped presets', () {
-    test('Iris and shadcn keep the kit defaults, bar the faded button', () {
+    test('Iris keeps the kit defaults, and shadcn its field', () {
       for (final theme in [irisTheme, shadcnTheme]) {
         for (final tokens in [theme.tokens, theme.dark!]) {
           expect(tokens.field, const AdminFieldStyle(), reason: theme.name);
-          expect(tokens.shell, const AdminShellStyle(), reason: theme.name);
-          expect(tokens.radii.radiusButton, isNull, reason: theme.name);
           expect(tokens.radii.radiusField, tokens.radii.radius);
           expect(tokens.focus.innerWidth, 0);
-          expect(
-            tokens.button,
-            theme == shadcnTheme
-                ? const AdminButtonStyle(disabled: ButtonDisabledStyle.faded)
-                : const AdminButtonStyle(),
-            reason: theme.name,
-          );
         }
+      }
+      for (final tokens in [irisTheme.tokens, irisTheme.dark!]) {
+        expect(tokens.shell, const AdminShellStyle());
+        expect(tokens.radii.radiusButton, isNull);
+        expect(tokens.button, const AdminButtonStyle());
+      }
+    });
+
+    test('shadcn: rounded-md buttons with px-3, px-4 and px-6, the 16rem '
+        'sidebar, and --sidebar in dark mode', () {
+      const shell = AdminShellStyle(
+        sidebarWidth: 256,
+        railWidth: 48,
+        itemHeight: 32,
+        itemRadius: 8,
+      );
+      final light = shadcnTheme.tokens;
+      final dark = shadcnTheme.dark!;
+      expect(light.shell, shell);
+      expect(light.shell.sidebarPalette, isNull);
+      expect(
+        dark.shell,
+        shell.copyWith(sidebarPalette: dark.shell.sidebarPalette),
+      );
+      expect(dark.shell.sidebarPalette, same(shadcnDarkSidebarPalette));
+      expect(shadcnDarkSidebarPalette.background, const Color(0xFF18181B));
+      for (final tokens in [light, dark]) {
+        expect(tokens.radii.radiusButton, 8);
+        expect(
+          tokens.button,
+          const AdminButtonStyle(
+            disabled: ButtonDisabledStyle.faded,
+            padding: AdminButtonPadding(
+              small: AdminButtonInsets.symmetric(12, startWithIcon: 10),
+              medium: AdminButtonInsets.symmetric(16, startWithIcon: 12),
+              large: AdminButtonInsets.symmetric(24, startWithIcon: 16),
+            ),
+          ),
+        );
       }
     });
 
@@ -417,7 +447,7 @@ void main() {
     const shells = {
       'Iris': (240.0, 64.0, 36.0, 56.0, null),
       'Material': (360.0, 80.0, 56.0, 64.0, NavIndicator.none),
-      'shadcn': (240.0, 64.0, 36.0, 56.0, null),
+      'shadcn': (256.0, 48.0, 32.0, 56.0, null),
       'Ant': (200.0, 80.0, 40.0, 64.0, NavIndicator.none),
       'Fluent': (260.0, 48.0, 40.0, 48.0, NavIndicator.bar),
       'Carbon': (256.0, 48.0, 32.0, 48.0, NavIndicator.edge),

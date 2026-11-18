@@ -14,7 +14,7 @@ const _expected = {
     checkmark: true,
   ),
   // the tabs list: p-[3px], a knob lifted by shadow-sm
-  'shadcn': AdminSegmentedStyle(knobOutline: false),
+  'shadcn': AdminSegmentedStyle(knobOutline: false, radius: 10),
   // Segmented: trackPadding 2, a thumb lifted by boxShadowTertiary
   'Ant': AdminSegmentedStyle(
     inset: 2,

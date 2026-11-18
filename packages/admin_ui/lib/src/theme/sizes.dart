@@ -107,10 +107,11 @@ class AdminControlSizes {
 const defaultControlSizes = AdminControlSizes(small: 28, medium: 36, large: 40);
 
 /// Glyph sizes for the admin UI: 12 / 14 / 16 / 20 / 24. Provided via
-/// [AdminTokens]; read through `context.iconSizes`. The defaults serve every
-/// shipped theme — a 16px glyph in a control, as lucide's `size-4` in
-/// shadcn and the 16px icons of Fluent and Carbon — and a theme overrides
-/// them whole.
+/// [AdminTokens]; read through `context.iconSizes`. The defaults serve the
+/// shipped themes but Fluent — a 16px glyph in a control, as lucide's
+/// `size-4` in shadcn and Carbon's 16px icons — and a theme overrides them
+/// whole: Fluent, whose buttons, menu items and tabs carry a 20px icon, sets
+/// [md] to 20.
 ///
 /// A field's own leading and trailing glyphs are
 /// [AdminControlSizes.fieldIcon].

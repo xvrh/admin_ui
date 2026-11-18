@@ -466,8 +466,8 @@ void main() {
     });
   });
 
-  group('Iris and shadcn keep the kit\'s frame', () {
-    for (final theme in [irisTheme, shadcnTheme]) {
+  group('Iris keeps the kit\'s frame', () {
+    for (final theme in [irisTheme]) {
       for (final dark in [false, true]) {
         testWidgets('${theme.name} ${dark ? 'Dark' : 'Light'}', (tester) async {
           final tokens = _tokens(theme, dark: dark);
@@ -502,6 +502,34 @@ void main() {
           expect(rail.size, const Size(Sidebar.collapsedWidth - 1 - 16, 36));
         });
       }
+    }
+  });
+
+  group('shadcn draws its sidebar', () {
+    for (final dark in [false, true]) {
+      testWidgets(dark ? 'Dark' : 'Light', (tester) async {
+        final tokens = _tokens(shadcnTheme, dark: dark);
+        await _pump(tester, tokens);
+        // SIDEBAR_WIDTH 16rem, over h-8 menu buttons a gap-1 apart.
+        expect(tester.getSize(find.byType(Sidebar)).width, 256);
+        final first = tester.getRect(_tile(Icons.dashboard_outlined));
+        final second = tester.getRect(_tile(Icons.description_outlined));
+        expect(first.height, 32);
+        expect(second.top - first.bottom, 4);
+        expect(first.left, 8);
+        // --sidebar: the page's own colour in light mode, the card's in dark.
+        expect(
+          _rail(tester),
+          dark ? const Color(0xFF18181B) : const Color(0xFFFAFAFA),
+        );
+        // SIDEBAR_WIDTH_ICON 3rem, a square tile in it.
+        await _pump(tester, tokens, collapsed: true);
+        expect(tester.getSize(find.byType(Sidebar)).width, 48);
+        expect(
+          tester.getSize(_tile(Icons.dashboard_outlined)),
+          const Size.square(32),
+        );
+      });
     }
   });
 

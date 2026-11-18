@@ -98,7 +98,7 @@ void main() {
   group('contrast', _contrast);
   group('disabled', _disabled);
   group('the style override', _override);
-  group('Iris and shadcn are unchanged', _unchanged);
+  group('Iris and shadcn keep the centred button', _unchanged);
   group('link and soft', _linkAndSoft);
   group('SplitButton and IconAction', _splitAndIconAction);
 }
@@ -690,7 +690,8 @@ void _unchanged() {
         final colors = tokens.palette;
         final radii = tokens.radii;
         final sizes = tokens.sizes;
-        expect(tokens.button.padding, isNull);
+        // Iris pads by the kit's rule; shadcn by px-3, px-4 and px-6.
+        expect(tokens.button.padding, name == 'Iris' ? isNull : isNotNull);
         expect(tokens.button.minWidth, isNull);
         expect(tokens.button.labelWeight, isNull);
 
@@ -702,13 +703,12 @@ void _unchanged() {
           final height = sizes.height(size);
           final box = tester.getRect(button);
           final label = tester.getRect(find.text('Save'));
+          final insets = tokens.button.paddingOf(size, height);
           expect(box.height, height);
-          expect(label.left - box.left, height / 2 - 4);
-          expect(box.width, label.width + height - 8);
-          expect(
-            _corners(tester, button).topLeft.x,
-            size == ControlSize.small ? radii.radiusSmall : radii.radius,
-          );
+          if (name == 'Iris') expect(insets.start, height / 2 - 4);
+          expect(label.left - box.left, insets.start);
+          expect(box.width, label.width + insets.start + insets.end);
+          expect(_corners(tester, button).topLeft.x, radii.button(size));
           expect(
             _label(tester, button).fontWeight,
             (size == ControlSize.small
@@ -1045,7 +1045,8 @@ void _splitAndIconAction() {
     ('Material', 999.0),
     ('Carbon', 0.0),
     ('Iris', _tokens(_theme('Iris')).radii.radiusSmall),
-    ('shadcn', _tokens(_theme('shadcn')).radii.radiusSmall),
+    // rounded-md at every size
+    ('shadcn', 8.0),
   ]) {
     testWidgets('$theme: IconAction hovers in the small button\'s corner', (
       tester,

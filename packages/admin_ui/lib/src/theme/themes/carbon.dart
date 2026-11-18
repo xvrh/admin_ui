@@ -16,7 +16,18 @@ import '../table_metrics.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
-/// IBM Carbon (white/g10) — structured grays, blue 60, square corners.
+// Audited on 18 November 2026 against Carbon v11.120.0: @carbon/themes
+// 11.85.0 and @carbon/styles 1.119.0. v12's rounded styles, in that source
+// behind a flag that is off, are not drawn.
+//
+// The kit's contrast rules move little here: a control's outline is Carbon's
+// own $border-strong-01 and the accents reach their targets as authored.
+// - A placeholder is the helper text's grey, at 4.5:1, where
+//   $text-placeholder is $text-primary at 40%, about #A2A2A2 on white.
+// - A disabled button's label is held to 2.5:1, where $text-disabled is
+//   $text-primary at 25%.
+
+/// IBM Carbon (g10) — structured grays, blue 60, square corners.
 const carbonPalette = AdminPalette(
   primary: Color(0xFF0F62FE),
   primaryStrong: Color(0xFF0050E6), // $button-primary-hover
@@ -26,8 +37,8 @@ const carbonPalette = AdminPalette(
   background: Color(0xFFF4F4F4),
   surfaceMuted: Color(0xFFFAFAFA),
   foreground: Color(0xFF161616),
-  foregroundSecondary: Color(0xFF393939),
-  foregroundMuted: Color(0xFF525252),
+  foregroundSecondary: Color(0xFF525252), // $text-secondary: a field's label
+  foregroundMuted: Color(0xFF6F6F6F), // $text-helper
   foregroundSubtle: Color(0xFF6F6F6F),
   foregroundFaint: Color(0xFFA8A8A8),
   border: Color(0xFFE0E0E0),
@@ -41,14 +52,21 @@ const carbonPalette = AdminPalette(
   tabDivider: Color(0xFFE0E0E0),
   info: Color(0xFF0043CE), // $support-info
   primaryActive: Color(0xFF002D9C), // $button-primary-active
+  dangerHover: Color(0xFFB81921), // $button-danger-hover
+  dangerActive: Color(0xFF750E13), // $button-danger-active
   controlBorder: Color(0xFF8D8D8D), // $border-strong-01
   focusRing: Color(0xFF0F62FE), // $focus
+  scrim: Color(0x99000000), // $overlay: black at 60%
   chart: _chartLight,
   listHighlight: Color(0xFFE8E8E8), // $layer-hover-01
   navSelectedFill: Color(0xFFE0E0E0), // $layer-selected-01
   navHoverFill: Color(0xFFE8E8E8), // $layer-hover-01
   navSelectedText: Color(0xFF161616), // $text-primary
   navIndicator: Color(0xFF0F62FE), // $border-interactive
+  // $layer-selected-01, #E0E0E0, with 5% of the primary in it. Carbon's
+  // selected row is that grey; the kit tells a selected row from a hovered
+  // one by its tint, so it carries the least blue that does.
+  tableRowSelected: Color(0xFFD5D9E2),
   // A field is $field-01, the white surface, on the #F4F4F4 page.
   fieldFillHover: Color(0xFFE8E8E8), // $field-hover-01
   neutralFill: Color(0xFF393939), // $button-secondary (Gray 80)
@@ -74,7 +92,7 @@ const carbonDarkPalette = AdminPalette(
   ), // gray 40: holds 4.5:1 on the selection tints too
   foregroundSubtle: Color(0xFF6F6F6F),
   foregroundFaint: Color(0xFF525252),
-  border: Color(0xFF393939), // $border-subtle-01
+  border: Color(0xFF525252), // $border-subtle-01
   borderSubtle: Color(0xFF333333),
   success: Color(0xFF42BE65),
   warning: Color(0xFFF1C21B),
@@ -87,6 +105,8 @@ const carbonDarkPalette = AdminPalette(
   primaryText: Color(0xFF78A9FF), // $link-primary
   dangerText: Color(0xFFFF8389), // $text-error
   primaryActive: Color(0xFF002D9C), // $button-primary-active
+  dangerHover: Color(0xFFB81921), // $button-danger-hover
+  dangerActive: Color(0xFF750E13), // $button-danger-active
   controlBorder: Color(0xFF6F6F6F), // $border-strong-01
   focusRing: Color(0xFFFFFFFF), // $focus
   chart: _chartDark,
@@ -95,6 +115,8 @@ const carbonDarkPalette = AdminPalette(
   navHoverFill: Color(0xFF333333), // $layer-hover-01
   navSelectedText: Color(0xFFF4F4F4), // $text-primary
   navIndicator: Color(0xFF4589FF), // $border-interactive
+  // $layer-selected-01, #393939, with 5% of the primary in it, as in g10.
+  tableRowSelected: Color(0xFF373B42),
   // A field is $field-01, the #262626 surface, on the #161616 page.
   fieldFillHover: Color(0xFF333333), // $field-hover-01
   neutralFill: Color(0xFF6F6F6F), // $button-secondary
@@ -132,6 +154,8 @@ const carbonShellPalette = AdminPalette(
   primaryText: Color(0xFF78A9FF), // $link-primary
   dangerText: Color(0xFFFF8389), // $text-error
   primaryActive: Color(0xFF002D9C), // $button-primary-active
+  dangerHover: Color(0xFFB81921), // $button-danger-hover
+  dangerActive: Color(0xFF750E13), // $button-danger-active
   controlBorder: Color(0xFF6F6F6F), // $border-strong-01
   focusRing: Color(0xFFFFFFFF), // $focus
   listHighlight: Color(0xFF292929), // $background-hover
@@ -220,14 +244,24 @@ final carbonTheme = AdminTheme.from(
   ),
   type: const AdminTypeSpec(
     fontFamily: 'IBM Plex Sans',
+    // code-01 and code-02, where the app bundles the family; elsewhere the
+    // platform's monospace, as before
+    monoFontFamily: 'IBM Plex Mono',
+    monoFontFamilyFallback: ['monospace', 'Menlo', 'Consolas', 'Courier New'],
     heading: FontWeight.w600,
     label: FontWeight.w400, // label-01
     uppercaseLabels: false,
     ramp: _ramp,
   ),
   focus: const AdminFocusSpec(width: 2, offset: -2),
-  // sm / md / lg fields and buttons (field md 40)
-  sizes: const AdminControlSizes(small: 32, medium: 40, large: 48),
+  // sm / md / lg fields and buttons (field md 40); a text input's
+  // $spacing-05 inline padding
+  sizes: const AdminControlSizes(
+    small: 32,
+    medium: 40,
+    large: 48,
+    fieldPaddingX: 16,
+  ),
   // DataTable md / lg / xl rows under a lg header, spacing-05 cells; its sm
   // row (32) would leave a sm control no room
   table: const AdminTableMetrics(
