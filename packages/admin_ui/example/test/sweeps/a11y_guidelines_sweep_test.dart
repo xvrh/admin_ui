@@ -1,5 +1,10 @@
 import 'dart:developer';
 
+import 'package:admin_ui/admin_ui.dart';
+// The kit's test hook for the roles only the web reads, which no barrel
+// exports.
+// ignore: implementation_imports
+import 'package:admin_ui/src/common/ui/web_roles.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -37,66 +42,153 @@ const _guidelines = <String, AccessibilityGuideline>{
 /// a fix starts from.
 const _skipped = <String, String>{};
 
-const _bareCheck =
-    'a Check with no label beside it is its box, 16 or 18px by the theme, '
-    "and so are the row and select-all boxes of a table, each alone in its "
-    'cell. Needs the target grown past the box: '
-    'lib/src/common/ui/checkbox.dart:73';
+/// A kind of target a guideline is not held to, wherever it is drawn: no
+/// wider than its reason. Growing a target moves pixels, and is not this
+/// sweep's to do.
+class _Exemption {
+  /// What it lets through, as the report of one that exempts nothing names
+  /// it.
+  final String name;
 
-const _bareToggle =
-    'a Toggle with no label beside it is its track, 18 to 22px tall in '
-    'every theme but Material and Carbon. Needs the target grown past the '
-    'track: lib/src/common/ui/toggle.dart:65';
+  /// The guideline's name in [_guidelines].
+  final String guideline;
 
-const _textLink =
-    'a TextLink is as tall as its line of text, 16 to 18px. In a sentence '
-    'WCAG 2.5.8 exempts it (a target in running text), and Flutter exempts a '
-    'node flagged as a link, which one that runs an action is not. A column '
-    'of them is no sentence: the rows of a ValidationSummary, a line apart, '
-    'are short of the criterion. Needs a row 24px tall: '
-    'lib/src/forms/validation_summary.dart, lib/src/common/ui/text_link.dart';
+  /// Why, and the line a fix starts from.
+  final String reason;
 
-/// Targets a guideline is not held to wherever they are drawn, by the
-/// guideline's name, then by what draws them: a widget of the kit's, or the
-/// file a target is written in (relative to `packages/admin_ui`), found
-/// among the three widgets nearest above the target that the package
-/// creates. Each with the reason and the line a fix starts from. Growing a
-/// target moves pixels, and is not this sweep's to do.
-const _exemptTargets = <String, Map<String, String>>{
-  _labelled: {
-    'lib/src/common/ui/choice.dart':
-        "the control-states page draws a radio with an empty label, to show "
-        "the dot alone in each state, and a ChoiceOption has no name but its "
-        'label. Needs a semantic label on the option: '
-        'lib/src/common/ui/choice.dart:35',
-  },
-  _sized: {
-    'Check': _bareCheck,
-    'Toggle': _bareToggle,
-    'TextLink': _textLink,
-    'lib/src/shell/ui/save_cluster.dart':
+  /// Whether [target] is of this kind: drawn by the widget the reason
+  /// names, in the state and the theme it names, and no smaller than the
+  /// size it gives, so a target that shrinks further fails.
+  final bool Function(_Target target) covers;
+
+  const _Exemption(
+    this.name, {
+    required this.guideline,
+    required this.reason,
+    required this.covers,
+  });
+}
+
+final _exemptions = <_Exemption>[
+  _Exemption(
+    'a Check with no label',
+    guideline: _sized,
+    reason:
+        'a Check with no label beside it is its box, 16 or 18px by the '
+        'theme, and so are the row and select-all boxes of a table, each '
+        'alone in its cell. Needs the target grown past the box: '
+        'lib/src/common/ui/checkbox.dart:73',
+    covers: (target) =>
+        target.nearest<Check>()?.label == null &&
+        target.nearest<Check>() != null &&
+        target.shortestSide >= 16,
+  ),
+  _Exemption(
+    'a Toggle with no label',
+    guideline: _sized,
+    reason:
+        'a Toggle with no label beside it is its track, 18 to 22px tall in '
+        'every theme but Material and Carbon. Needs the target grown past '
+        'the track: lib/src/common/ui/toggle.dart:65',
+    covers: (target) =>
+        target.nearest<Toggle>()?.label == null &&
+        target.nearest<Toggle>() != null &&
+        target.size.height >= 18 &&
+        target.size.width >= 24,
+  ),
+  _Exemption(
+    'a TextLink',
+    guideline: _sized,
+    reason:
+        'a TextLink is as tall as its line of text, 16 to 18px. In a '
+        'sentence WCAG 2.5.8 exempts it (a target in running text), and '
+        'Flutter exempts a node flagged as a link, which one that runs an '
+        'action is not. A column of them is no sentence: the rows of a '
+        'ValidationSummary, a line apart, are short of the criterion. '
+        'Needs a row 24px tall: lib/src/forms/validation_summary.dart, '
+        'lib/src/common/ui/text_link.dart',
+    covers: (target) =>
+        target.nearest<TextLink>() != null &&
+        target.size.height >= 16 &&
+        target.size.width >= 24,
+  ),
+  _Exemption(
+    'the save status link',
+    guideline: _sized,
+    reason:
         'the save status, "2 fields need attention", is a link as tall as '
         "its line, 16px, in the save bar's row of 32px controls. Needs the "
         'row height as its target: lib/src/shell/ui/save_cluster.dart:500',
-    'lib/src/common/ui/segmented.dart':
-        "Fluent's small segmented control is 24px tall with a 1px border, so "
-        'a segment inside it is 22px. Needs the segment to take the '
+    covers: (target) =>
+        target.isWrittenIn('lib/src/shell/ui/save_cluster.dart') &&
+        target.size.height >= 16 &&
+        target.size.width >= 24,
+  ),
+  _Exemption(
+    "Fluent's small segment",
+    guideline: _sized,
+    reason:
+        "Fluent's small segmented control is 24px tall with a 1px border, "
+        'so a segment inside it is 22px. Needs the segment to take the '
         "control's height: lib/src/common/ui/segmented.dart:376",
-    'lib/src/fields/ui/tags_body.dart':
-        "a tags field's input is announced as its line of text, 18 to 20px, "
-        "inside the field's box of 32px or more, which takes the pointer. "
-        'Not checked: whether a switch-access user reaches the box. '
-        'lib/src/fields/ui/tags_body.dart',
-    'LaneLanguage':
+    covers: (target) =>
+        target.theme == 'Fluent' &&
+        target.isWrittenIn('lib/src/common/ui/segmented.dart') &&
+        target.size.height >= 22 &&
+        target.size.width >= 24,
+  ),
+  _Exemption(
+    "a tags field's input",
+    guideline: _sized,
+    reason:
+        "a tags field's input is announced as its line of text, 18 to "
+        "20px, inside the field's box of 32px or more, which takes the "
+        'pointer. Not checked: whether a switch-access user reaches the '
+        'box. lib/src/fields/ui/tags_body.dart',
+    covers: (target) =>
+        target.isWrittenIn('lib/src/fields/ui/tags_body.dart') &&
+        target.size.height >= 18 &&
+        target.size.width >= 24,
+  ),
+  _Exemption(
+    "a translation lane's field",
+    guideline: _sized,
+    reason:
         "a translation lane's text field is announced as its line of text, "
         '18 to 22px, inside a lane row that is taller. Not checked: whether '
         'the row takes the pointer around the line. '
         'lib/src/fields/ui/source_target_pair.dart',
-    'example/lib/labs/lane_field_lab.dart':
+    covers: (target) =>
+        target.nearest<LaneLanguage>() != null &&
+        target.size.height >= 18 &&
+        target.size.width >= 24,
+  ),
+  _Exemption(
+    "a lab's links",
+    guideline: _sized,
+    reason:
         "a lab's own links, each as tall as its line of text (16px): a lab "
         'is a sketch, not a widget the kit ships',
-  },
-};
+    covers: (target) =>
+        target.isWrittenIn('example/lib/labs/lane_field_lab.dart') &&
+        target.size.height >= 16 &&
+        target.size.width >= 24,
+  ),
+  _Exemption(
+    'a radio drawn with no label',
+    guideline: _labelled,
+    reason:
+        'the control-states page draws a radio with an empty label, to '
+        'show the dot alone in each state, and a ChoiceOption has no name '
+        'but its label. Needs a semantic label on the option: '
+        'lib/src/common/ui/choice.dart:35',
+    covers: (target) =>
+        target.nearest<Choice<Object?>>()?.options.every(
+          (option) => option.label.isEmpty,
+        ) ??
+        false,
+  ),
+];
 
 /// Guidelines one demo is not held to, by its id then the guideline's name,
 /// each with the reason: something the demo does, not a widget.
@@ -119,15 +211,19 @@ final _node = RegExp(r'SemanticsNode#(\d+)\(');
 /// in its [homeCombo], so every theme and mode is checked: whatever takes a
 /// tap or a long press has a name, and is at least 24 by 24.
 ///
-/// The demo is pumped with its semantics on, so a node the framework
-/// refuses fails it too: a role where it cannot go, a list item outside a
-/// list, an alert that is a live region.
+/// The demo is pumped with its semantics on, and with the roles only the
+/// web reads (the main landmark, a tab panel), so a node the framework
+/// refuses fails it too: a role where it cannot go, a landmark inside
+/// another, an alert that is a live region.
 ///
 /// A target that fails is reported with what draws it. It is fixed, or
-/// listed in [_exemptTargets] or [_exemptEntries] with its reason.
+/// listed in [_exemptions] or [_exemptEntries] with its reason.
 void main() {
   final checked = <String>{};
-  final used = <(String, String)>{};
+  final used = <String>{};
+
+  setUp(() => debugWebRolesAreRead = true);
+  tearDown(() => debugWebRolesAreRead = null);
 
   sweep(
     semantics: true,
@@ -135,19 +231,21 @@ void main() {
     skipped: _skipped,
     check: (tester, entry) async {
       checked.add(entry.id);
+      final theme = homeCombo(entry).theme.name;
       final problems = <String>[];
       for (final MapEntry(key: name, value: guideline) in _guidelines.entries) {
         final evaluation = await guideline.evaluate(tester);
         if (evaluation.passed) continue;
         if (_exemptEntries[entry.id]?.containsKey(name) ?? false) {
-          used.add((entry.id, name));
+          used.add('${entry.id}: $name');
           continue;
         }
-        final exempt = _exemptTargets[name] ?? const {};
-        for (final target in _targets(tester, evaluation.reason ?? '')) {
-          final key = target.drawnBy.where(exempt.containsKey).firstOrNull;
-          if (key != null) {
-            used.add((name, key));
+        for (final target in _targets(tester, evaluation.reason ?? '', theme)) {
+          final exemption = _exemptions
+              .where((e) => e.guideline == name && e.covers(target))
+              .firstOrNull;
+          if (exemption != null) {
+            used.add(exemption.name);
           } else {
             problems.add('$name: $target');
           }
@@ -157,8 +255,8 @@ void main() {
         problems,
         isEmpty,
         reason:
-            '${entry.id} has targets short of a guideline. Fix them, or list '
-            'what draws them in _exemptTargets with the reason',
+            '${entry.id} has targets short of a guideline. Fix them, or add '
+            'what draws them to _exemptions with the reason',
       );
     },
   );
@@ -170,14 +268,12 @@ void main() {
     if (!pumped.every((entry) => checked.contains(entry.id))) return;
     expect(
       [
-        for (final MapEntry(key: name, value: targets)
-            in _exemptTargets.entries)
-          for (final key in targets.keys)
-            if (!used.contains((name, key))) '$name: $key',
+        for (final exemption in _exemptions)
+          if (!used.contains(exemption.name)) exemption.name,
         for (final MapEntry(key: id, value: guidelines)
             in _exemptEntries.entries)
           for (final name in guidelines.keys)
-            if (!used.contains((id, name))) '$id: $name',
+            if (!used.contains('$id: $name')) '$id: $name',
       ],
       isEmpty,
       reason: 'These exemptions exempt nothing now: drop them',
@@ -188,6 +284,20 @@ void main() {
     final ids = {for (final entry in demoEntries()) entry.id};
     expect(_exemptEntries.keys.where((id) => !ids.contains(id)), isEmpty);
   });
+
+  test('every exemption names a guideline, and no two share a name', () {
+    expect(
+      _exemptions
+          .map((e) => e.guideline)
+          .toSet()
+          .difference(_guidelines.keys.toSet()),
+      isEmpty,
+    );
+    expect(
+      _exemptions.map((e) => e.name).toSet(),
+      hasLength(_exemptions.length),
+    );
+  });
 }
 
 /// A target a guideline failed, and what draws it.
@@ -195,21 +305,36 @@ class _Target {
   final String label;
   final Size size;
 
-  /// The widgets nearest above the target that `packages/admin_ui` creates,
-  /// each as its type and as the file it is written in.
-  final List<String> drawnBy;
+  /// The theme the demo is pumped in, by name.
+  final String theme;
 
-  _Target(this.label, this.size, this.drawnBy);
+  /// The widgets above the target that `packages/admin_ui` creates, nearest
+  /// first, each with the file it is written in (relative to the package).
+  final List<(Widget, String)> above;
+
+  _Target(this.label, this.size, this.theme, this.above);
+
+  double get shortestSide => size.shortestSide;
+
+  /// The nearest widget of type [T] above the target.
+  T? nearest<T extends Widget>() =>
+      above.map((widget) => widget.$1).whereType<T>().firstOrNull;
+
+  /// Whether one of the three widgets nearest above the target is written
+  /// in [file].
+  bool isWrittenIn(String file) =>
+      above.take(3).any((widget) => widget.$2 == file);
 
   @override
   String toString() =>
       '"$label", ${size.width.toStringAsFixed(1)} by '
-      '${size.height.toStringAsFixed(1)}, drawn by ${drawnBy.join(', ')}';
+      '${size.height.toStringAsFixed(1)} in $theme, drawn by '
+      '${[for (final (widget, file) in above.take(3)) '${widget.runtimeType} ($file)'].join(', ')}';
 }
 
 /// The targets [reason], a guideline's report, names by their semantics
 /// node. The report is all a guideline gives, as one text.
-List<_Target> _targets(WidgetTester tester, String reason) {
+List<_Target> _targets(WidgetTester tester, String reason, String theme) {
   final ids = {
     for (final match in _node.allMatches(reason)) int.parse(match.group(1)!),
   };
@@ -219,22 +344,18 @@ List<_Target> _targets(WidgetTester tester, String reason) {
     final node = element.renderObject.debugSemantics;
     // The outermost render object of a node is the widget that makes it.
     if (node == null || !ids.remove(node.id)) continue;
-    final drawnBy = <String>[];
-    var widgets = 0;
+    final above = <(Widget, String)>[];
     element.visitAncestorElements((ancestor) {
       final file = CreationLocation.of(ancestor.widget)?.file;
-      final type = '${ancestor.widget.runtimeType}'.split('<').first;
       if (file == null ||
           !file.contains('packages/admin_ui/') ||
-          type.startsWith('_')) {
+          '${ancestor.widget.runtimeType}'.startsWith('_')) {
         return true;
       }
-      drawnBy
-        ..add(type)
-        ..add(file.split('packages/admin_ui/').last);
-      return ++widgets < 3;
+      above.add((ancestor.widget, file.split('packages/admin_ui/').last));
+      return above.length < 12;
     });
-    targets.add(_Target(node.label, node.rect.size, drawnBy));
+    targets.add(_Target(node.label, node.rect.size, theme, above));
   }
   expect(ids, isEmpty, reason: 'No widget found for these semantics nodes');
   return targets;

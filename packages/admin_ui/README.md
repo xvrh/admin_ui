@@ -1826,6 +1826,11 @@ Two things it says first:
   page. An app turns it on for everyone with
   `SemanticsBinding.instance.ensureSemantics()` after `runApp`.
 
+On the web the `Shell`'s page is the main landmark. An app that marks one
+itself, or puts the shell inside a landmark of its own, passes
+`Shell(mainLandmark: false)`: a main landmark holds no other, and the
+framework throws in a debug build where one does.
+
 Its tables are generated: `fvm dart run tool/gen_accessibility.dart` after
 adding a role, a component or a test of one.
 

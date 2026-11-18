@@ -702,12 +702,15 @@ class _BusyScrim extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (uploading) ...[
-            Text(
-              context.adminFormats.percent(item.clampedProgress),
-              textAlign: TextAlign.center,
-              style: context.type
-                  .weighted(context.type.bodySmall, FontWeight.w700)
-                  .copyWith(color: onImage),
+            // The bar says its value.
+            ExcludeSemantics(
+              child: Text(
+                context.adminFormats.percent(item.clampedProgress),
+                textAlign: TextAlign.center,
+                style: context.type
+                    .weighted(context.type.bodySmall, FontWeight.w700)
+                    .copyWith(color: onImage),
+              ),
             ),
             const Gap(AdminSpacing.sm),
             ClipRRect(
@@ -885,10 +888,13 @@ class _FileRow extends StatelessWidget {
           ),
         ),
         const Gap(AdminSpacing.md),
-        Text(
-          context.adminFormats.percent(item.clampedProgress),
-          style: context.type.caption.copyWith(
-            color: context.colors.foregroundMuted,
+        // The bar says its value.
+        ExcludeSemantics(
+          child: Text(
+            context.adminFormats.percent(item.clampedProgress),
+            style: context.type.caption.copyWith(
+              color: context.colors.foregroundMuted,
+            ),
           ),
         ),
       ],

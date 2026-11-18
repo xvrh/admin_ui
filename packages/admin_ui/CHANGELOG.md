@@ -5,11 +5,17 @@
 - More of the kit says what it is to assistive technology, each widget
   with the role Flutter has for it (`SemanticsRole`), asserted through the
   semantics tree. What a screen reader announces changes for these:
-  - `Shell`: the page beside the navigation is the main landmark, named
-    "Main content", which a screen reader on the web jumps to past the
-    sidebar and the top bar. A shell shown inside another's page is part
-    of that page. `ShellMessages` has `mainContent`, new: a subclass for a
-    language of the app's own adds it.
+  - `Shell`: on the web, the page beside the navigation is the main
+    landmark, named "Main content", which a screen reader jumps to past
+    the sidebar and the top bar. The other platforms read no such role and
+    get nothing: a named container there would be one more stop, the size
+    of the page. A shell shown inside another's page is part of that page.
+    A main landmark may hold no other and sit in no other, and the
+    framework throws in a debug build where one does: an app that marks
+    its own main landmark, inside the page or around the shell, or puts
+    the shell inside a landmark of its own, passes `mainLandmark: false`,
+    new. `ShellMessages` has `mainContent`, new: a subclass for a language
+    of the app's own adds it.
   - `Alert`: a danger alert that is read out (`liveRegion`, on by default
     for danger) is an alert. On the web it is read at once, over what the
     screen reader was saying, with its action and its close button; its
@@ -19,12 +25,15 @@
     live regions, as before.
   - `ProgressBar`: a bar with a value is a progress bar named by its
     `label`, where the label was a text beside a bar with no name, or by
-    the new `semanticLabel`, for a bar with no label. The kit's own bars
-    are named: an upload row's by its file, the upload summary's by the
-    summary.
+    the new `semanticLabel`, for a bar with no label. Its label and its
+    percent are the bar's name and value, and are no longer read a second
+    time as text. A bar with no value is named by `semanticLabel` in its
+    label's place, read as text. The kit's own bars are named: an upload
+    row's by its file, the upload summary's by the summary.
   - `TabPanel`, new: what the selected tab of a `Tabs` strip shows, as that
-    tab's panel, named by the tab. `Tabs` draws no content, so the caller
-    wraps what it shows; the asset picker's panes are panels.
+    tab's panel, named by the tab, on the web; nothing on the other
+    platforms. `Tabs` draws no content, so the caller wraps what it shows;
+    the asset picker's panes are panels.
   - `CommandPalette`: each result says where it stands, "2 of 5", as an
     option of a `Combobox` does, and the results no longer claim to be a
     list: a list's items are its direct children, and a scroll view's own

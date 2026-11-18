@@ -25,8 +25,10 @@ import 'severity.dart';
 /// colour as it is where it already does.
 ///
 /// A screen reader hears a bar with a [value] as a progress bar, named by
-/// [semanticLabel] or else [label], whose value runs from 0 to 100. A bar
-/// with no value has none to give: its [label] is read as the text it is.
+/// [semanticLabel] or else [label], whose value runs from 0 to 100; the
+/// label and the percent beside it are the bar's name and value, and are
+/// not read a second time. A bar with no value has none to give: its name,
+/// [semanticLabel] or else [label], is read as the text it is.
 class ProgressBar extends StatelessWidget {
   /// Completion in 0..1, clamped for display. `null` = indeterminate sweep.
   final double? value;
@@ -99,24 +101,32 @@ class ProgressBar extends StatelessWidget {
     // The indicator is the progress bar a screen reader lands on, so it
     // carries the name: a caption beside a nameless bar is two things.
     final named = _clamped != null;
+    Widget indicator = _clamped == null && motionReduced(context)
+        ? StillLinearProgress(
+            minHeight: thickness,
+            backgroundColor: context.colors.border,
+            color: _fill(context),
+          )
+        : LinearProgressIndicator(
+            value: _clamped,
+            minHeight: thickness,
+            backgroundColor: context.colors.border,
+            valueColor: AlwaysStoppedAnimation(_fill(context)),
+            semanticsLabel: named ? semanticLabel ?? label : null,
+          );
+    if (!named && semanticLabel != null) {
+      // No value to carry: the name is read as text, in the caption's place.
+      indicator = Semantics(
+        container: true,
+        label: semanticLabel,
+        child: ExcludeSemantics(child: indicator),
+      );
+    }
     var bar = ClipRRect(
       // The theme's small radius: rounded ends in most themes, square in
       // Carbon.
       borderRadius: BorderRadius.circular(context.radii.radiusSmall),
-      child: _clamped == null && motionReduced(context)
-          ? StillLinearProgress(
-              minHeight: thickness,
-              backgroundColor: context.colors.border,
-              color: _fill(context),
-              semanticsLabel: semanticLabel,
-            )
-          : LinearProgressIndicator(
-              value: _clamped,
-              minHeight: thickness,
-              backgroundColor: context.colors.border,
-              valueColor: AlwaysStoppedAnimation(_fill(context)),
-              semanticsLabel: named ? semanticLabel ?? label : semanticLabel,
-            ),
+      child: indicator,
     );
 
     var percent = showPercent && _clamped != null;
@@ -133,7 +143,7 @@ class ProgressBar extends StatelessWidget {
               if (label != null)
                 Expanded(
                   child: ExcludeSemantics(
-                    excluding: named,
+                    excluding: named || semanticLabel != null,
                     child: Text(
                       label!,
                       maxLines: 1,
@@ -145,13 +155,16 @@ class ProgressBar extends StatelessWidget {
               else
                 const Spacer(),
               if (percent)
-                Text(
-                  context.adminFormats.percent(_clamped!),
-                  style: context.type.weighted(
-                    context.type.caption.copyWith(
-                      color: context.colors.foregroundMuted,
+                // The bar says its value.
+                ExcludeSemantics(
+                  child: Text(
+                    context.adminFormats.percent(_clamped!),
+                    style: context.type.weighted(
+                      context.type.caption.copyWith(
+                        color: context.colors.foregroundMuted,
+                      ),
+                      FontWeight.w600,
                     ),
-                    FontWeight.w600,
                   ),
                 ),
             ],

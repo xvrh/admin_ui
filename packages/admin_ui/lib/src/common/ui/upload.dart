@@ -428,10 +428,13 @@ class _Row extends StatelessWidget {
                 ),
               ),
               const Gap(AdminSpacing.md),
-              Text(
-                formats.percent(item.clampedProgress),
-                style: context.type.caption.copyWith(
-                  color: context.colors.foregroundMuted,
+              // The bar says its value.
+              ExcludeSemantics(
+                child: Text(
+                  formats.percent(item.clampedProgress),
+                  style: context.type.caption.copyWith(
+                    color: context.colors.foregroundMuted,
+                  ),
                 ),
               ),
             ],

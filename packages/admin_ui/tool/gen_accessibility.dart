@@ -6,8 +6,8 @@
 //
 // Two tables, each between a pair of markers in ACCESSIBILITY.md:
 //
-// - roles: every `SemanticsRole` a file under lib/src names, and the files
-//   that name it;
+// - roles: every `SemanticsRole` the code of a file under lib/src names,
+//   comments left out, and the files that name it;
 // - status: one row for each of [components], with the roles its source
 //   sets, the test files that build it and press keys, read the semantics
 //   tree or measure contrast, where its targets are measured, and what is
@@ -67,7 +67,11 @@ const components = [
   ),
   Component('Tag'),
   Component('Tabs', only: {'tab', 'tabBar'}),
-  Component('TabPanel', only: {'tabPanel'}),
+  Component(
+    'TabPanel',
+    only: {'tabPanel'},
+    gap: 'On the web only: the other platforms read no such role.',
+  ),
   Component('Pagination'),
   Component('Breadcrumbs'),
   Component('Accordion'),
@@ -115,11 +119,22 @@ const components = [
     'ProgressBar',
     inherited: '`progressBar`, from Material\'s indicator',
     gap:
-        'With no value it is no progress bar, and its label is read as '
-        'text.',
+        'With no value it is no progress bar, and its name is read as '
+        'text. Where no role is read (iOS, the desktops) its value is the '
+        'number alone, "62".',
   ),
-  Component('Shell'),
-  Component('Sidebar'),
+  Component(
+    'Shell',
+    gap:
+        'The main landmark is on the web only: the other platforms read no '
+        'such role.',
+  ),
+  Component(
+    'Sidebar',
+    gap:
+        'Its landmark is a named container on every platform: on a phone, '
+        'a stop that reads "Navigation" before its links.',
+  ),
   Component('SplitView'),
   Component(
     'Tree',
@@ -194,11 +209,19 @@ String render(String root, String document) {
 
 final _role = RegExp(r'SemanticsRole\.(\w+)');
 
+final _comment = RegExp(r'//[^\n]*|/\*.*?\*/', dotAll: true);
+
+/// [dart] without its comments, so a role a comment names is not taken for
+/// one the code sets. A `//` inside a string goes too, with the rest of its
+/// line: nothing here reads strings.
+String stripComments(String dart) => dart.replaceAll(_comment, '');
+
 /// The roles the files of [sources] name, each with those files.
 Map<String, List<String>> rolesInUse(Map<String, String> sources) {
   final roles = <String, List<String>>{};
   for (final MapEntry(key: path, value: text) in sources.entries) {
-    for (final role in {for (final m in _role.allMatches(text)) m.group(1)!}) {
+    final code = stripComments(text);
+    for (final role in {for (final m in _role.allMatches(code)) m.group(1)!}) {
       if (role == 'none') continue;
       (roles[role] ??= []).add(path);
     }
@@ -244,8 +267,10 @@ String statusTable(
       for (final MapEntry(key: path, value: text) in tests.entries)
         if (built.hasMatch(text) && api.hasMatch(text)) path,
     ]..sort();
-    final named = {for (final m in _role.allMatches(source.value)) m.group(1)!}
-      ..remove('none');
+    final named = {
+      for (final m in _role.allMatches(stripComments(source.value)))
+        m.group(1)!,
+    }..remove('none');
     final only = component.only;
     if (only != null && !named.containsAll(only)) {
       throw StateError('${source.key} does not name ${only.difference(named)}');

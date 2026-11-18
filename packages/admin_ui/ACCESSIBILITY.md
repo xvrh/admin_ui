@@ -82,23 +82,37 @@ So a role adds to what the flags say and never stands in for them: a tab is
 still a selected button, an alert's words are still a live region wherever
 the role says nothing.
 
+A landmark and a tab panel are containers with a name, and on Android and
+iOS a node with a name is a stop of its own: a rectangle the size of the
+page, read before the page's first control. So `Shell`'s `main` and a
+`TabPanel` are given, role and name, only on the web, and are nothing
+elsewhere. The `navigation` landmarks of `Sidebar` and `Breadcrumbs` are
+older and are named on every platform: on a phone each is a stop that
+reads "Navigation" or "Breadcrumb" before its links. Whether that stop
+earns its place has not been decided, nor tried with a screen reader.
+
+A main landmark may hold no other and sit in no other, and the framework
+throws in a debug build where one does. An app that marks a main landmark
+of its own, or puts the `Shell` inside a landmark, passes
+`Shell(mainLandmark: false)`.
+
 <!-- roles:begin -->
 | Role | Set in |
 |---|---|
-| `alert` | `common/ui/alert.dart`, `common/ui/alert_role.dart`, `common/ui/toast.dart` |
+| `alert` | `common/ui/alert.dart`, `common/ui/toast.dart` |
 | `alertDialog` | `common/ui/modal.dart` |
 | `cell` | `collection/ui/collection_table.dart` |
 | `columnHeader` | `collection/ui/collection_table.dart` |
 | `dialog` | `assets/ui/asset_picker.dart`, `common/ui/modal.dart`, `common/ui/side_sheet.dart` |
 | `main` | `shell/ui/shell.dart` |
 | `menu` | `common/ui/menu.dart` |
-| `menuItem` | `common/ui/menu.dart`, `common/ui/tappable.dart` |
+| `menuItem` | `common/ui/menu.dart` |
 | `menuItemCheckbox` | `common/ui/menu.dart` |
 | `menuItemRadio` | `common/ui/menu.dart` |
 | `navigation` | `common/ui/breadcrumbs.dart`, `shell/ui/sidebar.dart` |
 | `radioGroup` | `common/ui/choice.dart`, `common/ui/segmented.dart` |
 | `row` | `collection/ui/collection_table.dart` |
-| `tab` | `common/ui/tabs.dart`, `common/ui/tappable.dart` |
+| `tab` | `common/ui/tabs.dart` |
 | `tabBar` | `common/ui/tabs.dart` |
 | `tabPanel` | `common/ui/tabs.dart` |
 | `table` | `collection/ui/collection_table.dart` |
@@ -171,11 +185,11 @@ demo of the catalog, or both. *Known gaps* is what is missing.
 | `ValueSlider` |  | `controls_followups`, `inputs_rtl` | `controls_followups`, `inputs_rtl`, `slider` | `controls_followups` | demos | Takes no label. Announced by Material's `Slider`; the `slider` role is newer than the oldest Flutter the kit builds on. |
 | `Tag` |  | `controls_semantics`, `inputs_rtl`, `layout_tabs` and 2 more | `controls_semantics`, `inputs_rtl`, `layout_tabs` and 4 more | `controls_on_colors`, `controls`, `layout_tabs` and 2 more | exhibits, demos |  |
 | `Tabs` | `tab`, `tabBar` | `controls_api_tabs_keyed`, `controls_focus`, `layout_motion` and 1 more | `controls_api_tabs_keyed`, `layout_tabs`, `semantics_roles` | `controls_focus`, `layout_tabs`, `sweep_a11y_guidelines` | exhibits, demos |  |
-| `TabPanel` | `tabPanel` | none | `semantics_roles` | none | none |  |
+| `TabPanel` | `tabPanel` | none | `semantics_roles` | none | none | On the web only: the other platforms read no such role. |
 | `Pagination` |  | `layout_keyboard` | `connected_pager`, `layout_keyboard` | `sweep_a11y_guidelines` | exhibits, demos |  |
 | `Breadcrumbs` | `navigation` | `controls_focus`, `display_rtl`, `frame_breadcrumbs` and 1 more | `display_l10n`, `frame_breadcrumbs`, `save_flow_chrome_page` | `controls_focus`, `sweep_a11y_guidelines` | exhibits, demos |  |
 | `Accordion` |  | `layout_keyboard`, `layout_motion` | `layout_keyboard` | `sweep_a11y_guidelines` | exhibits, demos |  |
-| `Menu` | `menu`, `menuItem`, `menuItemCheckbox`, `menuItemRadio` | `inputs_rtl`, `menus_checkbox`, `menus_header` and 3 more | `inputs_rtl`, `menus_checkbox`, `menus_header` and 2 more | `surfaces_overlay`, `sweep_a11y_guidelines` | exhibits, demos |  |
+| `Menu` | `menu`, `menuItem`, `menuItemCheckbox`, `menuItemRadio` | `inputs_rtl`, `menus_checkbox`, `menus_header` and 3 more | `inputs_rtl`, `menus_checkbox`, `menus_header` and 3 more | `surfaces_overlay`, `sweep_a11y_guidelines` | exhibits, demos |  |
 | `MenuButton` |  | `inputs_rtl`, `menu_button`, `menus_keyboard` | `inputs_rtl`, `menus_keyboard` | none | demos |  |
 | `Combobox` |  | `combobox`, `controls_followups`, `listboxes_combobox` | `controls_followups`, `listboxes_combobox` | `controls_followups` | demos | A text field that says whether it is open, with no `comboBox` role: the framework refuses it. Its options are buttons that say whether they are selected and where they stand, "2 of 5": the list box and option roles are newer than the oldest Flutter. |
 | `SearchField` |  | `search_field`, `text_inputs_auth_inputs` | `text_inputs_auth_inputs` | `sweep_a11y_guidelines`, `text_inputs_auth_inputs` | exhibits, demos |  |
@@ -189,9 +203,9 @@ demo of the catalog, or both. *Known gaps* is what is missing.
 | `Modal` | `alertDialog`, `dialog` | `overlays_modal`, `overlays_toast` | `dialogs_modal_size`, `overlays_modal`, `overlays_toast` | `surfaces_overlay`, `sweep_a11y_guidelines` | exhibits, demos |  |
 | `SideSheet` | `dialog` | `inputs_rtl`, `overlays_sheet`, `side_sheet` | `inputs_rtl`, `overlays_sheet`, `shell_notification_inbox` | `surfaces_overlay`, `sweep_a11y_guidelines` | exhibits, demos |  |
 | `Spinner` |  | `controls_semantics` | `controls_semantics` | none | demos | A named live region with no `loadingSpinner` role: see the roles left out. |
-| `ProgressBar` | `progressBar`, from Material's indicator | none | `display_l10n`, `semantics_roles`, `sweeps_reduced_motion` | `progress_bar` | demos | With no value it is no progress bar, and its label is read as text. |
-| `Shell` | `main` | `form_leave_sidebar`, `save_flow_chrome_page`, `shell_compact` and 1 more | `save_flow_chrome_page`, `semantics_roles`, `shell_compact` and 1 more | `shell_anatomy` | demos |  |
-| `Sidebar` | `navigation` | `form_leave_sidebar`, `frame_sidebar`, `save_flow_chrome_page` and 3 more | `frame_sidebar`, `save_flow_chrome_page`, `semantics_roles` and 4 more | `collection_shell_contrast`, `frame_sidebar`, `shell_anatomy` and 2 more | exhibits, demos |  |
+| `ProgressBar` | `progressBar`, from Material's indicator | none | `display_l10n`, `semantics_roles`, `sweeps_reduced_motion` | `progress_bar` | demos | With no value it is no progress bar, and its name is read as text. Where no role is read (iOS, the desktops) its value is the number alone, "62". |
+| `Shell` | `main` | `form_leave_sidebar`, `save_flow_chrome_page`, `shell_compact` and 1 more | `save_flow_chrome_page`, `semantics_roles`, `shell_compact` and 1 more | `shell_anatomy` | demos | The main landmark is on the web only: the other platforms read no such role. |
+| `Sidebar` | `navigation` | `form_leave_sidebar`, `frame_sidebar`, `save_flow_chrome_page` and 3 more | `frame_sidebar`, `save_flow_chrome_page`, `semantics_roles` and 4 more | `collection_shell_contrast`, `frame_sidebar`, `shell_anatomy` and 2 more | exhibits, demos | Its landmark is a named container on every platform: on a phone, a stop that reads "Navigation" before its links. |
 | `SplitView` |  | `display_rtl`, `layout_motion`, `split_view` | `split_view` | none | demos |  |
 | `Tree` |  | `controls_focus`, `display_rtl`, `layout_motion` and 1 more | `tree_keyboard` | `controls_focus` | demos | Flutter has no tree or tree item role: a row's caret is a button named Expand or Collapse that says whether it is open. Its drag handle has no `dragHandle` role: the framework refuses it; a row moves from its menu and with Alt and the arrows. |
 | `TreeEditor` |  | `canvas_tree_focus`, `display_rtl`, `history_a11y` and 1 more | `canvas_tree_focus`, `editor_tokens`, `history_a11y` and 1 more | `history_a11y`, `history_tree_editor` | demos |  |

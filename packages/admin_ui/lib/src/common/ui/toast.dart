@@ -10,11 +10,11 @@ import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
-import 'alert_role.dart';
 import 'button.dart';
 import 'icon_action.dart';
 import 'severity.dart';
 import 'spinner.dart';
+import 'web_roles.dart';
 
 /// A transient notification. For an in-flow message use an `Alert`; for a
 /// blocking choice a `Modal`.
@@ -763,11 +763,15 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
 
   /// The card is a live region, so new words are read out as its label
   /// changes. The same words in a new severity leave the label as it was:
-  /// say them again.
+  /// say them again. Not when the toast becomes an alert or stops being
+  /// one: the words then move to another node, or take the alert's role,
+  /// which the platform reads as new by itself.
   void _reannounce(Toast old, Toast now) {
     if (old.severity == now.severity ||
         old.title != now.title ||
-        old.message != now.message) {
+        old.message != now.message ||
+        (old.severity == Severity.danger) !=
+            (now.severity == Severity.danger)) {
       return;
     }
     unawaited(
@@ -1082,7 +1086,7 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
               // alert's text, not its label.
               child: Semantics(
                 container: _urgent,
-                liveRegion: _urgent && !alertRoleAnnounces,
+                liveRegion: _urgent && !webRolesAreRead,
                 child: title == null
                     ? Text(toast.message, style: firstLine)
                     : Column(

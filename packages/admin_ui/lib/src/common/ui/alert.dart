@@ -12,9 +12,9 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
-import 'alert_role.dart';
 import 'icon_action.dart';
 import 'severity.dart';
+import 'web_roles.dart';
 
 /// An inline, in-flow message — the page/section-level banner (info, success,
 /// warning, danger). For transient pop-ups use a [Toast]; for blocking choices a
@@ -118,7 +118,7 @@ class Alert extends StatelessWidget {
             : null,
         body: Semantics(
           container: urgent,
-          liveRegion: urgent && !alertRoleAnnounces,
+          liveRegion: urgent && !webRolesAreRead,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

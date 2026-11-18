@@ -19,6 +19,7 @@ import 'icon_action.dart';
 import 'menu.dart';
 import 'popover.dart';
 import 'tappable.dart';
+import 'web_roles.dart';
 
 /// One tab in a [Tabs] strip.
 class TabItem {
@@ -114,6 +115,10 @@ class TabScope extends InheritedWidget {
 /// Tabs(tabs: tabs, selected: selected, onChanged: select),
 /// TabPanel(label: tabs[selected].label, child: body),
 /// ```
+///
+/// Only the web has the role. On the other platforms the panel adds
+/// nothing: a named container would be one more stop for a screen reader
+/// there, a rectangle the size of the panel read before its content.
 class TabPanel extends StatelessWidget {
   /// The panel's name: its tab's label.
   final String label;
@@ -123,12 +128,13 @@ class TabPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final panel = webRolesAreRead;
     return Semantics(
-      container: true,
+      container: panel,
       // The panel's name is its tab's, not its content's.
-      explicitChildNodes: true,
-      role: SemanticsRole.tabPanel,
-      label: label,
+      explicitChildNodes: panel,
+      role: panel ? SemanticsRole.tabPanel : SemanticsRole.none,
+      label: panel ? label : null,
       child: child,
     );
   }

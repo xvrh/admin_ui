@@ -46,11 +46,18 @@ void sweep({
         '${entry.id} · $pass${reason == null ? '' : ' (skipped: $reason)'}',
         skip: reason != null,
         (tester) async {
+          // Disposed whether the demo passes or not, so a failing one
+          // reports its own failure and no undisposed handle beside it. In
+          // a `finally`, not a tear-down: the test checks its handles
+          // before it runs those.
           final handle = semantics ? tester.ensureSemantics() : null;
-          await pumpClean(tester, entry, config);
-          await check?.call(tester, entry);
-          await unmountAndDrain(tester);
-          handle?.dispose();
+          try {
+            await pumpClean(tester, entry, config);
+            await check?.call(tester, entry);
+            await unmountAndDrain(tester);
+          } finally {
+            handle?.dispose();
+          }
         },
       );
     }

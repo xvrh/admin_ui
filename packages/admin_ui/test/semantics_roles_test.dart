@@ -1,5 +1,5 @@
 import 'package:admin_ui/admin_ui.dart';
-import 'package:admin_ui/src/common/ui/alert_role.dart';
+import 'package:admin_ui/src/common/ui/web_roles.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,7 +88,7 @@ void main() {
   late SemanticsHandle handle;
   setUp(() => handle = SemanticsBinding.instance.ensureSemantics());
   tearDown(() {
-    debugAlertRoleAnnounces = null;
+    debugWebRolesAreRead = null;
     handle.dispose();
   });
 
@@ -110,8 +110,11 @@ void main() {
       expect(data.value, '62');
       expect(data.minValue, '0');
       expect(data.maxValue, '100');
-      // The caption is the bar's name, not a second thing to read.
+      // The caption is the bar's name and the percent its value, not two
+      // more things to read.
       expect(_labelled('cover.jpg'), [bar]);
+      expect(find.text('62%'), findsOneWidget);
+      expect(_labelled('62%'), isEmpty);
     });
 
     testWidgets('semanticLabel names a bar with no caption, and one whose '
@@ -149,6 +152,31 @@ void main() {
       expect(_withRole(SemanticsRole.progressBar), isEmpty);
       final caption = _labelled('Uploading…').single;
       expect(caption.getSemanticsData().role, SemanticsRole.none);
+    });
+
+    testWidgets('with no value, semanticLabel is the name read, in the '
+        "caption's place", (tester) async {
+      for (final reduced in [false, true]) {
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            FakeAccessibilityFeatures(disableAnimations: reduced);
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
+        await tester.pumpWidget(
+          _host(
+            const ProgressBar(
+              value: null,
+              label: 'cover.jpg',
+              semanticLabel: 'Uploading cover.jpg',
+            ),
+          ),
+        );
+        expect(find.text('cover.jpg'), findsOneWidget);
+        expect(_labelled('cover.jpg'), isEmpty, reason: 'reduced: $reduced');
+        final name = _labelled('Uploading cover.jpg').single;
+        expect(name.getSemanticsData().role, SemanticsRole.none);
+        await tester.pumpWidget(const SizedBox());
+      }
     });
 
     testWidgets('an upload row names its bar by the file', (tester) async {
@@ -209,7 +237,7 @@ void main() {
 
     testWidgets('where the role itself is read out, the words are no live '
         'region: the message is said once', (tester) async {
-      debugAlertRoleAnnounces = true;
+      debugWebRolesAreRead = true;
       await tester.pumpWidget(
         _host(const Alert('Check your password.', severity: Severity.danger)),
       );
@@ -293,7 +321,7 @@ void main() {
 
     testWidgets('where the role itself is read out, a danger toast is said '
         'once', (tester) async {
-      debugAlertRoleAnnounces = true;
+      debugWebRolesAreRead = true;
       await show(
         tester,
         const Toast('The page could not be saved.', severity: Severity.danger),
@@ -326,31 +354,72 @@ void main() {
     });
   });
 
-  group('TabPanel', () {
-    testWidgets('is a tab panel named by its tab, its content nodes of their '
-        'own', (tester) async {
+  group('Menu', () {
+    testWidgets('an open menu is a menu of menu items', (tester) async {
       await tester.pumpWidget(
         _host(
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Tabs(
-                tabs: const [TabItem('Content'), TabItem('SEO')],
-                selected: 1,
-                onChanged: (_) {},
-              ),
-              const TabPanel(label: 'SEO', child: Text('Meta title')),
+          Menu(
+            entries: [
+              MenuItem('Edit', onSelect: () {}),
+              MenuItem('Delete', danger: true, onSelect: () {}),
             ],
+            builder: (context, controller) =>
+                Button('Actions', onPressed: controller.toggle),
           ),
         ),
       );
+      expect(_withRole(SemanticsRole.menu), isEmpty);
+      await tester.tap(find.text('Actions'));
+      await tester.pumpAndSettle();
+
+      final menu = _withRole(SemanticsRole.menu).single;
+      final items = _withRole(SemanticsRole.menuItem);
+      expect(items, hasLength(2));
+      for (final item in items) {
+        expect(_isUnder(item, menu), isTrue);
+      }
+    });
+  });
+
+  group('TabPanel', () {
+    Widget tabs() => _host(
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Tabs(
+            tabs: const [TabItem('Content'), TabItem('SEO')],
+            selected: 1,
+            onChanged: (_) {},
+          ),
+          const TabPanel(label: 'SEO', child: Text('Meta title')),
+        ],
+      ),
+    );
+
+    testWidgets('where the role is read, is a tab panel named by its tab, '
+        'its content nodes of their own', (tester) async {
+      debugWebRolesAreRead = true;
+      await tester.pumpWidget(tabs());
       final panel = _withRole(SemanticsRole.tabPanel).single;
       expect(panel.getSemanticsData().label, 'SEO');
       expect(tester.getSemantics(find.text('Meta title')).parent, panel);
     });
 
+    testWidgets('where no role is read, adds no node: a named container '
+        'would be one more stop', (tester) async {
+      await tester.pumpWidget(tabs());
+      expect(_withRole(SemanticsRole.tabPanel), isEmpty);
+      // The tab is the one node named after it.
+      expect(_labelled('SEO'), [tester.getSemantics(find.text('SEO'))]);
+      expect(
+        tester.getSemantics(find.text('Meta title')).getSemanticsData().label,
+        'Meta title',
+      );
+    });
+
     testWidgets('the asset picker shows one panel, named by the tab it is '
         'on', (tester) async {
+      debugWebRolesAreRead = true;
       tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -379,8 +448,9 @@ void main() {
   });
 
   group('Shell', () {
-    testWidgets('the page is the main landmark, beside the navigation and '
-        'under the top bar', (tester) async {
+    testWidgets('where the role is read, the page is the main landmark, '
+        'beside the navigation and under the top bar', (tester) async {
+      debugWebRolesAreRead = true;
       await tester.pumpWidget(_frame(_shell()));
       final main = _withRole(SemanticsRole.main).single;
       expect(main.getSemanticsData().label, 'Main content');
@@ -391,7 +461,15 @@ void main() {
       expect(_isUnder(main, navigation), false);
     });
 
+    testWidgets('where no role is read, the page is no named container: it '
+        'would be a stop the size of the page', (tester) async {
+      await tester.pumpWidget(_frame(_shell()));
+      expect(_withRole(SemanticsRole.main), isEmpty);
+      expect(_labelled('Main content'), isEmpty);
+    });
+
     testWidgets('the landmark is named in the app\'s language', (tester) async {
+      debugWebRolesAreRead = true;
       for (final (locale, name) in const [
         (Locale('fr'), 'Contenu principal'),
         (Locale('ar'), 'المحتوى الرئيسي'),
@@ -407,6 +485,7 @@ void main() {
 
     testWidgets('a shell shown inside another\'s page is no landmark of its '
         'own', (tester) async {
+      debugWebRolesAreRead = true;
       await tester.pumpWidget(
         _frame(
           _shell(
@@ -430,6 +509,7 @@ void main() {
     testWidgets('two shells in one window are two named landmarks', (
       tester,
     ) async {
+      debugWebRolesAreRead = true;
       await tester.pumpWidget(
         _frame(
           const Row(
@@ -461,6 +541,54 @@ void main() {
         ),
       );
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('mainLandmark: false leaves the landmark to the app, which '
+        'the framework lets mark its own inside the page', (tester) async {
+      debugWebRolesAreRead = true;
+      Widget app({required bool mainLandmark}) => _frame(
+        Shell(
+          mainLandmark: mainLandmark,
+          child: Semantics(
+            container: true,
+            role: SemanticsRole.main,
+            child: const Center(child: Text('The page')),
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(app(mainLandmark: false));
+      expect(tester.takeException(), isNull);
+      expect(_withRole(SemanticsRole.main), hasLength(1));
+      expect(_labelled('Main content'), isEmpty);
+
+      // With the shell's own, the app's is a main landmark inside another:
+      // what the parameter is for.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpWidget(app(mainLandmark: true));
+      expect(
+        tester.takeException(),
+        isA<FlutterError>().having(
+          (error) => error.message,
+          'message',
+          contains('should not contained within any other landmark'),
+        ),
+      );
+      await tester.pumpWidget(const SizedBox());
+      tester.takeException();
+    });
+
+    testWidgets('the page keeps its state as mainLandmark changes', (
+      tester,
+    ) async {
+      debugWebRolesAreRead = true;
+      Widget app({required bool mainLandmark}) =>
+          _frame(Shell(mainLandmark: mainLandmark, child: const TextField()));
+      await tester.pumpWidget(app(mainLandmark: true));
+      await tester.enterText(find.byType(TextField), 'kept');
+      await tester.pumpWidget(app(mainLandmark: false));
+      expect(find.text('kept'), findsOneWidget);
+      expect(_withRole(SemanticsRole.main), isEmpty);
     });
   });
 

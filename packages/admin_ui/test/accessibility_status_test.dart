@@ -75,11 +75,56 @@ void main() {
   test('every role in use is asserted by a test', () {
     final tests = [
       for (final file in Directory('$root/test').listSync().whereType<File>())
-        if (file.path.endsWith('_test.dart')) file.readAsStringSync(),
+        if (file.path.endsWith('_test.dart'))
+          gen.stripComments(file.readAsStringSync()),
     ];
     expect([
       for (final role in gen.rolesInUse(_sources(root)).keys)
-        if (!tests.any((test) => test.contains('SemanticsRole.$role'))) role,
+        if (!tests.any(_asserts(role).hasMatch)) role,
     ], isEmpty);
   });
+
+  test('a role named without being asserted does not count', () {
+    final alert = _asserts('alert');
+    for (final asserted in [
+      'expect(node.getSemanticsData().role, SemanticsRole.alert);',
+      'expect(\n  node.role,\n  SemanticsRole.alert,\n);',
+      'final alert = _withRole(SemanticsRole.alert).single;',
+      'expect(_withRole(SemanticsRole.alert), hasLength(1));',
+    ]) {
+      expect(alert.hasMatch(asserted), isTrue, reason: asserted);
+    }
+    for (final named in [
+      'expect(_withRole(SemanticsRole.alert), isEmpty);',
+      'expect(node.role, isNot(SemanticsRole.alert));',
+      'Semantics(role: SemanticsRole.alert, child: child)',
+      'while (node.role != SemanticsRole.alert) {}',
+      'expect(node.role, SemanticsRole.alertDialog);',
+    ]) {
+      expect(alert.hasMatch(named), isFalse, reason: named);
+    }
+  });
+
+  test('a role a comment names is not in use', () {
+    expect(
+      gen.rolesInUse({
+        'a.dart':
+            '/// See [SemanticsRole.alert].\n'
+            '// SemanticsRole.status\n'
+            '/* SemanticsRole.list */\n'
+            'const role = SemanticsRole.main;\n',
+      }).keys,
+      ['main'],
+    );
+  });
 }
+
+/// Matches test code that asserts a node has [role]: an `expect` of a
+/// node's role against it, or the nodes with the role found, in
+/// `test/semantics_roles_test.dart`'s way, and not expected to be none.
+/// Naming the role is not enough: a test may build with it, or assert its
+/// absence.
+RegExp _asserts(String role) => RegExp(
+  '\\brole,\\s*SemanticsRole\\.$role\\b'
+  '|_withRole\\(SemanticsRole\\.$role\\)(?!,\\s*isEmpty)',
+);
