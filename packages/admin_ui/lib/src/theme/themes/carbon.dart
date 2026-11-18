@@ -15,6 +15,7 @@ import '../sizes.dart';
 import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
+import '../tabs_style.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
@@ -362,5 +363,15 @@ final carbonTheme = AdminTheme.from(
     trackHeight: 2,
     thumbSize: 14,
     ink: SelectionInk.foreground,
+  ),
+  // Tabs, line: body-compact-01 in $text-secondary over a 2px $border-subtle
+  // rule, the selected one heading-compact-01 in $text-primary over 2px of
+  // $border-interactive; 40 tall at md
+  tabs: const AdminTabsStyle(
+    selectedInk: TabsSelectedInk.foreground,
+    restInk: TabsRestInk.secondary,
+    labelWeight: FontWeight.w400,
+    selectedLabelWeight: FontWeight.w600,
+    rule: TabsRule.indicator,
   ),
 );

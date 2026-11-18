@@ -12,6 +12,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
+import '../../theme/tabs_style.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
 import 'focus_ring.dart';
@@ -180,15 +181,16 @@ class Tabs extends StatefulWidget {
   /// other controls).
   final bool baseline;
 
-  /// The strip's height: 40 at medium, the default; 32 with tighter tab
-  /// padding at small, for a compact strip (e.g. a saved-views row) rather
-  /// than top-level page navigation; 48 at large.
+  /// The strip's height: in the kit's own theme 40 at medium, the default;
+  /// 32 with tighter tab padding at small, for a compact strip (e.g. a
+  /// saved-views row) rather than top-level page navigation; 48 at large.
   ///
-  /// These are strip heights, the same in every theme, not the theme's
-  /// control heights (`context.sizes`) that a [Button] or a [Segmented] of
-  /// the same size takes: a strip sits on its own baseline rather than in a
-  /// row of controls, and a theme's large control is often no taller than
-  /// its medium strip.
+  /// These are strip heights, which a theme sets in its [AdminTabsStyle]
+  /// (`context.tabsStyle.heightOf(size)`), not the theme's control heights
+  /// (`context.sizes`) that a [Button] or a [Segmented] of the same size
+  /// takes: a strip sits on its own baseline rather than in a row of
+  /// controls, and a theme's large control is often no taller than its
+  /// medium strip.
   final ControlSize size;
 
   /// When set, a scrolling strip too long for its width ends in a menu of
@@ -546,10 +548,18 @@ class _TabsState extends State<Tabs> {
     if (!widget.baseline) return strip;
     switch (widget.variant) {
       case TabsVariant.line:
+        // The rule lies under the strip's last pixels, where the selected
+        // tab's indicator paints over it.
+        final rule = switch (context.tabsStyle.rule) {
+          TabsRule.hairline => context.stroke.hairline,
+          TabsRule.indicator => _Tab.indicatorThicknessOf(context),
+          TabsRule.none => 0.0,
+        };
+        if (rule == 0) return strip;
         return DecoratedBox(
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(color: context.colors.tabDivider),
+              bottom: BorderSide(color: context.colors.tabDivider, width: rule),
             ),
           ),
           child: strip,
@@ -652,13 +662,10 @@ class _Tab extends StatefulWidget {
     required this.onTap,
   });
 
-  /// The tab's height at [size], before the label's growth at a large text
-  /// size: a strip height, fixed across themes (see [Tabs.size]).
-  static double heightFor(ControlSize size) => switch (size) {
-    ControlSize.small => 32,
-    ControlSize.medium => 40,
-    ControlSize.large => 48,
-  };
+  /// The selected tab's indicator's thickness: the theme's tabs style's, or
+  /// the indicator stroke.
+  static double indicatorThicknessOf(BuildContext context) =>
+      context.tabsStyle.indicatorThickness ?? context.stroke.indicator;
 
   /// The inset of the tab's content from either side at [size].
   static double paddingFor(ControlSize size) =>
@@ -737,7 +744,7 @@ class _TabState extends State<_Tab> {
       builder: (context, states) => SizedBox(
         // Taller by as much as the label grows at a large text size.
         height:
-            _Tab.heightFor(widget.size) +
+            context.tabsStyle.heightOf(widget.size) +
             textGrowthOf(context, context.type.button),
         child: _content(context, states),
       ),
@@ -762,18 +769,64 @@ class _TabState extends State<_Tab> {
   Widget _content(BuildContext context, Set<WidgetState> states) {
     final enabled = widget.item.enabled;
     final hovered = enabled && states.contains(WidgetState.hovered);
-    // A line tab's selected label takes the primary (it's the only cue); an
-    // enclosed tab's surface already marks it, so its label stays foreground.
+    final style = context.tabsStyle;
+    // A line tab's selected label takes the theme's ink for it, the accent
+    // where the label is the cue and the foreground where the indicator is;
+    // an enclosed tab's surface already marks it, so its label stays
+    // foreground.
     final selectedColor = widget.variant == TabsVariant.enclosed
         ? context.colors.foreground
-        : context.colors.primaryText;
+        : style.selectedInkOf(context.colors);
     final color = !enabled
         ? context.colors.foregroundSubtle
         : widget.selected
         ? selectedColor
-        : (hovered
-              ? context.colors.foregroundSecondary
-              : context.colors.foregroundMuted);
+        : style.restInkOf(context.colors, hovered: hovered);
+    // Every label at the theme's weight, the selected one at its own where
+    // the theme has one. The label's box is as wide as the heavier of the
+    // two, so selecting a tab never moves the others.
+    final type = context.type;
+    TextStyle weighed(FontWeight? weight) =>
+        weight == null ? type.button : type.weighted(type.button, weight);
+    final restWeight = style.labelWeight;
+    final selectedWeight = style.selectedLabelWeight ?? restWeight;
+    final labelStyle = weighed(widget.selected ? selectedWeight : restWeight)
+        .copyWith(color: color);
+    final overflow = widget.truncates
+        ? TextOverflow.ellipsis
+        : TextOverflow.visible;
+    Widget text = Text(
+      widget.item.label,
+      maxLines: 1,
+      softWrap: false,
+      overflow: overflow,
+      style: labelStyle,
+    );
+    if (selectedWeight != restWeight) {
+      final heavier =
+          (selectedWeight ?? type.button.fontWeight ?? FontWeight.w400).value >=
+              (restWeight ?? type.button.fontWeight ?? FontWeight.w400).value
+          ? selectedWeight
+          : restWeight;
+      text = Stack(
+        alignment: AlignmentDirectional.center,
+        children: [
+          ExcludeSemantics(
+            child: Opacity(
+              opacity: 0,
+              child: Text(
+                widget.item.label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: overflow,
+                style: weighed(heavier),
+              ),
+            ),
+          ),
+          text,
+        ],
+      );
+    }
 
     final menu = enabled ? widget.item.menu : null;
     final padding = _Tab.paddingFor(widget.size);
@@ -794,17 +847,7 @@ class _TabState extends State<_Tab> {
             Icon(widget.item.icon, size: context.iconSizes.md, color: color),
             const Gap(AdminSpacing.sm),
           ],
-          Flexible(
-            child: Text(
-              widget.item.label,
-              maxLines: 1,
-              softWrap: false,
-              overflow: widget.truncates
-                  ? TextOverflow.ellipsis
-                  : TextOverflow.visible,
-              style: context.type.button.copyWith(color: color),
-            ),
-          ),
+          Flexible(child: text),
           if (widget.item.trailing != null) ...[
             const Gap(AdminSpacing.sm),
             widget.item.trailing!,
@@ -847,7 +890,7 @@ class _TabState extends State<_Tab> {
 
     return widget.variant == TabsVariant.enclosed
         ? _enclosed(label)
-        : _underlined(label);
+        : _underlined(label, inset: padding);
   }
 
   /// How far in from the tab's edge the focus ring's box sits: as far as the
@@ -897,16 +940,36 @@ class _TabState extends State<_Tab> {
     );
   }
 
-  Widget _underlined(Widget label) {
+  /// A line tab: [label] over the indicator, which the selected tab draws
+  /// in the accent, as wide as the tab or, [inset] in from either side, as
+  /// its content, with the ends the theme gives it.
+  Widget _underlined(Widget label, {required double inset}) {
+    final style = context.tabsStyle;
+    final thickness = _Tab.indicatorThicknessOf(context);
+    final round = Radius.circular(thickness);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(child: label),
         Container(
-          height: context.stroke.indicator,
-          color: widget.selected
-              ? context.colors.controlAccent
-              : Colors.transparent,
+          height: thickness,
+          margin: EdgeInsets.symmetric(
+            horizontal: style.indicatorWidth == TabsIndicatorWidth.label
+                ? inset
+                : 0,
+          ),
+          decoration: BoxDecoration(
+            color: widget.selected
+                ? context.colors.controlAccent
+                : Colors.transparent,
+            borderRadius: switch (style.indicatorShape) {
+              TabsIndicatorShape.square => null,
+              TabsIndicatorShape.roundedTop => BorderRadius.vertical(
+                top: round,
+              ),
+              TabsIndicatorShape.pill => BorderRadius.all(round),
+            },
+          ),
         ),
       ],
     );

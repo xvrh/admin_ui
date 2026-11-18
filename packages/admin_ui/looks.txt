@@ -237,6 +237,17 @@ slider.thumbSize: 18
 slider.thumbRing: 2
 slider.rail: border
 slider.ink: accent
+tabs.heightSmall: 32
+tabs.heightMedium: 40
+tabs.heightLarge: 48
+tabs.selectedInk: accent
+tabs.restInk: muted
+tabs.labelWeight: null
+tabs.selectedLabelWeight: null
+tabs.indicatorWidth: tab
+tabs.indicatorShape: square
+tabs.indicatorThickness: null
+tabs.rule: hairline
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -523,6 +534,17 @@ slider.thumbSize: 44
 slider.thumbRing: 2
 slider.rail: soft
 slider.ink: accent
+tabs.heightSmall: 40
+tabs.heightMedium: 48
+tabs.heightLarge: 56
+tabs.selectedInk: accent
+tabs.restInk: secondary
+tabs.labelWeight: w500
+tabs.selectedLabelWeight: null
+tabs.indicatorWidth: label
+tabs.indicatorShape: roundedTop
+tabs.indicatorThickness: 3
+tabs.rule: hairline
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -806,6 +828,17 @@ slider.thumbSize: 16
 slider.thumbRing: 1
 slider.rail: border
 slider.ink: accent
+tabs.heightSmall: 32
+tabs.heightMedium: 36
+tabs.heightLarge: 40
+tabs.selectedInk: foreground
+tabs.restInk: muted
+tabs.labelWeight: w500
+tabs.selectedLabelWeight: null
+tabs.indicatorWidth: tab
+tabs.indicatorShape: square
+tabs.indicatorThickness: null
+tabs.rule: none
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1152,6 +1185,17 @@ slider.thumbSize: 14
 slider.thumbRing: 2
 slider.rail: border
 slider.ink: accent
+tabs.heightSmall: 38
+tabs.heightMedium: 46
+tabs.heightLarge: 56
+tabs.selectedInk: accent
+tabs.restInk: foreground
+tabs.labelWeight: w400
+tabs.selectedLabelWeight: null
+tabs.indicatorWidth: label
+tabs.indicatorShape: square
+tabs.indicatorThickness: null
+tabs.rule: hairline
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1439,6 +1483,17 @@ slider.thumbSize: 20
 slider.thumbRing: 4
 slider.rail: control
 slider.ink: accent
+tabs.heightSmall: 32
+tabs.heightMedium: 44
+tabs.heightLarge: 52
+tabs.selectedInk: foreground
+tabs.restInk: secondary
+tabs.labelWeight: w400
+tabs.selectedLabelWeight: w600
+tabs.indicatorWidth: label
+tabs.indicatorShape: pill
+tabs.indicatorThickness: null
+tabs.rule: none
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 
@@ -1755,6 +1810,17 @@ slider.thumbSize: 14
 slider.thumbRing: 2
 slider.rail: border
 slider.ink: foreground
+tabs.heightSmall: 32
+tabs.heightMedium: 40
+tabs.heightLarge: 48
+tabs.selectedInk: foreground
+tabs.restInk: secondary
+tabs.labelWeight: w400
+tabs.selectedLabelWeight: w600
+tabs.indicatorWidth: tab
+tabs.indicatorShape: square
+tabs.indicatorThickness: null
+tabs.rule: indicator
 breakpoints.medium: 600
 breakpoints.expanded: 1200
 

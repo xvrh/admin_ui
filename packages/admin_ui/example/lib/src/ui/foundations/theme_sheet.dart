@@ -6,8 +6,8 @@ import '../../preview_shell.dart';
 import '../demo_kit.dart';
 
 /// The controls a theme's anatomy tokens draw, in every shipped theme at
-/// once: a switch, a checkbox, a radio and a slider, each card in its own
-/// theme's tokens, in the preview's mode. A change to one theme's anatomy
+/// once: a tab strip, a switch, a checkbox, a radio and a slider, each card
+/// in its own theme's tokens, in the preview's mode. A change to one theme's anatomy
 /// shows here beside the themes it left alone, whatever theme the preview
 /// itself is in.
 class ThemeSheetDemo extends StatelessWidget {
@@ -60,6 +60,12 @@ class _ThemeCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(name, style: context.type.sectionLabel),
+          const Gap(AdminSpacing.sm),
+          Tabs(
+            tabs: const [TabItem('Details'), TabItem('Orders')],
+            selected: 0,
+            onChanged: (_) {},
+          ),
           const Gap(AdminSpacing.md),
           Wrap(
             spacing: AdminSpacing.md,

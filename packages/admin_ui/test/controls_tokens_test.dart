@@ -156,7 +156,11 @@ void main() {
             matching: find.byType(Container),
           ),
         )
-        .where((c) => c.color == _tokens.palette.controlAccent);
+        .where((c) {
+          final decoration = c.decoration;
+          return decoration is BoxDecoration &&
+              decoration.color == _tokens.palette.controlAccent;
+        });
     expect(bars, isNotEmpty);
     for (final bar in bars) {
       expect(bar.constraints?.maxHeight, _stroke.indicator);
