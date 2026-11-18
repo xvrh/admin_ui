@@ -16,30 +16,57 @@ import '../table_metrics.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
-/// Microsoft Fluent (light) — communication blue, warm neutrals, low radii.
+// Audited on 18 November 2026 against Fluent 2 for the web: the
+// webLightTheme and webDarkTheme of @fluentui/react-components 9.75.2. The
+// segmented control is the Windows Community Toolkit's Segmented, since
+// React v9 ships none.
+//
+// The kit's rules move little here: a control's outline is Fluent's own
+// colorNeutralStrokeAccessible, and the brand reaches its targets as
+// authored, the dark compound brand standing in for the brand background on
+// a checked control.
+// - A placeholder is the muted text's grey, #616161, where Fluent's is
+//   colorNeutralForeground4, #707070.
+// - A disabled button's label is held to 2.5:1, where
+//   colorNeutralForegroundDisabled is #BDBDBD.
+// - The status warning is turned in hue, to stand apart from the danger: see
+//   the palettes.
+// - The light chart colours are held to 3:1.
+
+/// Microsoft Fluent (light) — communication blue, Fluent 2's neutral greys,
+/// low radii. The page is colorNeutralBackground2, cards and inputs
+/// colorNeutralBackground1 above it, and the wells colorNeutralBackground3.
 const fluentPalette = AdminPalette(
   primary: Color(0xFF0F6CBD),
   primaryStrong: Color(0xFF0C5A9E),
   primarySubtle: Color(0xFFEBF3FC),
   primaryFaint: Color(0xFFF5FAFE),
   surface: Color(0xFFFFFFFF),
-  background: Color(0xFFFAF9F8),
-  surfaceMuted: Color(0xFFF3F2F1),
+  background: Color(0xFFFAFAFA), // colorNeutralBackground2
+  surfaceMuted: Color(0xFFF5F5F5), // colorNeutralBackground3
   foreground: Color(0xFF242424),
   foregroundSecondary: Color(0xFF424242),
   foregroundMuted: Color(0xFF616161),
-  foregroundSubtle: Color(0xFF8A8886),
-  foregroundFaint: Color(0xFFC8C6C4),
-  border: Color(0xFFE1DFDD),
-  borderSubtle: Color(0xFFEDEBE9),
+  foregroundSubtle: Color(0xFF707070), // colorNeutralForeground4
+  foregroundFaint: Color(0xFFBDBDBD), // colorNeutralForegroundDisabled
+  border: Color(0xFFD1D1D1), // colorNeutralStroke1: a Button's and Input's
+  borderSubtle: Color(0xFFE0E0E0), // colorNeutralStroke2: a divider
   success: Color(0xFF107C10),
-  warning: Color(0xFFFFB900),
+  // Fluent 2's status warning is an orange, colorStatusWarningBackground3
+  // #F7630C under colorStatusWarningForeground1 #BC4B09, close in hue to the
+  // cranberry danger. The kit keeps its four status accents apart in hue, so
+  // that a changed line is told from a removed one without their words: each
+  // is turned 8° toward yellow, the least that parts them, and the text then
+  // deepened to 4.5:1 on its tint.
+  warning: Color(0xFFF7820C),
   danger: Color(0xFFC50F1F),
-  warningText: Color(0xFF8A5300),
+  warningText: Color(0xFFAA5908),
   highlight: Color(0xFFFFF4CE),
   modifiedFill: Color(0xFFFDF6E3),
   tabDivider: Color(0xFFE1DFDD),
   info: Color(0xFF0078D4),
+  primaryHover: Color(0xFF115EA3), // colorBrandBackgroundHover
+  primaryActive: Color(0xFF0C3B5E), // colorBrandBackgroundPressed
   controlBorder: Color(0xFF616161), // colorNeutralStrokeAccessible
   focusRing: Color(0xFF000000), // colorStrokeFocus2
   chart: _chartLight,
@@ -66,12 +93,14 @@ const fluentDarkPalette = AdminPalette(
   foregroundMuted: Color(0xFFADADAD),
   foregroundSubtle: Color(0xFF858585),
   foregroundFaint: Color(0xFF5C5C5C),
-  border: Color(0xFF404040),
-  borderSubtle: Color(0xFF333333),
-  success: Color(0xFF6BB700),
-  warning: Color(0xFFFCE100),
-  danger: Color(0xFFF1707B),
-  warningText: Color(0xFFD9B400),
+  border: Color(0xFF666666), // colorNeutralStroke1
+  borderSubtle: Color(0xFF525252), // colorNeutralStroke2
+  success: Color(0xFF54B054), // colorStatusSuccessForeground1
+  // colorStatusWarningForeground1, #FAA06B, turned 7° toward yellow, as the
+  // light palette's is turned, to stand apart from the danger in hue.
+  warning: Color(0xFFFAB16B),
+  danger: Color(0xFFDC626D), // colorStatusDangerForeground1
+  warningText: Color(0xFFFAB16B),
   highlight: Color(0xFF332D17),
   modifiedFill: Color(0xFF2A231C),
   tabDivider: Color(0xFF484644),
@@ -173,7 +202,7 @@ final fluentTheme = AdminTheme.from(
   radii: const AdminRadii(
     radiusSmall: 2,
     radius: 4,
-    radiusLarge: 8,
+    radiusLarge: 4, // a Card's borderRadiusMedium
     radiusMenu: 4, // borderRadiusMedium
     radiusDialog: 8, // borderRadiusXLarge
     radiusPill: 4,
@@ -189,8 +218,18 @@ final fluentTheme = AdminTheme.from(
   ),
   // a 2px colorStrokeFocus2 ring with 1px of colorStrokeFocus1 inside it
   focus: const AdminFocusSpec(width: 2, offset: 0, innerWidth: 1),
-  // Fluent 2 small / medium / large controls
-  sizes: const AdminControlSizes(small: 24, medium: 32, large: 40),
+  // Fluent 2 small / medium / large controls, and a medium Input's 20px
+  // icon. Fluent sets it spacingHorizontalXS, 4, from the text; 6 is the
+  // least that leaves the kit's 24px slot for a field's trailing action.
+  sizes: const AdminControlSizes(
+    small: 24,
+    medium: 32,
+    large: 40,
+    fieldIcon: 20,
+    fieldIconGap: 6,
+  ),
+  // the 20px icon of a medium Button, MenuItem and Tab
+  iconSizes: const AdminIconSizes(md: 20),
   // Fluent 2 Table: small (34, on the grid) and medium rows, a header as tall
   // as a row, spacingHorizontalS cells, a 44 selection cell
   table: const AdminTableMetrics(
@@ -213,8 +252,14 @@ final fluentTheme = AdminTheme.from(
     emphasized: Cubic(0.8, 0, 0.2, 1),
   ),
   // A focused input's 2px colorCompoundBrandStroke underline; an invalid one
-  // keeps its 1px red border.
-  stroke: const AdminStroke(fieldFocus: 2, fieldError: 1),
+  // keeps its 1px red border. A Checkbox's and Radio's strokeWidthThin
+  // outline, and a Tab's strokeWidthThicker indicator.
+  stroke: const AdminStroke(
+    fieldFocus: 2,
+    fieldError: 1,
+    controlStrong: 1,
+    indicator: 3,
+  ),
   elevation: _elevation(
     ambient: const Color(0x1F000000),
     key: const Color(0x24000000),
@@ -255,8 +300,9 @@ final fluentTheme = AdminTheme.from(
   ),
   // Tooltip: withArrow, maxWidth 240px, a 6px arrowHeight
   overlay: const AdminOverlayStyle(tooltipArrow: true, tooltipMaxWidth: 240),
-  // Segmented: an outlined track, the selected item raised in
-  // ControlFillColorDefault over a short accent pill, regular labels
+  // the Windows Community Toolkit's Segmented: an outlined track, the
+  // selected item raised in ControlFillColorDefault over a short accent
+  // pill, regular labels
   segmented: const AdminSegmentedStyle(
     inset: 2,
     trackOutline: true,

@@ -14,7 +14,7 @@ each with a light and a dark mode:
 |---|---|---|
 | Iris | the kit's own look (the default) | Inter (bundle it as for shadcn) |
 | Material | Material 3 | Roboto |
-| shadcn | shadcn/ui and Radix | Inter |
+| shadcn | shadcn/ui: the zinc base colour, in the Vega (new-york) style | Inter |
 | Ant | Ant Design | the platform's |
 | Fluent | Fluent 2 | Segoe UI, where the system has it |
 | Carbon | Carbon | IBM Plex Sans |
@@ -1057,8 +1057,8 @@ the body's in shadcn and Ant, whose forms set both at body size. `fieldText`'s
 line fits every theme's small control height (24 in Ant and Fluent).
 
 `mono` and `monoSmall` use `AdminTypeSpec.monoFontFamily` (`monospace`, with
-`monoFontFamilyFallback` for platforms without one), which the font
-resolver never sees. Change a weight with `context.type.weighted(style, weight)`:
+`monoFontFamilyFallback` for platforms without one; `IBM Plex Mono` in
+Carbon, where the app bundles it), which the font resolver never sees. Change a weight with `context.type.weighted(style, weight)`:
 it keeps a mono style in the monospace font.
 
 The ramp also carries the display, headline and `titleLarge` steps of the
@@ -1082,7 +1082,7 @@ something leaving, and `emphasized` for a larger move. Read them through
 | Iris | 120 / 180 / 240ms | 900ms | ease-out cubic · ease-out cubic · ease-in cubic |
 | Material | 100 / 200 / 300ms (short2, short4, medium2) | 900ms | standard · emphasized decelerate · emphasized accelerate |
 | shadcn | 150 / 200 / 300ms | 1000ms | ease-in-out · ease-out · ease-in |
-| Ant | 100 / 200 / 300ms (`motionDurationFast`, `Mid`, `Slow`) | 700ms | `motionEaseInOut` · `motionEaseOut` · `motionEaseIn` |
+| Ant | 100 / 200 / 300ms (`motionDurationFast`, `Mid`, `Slow`) | 700ms | `motionEaseInOut` · `motionEaseOut` · ease-in cubic, which Ant has no token for |
 | Fluent | 100 / 200 / 250ms (faster, normal, gentle) | 900ms | easy ease · decelerate mid · accelerate mid |
 | Carbon | 110 / 150 / 240ms (fast-02, moderate-01, moderate-02) | 1500ms | productive standard · entrance · exit |
 
@@ -1104,7 +1104,8 @@ duration.
 `AdminStroke` sets line widths, read through `context.stroke`: `hairline`
 (dividers, card edges) and `control` (a resting outline) are 1,
 `controlStrong` (an unchecked checkbox or radio) 1.5 and `indicator` (a
-selection bar or underline) 2. A field's focused and invalid outlines follow
+selection bar or underline) 2. Material draws `controlStrong` at 2; Fluent
+draws it at 1, and its `indicator` at 3. A field's focused and invalid outlines follow
 each design system; a focused invalid field takes the wider of the two.
 `resolveFieldChrome` draws them in the theme's field anatomy (see
 [Anatomy](#anatomy)); `fieldBorderSide(palette, states, stroke:
@@ -1127,7 +1128,8 @@ field never outweighs a focused one.
 `AdminIconSizes` sets glyph sizes, read through `context.iconSizes`: `xs` 12
 (in a badge or chip), `sm` 14 (beside small text), `md` 16 (in a control or
 beside body text), `lg` 20 (leading a larger element) and `xl` 24 (an empty
-state). Every shipped theme uses these.
+state). Every shipped theme uses these but Fluent, whose `md` is 20, the
+icon of its buttons, menu items and tabs.
 
 `AdminStateLayer` sets the opacity an interaction state lays its colour at:
 `palette.stateLayer`, from which the palette derives `hoverOverlay`,
@@ -1164,7 +1166,7 @@ a box.
 |---|---|---|---|
 | Iris | outlined, 1.5px focus ring | centred, `height / 2 − 4` padding | 240 / 64 / 36 / 56 |
 | Material | outlined, 4dp corner, 2dp primary on focus | stadium, 24dp padding (16 on the icon side), w500, outlined in `controlBorder`, a primary text button | 360 / 80 / 56 / 64, a stadium pill |
-| shadcn | outlined, a 3px ring at 50% | faded to 50% when disabled | 240 / 64 / 36 / 56 |
+| shadcn | outlined, a 3px ring at 50% | 12 / 16 / 24px padding by size (10 / 12 / 16 on the icon side), faded to 50% when disabled | 256 / 48 / 32 / 56, the #18181B sidebar in dark mode |
 | Ant | outlined, 6px corner, colorPrimary focus with a 2px ring, a primary hover | w400, 16px padding, a primary hover | 200 / 80 / 40 / 64, the dark #001529 sider in light mode |
 | Fluent | underlined, a 2px brand underline on focus | radius 4, w600, 12px padding, 96px wide at least | 260 / 48 / 40 / 48, a 4px bar |
 | Carbon | filled, square, a 2px inset `$focus` | square, label at the start and icon at the end (16 / 64), w400, a Gray 80 filled secondary, a `$link-primary` ghost | 256 / 48 / 32 / 48, a 3px edge rule, the g100 header in both modes |
@@ -1176,11 +1178,12 @@ and wrap at 280 and 200, shadcn's has Radix's 10×5 arrow, Ant's a 16×8 one at
 250, Fluent's wraps at 240 and Carbon's at 288, both with a 12×6 arrow.
 
 Each theme also takes its design system's shadows: M3's elevation levels,
+Tailwind's `shadow-sm`, `shadow-md` and `shadow-lg` for shadcn in light mode,
 Ant's `boxShadowSecondary`, Fluent's `shadow4`, `shadow16` and `shadow64`,
 and Carbon's `0 2px 6px`. Fluent's focus ring carries a 1px `surface` band
 inside it (`AdminFocusSpec.innerWidth`). The shell's `sidebarPalette` and
-`topBarPalette` draw the frame in a scheme of its own: `carbonShellPalette`
-and `antSiderPalette`. A wide sidebar keeps to `Sidebar.maxWindowShare` of
+`topBarPalette` draw the frame in a scheme of its own: `carbonShellPalette`,
+`antSiderPalette` and `shadcnDarkSidebarPalette`. A wide sidebar keeps to `Sidebar.maxWindowShare` of
 a narrow window, down to 240, so Material's drawer narrows before the page
 does. The catalog's Foundations / Anatomy page draws the active theme's
 tokens.

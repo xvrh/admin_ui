@@ -454,6 +454,7 @@ theme.dart materialTheme
 theme.dart relativeLuminance
 theme.dart resolveFieldChrome
 theme.dart shadcnDarkPalette
+theme.dart shadcnDarkSidebarPalette
 theme.dart shadcnPalette
 theme.dart shadcnTheme
 ui.dart re-exports auth.dart

@@ -133,7 +133,8 @@ void main() {
       'Iris': AdminFocusSpec(width: 2, offset: 2),
       'Material': AdminFocusSpec(width: 3, offset: 2),
       'shadcn': AdminFocusSpec(width: 3, offset: 0),
-      'Ant': AdminFocusSpec(width: 2, offset: 2),
+      // lineWidthFocus at outlineOffset 1
+      'Ant': AdminFocusSpec(width: 3, offset: 1),
       // colorStrokeFocus2 with 1px of colorStrokeFocus1 inside
       'Fluent': AdminFocusSpec(width: 2, offset: 0, innerWidth: 1),
       'Carbon': AdminFocusSpec(width: 2, offset: -2),
@@ -142,13 +143,17 @@ void main() {
     // spread); null for the kit's defaults.
     const menuShadow = {
       'Iris': null,
-      'shadcn': null,
+      // Tailwind's shadow-md; dark mode takes the kit's dark set
+      'shadcn': (
+        [(0x1A, 4.0, 6.0, -1.0), (0x1A, 2.0, 4.0, -2.0)],
+        [(0x80, 6.0, 18.0, 0.0)],
+      ),
       // M3 level 2, in both modes
       'Material': (
         [(0x4D, 1.0, 2.0, 0.0), (0x26, 2.0, 6.0, 2.0)],
         [(0x4D, 1.0, 2.0, 0.0), (0x26, 2.0, 6.0, 2.0)],
       ),
-      // boxShadowSecondary, which the dark algorithm keeps
+      // boxShadowSecondary, kept in black in dark mode
       'Ant': (
         [
           (0x14, 6.0, 16.0, 0.0),

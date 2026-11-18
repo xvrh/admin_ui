@@ -269,11 +269,14 @@ void main() {
   });
 
   group('icon sizes', () {
-    test('one default for every shipped theme', () {
+    test('one default for every shipped theme but Fluent', () {
       for (final theme in adminThemes) {
         expect(
           theme.tokens.iconSizes,
-          const AdminIconSizes(),
+          // The 20px icon of a Fluent Button, MenuItem and Tab.
+          theme == fluentTheme
+              ? const AdminIconSizes(md: 20)
+              : const AdminIconSizes(),
           reason: theme.name,
         );
       }

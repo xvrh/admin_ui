@@ -12,6 +12,18 @@ const _ramps = {
   'Carbon': (32.0, 40.0, 48.0),
 };
 
+/// Each shipped theme's field insets: the padding at its edge, and where its
+/// text starts after a leading glyph. The kit's own, unless the design
+/// system sets the glyph or the padding.
+const _insets = {
+  'Iris': (12.0, 36.0),
+  'Material': (12.0, 40.0), // a 20dp field icon, of M3's 24
+  'shadcn': (12.0, 36.0),
+  'Ant': (12.0, 36.0),
+  'Fluent': (12.0, 38.0), // an Input's 20px icon, 6 from its text
+  'Carbon': (16.0, 40.0), // $spacing-05
+};
+
 Widget _host(AdminTokens tokens, Widget child, {double textScale = 1}) =>
     MaterialApp(
       theme: buildAppTheme(tokens),
@@ -60,9 +72,9 @@ void main() {
           [small, medium, large],
         );
         expect(dark, light);
-        // One inset for every theme: the leading text starts at 36.
-        expect(light.fieldPaddingX, 12);
-        expect(light.fieldIconInset, 36);
+        final (padding, inset) = _insets[theme.name]!;
+        expect(light.fieldPaddingX, padding);
+        expect(light.fieldIconInset, inset);
       });
     }
   });
