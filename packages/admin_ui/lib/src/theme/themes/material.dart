@@ -12,6 +12,7 @@ import '../segmented_style.dart';
 import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
+import '../slider_style.dart';
 import '../state_layer.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
@@ -335,5 +336,13 @@ final materialTheme = AdminTheme.from(
     radioMark: RadioMark.dot,
     radioDot: 10,
     outline: SelectionOutline.secondary,
+  ),
+  // Slider: a 16dp track, secondaryContainer past the handle, parted by a
+  // 4×44dp handle with 6dp either side
+  slider: const AdminSliderStyle(
+    trackHeight: 16,
+    thumb: SliderThumb.bar,
+    thumbSize: 44,
+    rail: SliderRail.soft,
   ),
 );

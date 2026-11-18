@@ -11,6 +11,7 @@ import '../segmented_style.dart';
 import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
+import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
 import '../typography.dart';
@@ -312,5 +313,14 @@ final shadcnTheme = AdminTheme.from(
     checkSize: 16,
     radioSize: 16,
     radioDot: 8,
+  ),
+  // Slider: an h-1.5 track under a size-4 thumb, bg-white inside a 1px
+  // border-primary, on shadow-sm. Its track is bg-muted, which the kit
+  // draws in the border colour: bg-muted is all but the page's
+  slider: const AdminSliderStyle(
+    trackHeight: 6,
+    thumb: SliderThumb.ringed,
+    thumbSize: 16,
+    thumbRing: 1,
   ),
 );

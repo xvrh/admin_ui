@@ -1148,10 +1148,11 @@ Anatomy tokens give each theme the shapes of its reference system, not
 only its colours: `AdminFieldStyle` (`context.fieldStyle`),
 `AdminButtonStyle` (`context.buttonStyle`), `AdminShellStyle`
 (`context.shellStyle`), `AdminOverlayStyle` (`context.overlayStyle`),
-`AdminSegmentedStyle` (`context.segmentedStyle`) and `AdminSelectionStyle`
-(`context.selectionStyle`), beside the role radii `radiusField`,
-`radiusButton` (`context.radii.button(size)`) and `radiusCheck`. A component
-reads them; it never asks which theme it is in.
+`AdminSegmentedStyle` (`context.segmentedStyle`), `AdminSelectionStyle`
+(`context.selectionStyle`) and `AdminSliderStyle` (`context.sliderStyle`),
+beside the role radii `radiusField`, `radiusButton`
+(`context.radii.button(size)`) and `radiusCheck`. A component reads them; it
+never asks which theme it is in.
 
 A field's box is `outlined` (stroked on every side), `filled` (a
 `fieldFill` box with only a bottom `fieldRule`, square at the bottom) or
@@ -1199,6 +1200,25 @@ glyph against what they are drawn on.
 | Ant | 44×22, an 18 knob | 16, corner 4 | 16, a disc around a 6 dot |
 | Fluent | 40×20, a 14 knob, outlined off | 16, corner 2 | 16, a ring around a 10 dot |
 | Carbon | 48×24, an 18 knob, `success` when on | 16, corner 2, in the foreground | 18, a ring around an 8 dot, in the foreground |
+
+`AdminSliderStyle` draws a `ValueSlider`: its `trackHeight`, its `thumb` at
+`thumbSize`, the `rail` past the thumb (`border`, `controlBorder` or
+`softFill`), and its `ink`, the accent or the `foreground`. A thumb is a
+`disc` in the ink; `ringed`, the surface colour inside a ring of the ink
+`thumbRing` wide, on the theme's small shadow; `inset`, the ink inside a
+band of the surface colour `thumbRing` wide, edged in a hairline; or a
+`bar`, M3's 4dp handle, `thumbSize` tall, which parts the track by 6dp on
+either side. The slider's row is a medium control tall, or the thumb where
+that is taller.
+
+| Theme | Track | Thumb |
+|---|---|---|
+| Iris | 4 | an 18 disc |
+| Material | 16, `softFill` past the handle | a 4×44 bar |
+| shadcn | 6 | 16, ringed 1 |
+| Ant | 4 | 14, ringed 2 |
+| Fluent | 4, `controlBorder` past the thumb | 20, inset 4 |
+| Carbon | 2 | a 14 disc, in the foreground |
 
 `AdminOverlayStyle` sets whether a tooltip points at its target with an
 arrow, the width it wraps at, and the size of the arrow a tooltip or a

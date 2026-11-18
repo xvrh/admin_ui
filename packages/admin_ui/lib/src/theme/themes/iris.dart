@@ -10,6 +10,7 @@ import '../segmented_style.dart';
 import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
+import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
 import '../typography.dart';
@@ -123,4 +124,6 @@ final irisTheme = AdminTheme.from(
   // a 36×20 switch, filled while off; an 18px box and an 18px radio whose
   // mark is a disc, in the accent
   selection: const AdminSelectionStyle(),
+  // a 4px track under an 18px disc, in the accent
+  slider: const AdminSliderStyle(),
 );
