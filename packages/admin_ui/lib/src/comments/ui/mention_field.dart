@@ -511,7 +511,7 @@ class _MentionFieldState extends State<MentionField> {
               if (!_acceptHighlighted()) _submit();
             },
       onEditingComplete: _multiline ? null : () {},
-      style: fieldTextStyle(context),
+      style: fieldTextStyle(context, size: widget.size),
       decoration: fieldInputDecoration(
         context,
         hint: widget.hint,

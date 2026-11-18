@@ -140,6 +140,7 @@ const _ramp = AdminTypeRamp(
   sectionLabel: AdminTypeStep(12, 16), // caption1Strong
   fieldLabel: AdminTypeStep(14, 20), // body1
   fieldText: AdminTypeStep(14, 20),
+  fieldTextLarge: AdminTypeStep(16, 22), // a large Input: body2
   fieldDescription: AdminTypeStep(12, 16), // caption1, a Field's hint
   fieldMessage: AdminTypeStep(12, 16), // caption1
   body: AdminTypeStep(14, 20),
@@ -148,6 +149,7 @@ const _ramp = AdminTypeRamp(
   micro: AdminTypeStep(10, 14), // caption2
   button: AdminTypeStep(14, 20),
   buttonSmall: AdminTypeStep(12, 16), // a small button's caption1
+  buttonLarge: AdminTypeStep(16, 22), // a large button: fontSizeBase400
   mono: AdminTypeStep(14, 20),
   monoSmall: AdminTypeStep(12, 16),
 );
@@ -298,6 +300,7 @@ final fluentTheme = AdminTheme.from(
     ),
     minWidth: AdminButtonMinWidth(small: 64, medium: 96, large: 96),
     labelWeight: FontWeight.w600, // fontWeightSemibold
+    smallLabelWeight: FontWeight.w400, // a small Button: fontWeightRegular
   ),
   // NavDrawer: 260px wide, collapsing to a 48px rail, 40px items with 20px
   // icons, the selected one marked by a 4px brand bar; a 48px header

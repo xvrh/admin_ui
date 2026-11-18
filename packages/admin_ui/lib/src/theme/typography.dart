@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'fonts.dart';
 import 'palette.dart';
+import 'sizes.dart';
 
 /// One step of an [AdminTypeRamp]: a font [size] on a fixed [line] box, both
 /// whole logical pixels at scale 1, and the step's own [letterSpacing].
@@ -107,6 +108,11 @@ class AdminTypeRamp {
   /// fit the theme's smallest control height.
   final AdminTypeStep fieldText;
 
+  /// [AdminTypography.fieldTextLarge]: the text inside a large control. Null
+  /// sets it on [fieldText]'s step. Its line must fit the theme's large
+  /// control height.
+  final AdminTypeStep? fieldTextLarge;
+
   /// [AdminTypography.fieldDescription]: the help line under a field's
   /// label.
   final AdminTypeStep fieldDescription;
@@ -132,6 +138,10 @@ class AdminTypeRamp {
   /// [AdminTypography.buttonSmall]: a small button's label.
   final AdminTypeStep buttonSmall;
 
+  /// [AdminTypography.buttonLarge]: a large button's label. Null sets it on
+  /// [button]'s step.
+  final AdminTypeStep? buttonLarge;
+
   /// [AdminTypography.mono]: code and structured data.
   final AdminTypeStep mono;
 
@@ -151,6 +161,7 @@ class AdminTypeRamp {
     required this.sectionLabel,
     required this.fieldLabel,
     required this.fieldText,
+    this.fieldTextLarge,
     required this.fieldDescription,
     required this.fieldMessage,
     required this.body,
@@ -159,6 +170,7 @@ class AdminTypeRamp {
     required this.micro,
     required this.button,
     required this.buttonSmall,
+    this.buttonLarge,
     required this.mono,
     required this.monoSmall,
   });
@@ -177,6 +189,7 @@ class AdminTypeRamp {
     AdminTypeStep? sectionLabel,
     AdminTypeStep? fieldLabel,
     AdminTypeStep? fieldText,
+    AdminTypeStep? fieldTextLarge,
     AdminTypeStep? fieldDescription,
     AdminTypeStep? fieldMessage,
     AdminTypeStep? body,
@@ -185,6 +198,7 @@ class AdminTypeRamp {
     AdminTypeStep? micro,
     AdminTypeStep? button,
     AdminTypeStep? buttonSmall,
+    AdminTypeStep? buttonLarge,
     AdminTypeStep? mono,
     AdminTypeStep? monoSmall,
   }) => AdminTypeRamp(
@@ -200,6 +214,7 @@ class AdminTypeRamp {
     sectionLabel: sectionLabel ?? this.sectionLabel,
     fieldLabel: fieldLabel ?? this.fieldLabel,
     fieldText: fieldText ?? this.fieldText,
+    fieldTextLarge: fieldTextLarge ?? this.fieldTextLarge,
     fieldDescription: fieldDescription ?? this.fieldDescription,
     fieldMessage: fieldMessage ?? this.fieldMessage,
     body: body ?? this.body,
@@ -208,6 +223,7 @@ class AdminTypeRamp {
     micro: micro ?? this.micro,
     button: button ?? this.button,
     buttonSmall: buttonSmall ?? this.buttonSmall,
+    buttonLarge: buttonLarge ?? this.buttonLarge,
     mono: mono ?? this.mono,
     monoSmall: monoSmall ?? this.monoSmall,
   );
@@ -215,6 +231,14 @@ class AdminTypeRamp {
   static AdminTypeRamp lerp(AdminTypeRamp a, AdminTypeRamp b, double t) {
     AdminTypeStep s(AdminTypeStep x, AdminTypeStep y) =>
         AdminTypeStep.lerp(x, y, t);
+    // A step only one ramp names starts, or ends, at the step the other
+    // draws in its place.
+    AdminTypeStep? o(
+      AdminTypeStep? x,
+      AdminTypeStep xBase,
+      AdminTypeStep? y,
+      AdminTypeStep yBase,
+    ) => x == null && y == null ? null : s(x ?? xBase, y ?? yBase);
     return AdminTypeRamp(
       displayLarge: s(a.displayLarge, b.displayLarge),
       displayMedium: s(a.displayMedium, b.displayMedium),
@@ -224,12 +248,16 @@ class AdminTypeRamp {
       titleLarge: s(a.titleLarge, b.titleLarge),
       pageTitle: s(a.pageTitle, b.pageTitle),
       heading: s(a.heading, b.heading),
-      dialogTitle: a.dialogTitle == null && b.dialogTitle == null
-          ? null
-          : s(a.dialogTitle ?? a.heading, b.dialogTitle ?? b.heading),
+      dialogTitle: o(a.dialogTitle, a.heading, b.dialogTitle, b.heading),
       sectionLabel: s(a.sectionLabel, b.sectionLabel),
       fieldLabel: s(a.fieldLabel, b.fieldLabel),
       fieldText: s(a.fieldText, b.fieldText),
+      fieldTextLarge: o(
+        a.fieldTextLarge,
+        a.fieldText,
+        b.fieldTextLarge,
+        b.fieldText,
+      ),
       fieldDescription: s(a.fieldDescription, b.fieldDescription),
       fieldMessage: s(a.fieldMessage, b.fieldMessage),
       body: s(a.body, b.body),
@@ -238,13 +266,15 @@ class AdminTypeRamp {
       micro: s(a.micro, b.micro),
       button: s(a.button, b.button),
       buttonSmall: s(a.buttonSmall, b.buttonSmall),
+      buttonLarge: o(a.buttonLarge, a.button, b.buttonLarge, b.button),
       mono: s(a.mono, b.mono),
       monoSmall: s(a.monoSmall, b.monoSmall),
     );
   }
 
-  /// Every step by its role's name, in declaration order, [dialogTitle]
-  /// resolved to the step it is drawn on.
+  /// Every step by its role's name, in declaration order, [dialogTitle],
+  /// [fieldTextLarge] and [buttonLarge] resolved to the step each is drawn
+  /// on.
   Map<String, AdminTypeStep> get steps => {
     'displayLarge': displayLarge,
     'displayMedium': displayMedium,
@@ -258,6 +288,7 @@ class AdminTypeRamp {
     'sectionLabel': sectionLabel,
     'fieldLabel': fieldLabel,
     'fieldText': fieldText,
+    'fieldTextLarge': fieldTextLarge ?? fieldText,
     'fieldDescription': fieldDescription,
     'fieldMessage': fieldMessage,
     'body': body,
@@ -266,6 +297,7 @@ class AdminTypeRamp {
     'micro': micro,
     'button': button,
     'buttonSmall': buttonSmall,
+    'buttonLarge': buttonLarge ?? button,
     'mono': mono,
     'monoSmall': monoSmall,
   };
@@ -623,6 +655,11 @@ class AdminTypography {
   /// control-size tokens rather than the font's metrics.
   final TextStyle fieldText;
 
+  /// [fieldText] in a large control: the same style, a step larger where
+  /// the theme's design system sets a large control's text larger (16px in
+  /// Ant and Fluent). Read it through [fieldTextOf].
+  final TextStyle fieldTextLarge;
+
   /// The help line under a field's label, in [AdminPalette.foregroundMuted]:
   /// [caption]'s size in most themes, the body size where the reference
   /// system sets its field help at body size (shadcn, Ant).
@@ -661,6 +698,11 @@ class AdminTypography {
   /// A small button's label. Colourless, as [button] is.
   final TextStyle buttonSmall;
 
+  /// A large button's label: [button] a step larger where the theme's design
+  /// system sets it larger. Colourless, as [button] is. Read it through
+  /// [buttonOf].
+  final TextStyle buttonLarge;
+
   /// Code and structured data, in the spec's monospace font
   /// ([AdminTypeSpec.applyMonoFont]). Change its weight with [weighted],
   /// which keeps the monospace font.
@@ -674,8 +716,9 @@ class AdminTypography {
   final AdminTypeSpec spec;
 
   /// A typography built by hand. [fieldDescription] defaults to [caption],
-  /// [dialogTitle] to [heading], [buttonSmall] to [button], [mono] to [body]
-  /// and [monoSmall] to [mono]; [AdminTypography.from] sets all five.
+  /// [fieldTextLarge] to [fieldText], [dialogTitle] to [heading],
+  /// [buttonSmall] and [buttonLarge] to [button], [mono] to [body] and
+  /// [monoSmall] to [mono]; [AdminTypography.from] sets all seven.
   const AdminTypography({
     required this.sizeDisplayLarge,
     required this.sizeDisplayMedium,
@@ -685,6 +728,7 @@ class AdminTypography {
     required this.sizeTitleLarge,
     required this.fieldLabel,
     required this.fieldText,
+    TextStyle? fieldTextLarge,
     TextStyle? fieldDescription,
     required this.fieldMessage,
     required this.pageTitle,
@@ -699,12 +743,15 @@ class AdminTypography {
     required this.micro,
     required this.button,
     TextStyle? buttonSmall,
+    TextStyle? buttonLarge,
     TextStyle? mono,
     TextStyle? monoSmall,
     required this.spec,
-  }) : fieldDescription = fieldDescription ?? caption,
+  }) : fieldTextLarge = fieldTextLarge ?? fieldText,
+       fieldDescription = fieldDescription ?? caption,
        dialogTitle = dialogTitle ?? heading,
        buttonSmall = buttonSmall ?? button,
+       buttonLarge = buttonLarge ?? button,
        mono = mono ?? body,
        monoSmall = monoSmall ?? mono ?? body;
 
@@ -755,6 +802,11 @@ class AdminTypography {
         letterSpacing: spec.uppercaseLabels ? 0.4 : 0,
       ),
       fieldText: style(r.fieldText, weight: spec.body, color: p.foreground),
+      fieldTextLarge: style(
+        r.fieldTextLarge ?? r.fieldText,
+        weight: spec.body,
+        color: p.foreground,
+      ),
       fieldDescription: style(
         r.fieldDescription,
         weight: spec.body,
@@ -785,11 +837,29 @@ class AdminTypography {
       micro: style(r.micro, weight: spec.strong, color: p.foregroundMuted),
       button: style(r.button, weight: spec.strong),
       buttonSmall: style(r.buttonSmall, weight: spec.strong),
+      buttonLarge: style(r.buttonLarge ?? r.button, weight: spec.strong),
       mono: mono(r.mono),
       monoSmall: mono(r.monoSmall),
       spec: spec,
     );
   }
+
+  /// The text inside a control of [size]: [fieldTextLarge] in a large one,
+  /// [fieldText] in the other two. A field pads its text from this style's
+  /// line, so the style a field's text is set in and the size its box is
+  /// drawn at go together (`fieldTextStyle` and `fieldInputDecoration` both
+  /// take the size).
+  TextStyle fieldTextOf(ControlSize size) => switch (size) {
+    ControlSize.small || ControlSize.medium => fieldText,
+    ControlSize.large => fieldTextLarge,
+  };
+
+  /// A button's label at [size]: [buttonSmall], [button] or [buttonLarge].
+  TextStyle buttonOf(ControlSize size) => switch (size) {
+    ControlSize.small => buttonSmall,
+    ControlSize.medium => button,
+    ControlSize.large => buttonLarge,
+  };
 
   /// [label] as a field label shows it: in capitals when the theme's
   /// [AdminTypeSpec.uppercaseLabels] says so. Screen readers get [label]
@@ -819,6 +889,7 @@ class AdminTypography {
       sizeTitleLarge: d(a.sizeTitleLarge, b.sizeTitleLarge),
       fieldLabel: s(a.fieldLabel, b.fieldLabel),
       fieldText: s(a.fieldText, b.fieldText),
+      fieldTextLarge: s(a.fieldTextLarge, b.fieldTextLarge),
       fieldDescription: s(a.fieldDescription, b.fieldDescription),
       fieldMessage: s(a.fieldMessage, b.fieldMessage),
       pageTitle: s(a.pageTitle, b.pageTitle),
@@ -833,6 +904,7 @@ class AdminTypography {
       micro: s(a.micro, b.micro),
       button: s(a.button, b.button),
       buttonSmall: s(a.buttonSmall, b.buttonSmall),
+      buttonLarge: s(a.buttonLarge, b.buttonLarge),
       mono: s(a.mono, b.mono),
       monoSmall: s(a.monoSmall, b.monoSmall),
       spec: t < 0.5 ? a.spec : b.spec,
@@ -848,6 +920,7 @@ class AdminTypography {
     sizeTitleLarge,
     fieldLabel,
     fieldText,
+    fieldTextLarge,
     fieldDescription,
     fieldMessage,
     pageTitle,
@@ -862,6 +935,7 @@ class AdminTypography {
     micro,
     button,
     buttonSmall,
+    buttonLarge,
     mono,
     monoSmall,
     spec,

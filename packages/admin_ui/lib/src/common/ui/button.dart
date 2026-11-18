@@ -103,8 +103,9 @@ class Button extends StatefulWidget {
   /// This button's anatomy in place of the theme's `context.buttonStyle`:
   /// its members win, and a null [AdminButtonStyle.padding],
   /// [AdminButtonStyle.minWidth] or [AdminButtonStyle.labelWeight] keeps the
-  /// theme's. Start from `context.buttonStyle.copyWith(…)` to change one
-  /// member.
+  /// theme's. A [AdminButtonStyle.labelWeight] given here is the weight at
+  /// every size, whatever the theme's small one. Start from
+  /// `context.buttonStyle.copyWith(…)` to change one member.
   final AdminButtonStyle? style;
 
   /// Reports, and can seed, the button's interaction states (hovered,
@@ -638,7 +639,7 @@ class _ButtonState extends State<Button> {
 }
 
 /// [own] over [theme]: [own]'s members, with its unset padding, minimum
-/// width and label weight taken from [theme].
+/// width and label weights taken from [theme].
 AdminButtonStyle _merged(AdminButtonStyle theme, AdminButtonStyle? own) {
   if (own == null || own == theme) return theme;
   return AdminButtonStyle(
@@ -647,6 +648,11 @@ AdminButtonStyle _merged(AdminButtonStyle theme, AdminButtonStyle? own) {
     padding: own.padding ?? theme.padding,
     minWidth: own.minWidth ?? theme.minWidth,
     labelWeight: own.labelWeight ?? theme.labelWeight,
+    // A weight the button names is its weight at every size, the theme's
+    // small one included.
+    smallLabelWeight:
+        own.smallLabelWeight ??
+        (own.labelWeight == null ? theme.smallLabelWeight : null),
     disabled: own.disabled,
     fadedOpacity: own.fadedOpacity,
     filledSecondary: own.filledSecondary,
@@ -668,8 +674,9 @@ class _SizeSpec {
   /// The height is the theme's control height at [size] and the corner
   /// `radii.button(size)`; the padding, minimum width and label weight are
   /// [style]'s at that size (by default `height / 2 - 4` either side: 10 at
-  /// 28, 14 at 36, 16 at 40). A small button takes the small label and glyph
-  /// (`type.buttonSmall`, `iconSizes.sm`).
+  /// 28, 14 at 36, 16 at 40). The label is the type role of the size
+  /// (`type.buttonOf`), and a small button takes the small glyph
+  /// (`iconSizes.sm`).
   static _SizeSpec of(
     ControlSize size,
     BuildContext context,
@@ -678,11 +685,8 @@ class _SizeSpec {
     final type = context.type;
     final icons = context.iconSizes;
     final height = context.sizes.height(size);
-    final text = switch (size) {
-      ControlSize.small => type.buttonSmall,
-      ControlSize.medium || ControlSize.large => type.button,
-    };
-    final weight = style.labelWeight;
+    final text = type.buttonOf(size);
+    final weight = style.labelWeightOf(size);
     return _SizeSpec._(
       height: height,
       insets: style.paddingOf(size, height),

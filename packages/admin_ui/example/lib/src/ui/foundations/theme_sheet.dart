@@ -284,3 +284,80 @@ class _TypeCard extends StatelessWidget {
     );
   }
 }
+
+/// A button and a text input at each [ControlSize], in every shipped theme at
+/// once: the text a control holds as it grows. Each card is in its own
+/// theme's tokens, in the preview's mode, as [ThemeSheetDemo] shows the
+/// controls.
+class ThemeSizesSheetDemo extends StatelessWidget {
+  @Preview(name: 'Every theme · sizes', wrapper: adminUiPreview)
+  const ThemeSizesSheetDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = context.colors.brightness == Brightness.dark;
+    return DemoPage(
+      maxWidth: 820,
+      padding: const EdgeInsets.all(AdminSpacing.xl),
+      children: [
+        Wrap(
+          spacing: AdminSpacing.lg,
+          runSpacing: AdminSpacing.lg,
+          children: [
+            for (final theme in adminThemes)
+              Theme(
+                data: buildAppTheme(
+                  dark ? theme.dark ?? theme.tokens : theme.tokens,
+                ),
+                child: _SizesCard(theme.name),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// One theme's button and input at the three sizes, on that theme's surface.
+class _SizesCard extends StatelessWidget {
+  final String name;
+
+  const _SizesCard(this.name);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      width: 372,
+      padding: const EdgeInsets.all(AdminSpacing.lg),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(context.radii.radiusLarge),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(name, style: context.type.sectionLabel),
+          for (final size in ControlSize.values) ...[
+            const Gap(AdminSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: InputField(
+                    value: 'Boston fern',
+                    size: size,
+                    onChanged: (_) {},
+                  ),
+                ),
+                const Gap(AdminSpacing.md),
+                Button('Publish', size: size, onPressed: () {}),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

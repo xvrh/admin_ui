@@ -131,7 +131,7 @@ void _geometry() {
           tokens.radii.button(size),
           reason: '$size',
         );
-        final weight = style.labelWeight;
+        final weight = style.labelWeightOf(size);
         if (weight != null) {
           expect(_label(tester, button).fontWeight, weight, reason: '$size');
         }

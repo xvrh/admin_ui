@@ -514,7 +514,7 @@ class _ComboboxState<T> extends State<Combobox<T>> {
       focusNode: _focus,
       autofocus: widget.autofocus,
       readOnly: state.readOnly,
-      style: fieldTextStyle(context),
+      style: fieldTextStyle(context, size: widget.size),
       onTap: _openList,
       decoration: fieldInputDecoration(
         context,

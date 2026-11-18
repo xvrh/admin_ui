@@ -238,7 +238,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
         child: Builder(
           builder: (context) {
             final sizes = context.sizes;
-            final style = fieldTextStyle(context);
+            final style = fieldTextStyle(context, size: widget.size);
             return Row(
               children: [
                 Icon(

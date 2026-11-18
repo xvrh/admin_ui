@@ -96,6 +96,7 @@ void describeAdminTypography(
   describeValue(v.sizeTitleLarge, '${p}sizeTitleLarge', out);
   describeValue(v.fieldLabel, '${p}fieldLabel', out);
   describeValue(v.fieldText, '${p}fieldText', out);
+  describeValue(v.fieldTextLarge, '${p}fieldTextLarge', out);
   describeValue(v.fieldDescription, '${p}fieldDescription', out);
   describeValue(v.fieldMessage, '${p}fieldMessage', out);
   describeValue(v.pageTitle, '${p}pageTitle', out);
@@ -110,6 +111,7 @@ void describeAdminTypography(
   describeValue(v.micro, '${p}micro', out);
   describeValue(v.button, '${p}button', out);
   describeValue(v.buttonSmall, '${p}buttonSmall', out);
+  describeValue(v.buttonLarge, '${p}buttonLarge', out);
   describeValue(v.mono, '${p}mono', out);
   describeValue(v.monoSmall, '${p}monoSmall', out);
   describeAdminTypeSpec(v.spec, '${p}spec', out);
@@ -160,6 +162,11 @@ void describeAdminTypeRamp(
   describeAdminTypeStep(v.sectionLabel, '${p}sectionLabel', out);
   describeAdminTypeStep(v.fieldLabel, '${p}fieldLabel', out);
   describeAdminTypeStep(v.fieldText, '${p}fieldText', out);
+  if (v.fieldTextLarge case final f?) {
+    describeAdminTypeStep(f, '${p}fieldTextLarge', out);
+  } else {
+    out['${p}fieldTextLarge'] = 'null';
+  }
   describeAdminTypeStep(v.fieldDescription, '${p}fieldDescription', out);
   describeAdminTypeStep(v.fieldMessage, '${p}fieldMessage', out);
   describeAdminTypeStep(v.body, '${p}body', out);
@@ -168,6 +175,11 @@ void describeAdminTypeRamp(
   describeAdminTypeStep(v.micro, '${p}micro', out);
   describeAdminTypeStep(v.button, '${p}button', out);
   describeAdminTypeStep(v.buttonSmall, '${p}buttonSmall', out);
+  if (v.buttonLarge case final f?) {
+    describeAdminTypeStep(f, '${p}buttonLarge', out);
+  } else {
+    out['${p}buttonLarge'] = 'null';
+  }
   describeAdminTypeStep(v.mono, '${p}mono', out);
   describeAdminTypeStep(v.monoSmall, '${p}monoSmall', out);
 }
@@ -310,6 +322,7 @@ void describeAdminButtonStyle(
     out['${p}minWidth'] = 'null';
   }
   describeValue(v.labelWeight, '${p}labelWeight', out);
+  describeValue(v.smallLabelWeight, '${p}smallLabelWeight', out);
   describeValue(v.disabled, '${p}disabled', out);
   describeValue(v.fadedOpacity, '${p}fadedOpacity', out);
   describeValue(v.filledSecondary, '${p}filledSecondary', out);

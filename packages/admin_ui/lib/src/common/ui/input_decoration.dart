@@ -22,11 +22,12 @@ import 'icon_action.dart';
 /// reads on the control itself; read-only drops the hover; a disabled scope
 /// disables the decoration, and so a [TextField] that leaves its own
 /// `enabled` unset. A body still passes `readOnly` to its [TextField] itself
-/// (see [FieldState]), and styles its text with [fieldTextStyle].
+/// (see [FieldState]), and styles its text with [fieldTextStyle], given the
+/// same [size].
 ///
 /// The field is exactly the [size]'s control height (`context.sizes`) for any
-/// single line of text, and grows only for more (a multi-line box, a large
-/// text scale). Its text starts `fieldPaddingX` in, or after a
+/// single line of that size's text ([AdminTypography.fieldTextOf]), and
+/// grows only for more (a multi-line box, a large text scale). Its text starts `fieldPaddingX` in, or after a
 /// [leadingIcon] — a 16px glyph at `fieldPaddingX` — at `fieldIconInset`.
 /// [suffix] (a [ClearButton], a [FieldChevron], a reveal [IconAction]) sits
 /// in a 24px slot whose glyph lines up with `fieldPaddingX` at the end; the
@@ -51,9 +52,9 @@ InputDecoration fieldInputDecoration(
   final sizes = tokens.sizes;
   final state = FieldStateScope.of(context)
       .merge(readOnly: readOnly, invalid: invalid);
-  final hintStyle = tokens.typography.fieldText.copyWith(
-    color: palette.placeholder,
-  );
+  final hintStyle = tokens.typography
+      .fieldTextOf(size)
+      .copyWith(color: palette.placeholder);
   // Material 3 keeps 4px between an icon slot and the text.
   final iconGap = Theme.of(context).useMaterial3 ? 4.0 : 0.0;
   final slot = IconActionSize.inline.box;
@@ -155,7 +156,7 @@ InputDecoration fieldInputDecoration(
     hoverColor: const Color(0x00000000),
     contentPadding: EdgeInsets.symmetric(
       horizontal: sizes.fieldPaddingX,
-      vertical: fieldPaddingY(tokens.typography, height),
+      vertical: fieldPaddingY(tokens.typography, height, size: size),
     ),
     border: FieldBorder.of(tokens, borderRadius: radius, mapStates: resolved),
     prefixIcon: SizedBox(
@@ -203,9 +204,18 @@ InputDecoration fieldInputDecoration(
 /// [FieldState.textColor] of the ambient [FieldStateScope], with [enabled]
 /// folded in. Every body styles its [TextField] or value [Text] with it, so
 /// none falls back to Material's 16px `bodyLarge`.
-TextStyle fieldTextStyle(BuildContext context, {bool enabled = true}) {
+///
+/// [size] is the size of the control the text sits in, where it is not the
+/// medium one: a large control's text is [AdminTypography.fieldTextLarge].
+/// Give [fieldInputDecoration], or the `FieldTrigger` around the text, the
+/// same size, since the box pads its text from that style's line.
+TextStyle fieldTextStyle(
+  BuildContext context, {
+  bool enabled = true,
+  ControlSize size = ControlSize.medium,
+}) {
   final state = FieldStateScope.of(context).merge(enabled: enabled);
-  return context.type.fieldText.copyWith(
-    color: state.textColor(context.colors),
-  );
+  return context.type
+      .fieldTextOf(size)
+      .copyWith(color: state.textColor(context.colors));
 }
