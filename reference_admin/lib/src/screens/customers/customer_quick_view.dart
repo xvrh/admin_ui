@@ -138,9 +138,14 @@ class _CustomerQuickViewState extends State<CustomerQuickView> {
             ),
           ),
           Expanded(
-            child: _tab == 0
-                ? _Details(customer: customer, orders: _orders!)
-                : _Orders(orders: _orders!, onOpen: widget.onOpenOrder),
+            child: TabPanel(
+              label: _tab == 0
+                  ? strings.customerDetails
+                  : strings.customerOrders,
+              child: _tab == 0
+                  ? _Details(customer: customer, orders: _orders!)
+                  : _Orders(orders: _orders!, onOpen: widget.onOpenOrder),
+            ),
           ),
         ],
       );

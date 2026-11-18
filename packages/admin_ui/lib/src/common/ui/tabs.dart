@@ -20,6 +20,7 @@ import 'icon_action.dart';
 import 'menu.dart';
 import 'popover.dart';
 import 'tappable.dart';
+import 'web_roles.dart';
 
 /// One tab in a [Tabs] strip.
 class TabItem {
@@ -106,6 +107,40 @@ class TabScope extends InheritedWidget {
       tabId != old.tabId || selection != old.selection;
 }
 
+/// What the selected tab of a [Tabs] strip shows, as that tab's panel to
+/// assistive technology ([SemanticsRole.tabPanel]): a screen reader on the
+/// web says "SEO, tab panel" on the way in. [Tabs] reports a selection and
+/// draws no content, so the caller wraps what it shows for the tab:
+///
+/// ```dart
+/// Tabs(tabs: tabs, selected: selected, onChanged: select),
+/// TabPanel(label: tabs[selected].label, child: body),
+/// ```
+///
+/// Only the web has the role. On the other platforms the panel adds
+/// nothing: a named container would be one more stop for a screen reader
+/// there, a rectangle the size of the panel read before its content.
+class TabPanel extends StatelessWidget {
+  /// The panel's name: its tab's label.
+  final String label;
+  final Widget child;
+
+  const TabPanel({super.key, required this.label, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final panel = webRolesAreRead;
+    return Semantics(
+      container: panel,
+      // The panel's name is its tab's, not its content's.
+      explicitChildNodes: panel,
+      role: panel ? SemanticsRole.tabPanel : SemanticsRole.none,
+      label: panel ? label : null,
+      child: child,
+    );
+  }
+}
+
 /// The visual style of the strip.
 enum TabsVariant {
   /// Underline under the selected tab, on a hairline. Page/route-level nav.
@@ -130,8 +165,9 @@ enum TabsAlignment {
 /// A horizontal page-tab strip: labels with a primary underline under the
 /// selected one, sitting on a full-width hairline. The view is selection-only —
 /// it reports taps via [onChanged]; wiring tabs to routes/content stays with the
-/// caller. [Tabs.keyed] addresses the tabs by id through a [TabSelection]
-/// instead of by index.
+/// caller, who wraps what the selected tab shows in a [TabPanel].
+/// [Tabs.keyed] addresses the tabs by id through a [TabSelection] instead of
+/// by index.
 ///
 /// Keyboard: the strip is one Tab stop, landing on the selected tab. Arrow
 /// Left/Right move to the previous/next enabled tab (wrapping, and mirrored

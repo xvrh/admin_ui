@@ -123,6 +123,10 @@ class Tappable extends StatefulWidget {
   /// [excludeSemantics].
   final String? semanticLabel;
 
+  /// Read after the label and the state, as what the name leaves out: a
+  /// row's place among its siblings, "2 of 5".
+  final String? semanticHint;
+
   /// Selected state for assistive technology: a current page, a chosen segment.
   /// Also reported as [WidgetState.selected] when true.
   final bool? selected;
@@ -182,6 +186,7 @@ class Tappable extends StatefulWidget {
     this.focusRadius = 0,
     this.statesController,
     this.semanticLabel,
+    this.semanticHint,
     this.selected,
     this.expanded,
     this.checked,
@@ -212,6 +217,7 @@ class Tappable extends StatefulWidget {
     this.focusRadius = 0,
     this.statesController,
     this.semanticLabel,
+    this.semanticHint,
     this.selected,
     this.expanded,
     this.checked,
@@ -246,6 +252,7 @@ class Tappable extends StatefulWidget {
     this.focusRadius = 0,
     this.statesController,
     this.semanticLabel,
+    this.semanticHint,
     this.selected,
     this.expanded,
     this.checked,
@@ -589,6 +596,7 @@ class _TappableState extends State<Tappable> {
       enabled: enabled || _readOnly,
       readOnly: _readOnly ? true : null,
       label: widget.semanticLabel,
+      hint: widget.semanticHint,
       selected: widget.selected,
       expanded: widget.expanded,
       checked: widget.mixed == true ? false : widget.checked,

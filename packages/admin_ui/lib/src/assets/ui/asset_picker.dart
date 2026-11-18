@@ -319,13 +319,16 @@ class _AssetPickerDialogState extends State<_AssetPickerDialog> {
                   index: _tab,
                   sizing: StackFit.passthrough,
                   children: [
-                    library,
-                    _uploadPane(),
+                    TabPanel(label: strings.libraryTab, child: library),
+                    TabPanel(label: strings.uploadTab, child: _uploadPane()),
                     for (final p in widget.providers)
-                      _ProviderPane(
-                        provider: p,
-                        onCancel: _close,
-                        onSelect: _close,
+                      TabPanel(
+                        label: p.label,
+                        child: _ProviderPane(
+                          provider: p,
+                          onCancel: _close,
+                          onSelect: _close,
+                        ),
                       ),
                   ],
                 ),

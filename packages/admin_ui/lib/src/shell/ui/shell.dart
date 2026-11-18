@@ -3,11 +3,15 @@
 /// @docImport '../../common/ui/modal_anchor.dart';
 library;
 
+import 'dart:ui' show SemanticsRole;
+
 import 'package:flutter/foundation.dart' show internal;
 import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../common/ui/modal_anchor.dart';
+import '../../common/ui/web_roles.dart';
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/breakpoints.dart';
 import '../../theme/palette.dart';
 import '../../theme/shell_style.dart';
@@ -92,12 +96,24 @@ class Shell extends StatefulWidget {
   /// key of its own, or the logo of a top bar that is not a [TopBar].
   final Widget? drawerLeading;
 
+  /// Whether the page is the main landmark to assistive technology
+  /// ([SemanticsRole.main]), named "Main content": on the web, where a
+  /// screen reader jumps to it past the navigation and the top bar. The
+  /// other platforms have no such role, and get nothing.
+  ///
+  /// A main landmark may hold no other and sit in no other, and the
+  /// framework throws in a debug build where one does. Pass false in an
+  /// app that marks the main landmark itself, inside [child] or around the
+  /// shell, or that puts the shell inside a landmark of its own.
+  final bool mainLandmark;
+
   const Shell({
     super.key,
     this.sidebar,
     this.topBar,
     this.drawer,
     this.drawerLeading,
+    this.mainLandmark = true,
     required this.child,
   });
 
@@ -286,7 +302,12 @@ class _ShellState extends State<Shell> {
         final row = Row(
           children: [
             if (!compact && !spansPage) ?sidebar,
-            Expanded(child: widget.child),
+            Expanded(
+              child: _MainRegion(
+                enabled: widget.mainLandmark,
+                child: widget.child,
+              ),
+            ),
           ],
         );
         return _ShellScope(
@@ -332,6 +353,51 @@ class _ShellState extends State<Shell> {
       },
     );
   }
+}
+
+/// The page as the main landmark ([SemanticsRole.main]), which a screen
+/// reader on the web jumps to past the navigation and the top bar.
+///
+/// Only where the role is read ([webRolesAreRead]): a landmark is a named
+/// container, and on a phone a node with a name is a stop of its own, a
+/// rectangle the size of the page read before the page's first control. It
+/// is named, as the framework asks of a landmark there is more than one of:
+/// two shells may share a window, in a gallery of frames. A shell shown
+/// inside another's page is part of that page, and no landmark of its own,
+/// since a main landmark holds no other.
+///
+/// The widgets are the same whether the page is a landmark or not, so it
+/// keeps its state when [enabled] changes.
+class _MainRegion extends StatelessWidget {
+  final bool enabled;
+  final Widget child;
+
+  const _MainRegion({required this.enabled, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final inside =
+        context.getInheritedWidgetOfExactType<_MainRegionScope>()?.landmark ??
+        false;
+    final landmark = enabled && webRolesAreRead && !inside;
+    return Semantics(
+      container: landmark,
+      explicitChildNodes: landmark,
+      role: landmark ? SemanticsRole.main : SemanticsRole.none,
+      label: landmark ? context.adminL10n.shell.mainContent : null,
+      child: _MainRegionScope(landmark: landmark || inside, child: child),
+    );
+  }
+}
+
+/// Says whether what is below it is inside a shell's main landmark.
+class _MainRegionScope extends InheritedWidget {
+  final bool landmark;
+
+  const _MainRegionScope({required this.landmark, required super.child});
+
+  @override
+  bool updateShouldNotify(_MainRegionScope old) => landmark != old.landmark;
 }
 
 class _ShellScope extends InheritedWidget {

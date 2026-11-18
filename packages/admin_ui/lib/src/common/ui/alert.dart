@@ -14,6 +14,7 @@ import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'icon_action.dart';
 import 'severity.dart';
+import 'web_roles.dart';
 
 /// An inline, in-flow message — the page/section-level banner (info, success,
 /// warning, danger). For transient pop-ups use a [Toast]; for blocking choices a
@@ -42,6 +43,11 @@ class Alert extends StatelessWidget {
   /// Whether assistive technology reads the alert out when it appears or
   /// changes — for one shown in response to what the user did, such as an
   /// error under a form. Defaults to true for warning and danger.
+  ///
+  /// A danger alert that is read out is an alert to assistive technology
+  /// too ([SemanticsRole.alert]): the web reads it at once, over what it was
+  /// saying, where the other severities wait their turn. Its action and its
+  /// close button are read with it there.
   final bool? liveRegion;
 
   const Alert(
@@ -62,14 +68,23 @@ class Alert extends StatelessWidget {
     final live =
         liveRegion ??
         (severity == Severity.warning || severity == Severity.danger);
+    // An error is the one message that cannot wait. Its words are a node of
+    // their own inside the alert: the web reads an alert's text, not its
+    // label.
+    final urgent = live && severity == Severity.danger;
     return Semantics(
       container: true,
-      liveRegion: live,
-      child: _surface(context, style),
+      liveRegion: live && !urgent,
+      role: urgent ? SemanticsRole.alert : SemanticsRole.none,
+      child: _surface(context, style, urgent: urgent),
     );
   }
 
-  Widget _surface(BuildContext context, SeverityStyle style) {
+  Widget _surface(
+    BuildContext context,
+    SeverityStyle style, {
+    required bool urgent,
+  }) {
     const close = IconActionSize.inline;
     return Container(
       padding: EdgeInsetsDirectional.only(
@@ -101,20 +116,24 @@ class Alert extends StatelessWidget {
                 color: style.foreground,
               )
             : null,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (title != null) ...[
-              Text(title!, style: context.type.bodyStrong),
-              const Gap(AdminSpacing.xxs),
-            ],
-            Text(
-              message,
-              style: context.type.body.copyWith(
-                color: context.colors.foregroundSecondary,
+        body: Semantics(
+          container: urgent,
+          liveRegion: urgent && !webRolesAreRead,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (title != null) ...[
+                Text(title!, style: context.type.bodyStrong),
+                const Gap(AdminSpacing.xxs),
+              ],
+              Text(
+                message,
+                style: context.type.body.copyWith(
+                  color: context.colors.foregroundSecondary,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         trailing: action == null && onDismiss == null
             ? null

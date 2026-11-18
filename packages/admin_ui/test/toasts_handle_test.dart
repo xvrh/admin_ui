@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show SemanticsRole;
 
 import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter/services.dart';
@@ -544,6 +545,74 @@ void main() {
       );
       await tester.pump();
       expect(said, ['Published.']);
+
+      toasts.dismissAll();
+      await tester.pumpAndSettle();
+      handle.dispose();
+    });
+
+    testWidgets('the same words in a toast that becomes an alert, or stops '
+        'being one, are not said a second time by hand', (tester) async {
+      final handle = tester.ensureSemantics();
+      final said = <String>[];
+      tester.binding.defaultBinaryMessenger
+          .setMockDecodedMessageHandler<Object?>(SystemChannels.accessibility, (
+            message,
+          ) async {
+            final data = (message! as Map)['data'] as Map;
+            if (data['message'] case final String text) said.add(text);
+            return null;
+          });
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger
+            .setMockDecodedMessageHandler(SystemChannels.accessibility, null),
+      );
+
+      final toasts = await _pumpScope(tester);
+      final toast = toasts.show(const Toast('Saving the page', duration: null));
+      await _settle(tester);
+
+      // To an alert: the words move to a node of their own, a live region
+      // the platform reads as new.
+      toast.update(
+        const Toast(
+          'Saving the page',
+          severity: Severity.danger,
+          duration: null,
+        ),
+      );
+      await tester.pump();
+      final words = tester.getSemantics(find.text('Saving the page'));
+      expect(words, isSemantics(label: 'Saving the page', isLiveRegion: true));
+      expect(words.parent!.getSemanticsData().role, SemanticsRole.alert);
+      expect(said, isEmpty);
+
+      // And back: the card is the live region again.
+      toast.update(
+        const Toast(
+          'Saving the page',
+          severity: Severity.warning,
+          duration: null,
+        ),
+      );
+      await tester.pump();
+      expect(
+        tester.getSemantics(find.text('Saving the page')),
+        isSemantics(label: 'Saving the page', isLiveRegion: true),
+      );
+      expect(said, isEmpty);
+
+      // Between two severities that are both live regions, the label stays
+      // as it was, and the words are said by hand.
+      toast.update(
+        const Toast(
+          'Saving the page',
+          severity: Severity.success,
+          duration: null,
+        ),
+      );
+      await tester.pump();
+      expect(said, ['Saving the page']);
 
       toasts.dismissAll();
       await tester.pumpAndSettle();

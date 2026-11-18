@@ -76,8 +76,16 @@ class _Sample extends StatelessWidget {
                     Button.primary('Save', onPressed: () {}),
                     Button('Cancel', onPressed: () {}),
                     StatusPill(StatusMeta('Paid', colors.info)),
-                    Check(value: true, onChanged: (_) {}),
-                    Toggle(value: true, onChanged: (_) {}),
+                    Check(
+                      value: true,
+                      onChanged: (_) {},
+                      semanticLabel: 'Sample checkbox',
+                    ),
+                    Toggle(
+                      value: true,
+                      onChanged: (_) {},
+                      semanticLabel: 'Sample switch',
+                    ),
                   ],
                 ),
                 const Gap(AdminSpacing.lg),

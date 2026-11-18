@@ -43,6 +43,7 @@ lays out right to left.
 - [Name clashes](#name-clashes)
 - [API conventions](#api-conventions)
 - [The preview catalog](#the-preview-catalog)
+- [Accessibility](#accessibility)
 - [Sweeps](#sweeps)
 - [Testing an app on the kit](#testing-an-app-on-the-kit)
 
@@ -1853,9 +1854,31 @@ The catalog's last group, Labs, holds prototypes of private widgets, each
 kept to settle an open design question that its class doc names. The sweeps
 below pump the labs too.
 
+## Accessibility
+
+[ACCESSIBILITY.md](ACCESSIBILITY.md) records what each component tells
+assistive technology and which tests hold it: its keyboard, its name, role
+and state, its contrast and its targets, with what is known to be missing.
+Two things it says first:
+
+- No manual screen-reader pass has been made. The record is what tests read
+  from the semantics tree, not what a screen reader said.
+- On the web, Flutter builds no accessibility tree until the user asks for
+  one, from the "Enable accessibility" button a screen reader finds on the
+  page. An app turns it on for everyone with
+  `SemanticsBinding.instance.ensureSemantics()` after `runApp`.
+
+On the web the `Shell`'s page is the main landmark. An app that marks one
+itself, or puts the shell inside a landmark of its own, passes
+`Shell(mainLandmark: false)`: a main landmark holds no other, and the
+framework throws in a debug build where one does.
+
+Its tables are generated: `fvm dart run tool/gen_accessibility.dart` after
+adding a role, a component or a test of one.
+
 ## Sweeps
 
-Four sweeps pump every demo of the catalog, catalog pages and preview-only
+Five sweeps pump every demo of the catalog, catalog pages and preview-only
 demos alike, with the real fonts, and fail on an exception or an overflow.
 They compare no pixels, so they run the same on every machine:
 
@@ -1871,6 +1894,11 @@ They compare no pixels, so they run the same on every machine:
   once the fixed pumps are over.
 - **Locales** (`example/test/rtl_smoke_test.dart`): every demo mirrored in
   Arabic, and in French, whose strings run longest.
+- **Targets** (`a11y_guidelines_sweep_test.dart`): every demo with its
+  semantics on, against Flutter's guidelines for targets: whatever takes a
+  tap has a name and is at least 24 by 24. A node the framework refuses, a
+  role where it cannot go, fails too. A target it lets through is listed
+  there with its reason.
 
 A sweep that cannot pump a demo yet lists it with the reason and the line a
 fix starts from, so nothing is left out silently. Run them from

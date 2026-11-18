@@ -23,6 +23,12 @@ import 'severity.dart';
 /// colour, the fill is what shows the value, so it takes the nearest shade of
 /// it that clears 3:1 against the track and the page (WCAG 1.4.11): the
 /// colour as it is where it already does.
+///
+/// A screen reader hears a bar with a [value] as a progress bar, named by
+/// [semanticLabel] or else [label], whose value runs from 0 to 100; the
+/// label and the percent beside it are the bar's name and value, and are
+/// not read a second time. A bar with no value has none to give: its name,
+/// [semanticLabel] or else [label], is read as the text it is.
 class ProgressBar extends StatelessWidget {
   /// Completion in 0..1, clamped for display. `null` = indeterminate sweep.
   final double? value;
@@ -40,6 +46,11 @@ class ProgressBar extends StatelessWidget {
   /// in French). Ignored when indeterminate.
   final bool showPercent;
 
+  /// What a screen reader calls the bar, for one with no [label] or whose
+  /// label says too little out of sight of what is around it; null is
+  /// [label].
+  final String? semanticLabel;
+
   const ProgressBar({
     super.key,
     required this.value,
@@ -47,6 +58,7 @@ class ProgressBar extends StatelessWidget {
     this.severity,
     this.label,
     this.showPercent = false,
+    this.semanticLabel,
   });
 
   double? get _clamped => value?.clamp(0, 1).toDouble();
@@ -86,22 +98,35 @@ class ProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The indicator is the progress bar a screen reader lands on, so it
+    // carries the name: a caption beside a nameless bar is two things.
+    final named = _clamped != null;
+    Widget indicator = _clamped == null && motionReduced(context)
+        ? StillLinearProgress(
+            minHeight: thickness,
+            backgroundColor: context.colors.border,
+            color: _fill(context),
+          )
+        : LinearProgressIndicator(
+            value: _clamped,
+            minHeight: thickness,
+            backgroundColor: context.colors.border,
+            valueColor: AlwaysStoppedAnimation(_fill(context)),
+            semanticsLabel: named ? semanticLabel ?? label : null,
+          );
+    if (!named && semanticLabel != null) {
+      // No value to carry: the name is read as text, in the caption's place.
+      indicator = Semantics(
+        container: true,
+        label: semanticLabel,
+        child: ExcludeSemantics(child: indicator),
+      );
+    }
     var bar = ClipRRect(
       // The theme's small radius: rounded ends in most themes, square in
       // Carbon.
       borderRadius: BorderRadius.circular(context.radii.radiusSmall),
-      child: _clamped == null && motionReduced(context)
-          ? StillLinearProgress(
-              minHeight: thickness,
-              backgroundColor: context.colors.border,
-              color: _fill(context),
-            )
-          : LinearProgressIndicator(
-              value: _clamped,
-              minHeight: thickness,
-              backgroundColor: context.colors.border,
-              valueColor: AlwaysStoppedAnimation(_fill(context)),
-            ),
+      child: indicator,
     );
 
     var percent = showPercent && _clamped != null;
@@ -117,23 +142,29 @@ class ProgressBar extends StatelessWidget {
             children: [
               if (label != null)
                 Expanded(
-                  child: Text(
-                    label!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.type.caption,
+                  child: ExcludeSemantics(
+                    excluding: named || semanticLabel != null,
+                    child: Text(
+                      label!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.type.caption,
+                    ),
                   ),
                 )
               else
                 const Spacer(),
               if (percent)
-                Text(
-                  context.adminFormats.percent(_clamped!),
-                  style: context.type.weighted(
-                    context.type.caption.copyWith(
-                      color: context.colors.foregroundMuted,
+                // The bar says its value.
+                ExcludeSemantics(
+                  child: Text(
+                    context.adminFormats.percent(_clamped!),
+                    style: context.type.weighted(
+                      context.type.caption.copyWith(
+                        color: context.colors.foregroundMuted,
+                      ),
+                      FontWeight.w600,
                     ),
-                    FontWeight.w600,
                   ),
                 ),
             ],

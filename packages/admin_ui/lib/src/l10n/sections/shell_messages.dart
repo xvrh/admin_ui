@@ -11,6 +11,9 @@ abstract class ShellMessages extends AdminMessages {
   /// The sidebar's navigation landmark.
   String get navigation;
 
+  /// The shell's main landmark: the page beside the navigation.
+  String get mainContent;
+
   /// The compact shell's menu button, which opens the navigation drawer.
   String get openNavigation;
 
@@ -143,6 +146,9 @@ class ShellMessagesEn extends ShellMessages {
 
   @override
   String get navigation => 'Navigation';
+
+  @override
+  String get mainContent => 'Main content';
 
   @override
   String get openNavigation => 'Open navigation';
@@ -287,6 +293,9 @@ class ShellMessagesFr extends ShellMessages {
   String get navigation => 'Navigation';
 
   @override
+  String get mainContent => 'Contenu principal';
+
+  @override
   String get openNavigation => 'Ouvrir la navigation';
 
   @override
@@ -428,6 +437,9 @@ class ShellMessagesAr extends ShellMessages {
 
   @override
   String get navigation => 'التنقل';
+
+  @override
+  String get mainContent => 'المحتوى الرئيسي';
 
   @override
   String get openNavigation => 'فتح التنقل';

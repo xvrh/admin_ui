@@ -166,7 +166,14 @@ export 'src/common/ui/status_pill.dart' show StatusDot, StatusMeta, StatusPill;
 export 'src/common/ui/steps.dart' show StepItem, Steps;
 export 'src/common/ui/swatch_row.dart' show SwatchOption, SwatchRow;
 export 'src/common/ui/tabs.dart'
-    show TabItem, TabScope, TabSelection, Tabs, TabsAlignment, TabsVariant;
+    show
+        TabItem,
+        TabPanel,
+        TabScope,
+        TabSelection,
+        Tabs,
+        TabsAlignment,
+        TabsVariant;
 export 'src/common/ui/tag.dart' show Tag, TagVariant;
 export 'src/common/ui/tappable.dart' show CursorRegion, Tappable;
 export 'src/common/ui/text_link.dart' show TextLink;

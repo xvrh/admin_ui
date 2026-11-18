@@ -409,8 +409,13 @@ void main() {
 
       expect(find.text('Mapped FormatException'), findsOneWidget);
       expect(find.textContaining('409'), findsNothing);
+      // An alert to assistive technology, whose words are the live region.
       expect(
-        tester.getSemantics(find.byType(Alert)),
+        tester.getSemantics(find.byType(Alert)).getSemanticsData().role,
+        SemanticsRole.alert,
+      );
+      expect(
+        tester.getSemantics(find.text('Mapped FormatException')),
         isSemantics(isLiveRegion: true),
       );
       // Focus returns to Cancel, so Escape still answers after a failure.
