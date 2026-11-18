@@ -433,6 +433,7 @@ theme.dart TabsRule
 theme.dart TabsSelectedInk
 theme.dart ToggleOffStyle
 theme.dart ToggleOnColor
+theme.dart TooltipText
 theme.dart TopBarSpan
 theme.dart adminAccents
 theme.dart adminThemes

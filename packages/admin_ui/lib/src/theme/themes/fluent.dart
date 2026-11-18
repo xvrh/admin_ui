@@ -307,8 +307,15 @@ final fluentTheme = AdminTheme.from(
     indicatorWidth: 4,
     topBarHeight: 48,
   ),
-  // Tooltip: withArrow, maxWidth 240px, a 6px arrowHeight
-  overlay: const AdminOverlayStyle(tooltipArrow: true, tooltipMaxWidth: 240),
+  // Tooltip: withArrow, maxWidth 240px, a 6px arrowHeight,
+  // borderRadiusMedium, `5px 12px 7px 12px` around caption1
+  overlay: const AdminOverlayStyle(
+    tooltipArrow: true,
+    tooltipMaxWidth: 240,
+    tooltipRadius: 4,
+    tooltipPaddingX: 12,
+    tooltipPaddingY: 6,
+  ),
   // the Windows Community Toolkit's Segmented: an outlined track, the
   // selected item raised in ControlFillColorDefault over a short accent
   // pill, regular labels

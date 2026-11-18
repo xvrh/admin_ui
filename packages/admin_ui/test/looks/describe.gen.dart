@@ -379,6 +379,11 @@ void describeAdminOverlayStyle(
   final p = path.isEmpty ? '' : '$path.';
   describeValue(v.tooltipArrow, '${p}tooltipArrow', out);
   describeValue(v.tooltipMaxWidth, '${p}tooltipMaxWidth', out);
+  describeValue(v.tooltipRadius, '${p}tooltipRadius', out);
+  describeValue(v.tooltipPaddingX, '${p}tooltipPaddingX', out);
+  describeValue(v.tooltipPaddingY, '${p}tooltipPaddingY', out);
+  describeValue(v.tooltipText, '${p}tooltipText', out);
+  describeValue(v.tooltipDelay, '${p}tooltipDelay', out);
   describeValue(v.arrowWidth, '${p}arrowWidth', out);
   describeValue(v.arrowHeight, '${p}arrowHeight', out);
 }

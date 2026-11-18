@@ -119,7 +119,9 @@ final irisTheme = AdminTheme.from(
   field: const AdminFieldStyle(), // an outlined box, focused in focusRing
   button: const AdminButtonStyle(), // centred, height / 2 - 4 either side
   shell: const AdminShellStyle(), // a 240 / 64 sidebar, a 56 top bar
-  overlay: const AdminOverlayStyle(), // plain tooltips at 280, a 12×6 arrow
+  // plain tooltips at the small radius, 8×4 around caption text, wrapping
+  // at 280; a 12×6 arrow
+  overlay: const AdminOverlayStyle(),
   // a track with a hairline-ringed knob 3 in, sliding
   segmented: const AdminSegmentedStyle(),
   // a 36×20 switch, filled while off; an 18px box and an 18px radio whose

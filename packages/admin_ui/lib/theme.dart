@@ -25,7 +25,7 @@ export 'src/theme/field_style.dart'
 export 'src/theme/focus.dart' show AdminFocusSpec;
 export 'src/theme/fonts.dart' show AdminFonts;
 export 'src/theme/motion.dart' show AdminMotion, defaultMotion;
-export 'src/theme/overlay_style.dart' show AdminOverlayStyle;
+export 'src/theme/overlay_style.dart' show AdminOverlayStyle, TooltipText;
 export 'src/theme/palette.dart' show AdminPalette;
 export 'src/theme/radii.dart' show AdminRadii, defaultRadii;
 export 'src/theme/segmented_style.dart'

@@ -85,6 +85,7 @@ theme_internals:
     - TabsSelectedInk
     - ToggleOffStyle
     - ToggleOnColor
+    - TooltipText
     - TopBarSpan
     - antDarkPalette
     - antPalette

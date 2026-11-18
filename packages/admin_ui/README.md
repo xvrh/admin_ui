@@ -1279,7 +1279,22 @@ indicator stroke where the style gives none. A line strip stands on a
 arrow, the width it wraps at, and the size of the arrow a tooltip or a
 popover with `showArrow` draws: Iris and Material's plain tooltips have none
 and wrap at 280 and 200, shadcn's has Radix's 10×5 arrow, Ant's a 16×8 one at
-250, Fluent's wraps at 240 and Carbon's at 288, both with a 12×6 arrow.
+250, Fluent's wraps at 240 and Carbon's at 288, both with a 12×6 arrow. It
+also sets a tooltip's corner (`tooltipRadius`, the small radius where none is
+given), its padding (`tooltipPaddingX`, `tooltipPaddingY`), its text
+(`tooltipText`: the caption or the body) and how long the pointer rests
+before it shows (`tooltipDelay`); a `Tip` given a `waitDuration` keeps its
+own.
+
+| Theme | Tooltip corner | Padding | Text | Delay |
+|---|---|---|---|---|
+| Iris | the small radius, 7 | 8 × 4 | caption | 400ms |
+| Material | 4 | 8 × 4 | caption | 400ms |
+| shadcn | 8 | 12 × 6 | caption | none |
+| Ant | 6 | 8 × 6 | body | 400ms |
+| Fluent | 4 | 12 × 6 | caption | 400ms |
+| Carbon | 2 | 16 × 16 | body | 400ms |
+
 
 Each theme also takes its design system's shadows: M3's elevation levels,
 Tailwind's `shadow-sm`, `shadow-md` and `shadow-lg` for shadcn in light mode,
