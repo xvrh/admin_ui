@@ -7,6 +7,7 @@ import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
 import '../segmented_style.dart';
+import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -119,4 +120,7 @@ final irisTheme = AdminTheme.from(
   overlay: const AdminOverlayStyle(), // plain tooltips at 280, a 12×6 arrow
   // a track with a hairline-ringed knob 3 in, sliding
   segmented: const AdminSegmentedStyle(),
+  // a 36×20 switch, filled while off; an 18px box and an 18px radio whose
+  // mark is a disc, in the accent
+  selection: const AdminSelectionStyle(),
 );

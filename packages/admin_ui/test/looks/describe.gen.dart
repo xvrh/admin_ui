@@ -21,6 +21,7 @@ void describeAdminTokens(AdminTokens v, String path, Map<String, String> out) {
   describeAdminShellStyle(v.shell, '${p}shell', out);
   describeAdminOverlayStyle(v.overlay, '${p}overlay', out);
   describeAdminSegmentedStyle(v.segmented, '${p}segmented', out);
+  describeAdminSelectionStyle(v.selection, '${p}selection', out);
   describeAdminBreakpoints(v.breakpoints, '${p}breakpoints', out);
 }
 
@@ -391,6 +392,26 @@ void describeAdminSegmentedStyle(
   describeValue(v.inverse, '${p}inverse', out);
   describeValue(v.radius, '${p}radius', out);
   describeValue(v.labelWeight, '${p}labelWeight', out);
+}
+
+void describeAdminSelectionStyle(
+  AdminSelectionStyle v,
+  String path,
+  Map<String, String> out,
+) {
+  final p = path.isEmpty ? '' : '$path.';
+  describeValue(v.toggleWidth, '${p}toggleWidth', out);
+  describeValue(v.toggleHeight, '${p}toggleHeight', out);
+  describeValue(v.toggleKnob, '${p}toggleKnob', out);
+  describeValue(v.toggleKnobOn, '${p}toggleKnobOn', out);
+  describeValue(v.toggleOff, '${p}toggleOff', out);
+  describeValue(v.toggleOn, '${p}toggleOn', out);
+  describeValue(v.checkSize, '${p}checkSize', out);
+  describeValue(v.radioSize, '${p}radioSize', out);
+  describeValue(v.radioMark, '${p}radioMark', out);
+  describeValue(v.radioDot, '${p}radioDot', out);
+  describeValue(v.ink, '${p}ink', out);
+  describeValue(v.outline, '${p}outline', out);
 }
 
 void describeAdminBreakpoints(

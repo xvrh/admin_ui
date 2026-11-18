@@ -1,9 +1,14 @@
+/// @docImport '../../theme/palette.dart';
+/// @docImport '../../theme/stroke.dart';
 /// @docImport 'checkbox.dart';
 library;
+
+import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/contrast.dart';
+import '../../theme/selection_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'control_label.dart';
@@ -16,6 +21,11 @@ import 'tappable.dart';
 ///
 /// A Tab stop that Space and Enter flip, announced as a switch with its on/off
 /// state. Keyboard focus rings the track.
+///
+/// The theme's [AdminSelectionStyle] draws it as its reference system does
+/// (see `context.selectionStyle`): the track's and the knob's sizes, a knob
+/// that grows as it turns on, an off track that is filled or outlined, and
+/// an on track in the accent or in the success colour.
 ///
 /// A null [onChanged] disables it: the track greys, as a disabled [Check]'s
 /// box does, and it leaves the Tab order. [readOnly] shows the value at full
@@ -47,10 +57,6 @@ class Toggle extends StatelessWidget {
     this.readOnly = false,
   });
 
-  static const _width = 36.0;
-  static const _height = 20.0;
-  static const _knob = 16.0;
-
   @override
   Widget build(BuildContext context) {
     final editable = onChanged != null && !readOnly;
@@ -66,7 +72,7 @@ class Toggle extends StatelessWidget {
       builder: (context, states) {
         final track = FocusRing(
           focused: states.contains(WidgetState.focused),
-          radius: _height / 2,
+          radius: context.selectionStyle.toggleHeight / 2,
           child: _track(
             context,
             enabled: enabled,
@@ -102,37 +108,69 @@ class Toggle extends StatelessWidget {
     );
   }
 
+  /// Off, a [ToggleOffStyle.filled] track is [AdminPalette.controlBorder]
+  /// under a knob in the surface colour; an outlined one is ringed in it,
+  /// [AdminStroke.controlStrong] wide, around a knob in the same colour, over
+  /// nothing or, [ToggleOffStyle.tonal], a wash of the foreground. On, the
+  /// track is [AdminSelectionStyle.toggleOnOf] under
+  /// [AdminSelectionStyle.toggleKnobOnOf]. Under the pointer the off colour
+  /// deepens by the pressed overlay and the on track takes its hover shade.
+  /// Disabled, the track greys.
   Widget _track(
     BuildContext context, {
     required bool enabled,
     required bool hovered,
   }) {
     final colors = context.colors;
-    final Color track;
+    final style = context.selectionStyle;
+    final filled = style.toggleOff == ToggleOffStyle.filled;
+    const clear = Color(0x00000000);
+
+    // The off colour: a filled track, or an outlined one's ring and knob.
+    final Color off;
     if (!enabled) {
-      track = value
-          ? colors.foregroundSubtle
+      off = filled
           // token-literal: a disabled off track, fainter than the faint step
-          : colors.foregroundFaint.withValues(alpha: 0.5);
-    } else if (value) {
-      track = hovered ? colors.controlAccentHover : colors.controlAccent;
+          ? colors.foregroundFaint.withValues(alpha: 0.5)
+          : colors.foregroundFaint;
     } else {
-      track = hovered
+      off = hovered
           ? Color.alphaBlend(colors.pressedOverlay, colors.controlBorder)
           : colors.controlBorder;
     }
-    // On, the accent's on-colour, as a checked Check's glyph: it holds its
+
+    final Color track;
+    final Color ring;
+    if (value) {
+      track = enabled
+          ? style.toggleOnOf(colors, hovered: hovered)
+          : colors.foregroundSubtle;
+      ring = track;
+    } else if (filled) {
+      track = off;
+      ring = off;
+    } else {
+      track = style.toggleOff == ToggleOffStyle.tonal && enabled
+          ? Color.alphaBlend(colors.pressedOverlay, colors.surface)
+          : clear;
+      ring = off;
+    }
+
+    // On, the track's on-colour, as a checked Check's glyph: it holds its
     // contrast on the hover shade too, and it is Material's onPrimary handle
     // and shadcn's thumb (the page colour in light, primary-foreground in
-    // dark). Off, the surface colour; but in a dark theme a surface-coloured
-    // knob on a dim track reads as a hole, so there it takes whichever of the
-    // surface and the foreground stands out more from the track. Disabled, the
+    // dark). Off on a filled track, the surface colour; but in a dark theme a
+    // surface-coloured knob on a dim track reads as a hole, so there it takes
+    // whichever of the surface and the foreground stands out more from the
+    // track. Off in an outlined track, the ring's colour. Disabled, the
     // surface colour on grey.
     final Color knob;
-    if (!enabled) {
+    if (value) {
+      knob = enabled ? style.toggleKnobOnOf(colors) : colors.surface;
+    } else if (!filled) {
+      knob = off;
+    } else if (!enabled) {
       knob = colors.surface;
-    } else if (value) {
-      knob = colors.onControlAccent;
     } else if (colors.brightness == Brightness.dark) {
       knob =
           contrastRatio(colors.foreground, track) >
@@ -143,18 +181,31 @@ class Toggle extends StatelessWidget {
       knob = colors.surface;
     }
 
+    final height = style.toggleHeight;
+    // The knob is laid out at the larger of its two sizes and drawn smaller
+    // where it shrinks, so it grows about its own centre.
+    final slot = style.toggleKnobSlot;
+    final size = value
+        ? style.toggleKnobOn ?? style.toggleKnob
+        : style.toggleKnob;
+    // An outlined track keeps its ring's width while on, in the track's own
+    // colour, so the knob's margins never move.
+    final ringWidth = filled ? 0.0 : context.stroke.controlStrong;
     final motion = context.motion;
     return AnimatedContainer(
       duration: motion.fast,
       curve: motion.standard,
-      width: _width,
-      height: _height,
-      padding: const EdgeInsets.all((_height - _knob) / 2),
+      width: style.toggleWidth,
+      height: height,
+      // A Container adds its border's width to its padding. A ring wider
+      // than the knob's margin leaves the knob that much less room.
+      padding: EdgeInsets.all(math.max(0, (height - slot) / 2 - ringWidth)),
       decoration: BoxDecoration(
         color: track,
         // A pill in every theme, whatever its radii: no reference system
         // squares off a switch, Carbon included.
-        borderRadius: BorderRadius.circular(_height / 2),
+        borderRadius: BorderRadius.circular(height / 2),
+        border: filled ? null : Border.all(color: ring, width: ringWidth),
       ),
       child: AnimatedAlign(
         duration: motion.fast,
@@ -162,13 +213,20 @@ class Toggle extends StatelessWidget {
         alignment: value
             ? AlignmentDirectional.centerEnd
             : AlignmentDirectional.centerStart,
-        child: Container(
-          width: _knob,
-          height: _knob,
-          decoration: BoxDecoration(
-            color: knob,
-            shape: BoxShape.circle,
-            boxShadow: context.elevation.sm,
+        child: AnimatedScale(
+          duration: motion.fast,
+          curve: motion.standard,
+          scale: size / slot,
+          child: Container(
+            width: slot,
+            height: slot,
+            decoration: BoxDecoration(
+              color: knob,
+              shape: BoxShape.circle,
+              // A knob on a filled track is lifted; an outlined track's is
+              // flat, as M3's and Fluent's are.
+              boxShadow: filled ? context.elevation.sm : null,
+            ),
           ),
         ),
       ),

@@ -33,6 +33,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
   final palette = tokens.palette;
   final type = tokens.typography;
   final radii = tokens.radii;
+  final selection = tokens.selection;
   final layer = palette.stateLayer;
 
   var base = ThemeData(
@@ -153,35 +154,36 @@ ThemeData buildAppTheme(AdminTokens tokens) {
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.controlAccent) ??
+            whenSelected(states, selection.inkOf(palette)) ??
             const Color(0x00000000),
       ),
-      checkColor: WidgetStatePropertyAll(palette.onControlAccent),
+      checkColor: WidgetStatePropertyAll(selection.onInkOf(palette)),
       side: BorderSide(
-        color: palette.controlBorder,
+        color: selection.outlineOf(palette),
         width: tokens.stroke.controlStrong,
       ),
     ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.controlAccent) ??
-            palette.controlBorder,
+            whenSelected(states, selection.inkOf(palette)) ??
+            selection.outlineOf(palette),
       ),
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.onControlAccent) ??
+            whenSelected(states, selection.toggleKnobOnOf(palette)) ??
             palette.controlBorder,
       ),
       trackColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.controlAccent) ?? palette.border,
+            whenSelected(states, selection.toggleOnOf(palette)) ??
+            palette.border,
       ),
       trackOutlineColor: WidgetStateProperty.resolveWith(
         (states) =>
-            whenSelected(states, palette.controlAccent) ??
+            whenSelected(states, selection.toggleOnOf(palette)) ??
             palette.controlBorder,
       ),
     ),

@@ -8,7 +8,8 @@ import '../demo_kit.dart';
 /// The active theme's anatomy tokens, drawn from the tokens alone: a field's
 /// box in each state (`resolveFieldChrome` through `fieldDecoration`), a
 /// stock `TextField` on the theme's `FieldBorder`, the button and shell
-/// geometry, and the palettes the frame draws its sidebar and top bar in.
+/// geometry, the switch, checkbox and radio, and the palettes the frame
+/// draws its sidebar and top bar in.
 class AnatomyDemo extends StatelessWidget {
   @Preview(name: 'Anatomy', wrapper: adminUiPreview)
   const AnatomyDemo({super.key});
@@ -19,6 +20,7 @@ class AnatomyDemo extends StatelessWidget {
     final field = tokens.field;
     final button = tokens.button;
     final shell = tokens.shell;
+    final selection = tokens.selection;
     final radii = tokens.radii;
     String n(double v) =>
         v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
@@ -83,6 +85,62 @@ class AnatomyDemo extends StatelessWidget {
           ),
         ])
           _value(context, label, value),
+        const Gap(AdminSpacing.xl),
+
+        const DemoSection('Selection'),
+        _value(
+          context,
+          'switch',
+          '${n(selection.toggleWidth)} × ${n(selection.toggleHeight)}, knob '
+              '${n(selection.toggleKnob)}'
+              '${selection.toggleKnobOn == null ? '' : ' to ${n(selection.toggleKnobOn!)}'}'
+              ', ${selection.toggleOff.name} off, ${selection.toggleOn.name} on',
+        ),
+        _value(
+          context,
+          'checkbox',
+          '${n(selection.checkSize)}, corner ${n(radii.radiusCheck)}',
+        ),
+        _value(
+          context,
+          'radio',
+          '${n(selection.radioSize)}, '
+              '${selection.radioMark == RadioMark.disc ? 'a disc' : 'its ring'} '
+              'around a dot of ${n(selection.radioDot)}',
+        ),
+        _value(
+          context,
+          'drawn in',
+          '${selection.ink.name}, outlined in ${selection.outline.name} at '
+              '${n(tokens.stroke.controlStrong)}',
+        ),
+        const Gap(AdminSpacing.md),
+        Wrap(
+          spacing: AdminSpacing.xl,
+          runSpacing: AdminSpacing.md,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Toggle(value: false, onChanged: (_) {}, semanticLabel: 'Off'),
+            Toggle(value: true, onChanged: (_) {}, semanticLabel: 'On'),
+            Check(value: false, onChanged: (_) {}, semanticLabel: 'Unchecked'),
+            Check(value: true, onChanged: (_) {}, semanticLabel: 'Checked'),
+            Check(
+              value: true,
+              indeterminate: true,
+              onChanged: (_) {},
+              semanticLabel: 'Mixed',
+            ),
+          ],
+        ),
+        const Gap(AdminSpacing.md),
+        Choice<String>(
+          value: 'selected',
+          onChanged: (_) {},
+          options: const [
+            ChoiceOption('selected', 'Selected'),
+            ChoiceOption('unselected', 'Unselected'),
+          ],
+        ),
         const Gap(AdminSpacing.xl),
 
         const DemoSection('Shell'),

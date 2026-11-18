@@ -38,13 +38,15 @@ const _guidelines = <String, AccessibilityGuideline>{
 const _skipped = <String, String>{};
 
 const _bareCheck =
-    'a Check with no label beside it is its 18px box, and so are the row and '
-    "select-all boxes of a table, each alone in its cell. Needs the target "
-    'grown past the box: lib/src/common/ui/checkbox.dart:62';
+    'a Check with no label beside it is its box, 16 or 18px by the theme, '
+    "and so are the row and select-all boxes of a table, each alone in its "
+    'cell. Needs the target grown past the box: '
+    'lib/src/common/ui/checkbox.dart:73';
 
 const _bareToggle =
-    'a Toggle with no label beside it is its track, 36 by 20. Needs the '
-    'target grown past the track: lib/src/common/ui/toggle.dart:59';
+    'a Toggle with no label beside it is its track, 18 to 22px tall in '
+    'every theme but Material and Carbon. Needs the target grown past the '
+    'track: lib/src/common/ui/toggle.dart:65';
 
 const _textLink =
     'a TextLink is as tall as its line of text, 16 to 18px. In a sentence '
@@ -66,7 +68,7 @@ const _exemptTargets = <String, Map<String, String>>{
         "the control-states page draws a radio with an empty label, to show "
         "the dot alone in each state, and a ChoiceOption has no name but its "
         'label. Needs a semantic label on the option: '
-        'lib/src/common/ui/choice.dart:33',
+        'lib/src/common/ui/choice.dart:35',
   },
   _sized: {
     'Check': _bareCheck,

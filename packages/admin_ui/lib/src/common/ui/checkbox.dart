@@ -1,6 +1,11 @@
+/// @docImport '../../theme/radii.dart';
+library;
+
+import 'dart:math' as math;
+
 import 'package:material_ui/material_ui.dart';
 
-import '../../theme/palette.dart';
+import '../../theme/selection_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/stroke.dart';
 import '../../theme/tokens.dart';
@@ -15,12 +20,18 @@ import 'tappable.dart';
 /// A Tab stop that Space and Enter toggle, announced as a checkbox with its
 /// checked (or mixed) state. Keyboard focus rings the box.
 ///
+/// The theme's [AdminSelectionStyle] sets the box's size, what rings it while
+/// off and what fills it while on (see `context.selectionStyle`); its corner
+/// is [AdminRadii.radiusCheck] and its outline [AdminStroke.controlStrong].
+///
 /// A null [onChanged] disables it: the box greys and it leaves the Tab
 /// order. [readOnly] shows the value at full contrast without letting it
 /// change — still a Tab stop, announced read-only, with no hover (see
 /// `FieldState`).
 class Check extends StatelessWidget {
-  /// The box's side, without a [label].
+  /// The box's side in the kit's own theme. A theme sets its own: read
+  /// `context.selectionStyle.checkSize`.
+  @Deprecated('Read context.selectionStyle.checkSize: a theme sets the size.')
   static const size = 18.0;
 
   final bool value;
@@ -106,18 +117,20 @@ class Check extends StatelessWidget {
     );
   }
 
-  /// Filled with [AdminPalette.controlAccent] and an
-  /// [AdminPalette.onControlAccent] glyph when on, its hover shade under the
-  /// pointer; an [AdminPalette.controlBorder] outline
-  /// ([AdminStroke.controlStrong]) when off, which takes
-  /// the [offHoverOutline] under the pointer. Disabled, the fill drops to the
-  /// disabled grey with a knocked-out glyph.
+  /// Filled with the style's ink ([AdminSelectionStyle.inkOf]) under a glyph
+  /// in its on-colour when on, its hover shade under the pointer; outlined
+  /// ([AdminSelectionStyle.outlineOf], [AdminStroke.controlStrong] wide) when
+  /// off, which takes [AdminSelectionStyle.hoverOutlineOf] under the
+  /// pointer. Disabled, the fill drops to the disabled grey with a
+  /// knocked-out glyph.
   Widget _box(
     BuildContext context, {
     required bool enabled,
     required bool hovered,
   }) {
     final colors = context.colors;
+    final style = context.selectionStyle;
+    final size = style.checkSize;
     final on = value || indeterminate;
     final Color fill;
     final Color border;
@@ -125,11 +138,11 @@ class Check extends StatelessWidget {
       fill = on ? colors.foregroundSubtle : Colors.transparent;
       border = on ? colors.foregroundSubtle : colors.foregroundFaint;
     } else if (on) {
-      fill = hovered ? colors.controlAccentHover : colors.controlAccent;
+      fill = style.inkOf(colors, hovered: hovered);
       border = fill;
     } else {
       fill = Colors.transparent;
-      border = hovered ? offHoverOutline(colors) : colors.controlBorder;
+      border = hovered ? style.hoverOutlineOf(colors) : style.outlineOf(colors);
     }
     return Container(
       width: size,
@@ -145,8 +158,9 @@ class Check extends StatelessWidget {
       child: on
           ? Icon(
               indeterminate ? Icons.remove_rounded : Icons.check_rounded,
-              size: context.iconSizes.sm,
-              color: enabled ? colors.onControlAccent : colors.surface,
+              // the glyph keeps a pixel clear of the box's edge
+              size: math.min(context.iconSizes.sm, size - 2),
+              color: enabled ? style.onInkOf(colors) : colors.surface,
             )
           : null,
     );

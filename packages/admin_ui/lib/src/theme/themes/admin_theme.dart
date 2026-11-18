@@ -10,6 +10,7 @@ import '../overlay_style.dart';
 import '../palette.dart';
 import '../radii.dart';
 import '../segmented_style.dart';
+import '../selection_style.dart';
 import '../shell_style.dart';
 import '../sizes.dart';
 import '../stroke.dart';
@@ -39,8 +40,9 @@ class AdminTheme {
   /// share the [radii], [type], [focus] ring, control [sizes] (left out,
   /// [defaultControlSizes]), [table] metrics (left out,
   /// [defaultTableMetrics]), [motion] (left out, [defaultMotion]), [stroke]
-  /// widths, [iconSizes], the [field], [button], [overlay] and [segmented]
-  /// anatomy, and the layout [breakpoints] (left out, [AdminBreakpoints]' defaults).
+  /// widths, [iconSizes], the [field], [button], [overlay], [segmented] and
+  /// [selection] anatomy, and the layout [breakpoints] (left out,
+  /// [AdminBreakpoints]' defaults).
   /// The light set takes [elevation] and [shell], the dark set
   /// [darkElevation] and [darkShell]; left out, each mode gets the shadows
   /// that suit its palette's brightness ([defaultElevation] or
@@ -70,6 +72,7 @@ class AdminTheme {
     AdminShellStyle? darkShell,
     AdminOverlayStyle? overlay,
     AdminSegmentedStyle? segmented,
+    AdminSelectionStyle? selection,
     AdminBreakpoints? breakpoints,
   }) = _PaletteTheme;
 
@@ -128,6 +131,7 @@ class _PaletteTheme implements AdminTheme {
   final AdminShellStyle? darkShell;
   final AdminOverlayStyle? overlay;
   final AdminSegmentedStyle? segmented;
+  final AdminSelectionStyle? selection;
   final AdminBreakpoints? breakpoints;
 
   _PaletteTheme({
@@ -150,6 +154,7 @@ class _PaletteTheme implements AdminTheme {
     this.darkShell,
     this.overlay,
     this.segmented,
+    this.selection,
     this.breakpoints,
   }) : darkPalette = dark;
 
@@ -182,6 +187,7 @@ class _PaletteTheme implements AdminTheme {
     shell: shell,
     overlay: overlay,
     segmented: segmented,
+    selection: selection,
     breakpoints: breakpoints,
   );
 
@@ -211,6 +217,7 @@ class _PaletteTheme implements AdminTheme {
     darkShell: darkShell?.branded(seed),
     overlay: overlay,
     segmented: segmented,
+    selection: selection,
     breakpoints: breakpoints,
   );
 

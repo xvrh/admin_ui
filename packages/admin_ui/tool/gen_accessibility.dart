@@ -47,8 +47,16 @@ const components = [
         'As tall as its line of text, 16 to 18px: under 24px where it is '
         'not in a sentence.',
   ),
-  Component('Toggle', gap: 'With no label, its target is its 36 by 20 track.'),
-  Component('Check', gap: 'With no label, its target is its 18px box.'),
+  Component(
+    'Toggle',
+    gap:
+        'With no label, its target is its track, 18 to 22px tall in every '
+        'theme but Material and Carbon.',
+  ),
+  Component(
+    'Check',
+    gap: 'With no label, its target is its box, 16 or 18px by the theme.',
+  ),
   Component('Choice', gap: 'An option has no name but its visible label.'),
   Component('Segmented', gap: "Fluent's small segment is 22px tall."),
   Component(
