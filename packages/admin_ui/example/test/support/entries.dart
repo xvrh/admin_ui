@@ -92,6 +92,11 @@ const previewOnly = <PreviewOnlyDemo>[
     CopyButtonStatesDemo.new,
   ),
   PreviewOnlyDemo(
+    'StatCardDemo.phone',
+    'Stat card / dashboard (phone width)',
+    StatCardDemo.phone,
+  ),
+  PreviewOnlyDemo(
     'ChartCardDemo.phone',
     'Chart card (phone width)',
     ChartCardDemo.phone,

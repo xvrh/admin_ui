@@ -6,16 +6,30 @@ import '../../preview_shell.dart';
 import '../demo_kit.dart';
 
 class StatCardDemo extends StatelessWidget {
+  /// The page's width, or null for a desktop page.
+  final double? width;
+
   @Preview(name: 'Stat card / dashboard', wrapper: adminUiPreview)
-  const StatCardDemo({super.key});
+  const StatCardDemo({super.key}) : width = null;
+
+  /// At a phone's width: the tiles two across, 165.5 wide, loaded and
+  /// loading.
+  @Preview(name: 'Stat card / dashboard (phone width)', wrapper: adminUiPreview)
+  const StatCardDemo.phone({super.key}) : width = 375;
 
   @override
   Widget build(BuildContext context) {
+    final phone = width != null;
+    final minTileWidth = phone ? 140.0 : 200.0;
     return DemoPage(
-      maxWidth: 760,
+      maxWidth: width ?? 760,
+      padding: EdgeInsets.all(phone ? AdminSpacing.xl : AdminSpacing.xxxl),
       children: [
-        const DemoSection('Dashboard grid (responsive)'),
+        DemoSection(
+          phone ? 'Two across a phone' : 'Dashboard grid (responsive)',
+        ),
         StatGrid(
+          minTileWidth: minTileWidth,
           children: [
             StatCard(
               label: 'Revenue',
@@ -59,25 +73,32 @@ class StatCardDemo extends StatelessWidget {
         ),
         const Gap(AdminSpacing.xxxl),
 
-        const DemoSection('Minimal — value only'),
-        const StatGrid(
-          minTileWidth: 160,
-          children: [
-            StatCard(label: 'Posts', value: '312'),
-            StatCard(label: 'Drafts', value: '18'),
-            StatCard(label: 'Comments', value: '1,047'),
-            StatCard(
-              label: 'Storage',
-              value: '6.4 GB',
-              delta: StatDelta('flat', direction: TrendDirection.flat),
-            ),
-          ],
-        ),
-        const Gap(AdminSpacing.xxxl),
+        if (!phone) ...const [
+          DemoSection('Minimal — value only'),
+          StatGrid(
+            minTileWidth: 160,
+            children: [
+              StatCard(label: 'Posts', value: '312'),
+              StatCard(label: 'Drafts', value: '18'),
+              StatCard(label: 'Comments', value: '1,047'),
+              StatCard(
+                label: 'Storage',
+                value: '6.4 GB',
+                delta: StatDelta('flat', direction: TrendDirection.flat),
+              ),
+            ],
+          ),
+          Gap(AdminSpacing.xxxl),
+        ],
 
-        const DemoSection('Loading — as tall as the loaded cards'),
-        const StatGrid(
-          children: [
+        DemoSection(
+          phone
+              ? 'Loading, two across'
+              : 'Loading — as tall as the loaded cards',
+        ),
+        StatGrid(
+          minTileWidth: minTileWidth,
+          children: const [
             StatCard(
               label: 'Revenue',
               icon: Icons.payments_rounded,

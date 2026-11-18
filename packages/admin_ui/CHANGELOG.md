@@ -275,6 +275,16 @@
 
 ### Looks
 
+- A loading `StatCard`'s delta bar is as wide as the chip of a short delta,
+  "12%": the chip's padding, its arrow and its words, measured as the chip
+  lays them out. It was three times as wide as it is tall, about 7 wider
+  than that chip at the normal size, 21 in Ant. Only the chip's words grow
+  with the text size, not its padding or its arrow, so at twice the size
+  the bar stood up to 80% wider than the chip, and a loading card two
+  across a phone (165.5 wide) overflowed in Ant. The bar is narrower at
+  every size, and a loading card fits wherever the card it becomes does.
+  The catalog's stat card page has a phone-width preview, its tiles two
+  across.
 - A `BarList`'s values stand in a column as wide as the widest, each at its
   end edge, and every row's bar runs along the same track. Each row's track
   ended where its own value began, so a row with a short value had a longer

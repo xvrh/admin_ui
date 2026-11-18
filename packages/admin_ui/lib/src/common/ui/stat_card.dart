@@ -502,26 +502,51 @@ class _SkeletonTrend extends StatelessWidget {
 }
 
 /// A loading [_DeltaChip]: a pill of its height, its padding around the
-/// taller of its arrow and its text.
+/// taller of its arrow and its words, and as wide as the chip of a short
+/// delta, [_sample]. It is measured as the chip is laid out: only the words
+/// grow with the text size, not the padding or the arrow, so a pill drawn in
+/// proportion to its height would outgrow the chip, and a narrow card, at a
+/// large text size.
 class _SkeletonDeltaChip extends StatelessWidget {
+  /// The words of a short delta, which the pill is as wide as.
+  static const _sample = '12%';
+
   const _SkeletonDeltaChip();
 
   @override
   Widget build(BuildContext context) {
-    final line = lineHeightOf(
-      context,
-      context.type.weighted(context.type.caption, FontWeight.w700),
-    );
-    final height = 2 * AdminSpacing.xxs + math.max(context.iconSizes.xs, line);
+    final style = _DeltaChip.labelStyle(context);
+    final arrow = context.iconSizes.xs;
     return Skeleton(
-      width: 3 * height,
-      height: height,
+      width:
+          _DeltaChip.padding.horizontal +
+          arrow +
+          _DeltaChip.gap +
+          textWidthOf(context, _sample, style, exact: true),
+      height:
+          _DeltaChip.padding.vertical +
+          math.max(arrow, lineHeightOf(context, style)),
       borderRadius: BorderRadius.circular(context.radii.radiusPill),
     );
   }
 }
 
 class _DeltaChip extends StatelessWidget {
+  /// A Tag's padding, so the two read as one kind of chip.
+  static const padding = EdgeInsetsDirectional.fromSTEB(
+    AdminSpacing.sm,
+    AdminSpacing.xxs,
+    AdminSpacing.md,
+    AdminSpacing.xxs,
+  );
+
+  /// Between the arrow and the words.
+  static const gap = AdminSpacing.xxs;
+
+  /// The words' style, before their colour.
+  static TextStyle labelStyle(BuildContext context) =>
+      context.type.weighted(context.type.caption, FontWeight.w700);
+
   final StatDelta delta;
 
   const _DeltaChip({required this.delta});
@@ -548,14 +573,9 @@ class _DeltaChip extends StatelessWidget {
       TrendDirection.flat => Icons.remove_rounded,
     };
 
-    // A Tag's padding and pill, so the two read as one kind of chip.
+    // A Tag's pill, as it has a Tag's padding.
     return Container(
-      padding: const EdgeInsetsDirectional.fromSTEB(
-        AdminSpacing.sm,
-        AdminSpacing.xxs,
-        AdminSpacing.md,
-        AdminSpacing.xxs,
-      ),
+      padding: padding,
       decoration: BoxDecoration(
         color: surface,
         borderRadius: BorderRadius.circular(context.radii.radiusPill),
@@ -564,13 +584,10 @@ class _DeltaChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: context.iconSizes.xs, color: foreground),
-          const Gap(AdminSpacing.xxs),
+          const Gap(gap),
           Text(
             delta.label,
-            style: context.type.weighted(
-              context.type.caption.copyWith(color: foreground),
-              FontWeight.w700,
-            ),
+            style: labelStyle(context).copyWith(color: foreground),
           ),
         ],
       ),
