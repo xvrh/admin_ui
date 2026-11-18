@@ -50,6 +50,14 @@ export 'src/theme/stroke.dart' show AdminStroke;
 export 'src/theme/syntax.dart' show AdminSyntaxColors;
 export 'src/theme/table_metrics.dart'
     show AdminTableMetrics, TableDensity, TableHeaderText, defaultTableMetrics;
+export 'src/theme/tabs_style.dart'
+    show
+        AdminTabsStyle,
+        TabsIndicatorShape,
+        TabsIndicatorWidth,
+        TabsRestInk,
+        TabsRule,
+        TabsSelectedInk;
 export 'src/theme/theme.dart'
     show
         FieldBorder,

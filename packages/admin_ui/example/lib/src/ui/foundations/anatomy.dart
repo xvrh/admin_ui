@@ -8,8 +8,8 @@ import '../demo_kit.dart';
 /// The active theme's anatomy tokens, drawn from the tokens alone: a field's
 /// box in each state (`resolveFieldChrome` through `fieldDecoration`), a
 /// stock `TextField` on the theme's `FieldBorder`, the button and shell
-/// geometry, the switch, checkbox, radio and slider, and the palettes the
-/// frame draws its sidebar and top bar in.
+/// geometry, the switch, checkbox, radio, slider and tab strip, and the
+/// palettes the frame draws its sidebar and top bar in.
 class AnatomyDemo extends StatelessWidget {
   @Preview(name: 'Anatomy', wrapper: adminUiPreview)
   const AnatomyDemo({super.key});
@@ -22,6 +22,7 @@ class AnatomyDemo extends StatelessWidget {
     final shell = tokens.shell;
     final selection = tokens.selection;
     final slider = tokens.slider;
+    final tabs = tokens.tabs;
     final radii = tokens.radii;
     String n(double v) =>
         v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
@@ -161,6 +162,35 @@ class AnatomyDemo extends StatelessWidget {
         SizedBox(
           width: 280,
           child: ValueSlider(value: 0.4, showValue: false, onChanged: (_) {}),
+        ),
+        const Gap(AdminSpacing.xl),
+
+        const DemoSection('Tabs'),
+        _value(context, 'height (s / m / l)', sizes(tabs.heightOf)),
+        _value(
+          context,
+          'labels',
+          '${tabs.restInk.name}, selected ${tabs.selectedInk.name}; '
+              '${tabs.labelWeight ?? 'button weight'}'
+              '${tabs.selectedLabelWeight == null ? '' : ', selected ${tabs.selectedLabelWeight}'}',
+        ),
+        _value(
+          context,
+          'indicator',
+          '${tabs.indicatorShape.name}, as wide as its '
+              '${tabs.indicatorWidth.name}, '
+              '${n(tabs.indicatorThickness ?? tokens.stroke.indicator)} thick',
+        ),
+        _value(context, 'rule', tabs.rule.name),
+        const Gap(AdminSpacing.md),
+        Tabs(
+          tabs: const [
+            TabItem('Details'),
+            TabItem('Orders'),
+            TabItem('Archived', enabled: false),
+          ],
+          selected: 0,
+          onChanged: (_) {},
         ),
         const Gap(AdminSpacing.xl),
 

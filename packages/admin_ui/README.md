@@ -1149,8 +1149,8 @@ only its colours: `AdminFieldStyle` (`context.fieldStyle`),
 `AdminButtonStyle` (`context.buttonStyle`), `AdminShellStyle`
 (`context.shellStyle`), `AdminOverlayStyle` (`context.overlayStyle`),
 `AdminSegmentedStyle` (`context.segmentedStyle`), `AdminSelectionStyle`
-(`context.selectionStyle`) and `AdminSliderStyle` (`context.sliderStyle`),
-beside the role radii `radiusField`, `radiusButton`
+(`context.selectionStyle`), `AdminSliderStyle` (`context.sliderStyle`) and
+`AdminTabsStyle` (`context.tabsStyle`), beside the role radii `radiusField`, `radiusButton`
 (`context.radii.button(size)`) and `radiusCheck`. A component reads them; it
 never asks which theme it is in.
 
@@ -1219,6 +1219,28 @@ that is taller.
 | Ant | 4 | 14, ringed 2 |
 | Fluent | 4, `controlBorder` past the thumb | 20, inset 4 |
 | Carbon | 2 | a 14 disc, in the foreground |
+
+`AdminTabsStyle` draws a `Tabs` strip: its height at each size
+(`heightSmall`, `heightMedium`, `heightLarge`), what a line strip writes its
+selected label in (`selectedInk`, the accent or the `foreground`) and the
+others (`restInk`: `foregroundMuted`, `foregroundSecondary` or the
+`foreground`, each a step stronger under the pointer), and how heavily
+(`labelWeight`, and `selectedLabelWeight` where the selected tab is set
+heavier; a tab is as wide as its label at the heavier weight, so selecting
+one never moves the rest). The selected tab's indicator is as wide as its
+tab or as its label (`indicatorWidth`), square, rounded at the top or round
+at both ends (`indicatorShape`), and `indicatorThickness` thick, the
+indicator stroke where the style gives none. A line strip stands on a
+`rule`: a hairline, a rule as thick as the indicator, or none.
+
+| Theme | Height (s / m / l) | Labels | Indicator | Rule |
+|---|---|---|---|---|
+| Iris | 32 / 40 / 48 | muted, the selected one in the accent | 2, as wide as the tab | hairline |
+| Material | 40 / 48 / 56 | w500, on-surface-variant, the selected one in the accent | 3, as wide as the label, rounded at the top | hairline |
+| shadcn | 32 / 36 / 40 | w500, muted, the selected one in the foreground | 2, as wide as the tab | none |
+| Ant | 38 / 46 / 56 | w400, the foreground, the selected one in the accent | 2, as wide as the label | hairline |
+| Fluent | 32 / 44 / 52 | w400, secondary; the selected one w600 in the foreground | 3, as wide as the label, round | none |
+| Carbon | 32 / 40 / 48 | w400, secondary; the selected one w600 in the foreground | 2, as wide as the tab | 2 |
 
 `AdminOverlayStyle` sets whether a tooltip points at its target with an
 arrow, the width it wraps at, and the size of the arrow a tooltip or a
@@ -1783,7 +1805,7 @@ name kept as a deprecated alias for one release (see
 | Errors | An error message is `errorText: String?`. Error chrome with no message is `invalid: bool`. A collection view's slot for a failed load stays `error`, a widget, beside `empty`. | `InputField(errorText:)`, `FieldChrome(invalid:)` |
 | Placeholders and empty states | Placeholder text in an input is `hint`. A widget slot for no content is `empty`. The text a display widget shows for a missing value is `emptyText`. | `CommandPalette(hint:)`, `Tree(empty:)`, `DescriptionList(emptyText:)` |
 | Disabled and read-only | A control is disabled with `enabled: bool`: it dims and takes no input. `readOnly` shows a value that cannot change, at full contrast, and text in it can still be selected and copied; every field body honours both, through `FieldState`. As in Flutter, a null `onChanged` or `onPressed` also disables. | `FieldShell(enabled:, readOnly:)`, `InputField(enabled:)` |
-| Size | `size: ControlSize` (`small`, `medium`, `large`) on every control, at the theme's three control heights. A flag for a denser look is a size. `Tabs` reads it as a strip height instead: 32, 40 or 48 in every theme. | `Button(size:)`, `Tabs(size:)` |
+| Size | `size: ControlSize` (`small`, `medium`, `large`) on every control, at the theme's three control heights. A flag for a denser look is a size. `Tabs` reads it as a strip height instead, the theme's `tabsStyle.heightOf(size)`: 32, 40 or 48 in Iris. | `Button(size:)`, `Tabs(size:)` |
 | Changes and choices | A change to a value the widget holds or shows is `onChanged`. A one-shot choice from a list or a menu, where the widget keeps no value, is `onSelect`. An active index keeps its domain name, with `onChanged`. | `Calendar(onChanged:)`, `MenuItem(onSelect:)`, `Steps(current:, onChanged:)` |
 | Dismissing | An overlay or a banner is dismissed through `onDismiss`, and shows a close button exactly when it is set. `Toast` is the one exception: a toast can always be dismissed, so it always shows its close button, and its `onDismiss` hears why it left, as a `ToastDismissReason`. `onCancel` cancels an operation, such as an upload. | `Modal(onDismiss:)`, `SideSheet(onDismiss:)`, `Toast(onDismiss:)` |
 | Placement | An overlay opens on a `side: PopoverSide` and lines up by `align: PopoverAlign`. `start` and `end` follow the text direction, in both: `PopoverSide.start` is the anchor's left in a left-to-right app and its right in a right-to-left one, so a layout written once mirrors. | `Popover(side: PopoverSide.end)`, `Tip(side:)` |

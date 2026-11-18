@@ -13,6 +13,7 @@ import '../sizes.dart';
 import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
+import '../tabs_style.dart';
 import '../typography.dart';
 import 'admin_theme.dart';
 
@@ -126,4 +127,7 @@ final irisTheme = AdminTheme.from(
   selection: const AdminSelectionStyle(),
   // a 4px track under an 18px disc, in the accent
   slider: const AdminSliderStyle(),
+  // 32 / 40 / 48 tall, labels at the button weight, the selected one in the
+  // accent over a 2px bar as wide as its tab, on a hairline
+  tabs: const AdminTabsStyle(),
 );

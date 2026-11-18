@@ -16,6 +16,7 @@ import '../sizes.dart';
 import '../slider_style.dart';
 import '../stroke.dart';
 import '../table_metrics.dart';
+import '../tabs_style.dart';
 import '../tokens.dart';
 import '../typography.dart';
 
@@ -42,8 +43,8 @@ class AdminTheme {
   /// [defaultControlSizes]), [table] metrics (left out,
   /// [defaultTableMetrics]), [motion] (left out, [defaultMotion]), [stroke]
   /// widths, [iconSizes], the [field], [button], [overlay], [segmented],
-  /// [selection] and [slider] anatomy, and the layout [breakpoints] (left
-  /// out, [AdminBreakpoints]' defaults).
+  /// [selection], [slider] and [tabs] anatomy, and the layout [breakpoints]
+  /// (left out, [AdminBreakpoints]' defaults).
   /// The light set takes [elevation] and [shell], the dark set
   /// [darkElevation] and [darkShell]; left out, each mode gets the shadows
   /// that suit its palette's brightness ([defaultElevation] or
@@ -75,6 +76,7 @@ class AdminTheme {
     AdminSegmentedStyle? segmented,
     AdminSelectionStyle? selection,
     AdminSliderStyle? slider,
+    AdminTabsStyle? tabs,
     AdminBreakpoints? breakpoints,
   }) = _PaletteTheme;
 
@@ -135,6 +137,7 @@ class _PaletteTheme implements AdminTheme {
   final AdminSegmentedStyle? segmented;
   final AdminSelectionStyle? selection;
   final AdminSliderStyle? slider;
+  final AdminTabsStyle? tabs;
   final AdminBreakpoints? breakpoints;
 
   _PaletteTheme({
@@ -159,6 +162,7 @@ class _PaletteTheme implements AdminTheme {
     this.segmented,
     this.selection,
     this.slider,
+    this.tabs,
     this.breakpoints,
   }) : darkPalette = dark;
 
@@ -193,6 +197,7 @@ class _PaletteTheme implements AdminTheme {
     segmented: segmented,
     selection: selection,
     slider: slider,
+    tabs: tabs,
     breakpoints: breakpoints,
   );
 
@@ -224,6 +229,7 @@ class _PaletteTheme implements AdminTheme {
     segmented: segmented,
     selection: selection,
     slider: slider,
+    tabs: tabs,
     breakpoints: breakpoints,
   );
 

@@ -55,6 +55,7 @@ theme_internals:
     - AdminStroke
     - AdminSyntaxColors
     - AdminTableMetrics
+    - AdminTabsStyle
     - AdminTypeRamp
     - AdminTypeStep
     - ButtonDisabledStyle
@@ -74,6 +75,11 @@ theme_internals:
     - SliderRail
     - SliderThumb
     - TableHeaderText
+    - TabsIndicatorShape
+    - TabsIndicatorWidth
+    - TabsRestInk
+    - TabsRule
+    - TabsSelectedInk
     - ToggleOffStyle
     - ToggleOnColor
     - TopBarSpan

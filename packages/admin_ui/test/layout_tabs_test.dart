@@ -586,10 +586,10 @@ void main() {
           )
           .first,
     );
-    expect(underline.color, palette.controlAccent);
-    expect(
-      contrastRatio(underline.color!, palette.surface),
-      greaterThanOrEqualTo(3),
-    );
+    // The bar's colour is in its decoration, which also rounds its ends
+    // where a theme asks.
+    final color = (underline.decoration! as BoxDecoration).color!;
+    expect(color, palette.controlAccent);
+    expect(contrastRatio(color, palette.surface), greaterThanOrEqualTo(3));
   });
 }
