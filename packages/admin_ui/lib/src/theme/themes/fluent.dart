@@ -328,6 +328,13 @@ final fluentTheme = AdminTheme.from(
     tooltipRadius: 4,
     tooltipPaddingX: 12,
     tooltipPaddingY: 6,
+    // DialogSurfaceMotion: Scale from 0.85 over durationGentle (250ms) on
+    // curveDecelerateMid, out on curveAccelerateMin
+    modalMotion: AdminOverlayMotion(
+      scale: 0.85,
+      speed: MotionSpeed.slow,
+      reverseCurve: Cubic(0.8, 0, 0.78, 1),
+    ),
   ),
   // the Windows Community Toolkit's Segmented: an outlined track, the
   // selected item raised in ControlFillColorDefault over a short accent

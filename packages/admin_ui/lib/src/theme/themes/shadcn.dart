@@ -311,6 +311,8 @@ final shadcnTheme = AdminTheme.from(
     tooltipPaddingX: 12,
     tooltipPaddingY: 6,
     tooltipDelay: Duration.zero,
+    // DialogContent: fade-in-0 zoom-in-95 over duration-200, and back
+    modalMotion: AdminOverlayMotion(scale: 0.95),
     arrowWidth: 10,
     arrowHeight: 5,
   ),

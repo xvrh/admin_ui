@@ -1,6 +1,20 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 
+/// One of [AdminMotion]'s three durations, for a token that names how long
+/// a move takes without fixing the milliseconds: the theme's own step, and
+/// zero while the platform asks for less motion.
+enum MotionSpeed {
+  /// [AdminMotion.fast].
+  fast,
+
+  /// [AdminMotion.medium].
+  medium,
+
+  /// [AdminMotion.slow].
+  slow,
+}
+
 /// How the kit moves: three durations by how far something travels, a
 /// [pulse] for a looping placeholder, and the easing curves a move takes.
 /// Provided via [AdminTokens]; read through `context.motion`, which is
@@ -48,6 +62,13 @@ class AdminMotion {
     this.exit = Curves.easeInCubic,
     this.emphasized = Curves.easeInOutCubicEmphasized,
   });
+
+  /// The duration of [speed]: [fast], [medium] or [slow].
+  Duration durationOf(MotionSpeed speed) => switch (speed) {
+    MotionSpeed.fast => fast,
+    MotionSpeed.medium => medium,
+    MotionSpeed.slow => slow,
+  };
 
   /// This motion with every duration [Duration.zero] and the curves kept:
   /// what `context.motion` returns while animations are disabled, so a

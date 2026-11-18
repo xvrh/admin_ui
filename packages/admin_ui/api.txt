@@ -383,6 +383,7 @@ theme.dart AdminFocusSpec
 theme.dart AdminFonts
 theme.dart AdminIconSizes
 theme.dart AdminMotion
+theme.dart AdminOverlayMotion
 theme.dart AdminOverlayStyle
 theme.dart AdminPalette
 theme.dart AdminRadii
@@ -417,6 +418,7 @@ theme.dart FieldRequiredMark
 theme.dart FieldVariant
 theme.dart Gap
 theme.dart LabelInk
+theme.dart MotionSpeed
 theme.dart NavIndicator
 theme.dart RadioMark
 theme.dart SegmentedVariant

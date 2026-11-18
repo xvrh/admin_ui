@@ -354,6 +354,14 @@ final carbonTheme = AdminTheme.from(
     tooltipPaddingX: 16,
     tooltipPaddingY: 16,
     tooltipText: TooltipText.body,
+    // a modal's container: translate3d(0, -24px, 0) to rest over
+    // $duration-moderate-02, on the expressive entrance and exit curves
+    modalMotion: AdminOverlayMotion(
+      slide: 24,
+      speed: MotionSpeed.slow,
+      curve: Cubic(0, 0, 0.3, 1),
+      reverseCurve: Cubic(0.4, 0.14, 1, 1),
+    ),
   ),
   // the high-contrast content switcher: a $border-inverse outline, the
   // selected switch in $layer-selected-inverse under $text-inverse, rounded

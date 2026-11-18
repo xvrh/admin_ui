@@ -46,6 +46,7 @@ theme_internals:
     - AdminFocusSpec
     - AdminIconSizes
     - AdminMotion
+    - AdminOverlayMotion
     - AdminOverlayStyle
     - AdminPalette
     - AdminSegmentedStyle
@@ -70,6 +71,7 @@ theme_internals:
     - FieldRequiredMark
     - FieldVariant
     - LabelInk
+    - MotionSpeed
     - NavIndicator
     - RadioMark
     - SegmentedVariant
