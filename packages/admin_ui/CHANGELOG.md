@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- A theme draws a toast in a palette of its own:
+  `AdminFeedbackStyle.toastPalette`. The toast's fill and edge, its text,
+  its status colours, its action and its close button are that palette's,
+  and the page under it keeps its own. `AdminTheme.from` takes a
+  `darkFeedback` for the dark set, the light `feedback` where none is
+  given, and a brand reaches the toast's palette as it does the shell's
+  (`AdminFeedbackStyle.branded`). A dark page rings a toast that the theme
+  does not outline only where the toast's palette is dark too.
 - A palette says what a tooltip and a stock snack bar are filled with:
   `AdminPalette.inverseSurface`, and `onInverseSurface` for what reads on
   it. Both are optional. A palette that gives neither has its `foreground`
@@ -505,6 +513,18 @@
 
 ### Looks
 
+- A toast is drawn in the inverse scheme in Material and Carbon, where it
+  was a card in the page's own colours. The other four themes keep that.
+  - Material: an M3 snackbar. On the light page a `#322F35` card under
+    `#F5EFF7` text, with the dark scheme's status colours and accent; on
+    the dark page a `#E6E0E9` card under `#322F35` text, with the light
+    scheme's. It has no outline and no status bar (was outlined, behind a
+    4px bar).
+  - Carbon: the high-contrast notification. On the Gray 10 page a
+    `#393939` card under white text behind a 3px bar in the inverse
+    support colour; on the Gray 100 page a `#F4F4F4` card under `#161616`
+    text. It has no outline (was tinted with its status, inside its
+    border). An `Alert` keeps the low-contrast, tinted form.
 - A tooltip's chip, and a stock snack bar, follow each reference theme's
   inverse surface, where every theme filled them with its foreground under
   its card colour. Iris and shadcn keep that.

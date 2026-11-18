@@ -10,8 +10,9 @@ import 'package:material_ui/material_ui.dart';
 const _expected = {
   // a tinted alert; an outlined toast behind a 4px bar
   'Iris': AdminFeedbackStyle(),
-  // no inline alert in M3, and an inverse snackbar the palette cannot draw
-  'Material': AdminFeedbackStyle(),
+  // no inline alert in M3. A snackbar: no bar, no outline, in the inverse
+  // scheme (see [_toastPalettes])
+  'Material': AdminFeedbackStyle(toastBar: 0, toastOutline: false),
   // Alert: a rounded-lg card. Sonner: outlined, no bar
   'shadcn': AdminFeedbackStyle(
     alertFill: FeedbackFill.surface,
@@ -22,13 +23,59 @@ const _expected = {
   'Ant': AdminFeedbackStyle(alertRadius: 8, toastBar: 0, toastOutline: false),
   // MessageBar: tinted. Toast: a transparent border, no bar
   'Fluent': AdminFeedbackStyle(toastBar: 0, toastOutline: false),
-  // the low-contrast notification: tinted behind a 3px bar, inline and toast
-  'Carbon': AdminFeedbackStyle(
-    alertBar: 3,
-    toastFill: FeedbackFill.tint,
-    toastBar: 3,
+  // inline, the low-contrast notification: tinted behind a 3px bar. A
+  // toast, the high-contrast one: a card behind the bar, in the inverse
+  // scheme (see [_toastPalettes])
+  'Carbon': AdminFeedbackStyle(alertBar: 3, toastBar: 3, toastOutline: false),
+};
+
+/// A toast tinted with its status behind a 3px bar, as Carbon's inline
+/// notification is. No shipped theme draws its toast so; the anatomy still
+/// can.
+const _tinted = AdminFeedbackStyle(
+  alertBar: 3,
+  toastFill: FeedbackFill.tint,
+  toastBar: 3,
+);
+
+/// The palette each theme draws a toast in where it is not the page's, on
+/// its light page then on its dark one.
+final _toastPalettes = <String, (AdminPalette, AdminPalette)>{
+  // the opposite scheme on inverseSurface, under inverseOnSurface
+  'Material': (
+    materialDarkPalette.copyWith(
+      surface: const Color(0xFF322F35),
+      foreground: const Color(0xFFF5EFF7),
+    ),
+    materialPalette.copyWith(
+      surface: const Color(0xFFE6E0E9),
+      foreground: const Color(0xFF322F35),
+      // its warning text deepened to read there
+      warningText: const Color(0xFF7D5C00),
+    ),
+  ),
+  // the opposite theme on $background-inverse, under $text-inverse, with
+  // $support-error-inverse on the light page
+  'Carbon': (
+    carbonDarkPalette.copyWith(
+      surface: const Color(0xFF393939),
+      foreground: const Color(0xFFFFFFFF),
+      danger: const Color(0xFFFA4D56),
+    ),
+    carbonPalette.copyWith(surface: const Color(0xFFF4F4F4)),
   ),
 };
+
+/// [theme]'s expected feedback anatomy, on its light page then its dark one.
+(AdminFeedbackStyle, AdminFeedbackStyle) _expectedOf(AdminTheme theme) {
+  final style = _expected[theme.name]!;
+  final palettes = _toastPalettes[theme.name];
+  if (palettes == null) return (style, style);
+  return (
+    style.copyWith(toastPalette: palettes.$1),
+    style.copyWith(toastPalette: palettes.$2),
+  );
+}
 
 /// The client accents the catalog's Brand control offers.
 const _brands = <String, Color?>{
@@ -122,7 +169,7 @@ void main() {
   test('copyWith, lerp, == and toString', () {
     const style = AdminFeedbackStyle();
     final shadcn = _expected['shadcn']!;
-    final carbon = _expected['Carbon']!;
+    final carbon = _tinted;
     expect(style.copyWith(), style);
     expect(style.copyWith().hashCode, style.hashCode);
     expect(
@@ -174,7 +221,7 @@ void main() {
   });
 
   test('AdminTokens carry it through from, copyWith, lerp and ==', () {
-    final carbon = _expected['Carbon']!;
+    final carbon = _tinted;
     final plain = AdminTokens.from(palette: irisPalette);
     final tokens = AdminTokens.from(palette: irisPalette, feedback: carbon);
     expect(plain.feedback, const AdminFeedbackStyle());
@@ -205,10 +252,21 @@ void main() {
   group('each theme', () {
     for (final theme in adminThemes) {
       test('${theme.name}: its reference system', () {
-        final expected = _expected[theme.name];
-        expect(expected, isNotNull, reason: 'a theme with no expectation');
-        expect(theme.tokens.feedback, expected);
-        expect(theme.dark!.feedback, expected);
+        expect(
+          _expected[theme.name],
+          isNotNull,
+          reason: 'a theme with no expectation',
+        );
+        final (light, dark) = _expectedOf(theme);
+        expect(theme.tokens.feedback, light);
+        expect(theme.dark!.feedback, dark);
+        // A toast in a scheme of its own is in the opposite one.
+        for (final tokens in [theme.tokens, theme.dark!]) {
+          final own = tokens.feedback.toastPalette;
+          if (own != null) {
+            expect(own.brightness, isNot(tokens.palette.brightness));
+          }
+        }
       });
     }
   });
@@ -375,7 +433,7 @@ void main() {
       tester,
     ) async {
       final p = carbonPalette;
-      await _showToast(tester, _tokens(_expected['Carbon']!, palette: p));
+      await _showToast(tester, _tokens(_tinted, palette: p));
       final card = tester.widget<Material>(_toastCard('Page published.'));
       expect(card.color, p.statusFill(p.success));
       expect(
@@ -397,17 +455,18 @@ void main() {
         for (final MapEntry(key: brand, value: seed) in _brands.entries) {
           test('${theme.name} $mode $brand', () {
             final t = seed == null ? tokens : tokens.branded(seed);
-            final p = t.palette;
             final style = t.feedback;
-            for (final (name, accent, ink) in [
-              ('info', p.info, p.infoText),
-              ('success', p.success, p.successText),
-              ('warning', p.warning, p.warningText),
-              ('danger', p.danger, p.dangerText),
+            // An alert is in the page's palette; a toast in its own where
+            // the theme gives it one.
+            for (final (what, fill, p) in [
+              ('alert', style.alertFill, t.palette),
+              ('toast', style.toastFill, style.toastPalette ?? t.palette),
             ]) {
-              for (final (what, fill) in [
-                ('alert', style.alertFill),
-                ('toast', style.toastFill),
+              for (final (name, accent, ink) in [
+                ('info', p.info, p.infoText),
+                ('success', p.success, p.successText),
+                ('warning', p.warning, p.warningText),
+                ('danger', p.danger, p.dangerText),
               ]) {
                 final ground = switch (fill) {
                   FeedbackFill.tint => p.statusFill(accent),
@@ -480,16 +539,22 @@ void main() {
             style.alertBar > 0 ? findsOneWidget : findsNothing,
           );
 
+          // In its own palette where the theme gives it one.
+          final tp = style.toastPalette ?? p;
           final card = tester.widget<Material>(_toastCard('Page published.'));
           expect(
             card.color,
             style.toastFill == FeedbackFill.tint
-                ? p.statusFill(p.success)
-                : p.surface,
+                ? tp.statusFill(tp.success)
+                : tp.surface,
           );
+          // Ringed where the theme outlines it, and always where it is a
+          // dark card on a dark page.
           expect(
             (card.shape! as RoundedRectangleBorder).side == BorderSide.none,
-            !(style.toastOutline || p.brightness == Brightness.dark),
+            !(style.toastOutline ||
+                (p.brightness == Brightness.dark &&
+                    tp.brightness == Brightness.dark)),
           );
           expect(
             _toastBar('Page published.'),
@@ -498,5 +563,204 @@ void main() {
         });
       }
     }
+  });
+
+  group('a toast in a palette of its own', () {
+    // A dark card for a light page: Iris's dark palette on another surface.
+    final own = irisDarkPalette.copyWith(surface: const Color(0xFF2A2D35));
+    const bare = AdminFeedbackStyle(toastOutline: false);
+    final style = bare.copyWith(toastPalette: own);
+
+    test('the style carries it', () {
+      expect(const AdminFeedbackStyle().toastPalette, isNull);
+      expect(style.toastPalette, own);
+      expect(style, isNot(bare));
+      expect(style.hashCode, isNot(bare.hashCode));
+      expect(style.copyWith(), style);
+      expect(style.copyWith().hashCode, style.hashCode);
+      expect(style.copyWith(toastBar: 0).toastPalette, own);
+      expect(style, bare.copyWith(toastPalette: own.copyWith()));
+      expect(bare.copyWith(toastPalette: irisPalette), isNot(style));
+
+      // From the nearer side, as the fills are.
+      expect(AdminFeedbackStyle.lerp(bare, style, 0.4).toastPalette, isNull);
+      expect(AdminFeedbackStyle.lerp(bare, style, 0.6).toastPalette, own);
+
+      expect('$style', contains('own palette'));
+      expect('$bare', isNot(contains('palette')));
+    });
+
+    test('a brand reaches it, and leaves a style with none alone', () {
+      const seed = Color(0xFF0D9488);
+      expect(bare.branded(seed), same(bare));
+      final branded = style.branded(seed);
+      expect(branded.toastPalette, own.branded(seed));
+      expect(branded.toastPalette, isNot(own));
+      // Its surface and its text are untouched.
+      expect(branded.toastPalette!.surface, own.surface);
+      expect(branded.toastPalette!.foreground, own.foreground);
+      expect(branded.toastBar, style.toastBar);
+
+      final tokens = AdminTokens.from(palette: irisPalette, feedback: style);
+      expect(tokens.branded(seed).feedback.toastPalette, own.branded(seed));
+      expect(tokens.branded(seed).palette, irisPalette.branded(seed));
+    });
+
+    test('AdminTheme.from gives each mode its own', () {
+      final light = style;
+      final dark = bare.copyWith(toastPalette: irisPalette);
+      final theme = AdminTheme.from(
+        name: 'Test',
+        palette: irisPalette,
+        dark: irisDarkPalette,
+        feedback: light,
+        darkFeedback: dark,
+      );
+      expect(theme.tokens.feedback, light);
+      expect(theme.dark!.feedback, dark);
+
+      // Left out, the dark set takes the light one.
+      final shared = AdminTheme.from(
+        name: 'Test',
+        palette: irisPalette,
+        dark: irisDarkPalette,
+        feedback: light,
+      );
+      expect(shared.dark!.feedback, light);
+
+      const seed = Color(0xFF0D9488);
+      final branded = theme.branded('Test Teal', seed);
+      expect(branded.tokens.feedback.toastPalette, own.branded(seed));
+      expect(branded.dark!.feedback.toastPalette, irisPalette.branded(seed));
+    });
+
+    Future<void> show(
+      WidgetTester tester,
+      AdminTokens tokens, {
+      Severity severity = Severity.success,
+    }) async {
+      await tester.pumpWidget(_host(tokens, const SizedBox()));
+      tester
+          .state<ToastScopeState>(find.byType(ToastScope))
+          .show(
+            Toast(
+              'It could not be restored.',
+              title: 'Page deleted',
+              severity: severity,
+              duration: null,
+              actionLabel: 'Undo',
+              onAction: () {},
+            ),
+          );
+      await tester.pumpAndSettle();
+    }
+
+    Color inkOf(WidgetTester tester, String text) =>
+        tester.widget<Text>(find.text(text)).style!.color!;
+
+    testWidgets('its fill, text, icon, bar, action and close are that '
+        'palette’s', (tester) async {
+      final tokens = _tokens(style);
+      await show(tester, tokens, severity: Severity.danger);
+      expect(tester.takeException(), isNull);
+
+      final card = tester.widget<Material>(_toastCard('Page deleted'));
+      expect(card.color, own.surface);
+      expect(card.color, isNot(irisPalette.surface));
+      // No ring: it stands out from the light page by its fill.
+      expect((card.shape! as RoundedRectangleBorder).side, BorderSide.none);
+
+      expect(inkOf(tester, 'Page deleted'), own.foreground);
+      expect(
+        inkOf(tester, 'It could not be restored.'),
+        own.foregroundSecondary,
+      );
+      final icon = tester.widget<Icon>(
+        find.descendant(
+          of: _toastCard('Page deleted'),
+          matching: find.byIcon(Icons.error_outline_rounded),
+        ),
+      );
+      expect(icon.color, own.dangerText);
+      final bar = tester.widget<Container>(_toastBar('Page deleted'));
+      expect(bar.color, own.danger);
+
+      // The action and the close button are drawn for that surface too.
+      expect(
+        contrastRatio(inkOf(tester, 'Undo'), own.surface),
+        greaterThanOrEqualTo(4.5),
+      );
+      final close = tester.widget<Icon>(
+        find.descendant(
+          of: find.descendant(
+            of: _toastCard('Page deleted'),
+            matching: find.byType(IconAction),
+          ),
+          matching: find.byType(Icon),
+        ),
+      );
+      expect(contrastRatio(close.color!, own.surface), greaterThanOrEqualTo(3));
+      for (final text in ['Page deleted', 'It could not be restored.']) {
+        expect(
+          contrastRatio(inkOf(tester, text), own.surface),
+          greaterThanOrEqualTo(4.5),
+        );
+      }
+    });
+
+    testWidgets('the page under it keeps its own palette', (tester) async {
+      final tokens = _tokens(style);
+      await tester.pumpWidget(
+        _host(tokens, const Alert('Check the price before publishing.')),
+      );
+      tester
+          .state<ToastScopeState>(find.byType(ToastScope))
+          .show(const Toast('Page published.', duration: null));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<Material>(_toastCard('Page published.')).color,
+        own.surface,
+      );
+      expect(
+        _alertLook(tester).color,
+        irisPalette.statusFill(irisPalette.info),
+      );
+    });
+
+    testWidgets('on a dark page, a dark card is ringed and a light one is '
+        'not', (tester) async {
+      // Dark on dark: the shadow does not read, so the ring comes back.
+      await show(tester, _tokens(style, palette: irisDarkPalette));
+      var card = tester.widget<Material>(_toastCard('Page deleted'));
+      expect((card.shape! as RoundedRectangleBorder).side.color, own.border);
+
+      // Light on dark: the fill is the edge.
+      final light = bare.copyWith(toastPalette: irisPalette);
+      await show(tester, _tokens(light, palette: irisDarkPalette));
+      card = tester.widget<Material>(_toastCard('Page deleted'));
+      expect(card.color, irisPalette.surface);
+      expect((card.shape! as RoundedRectangleBorder).side, BorderSide.none);
+
+      // And a style that outlines its toast rings it in that palette's edge.
+      await show(
+        tester,
+        _tokens(light.copyWith(toastOutline: true), palette: irisDarkPalette),
+      );
+      card = tester.widget<Material>(_toastCard('Page deleted'));
+      expect(
+        (card.shape! as RoundedRectangleBorder).side.color,
+        irisPalette.border,
+      );
+    });
+
+    testWidgets('a tinted toast is tinted in that palette', (tester) async {
+      await show(
+        tester,
+        _tokens(style.copyWith(toastFill: FeedbackFill.tint)),
+        severity: Severity.warning,
+      );
+      final card = tester.widget<Material>(_toastCard('Page deleted'));
+      expect(card.color, own.statusFill(own.warning));
+    });
   });
 }

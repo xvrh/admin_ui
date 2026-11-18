@@ -180,11 +180,15 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
 
   /// Rebrands this token set: [seed] becomes the primary colour and the
   /// primary roles are recomputed from it (see [AdminPalette.branded]), in
-  /// the page's palette and in the [shell]'s own sidebar and top bar
-  /// palettes. Surfaces, text, status, radii and typography are untouched —
+  /// the page's palette, in the [shell]'s own sidebar and top bar palettes
+  /// and in the [feedback]'s toast palette. Surfaces, text, status, radii and
+  /// typography are untouched —
   /// so any theme can be branded for a client by swapping just the accent.
-  AdminTokens branded(Color seed) =>
-      copyWith(palette: palette.branded(seed), shell: shell.branded(seed));
+  AdminTokens branded(Color seed) => copyWith(
+    palette: palette.branded(seed),
+    shell: shell.branded(seed),
+    feedback: feedback.branded(seed),
+  );
 
   /// A copy with the given members replaced.
   ///

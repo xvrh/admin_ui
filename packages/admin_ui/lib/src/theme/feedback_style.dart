@@ -1,11 +1,12 @@
-/// @docImport 'palette.dart';
 /// @docImport 'radii.dart';
 /// @docImport 'tokens.dart';
 library;
 
-import 'dart:ui' show lerpDouble;
+import 'dart:ui' show Color, lerpDouble;
 
 import 'package:flutter/foundation.dart';
+
+import 'palette.dart';
 
 /// What a feedback surface is filled with; see
 /// [AdminFeedbackStyle.alertFill] and [AdminFeedbackStyle.toastFill].
@@ -53,6 +54,16 @@ class AdminFeedbackStyle {
   /// not read, always rings it.
   final bool toastOutline;
 
+  /// The palette a toast is drawn in, in place of the page's: its fill and
+  /// edge, its text, its status colours, its action and its close button.
+  /// M3's snackbar and Carbon's high-contrast notification are a card in the
+  /// opposite scheme. Null draws a toast in the page's palette.
+  ///
+  /// [toastFill] and the rest are read in this palette: a
+  /// [FeedbackFill.surface] toast is filled with its [AdminPalette.surface].
+  /// A dark page rings such a toast only where this palette is dark too.
+  final AdminPalette? toastPalette;
+
   const AdminFeedbackStyle({
     this.alertFill = FeedbackFill.tint,
     this.alertBar = 0,
@@ -60,10 +71,21 @@ class AdminFeedbackStyle {
     this.toastFill = FeedbackFill.surface,
     this.toastBar = 4,
     this.toastOutline = true,
+    this.toastPalette,
   }) : assert(alertBar >= 0 && toastBar >= 0),
        assert(alertRadius == null || alertRadius >= 0);
 
-  /// A copy with the given members replaced.
+  /// This style with [toastPalette] rebranded with [seed] (see
+  /// [AdminPalette.branded]), so a toast's action follows a client's accent
+  /// as the page's does. A style with no palette of its own is returned
+  /// as it is.
+  AdminFeedbackStyle branded(Color seed) => toastPalette == null
+      ? this
+      : copyWith(toastPalette: toastPalette!.branded(seed));
+
+  /// A copy with the given members replaced. A null argument keeps the
+  /// current value, so [alertRadius] and [toastPalette] cannot be cleared
+  /// here; build a new style for that.
   AdminFeedbackStyle copyWith({
     FeedbackFill? alertFill,
     double? alertBar,
@@ -71,6 +93,7 @@ class AdminFeedbackStyle {
     FeedbackFill? toastFill,
     double? toastBar,
     bool? toastOutline,
+    AdminPalette? toastPalette,
   }) => AdminFeedbackStyle(
     alertFill: alertFill ?? this.alertFill,
     alertBar: alertBar ?? this.alertBar,
@@ -78,6 +101,7 @@ class AdminFeedbackStyle {
     toastFill: toastFill ?? this.toastFill,
     toastBar: toastBar ?? this.toastBar,
     toastOutline: toastOutline ?? this.toastOutline,
+    toastPalette: toastPalette ?? this.toastPalette,
   );
 
   /// Interpolates the bars, and an [alertRadius] both sides author; the rest
@@ -99,6 +123,7 @@ class AdminFeedbackStyle {
       toastFill: near.toastFill,
       toastBar: lerpDouble(a.toastBar, b.toastBar, t)!,
       toastOutline: near.toastOutline,
+      toastPalette: near.toastPalette,
     );
   }
 
@@ -110,7 +135,8 @@ class AdminFeedbackStyle {
       other.alertRadius == alertRadius &&
       other.toastFill == toastFill &&
       other.toastBar == toastBar &&
-      other.toastOutline == toastOutline;
+      other.toastOutline == toastOutline &&
+      other.toastPalette == toastPalette;
 
   @override
   int get hashCode => Object.hash(
@@ -120,6 +146,7 @@ class AdminFeedbackStyle {
     toastFill,
     toastBar,
     toastOutline,
+    toastPalette,
   );
 
   @override
@@ -127,5 +154,6 @@ class AdminFeedbackStyle {
       'AdminFeedbackStyle(alert ${alertFill.name}, bar $alertBar, '
       '${alertRadius == null ? "the theme's radius" : 'radius $alertRadius'}; '
       'toast ${toastFill.name}, bar $toastBar, '
-      '${toastOutline ? 'outlined' : 'no outline'})';
+      '${toastOutline ? 'outlined' : 'no outline'}'
+      '${toastPalette == null ? '' : ', own palette'})';
 }

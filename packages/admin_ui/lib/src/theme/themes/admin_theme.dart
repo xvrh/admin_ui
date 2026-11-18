@@ -44,12 +44,13 @@ class AdminTheme {
   /// [defaultControlSizes]), [table] metrics (left out,
   /// [defaultTableMetrics]), [motion] (left out, [defaultMotion]), [stroke]
   /// widths, [iconSizes], the [field], [button], [overlay], [segmented],
-  /// [selection], [slider], [tabs] and [feedback] anatomy, and the layout
+  /// [selection], [slider] and [tabs] anatomy, and the layout
   /// [breakpoints] (left out, [AdminBreakpoints]' defaults).
-  /// The light set takes [elevation] and [shell], the dark set
-  /// [darkElevation] and [darkShell]; left out, each mode gets the shadows
-  /// that suit its palette's brightness ([defaultElevation] or
-  /// [defaultDarkElevation]), and the dark set the light [shell].
+  /// The light set takes [elevation], [shell] and [feedback], the dark set
+  /// [darkElevation], [darkShell] and [darkFeedback]; left out, each mode
+  /// gets the shadows that suit its palette's brightness ([defaultElevation]
+  /// or [defaultDarkElevation]), and the dark set the light [shell] and
+  /// [feedback].
   ///
   /// The token sets are built the first time [tokens] or [dark] is read, not
   /// here: building typography is what calls `AdminFonts.resolver`, so
@@ -79,6 +80,7 @@ class AdminTheme {
     AdminSliderStyle? slider,
     AdminTabsStyle? tabs,
     AdminFeedbackStyle? feedback,
+    AdminFeedbackStyle? darkFeedback,
     AdminBreakpoints? breakpoints,
   }) = _PaletteTheme;
 
@@ -141,6 +143,7 @@ class _PaletteTheme implements AdminTheme {
   final AdminSliderStyle? slider;
   final AdminTabsStyle? tabs;
   final AdminFeedbackStyle? feedback;
+  final AdminFeedbackStyle? darkFeedback;
   final AdminBreakpoints? breakpoints;
 
   _PaletteTheme({
@@ -167,15 +170,21 @@ class _PaletteTheme implements AdminTheme {
     this.slider,
     this.tabs,
     this.feedback,
+    this.darkFeedback,
     this.breakpoints,
   }) : darkPalette = dark;
 
   @override
-  late final AdminTokens tokens = _build(palette, elevation, shell);
+  late final AdminTokens tokens = _build(palette, elevation, shell, feedback);
 
   @override
   late final AdminTokens? dark = switch (darkPalette) {
-    final p? => _build(p, darkElevation, darkShell ?? shell),
+    final p? => _build(
+      p,
+      darkElevation,
+      darkShell ?? shell,
+      darkFeedback ?? feedback,
+    ),
     null => null,
   };
 
@@ -183,6 +192,7 @@ class _PaletteTheme implements AdminTheme {
     AdminPalette palette,
     AdminElevation? elevation,
     AdminShellStyle? shell,
+    AdminFeedbackStyle? feedback,
   ) => AdminTokens.from(
     palette: palette,
     radii: radii,
@@ -209,8 +219,8 @@ class _PaletteTheme implements AdminTheme {
   @override
   bool get hasDark => darkPalette != null;
 
-  /// Rebrands the palettes (the shell's own included) only; the copy stays
-  /// lazy.
+  /// Rebrands the palettes (the shell's own and a toast's included) only;
+  /// the copy stays lazy.
   @override
   AdminTheme branded(String name, Color seed) => _PaletteTheme(
     name: name,
@@ -235,7 +245,8 @@ class _PaletteTheme implements AdminTheme {
     selection: selection,
     slider: slider,
     tabs: tabs,
-    feedback: feedback,
+    feedback: feedback?.branded(seed),
+    darkFeedback: darkFeedback?.branded(seed),
     breakpoints: breakpoints,
   );
 

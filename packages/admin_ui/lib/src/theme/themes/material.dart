@@ -371,5 +371,32 @@ final materialTheme = AdminTheme.from(
   ),
   // M3 has no inline alert, and its snackbar is an inverse surface, which
   // the palette has no role for: the kit's own alert and toast
-  feedback: const AdminFeedbackStyle(),
+  // no inline alert in M3. A snackbar: a card in the inverse scheme, with no
+  // outline and no status bar
+  feedback: AdminFeedbackStyle(
+    toastBar: 0,
+    toastOutline: false,
+    toastPalette: _snackbar,
+  ),
+  darkFeedback: AdminFeedbackStyle(
+    toastBar: 0,
+    toastOutline: false,
+    toastPalette: _darkSnackbar,
+  ),
+);
+
+/// A snackbar on the light page: the dark scheme, whose primary is the light
+/// one's `inversePrimary`, on `inverseSurface` under `inverseOnSurface`.
+final _snackbar = materialDarkPalette.copyWith(
+  surface: const Color(0xFF322F35),
+  foreground: const Color(0xFFF5EFF7),
+);
+
+/// A snackbar on the dark page: the light scheme on the dark one's
+/// `inverseSurface` under its `inverseOnSurface`.
+final _darkSnackbar = materialPalette.copyWith(
+  surface: const Color(0xFFE6E0E9),
+  foreground: const Color(0xFF322F35),
+  // the light scheme's #8A6500, deepened to read at 4.5:1 on neutral90
+  warningText: const Color(0xFF7D5C00),
 );

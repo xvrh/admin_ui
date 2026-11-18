@@ -493,6 +493,11 @@ void describeAdminFeedbackStyle(
   describeValue(v.toastFill, '${p}toastFill', out);
   describeValue(v.toastBar, '${p}toastBar', out);
   describeValue(v.toastOutline, '${p}toastOutline', out);
+  if (v.toastPalette case final f?) {
+    describeAdminPalette(f, '${p}toastPalette', out);
+  } else {
+    out['${p}toastPalette'] = 'null';
+  }
 }
 
 void describeAdminBreakpoints(

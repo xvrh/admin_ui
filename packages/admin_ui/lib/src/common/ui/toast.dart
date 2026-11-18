@@ -12,6 +12,7 @@ import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
 import 'button.dart';
+import 'chrome_theme.dart';
 import 'icon_action.dart';
 import 'severity.dart';
 import 'spinner.dart';
@@ -929,31 +930,37 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
     };
   }
 
-  @override
-  Widget build(BuildContext context) {
+  /// The theme's toast: a card in the surface colour or tinted with its
+  /// status, outlined in its fill's edge or lifted on its shadow alone,
+  /// behind a status bar on its leading edge where the theme has one.
+  /// [context] is under the toast's own palette where [look] names one, and
+  /// [pageIsDark] says what the page it floats over is.
+  Widget _card(
+    BuildContext context,
+    AdminFeedbackStyle look, {
+    required bool pageIsDark,
+  }) {
     final style = severityStyleOf(context, widget.toast.severity);
+    final colors = context.colors;
     final corners = BorderRadius.circular(context.radii.radiusMenu);
-    final top = widget.position._top;
-    // The theme's toast: a card in the surface colour or tinted with its
-    // status, outlined in its fill's edge or lifted on its shadow alone,
-    // behind a status bar on its leading edge where the theme has one.
-    final look = context.feedbackStyle;
     final tinted = look.toastFill == FeedbackFill.tint;
-    final dark = context.colors.brightness == Brightness.dark;
-
-    final card = DecoratedBox(
+    // A dark card on a dark page, where a shadow does not read, is always
+    // ringed. A card in the opposite scheme stands out by its fill.
+    final ringed =
+        look.toastOutline ||
+        (pageIsDark && colors.brightness == Brightness.dark);
+    return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: corners,
         boxShadow: context.elevation.md,
       ),
       child: Material(
-        color: tinted ? style.surface : context.colors.surface,
+        color: tinted ? style.surface : colors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: corners,
-          // A dark palette, where a shadow does not read, always rings it.
-          side: look.toastOutline || dark
-              ? BorderSide(color: tinted ? style.border : context.colors.border)
+          side: ringed
+              ? BorderSide(color: tinted ? style.border : colors.border)
               : BorderSide.none,
         ),
         clipBehavior: Clip.antiAlias,
@@ -969,6 +976,22 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final top = widget.position._top;
+    final look = context.feedbackStyle;
+    final pageIsDark = context.colors.brightness == Brightness.dark;
+    // Built under the toast's palette where the theme gives it one, so its
+    // text, status colours, action and close button are that palette's.
+    final Widget inner = Builder(
+      builder: (context) => _card(context, look, pageIsDark: pageIsDark),
+    );
+    final palette = look.toastPalette;
+    final card = palette == null
+        ? inner
+        : ChromeTheme(palette: palette, child: inner);
 
     return AnimatedBuilder(
       animation: _curve,

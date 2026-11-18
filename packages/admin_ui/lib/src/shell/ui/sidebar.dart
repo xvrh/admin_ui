@@ -10,6 +10,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../common/text_metrics.dart';
 import '../../common/ui/avatar.dart';
+import '../../common/ui/chrome_theme.dart';
 import '../../common/ui/focus_ring.dart';
 import '../../common/ui/leave_guard.dart';
 import '../../common/ui/menu.dart';
