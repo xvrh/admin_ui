@@ -106,6 +106,7 @@ import 'ui/primitives/steps.dart';
 import 'ui/primitives/tabs.dart';
 import 'ui/primitives/timeline.dart';
 import 'ui/primitives/tip.dart';
+import 'ui/primitives/tree.dart';
 import 'ui/primitives/upload.dart';
 import 'ui/primitives/zoom_view.dart';
 import 'ui/screens/capabilities/comments_button.dart';
@@ -188,6 +189,7 @@ Map<String, dynamic> genericCatalog() => {
     'Modal anchor': const ModalAnchorDemo(),
     'List row': const ListRowDemo(),
     'Split view (resizable)': const SplitViewDemo(),
+    'Tree': const TreeDemo(),
     'Upload zone': const UploadZoneDemo(),
     'Feedback': {
       'Alert': const AlertDemo(),

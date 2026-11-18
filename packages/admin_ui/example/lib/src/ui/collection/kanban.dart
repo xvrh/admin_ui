@@ -4,18 +4,27 @@ import 'package:flutterware/ui_catalog.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../preview_shell.dart';
+import '../demo_kit.dart';
 
 /// Demo — a generic [KanbanBoard]: cards flow across workflow columns and drag
-/// between them (or move with Alt+← / Alt+→ once focused). Here it's an
-/// editorial content pipeline (one card per content item), but the board is
-/// domain-agnostic: give it columns, a `cardBuilder`, and an `onMove`, and it
-/// stays a pure View — the demo holds the card→column assignment locally so
-/// drags actually move cards. Two columns carry a subtitle and Backlog an
-/// add action, and the first cards still line up; the Type filter empties
-/// columns.
+/// between them, or move without a drag: with Alt+← / Alt+→ once focused, or
+/// from the ⋯ menu in a card's corner, which shows under the pointer and on
+/// focus. Here it's an editorial content pipeline (one card per content
+/// item), but the board is domain-agnostic: give it columns, a `cardBuilder`,
+/// and an `onMove`, and it stays a pure View — the demo holds the
+/// card→column assignment locally so moves actually move cards. Two columns
+/// carry a subtitle and Backlog an add action, and the first cards still line
+/// up; the Type filter empties columns. An event opens nothing (`canOpen`):
+/// its card is still a Tab stop, to move it from.
 class KanbanDemo extends StatefulWidget {
+  final bool _cardMenu;
+
   @Preview(name: 'Kanban board', wrapper: adminUiPreview)
-  const KanbanDemo({super.key});
+  const KanbanDemo({super.key}) : _cardMenu = false;
+
+  /// The first card's ⋯ open: a "Move to …" item per other column.
+  @Preview(name: 'Kanban board · Move to menu', wrapper: adminUiPreview)
+  const KanbanDemo.cardMenu({super.key}) : _cardMenu = true;
 
   @override
   State<KanbanDemo> createState() => _KanbanDemoState();
@@ -129,30 +138,34 @@ class _KanbanDemoState extends State<KanbanDemo> {
       ),
     ];
 
+    final board = _board(context, columns);
     return Scaffold(
       backgroundColor: context.colors.surface,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _metrics(context, visible),
-          Expanded(
-            child: KanbanBoard<_Item>(
-              columns: columns,
-              itemKey: (i) => i.id,
-              onMove: _move,
-              onCardTap: (i) => ScaffoldMessenger.of(context)
-                ..clearSnackBars()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('Open ${i.title}'),
-                    duration: const Duration(milliseconds: 900),
-                  ),
-                ),
-              cardBuilder: (context, i) => _ItemCard(item: i),
-            ),
-          ),
+          Expanded(child: widget._cardMenu ? PinnedOpen(child: board) : board),
         ],
       ),
+    );
+  }
+
+  Widget _board(BuildContext context, List<KanbanColumn<_Item>> columns) {
+    return KanbanBoard<_Item>(
+      columns: columns,
+      itemKey: (i) => i.id,
+      onMove: _move,
+      canOpen: (i) => i.kind != _Kind.event,
+      onCardTap: (i) => ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Open ${i.title}'),
+            duration: const Duration(milliseconds: 900),
+          ),
+        ),
+      cardBuilder: (context, i) => _ItemCard(item: i),
     );
   }
 
@@ -275,9 +288,12 @@ class _ItemCard extends StatelessWidget {
                 i.kind.label,
                 style: context.type.caption.copyWith(color: c.foregroundMuted),
               ),
-              const Spacer(),
-              if (i.flagged)
+              // Beside the type, not in the top end corner, where the
+              // board's ⋯ lies over the card.
+              if (i.flagged) ...[
+                const Gap(AdminSpacing.sm),
                 Icon(Icons.flag_rounded, size: 14, color: c.danger),
+              ],
             ],
           ),
           const Gap(AdminSpacing.md),

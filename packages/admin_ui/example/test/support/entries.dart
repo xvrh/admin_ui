@@ -11,6 +11,7 @@ import 'package:admin_ui_example/src/ui/auth/auth.dart';
 import 'package:admin_ui_example/src/ui/collection/collection_toolbar.dart';
 import 'package:admin_ui_example/src/ui/collection/column_chooser.dart';
 import 'package:admin_ui_example/src/ui/collection/filter_editors.dart';
+import 'package:admin_ui_example/src/ui/collection/kanban.dart';
 import 'package:admin_ui_example/src/ui/collection/table/data_table_interaction.dart';
 import 'package:admin_ui_example/src/ui/collection/table/data_table_states.dart';
 import 'package:admin_ui_example/src/ui/editor/insert_picker_demo.dart';
@@ -29,9 +30,11 @@ import 'package:admin_ui_example/src/ui/primitives/json_view.dart';
 import 'package:admin_ui_example/src/ui/primitives/menu.dart';
 import 'package:admin_ui_example/src/ui/primitives/notification_center.dart';
 import 'package:admin_ui_example/src/ui/primitives/overlay_surfaces.dart';
+import 'package:admin_ui_example/src/ui/primitives/split_view.dart';
 import 'package:admin_ui_example/src/ui/primitives/stat_card.dart';
 import 'package:admin_ui_example/src/ui/primitives/states/progress.dart';
 import 'package:admin_ui_example/src/ui/primitives/thumbnail_image.dart';
+import 'package:admin_ui_example/src/ui/primitives/tree.dart';
 import 'package:admin_ui_example/src/ui/primitives/zoom_view.dart';
 import 'package:admin_ui_example/src/ui/screens/customer_form.dart';
 import 'package:admin_ui_example/src/ui/screens/customer_form_states.dart';
@@ -105,6 +108,21 @@ const previewOnly = <PreviewOnlyDemo>[
     'StatCardTrendDemo.phone',
     'Stat card / trend (phone width)',
     StatCardTrendDemo.phone,
+  ),
+  PreviewOnlyDemo(
+    'TreeDemo.focused',
+    'Tree · keyboard focus',
+    TreeDemo.focused,
+  ),
+  PreviewOnlyDemo(
+    'SplitViewDemo.focused',
+    'Split view · a focused divider',
+    SplitViewDemo.focused,
+  ),
+  PreviewOnlyDemo(
+    'KanbanDemo.cardMenu',
+    'Kanban board · Move to menu',
+    KanbanDemo.cardMenu,
   ),
   PreviewOnlyDemo(
     'JsonViewDemo.rowActions',

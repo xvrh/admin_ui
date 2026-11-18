@@ -1,14 +1,24 @@
-import 'dart:async';
+/// @docImport 'tree_editor.dart';
+library;
 
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../l10n/formats.dart';
+import '../../l10n/shortcut_label.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'focus_ring.dart';
 import 'icon_action.dart';
+import 'menu.dart';
+import 'menu_button.dart';
 
 /// A node in a [Tree]. Structure only — the row's content is drawn by the
 /// tree's `itemBuilder`, keyed by [id]; the caller owns the payload.
@@ -149,6 +159,22 @@ TreeDrop projectTreeDrop(
   );
 }
 
+/// The moves a key or a menu makes on one row of a [Tree], each a call to
+/// [Tree.onMove]: one place [up] or [down] among its siblings, [indent] to
+/// the end of the sibling above it, [outdent] to just after its parent. A
+/// null move is not open to the row: the first of its siblings has no [up]
+/// and no [indent], a root no [outdent], and [Tree.maxDepth] stops an
+/// [indent] that would take the row or anything under it past it.
+@immutable
+class TreeRowMoves {
+  final VoidCallback? up;
+  final VoidCallback? down;
+  final VoidCallback? indent;
+  final VoidCallback? outdent;
+
+  const TreeRowMoves({this.up, this.down, this.indent, this.outdent});
+}
+
 /// Per-row state handed to a [Tree]'s `itemBuilder`.
 @immutable
 class TreeRowInfo {
@@ -162,12 +188,19 @@ class TreeRowInfo {
   /// Descendants riding along under a dragged parent (0 unless [dragging]).
   final int subtreeCount;
 
+  /// The moves open to the row without a drag, null in a tree with no
+  /// [Tree.onMove]. The tree binds them to its keys and lists them in the
+  /// row's menu itself; a row that is a control of its own
+  /// ([Tree.rowControls] false) offers them from here.
+  final TreeRowMoves? moves;
+
   const TreeRowInfo({
     required this.depth,
     required this.hasChildren,
     required this.expanded,
     this.dragging = false,
     this.subtreeCount = 0,
+    this.moves,
   });
 }
 
@@ -191,6 +224,27 @@ typedef TreeRowBuilder = Widget Function(
 ///
 /// With animations disabled (reduced motion) rows, carets and the drop slot
 /// move at once instead of sliding.
+///
+/// **Keyboard.** The tree is one Tab stop: the row that held focus last, or
+/// the first. ↑ and ↓ move between the rows on screen and Home and End go
+/// to the first and the last. → opens a closed parent, and on an open one
+/// goes to its first child; ← closes an open parent, and on any other row
+/// goes to its parent; Enter or Space opens or closes a parent. Right to
+/// left, → and ← trade places. Tab goes on from the focused row to the
+/// controls inside it, then out of the tree.
+///
+/// With [onMove], Alt+↑ and Alt+↓ move the focused row one place among its
+/// siblings, Alt+→ nests it under the sibling above and Alt+← takes it out
+/// beside its parent (Alt+← nests right to left), and each row ends in a ⋯
+/// menu of the same four moves, each beside its key: a move never needs a
+/// drag. Focus stays on the moved row, and a screen reader hears where it
+/// went.
+///
+/// A caret is a button named "Expand" or "Collapse" that carries its row's
+/// expanded state, as the focused row does.
+///
+/// [rowControls] false leaves the keyboard and the menu to rows that are
+/// controls of their own, as [TreeEditor]'s are.
 class Tree extends StatefulWidget {
   final List<TreeNode> roots;
   final TreeRowBuilder itemBuilder;
@@ -203,9 +257,20 @@ class Tree extends StatefulWidget {
   /// (the tree is as tall as its content and relies on an outer scrollable).
   final double? maxHeight;
 
-  /// Called when a drag commits: move the node `id` under `newParentId` (null
-  /// = root) at `index` among that parent's children.
+  /// Called when a drag, a move key or an item of a row's menu commits: move
+  /// the node `id` under `newParentId` (null = root) at `index` among that
+  /// parent's children.
   final void Function(String id, String? newParentId, int index)? onMove;
+
+  /// Whether the tree operates its rows itself: one Tab stop with the arrow
+  /// keys between its rows and, with [onMove], the move keys and a ⋯ menu
+  /// at the end of each row. See [Tree].
+  ///
+  /// False where each row is a control of the caller's own, a Tab stop that
+  /// offers its [TreeRowInfo.moves] itself as a [TreeEditor] row does, so
+  /// that nothing is offered twice: the tree then adds no Tab stop, key or
+  /// menu to a row, and each caret is a Tab stop.
+  final bool rowControls;
 
   final double rowHeight;
   final double indent;
@@ -235,6 +300,7 @@ class Tree extends StatefulWidget {
     required this.itemBuilder,
     this.empty,
     this.onMove,
+    this.rowControls = true,
     this.rowHeight = 44,
     this.indent = 28,
     this.maxDepth,
@@ -272,6 +338,23 @@ class _TreeState extends State<Tree> {
   // The scrollable auto-scroll drives during a drag: the internal viewport when
   // height-capped, otherwise the nearest enclosing vertical scrollable.
   ScrollableState? _outerScrollable;
+
+  /// The focus node of each row on screen, by node id, which each row
+  /// registers while it is mounted; with [Tree.rowControls].
+  final _rowNodes = <String, FocusNode>{};
+
+  /// The row that is the tree's Tab stop: the one that held focus last. The
+  /// first row stands in while it is null or off screen.
+  String? _current;
+
+  /// Where each node sat among its siblings at the last build, or null
+  /// until something asks. Read from [Tree.roots] again at every build,
+  /// and not kept for as long as the list is the same object: a host may
+  /// reorder its list in place.
+  Map<String, _Place>? _places;
+
+  /// The move keys as the row menus show them, written once a build.
+  _MoveKeyLabels? _keyLabels;
 
   /// The caret's and the drag handle's cells: the smallest target an icon
   /// action takes.
@@ -314,10 +397,210 @@ class _TreeState extends State<Tree> {
   }
 
   void _toggle(String id) {
+    final closing = !_collapsed.contains(id);
+    if (widget.rowControls && closing) {
+      // A row about to go from under the focus hands it to the parent that
+      // closes over it, which is then the Tab stop. So is a parent that
+      // closes over the Tab stop while focus is out of the tree. Any other
+      // press of a caret, with the mouse while the keyboard is on another
+      // row, leaves the Tab stop to the row that holds focus: a row that
+      // stopped being it could not be tabbed on from to its own controls.
+      final focused = _focusedRow;
+      if (focused != null && _isUnder(focused, id)) {
+        _rowNodes[id]?.requestFocus();
+      } else if (focused == null && _isUnder(_current ?? '', id)) {
+        _current = id;
+      }
+    }
     setState(() {
       if (!_collapsed.remove(id)) _collapsed.add(id);
     });
     widget.onToggle?.call(id);
+  }
+
+  /// The row that holds focus, itself or through a control inside it.
+  String? get _focusedRow {
+    for (final MapEntry(key: id, value: node) in _rowNodes.entries) {
+      if (node.hasFocus) return id;
+    }
+    return null;
+  }
+
+  Map<String, _Place> get _placeOf => _places ??= _placesOf(widget.roots);
+
+  /// Every node's place, in one walk that also measures what is under it.
+  static Map<String, _Place> _placesOf(List<TreeNode> roots) {
+    final places = <String, _Place>{};
+    // The levels under the tallest of [nodes], itself counted.
+    int walk(List<TreeNode> nodes, String? parent) {
+      var tallest = 0;
+      for (final (index, node) in nodes.indexed) {
+        final height = walk(node.children, node.id);
+        places[node.id] = _Place(parent, nodes, index, height);
+        tallest = math.max(tallest, height + 1);
+      }
+      return tallest;
+    }
+
+    walk(roots, null);
+    return places;
+  }
+
+  /// Whether [id] sits somewhere under [ancestor].
+  bool _isUnder(String id, String ancestor) {
+    final places = _placeOf;
+    for (var p = places[id]?.parentId; p != null; p = places[p]?.parentId) {
+      if (p == ancestor) return true;
+    }
+    return false;
+  }
+
+  /// The moves open to the row [id] at [depth] without a drag; see
+  /// [TreeRowMoves].
+  TreeRowMoves? _movesOf(String id, int depth) {
+    final onMove = widget.onMove;
+    final place = _placeOf[id];
+    if (onMove == null || place == null) return null;
+    final _Place(:parentId, :siblings, :index, :height) = place;
+    final maxDepth = widget.maxDepth;
+
+    VoidCallback? indent;
+    if (index > 0 && (maxDepth == null || depth + 1 + height <= maxDepth)) {
+      final above = siblings[index - 1];
+      indent = () => onMove(id, above.id, above.children.length);
+    }
+    VoidCallback? outdent;
+    if (_placeOf[parentId] case final parent?) {
+      outdent = () => onMove(id, parent.parentId, parent.index + 1);
+    }
+    return TreeRowMoves(
+      up: index > 0 ? () => onMove(id, parentId, index - 1) : null,
+      down: index < siblings.length - 1
+          ? () => onMove(id, parentId, index + 1)
+          : null,
+      indent: indent,
+      outdent: outdent,
+    );
+  }
+
+  /// [move], then [done] said to a screen reader: focus stays on the row,
+  /// which says nothing of where it went.
+  VoidCallback? _announced(VoidCallback? move, String done) {
+    if (move == null) return null;
+    return () {
+      move();
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        done,
+        Directionality.of(context),
+      );
+    };
+  }
+
+  /// Gives the row [id] the focus, and scrolls it into view.
+  void _focusRow(String id) {
+    final node = _rowNodes[id];
+    if (node == null) return;
+    node.requestFocus();
+    final row = node.context;
+    if (row == null) return;
+    for (final policy in const [
+      ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+      ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+    ]) {
+      Scrollable.ensureVisible(row, alignmentPolicy: policy);
+    }
+  }
+
+  static const _upKey = SingleActivator(LogicalKeyboardKey.arrowUp, alt: true);
+  static const _downKey = SingleActivator(
+    LogicalKeyboardKey.arrowDown,
+    alt: true,
+  );
+
+  /// The arrow toward the end edge, where a row's children are and where
+  /// nesting deeper moves it: → left to right, ← right to left.
+  static LogicalKeyboardKey _inward(BuildContext context) =>
+      Directionality.of(context) == TextDirection.rtl
+      ? LogicalKeyboardKey.arrowLeft
+      : LogicalKeyboardKey.arrowRight;
+
+  static LogicalKeyboardKey _outward(BuildContext context) =>
+      Directionality.of(context) == TextDirection.rtl
+      ? LogicalKeyboardKey.arrowRight
+      : LogicalKeyboardKey.arrowLeft;
+
+  /// The tree's keys on the row [id], while the row itself holds the focus:
+  /// a control inside it keeps its own.
+  KeyEventResult _onRowKey(String id, FocusNode node, KeyEvent event) {
+    if (event is KeyUpEvent || !node.hasPrimaryFocus) {
+      return KeyEventResult.ignored;
+    }
+    final keyboard = HardwareKeyboard.instance;
+    if (keyboard.isControlPressed ||
+        keyboard.isMetaPressed ||
+        keyboard.isShiftPressed) {
+      return KeyEventResult.ignored;
+    }
+    final rows = flattenTree(widget.roots, collapsed: _collapsed);
+    final index = rows.indexWhere((row) => row.id == id);
+    if (index < 0) return KeyEventResult.ignored;
+    final row = rows[index];
+    final key = event.logicalKey;
+    final inward = key == _inward(context);
+    final outward = key == _outward(context);
+
+    if (keyboard.isAltPressed) {
+      final moves = _movesOf(id, row.depth);
+      if (moves == null) return KeyEventResult.ignored;
+      final strings = context.adminL10n.display;
+      final VoidCallback? move;
+      if (key == LogicalKeyboardKey.arrowUp) {
+        move = _announced(moves.up, strings.rowMovedUp);
+      } else if (key == LogicalKeyboardKey.arrowDown) {
+        move = _announced(moves.down, strings.rowMovedDown);
+      } else if (inward) {
+        move = _announced(moves.indent, strings.rowIndented);
+      } else if (outward) {
+        move = _announced(moves.outdent, strings.rowOutdented);
+      } else {
+        return KeyEventResult.ignored;
+      }
+      // A move the row cannot make is still the tree's key: Alt+← must not
+      // go on to take a browser back a page.
+      move?.call();
+      return KeyEventResult.handled;
+    }
+
+    if (key == LogicalKeyboardKey.arrowDown) {
+      if (index + 1 < rows.length) _focusRow(rows[index + 1].id);
+    } else if (key == LogicalKeyboardKey.arrowUp) {
+      if (index > 0) _focusRow(rows[index - 1].id);
+    } else if (key == LogicalKeyboardKey.home) {
+      _focusRow(rows.first.id);
+    } else if (key == LogicalKeyboardKey.end) {
+      _focusRow(rows.last.id);
+    } else if (inward) {
+      if (row.hasChildren && !row.expanded) {
+        _toggle(id);
+      } else if (row.hasChildren) {
+        _focusRow(rows[index + 1].id);
+      }
+    } else if (outward) {
+      if (row.hasChildren && row.expanded) {
+        _toggle(id);
+      } else if (row.parentId case final parent?) {
+        _focusRow(parent);
+      }
+    } else if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.space) {
+      if (!row.hasChildren) return KeyEventResult.ignored;
+      if (event is KeyDownEvent) _toggle(id);
+    } else {
+      return KeyEventResult.ignored;
+    }
+    return KeyEventResult.handled;
   }
 
   Offset _toLocal(Offset global) {
@@ -478,6 +761,9 @@ class _TreeState extends State<Tree> {
 
   @override
   Widget build(BuildContext context) {
+    // Read again from the list and the context as they are now.
+    _places = null;
+    _keyLabels = null;
     final all = flattenTree(widget.roots, collapsed: _collapsed);
     if (all.isEmpty) {
       return SizedBox(
@@ -485,6 +771,12 @@ class _TreeState extends State<Tree> {
         child: Center(child: widget.empty ?? const SizedBox.shrink()),
       );
     }
+
+    // The Tab stop: the row focused last, or the first once that one is gone
+    // or folded away.
+    final tabStop = all.any((row) => row.id == _current)
+        ? _current!
+        : all.first.id;
 
     final dragging = _dragId != null;
     // Flow rows = the tree minus the dragged subtree; the dragged row stays
@@ -550,11 +842,17 @@ class _TreeState extends State<Tree> {
                   (drop != null && i >= drop.index ? widget.rowHeight : 0),
               start: ordered[i].depth * widget.indent,
               end: 0,
-              child: _row(context, ordered[i], floating: false),
+              child: _row(
+                context,
+                ordered[i],
+                floating: false,
+                tabStop: ordered[i].id == tabStop,
+              ),
             ),
           if (expanded) _expansion(context, expandedIndex),
           if (drop != null) _slot(context, drop),
-          if (dragging) _floatingRow(context, all, drop, maxTop, carried),
+          if (dragging)
+            _floatingRow(context, all, drop, maxTop, carried, tabStop),
         ],
       ),
     );
@@ -582,6 +880,7 @@ class _TreeState extends State<Tree> {
     TreeDrop? drop,
     double maxTop,
     int carried,
+    String tabStop,
   ) {
     final node = all.firstWhere((f) => f.id == _dragId);
     return AnimatedPositionedDirectional(
@@ -590,7 +889,13 @@ class _TreeState extends State<Tree> {
       top: (_pointerY - widget.rowHeight / 2).clamp(0.0, maxTop),
       start: (drop?.depth ?? node.depth) * widget.indent,
       end: 0,
-      child: _row(context, node, floating: true, subtreeCount: carried),
+      child: _row(
+        context,
+        node,
+        floating: true,
+        subtreeCount: carried,
+        tabStop: node.id == tabStop,
+      ),
     );
   }
 
@@ -598,9 +903,11 @@ class _TreeState extends State<Tree> {
     BuildContext context,
     TreeFlatNode node, {
     required bool floating,
+    required bool tabStop,
     int subtreeCount = 0,
   }) {
     final canDrag = widget.onMove != null;
+    final moves = _movesOf(node.id, node.depth);
     final content = Row(
       children: [
         SizedBox(
@@ -630,9 +937,11 @@ class _TreeState extends State<Tree> {
               expanded: node.expanded,
               dragging: floating,
               subtreeCount: subtreeCount,
+              moves: moves,
             ),
           ),
         ),
+        if (widget.rowControls && moves != null) _moveMenu(context, moves),
         if (floating && subtreeCount > 0) _carriedBadge(context, subtreeCount),
       ],
     );
@@ -640,7 +949,7 @@ class _TreeState extends State<Tree> {
     // The flow and floating rows MUST share one widget structure, or switching
     // between them on pickup rebuilds the drag handle's GestureDetector and
     // cancels the in-flight pan. Only the decoration toggles.
-    return SizedBox(
+    final row = SizedBox(
       height: widget.rowHeight,
       child: Material(
         elevation: floating ? 6 : 0,
@@ -665,6 +974,71 @@ class _TreeState extends State<Tree> {
           ),
           child: content,
         ),
+      ),
+    );
+    if (!widget.rowControls) return row;
+    return _RowFocus(
+      id: node.id,
+      tabStop: tabStop,
+      expanded: node.hasChildren ? node.expanded : null,
+      nodes: _rowNodes,
+      onFocused: (id) {
+        if (id != _current) setState(() => _current = id);
+      },
+      onKeyEvent: _onRowKey,
+      child: row,
+    );
+  }
+
+  /// The ⋯ at the end of a row, with the moves a drag makes, each beside
+  /// its key.
+  Widget _moveMenu(BuildContext context, TreeRowMoves moves) {
+    final l10n = context.adminL10n;
+    final strings = l10n.display;
+    // The same four labels on every row's menu.
+    final keys = _keyLabels ??= _MoveKeyLabels(
+      up: shortcutLabel(context, _upKey),
+      down: shortcutLabel(context, _downKey),
+      indent: shortcutLabel(
+        context,
+        SingleActivator(_inward(context), alt: true),
+      ),
+      outdent: shortcutLabel(
+        context,
+        SingleActivator(_outward(context), alt: true),
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: AdminSpacing.xs),
+      child: MenuButton(
+        icon: Icons.more_horiz_rounded,
+        tooltip: l10n.moreActions,
+        entries: [
+          MenuItem(
+            l10n.moveUp,
+            icon: Icons.arrow_upward_rounded,
+            shortcut: keys.up,
+            onSelect: _announced(moves.up, strings.rowMovedUp),
+          ),
+          MenuItem(
+            l10n.moveDown,
+            icon: Icons.arrow_downward_rounded,
+            shortcut: keys.down,
+            onSelect: _announced(moves.down, strings.rowMovedDown),
+          ),
+          MenuItem(
+            strings.indent,
+            icon: Icons.format_indent_increase_rounded,
+            shortcut: keys.indent,
+            onSelect: _announced(moves.indent, strings.rowIndented),
+          ),
+          MenuItem(
+            strings.outdent,
+            icon: Icons.format_indent_decrease_rounded,
+            shortcut: keys.outdent,
+            onSelect: _announced(moves.outdent, strings.rowOutdented),
+          ),
+        ],
       ),
     );
   }
@@ -693,6 +1067,8 @@ class _TreeState extends State<Tree> {
   Widget _caret(BuildContext context, TreeFlatNode node) => _Caret(
     expanded: node.expanded,
     size: _caretWidth,
+    // → and ← open and close a row the tree operates.
+    focusable: !widget.rowControls,
     onTap: () => _toggle(node.id),
   );
 
@@ -846,16 +1222,158 @@ class _MeasureSizeRender extends RenderProxyBox {
   }
 }
 
-/// The expand / collapse chevron: the whole cell is the hit target, and
-/// keyboard focus rings the [size] square around the glyph.
+/// Where a node sits in a tree: under [parentId], at [index] among
+/// [siblings], with [height] levels under it, 0 for a leaf.
+class _Place {
+  final String? parentId;
+  final List<TreeNode> siblings;
+  final int index;
+  final int height;
+
+  const _Place(this.parentId, this.siblings, this.index, this.height);
+}
+
+/// The four move keys as a row's menu shows them: "Alt+↑".
+class _MoveKeyLabels {
+  final String up;
+  final String down;
+  final String indent;
+  final String outdent;
+
+  const _MoveKeyLabels({
+    required this.up,
+    required this.down,
+    required this.indent,
+    required this.outdent,
+  });
+}
+
+/// One row of a tree that operates its rows: the focus node the arrow keys
+/// move between, a Tab stop on the one row that is [tabStop], with the
+/// focus ring and the row's semantics.
+class _RowFocus extends StatefulWidget {
+  final String id;
+  final bool tabStop;
+
+  /// A parent's expanded state; null for a leaf.
+  final bool? expanded;
+
+  /// Where the row keeps its focus node, under its [id], while mounted.
+  final Map<String, FocusNode> nodes;
+
+  /// Focus came to the row, or to a control inside it.
+  final ValueChanged<String> onFocused;
+  final KeyEventResult Function(String id, FocusNode node, KeyEvent event)
+  onKeyEvent;
+  final Widget child;
+
+  const _RowFocus({
+    required this.id,
+    required this.tabStop,
+    required this.expanded,
+    required this.nodes,
+    required this.onFocused,
+    required this.onKeyEvent,
+    required this.child,
+  });
+
+  @override
+  State<_RowFocus> createState() => _RowFocusState();
+}
+
+class _RowFocusState extends State<_RowFocus> {
+  final _node = FocusNode(debugLabel: 'tree row');
+
+  @override
+  void initState() {
+    super.initState();
+    widget.nodes[widget.id] = _node;
+    // The row's own semantics and its ring carry the focus.
+    _node.addListener(_onFocus);
+  }
+
+  @override
+  void didUpdateWidget(_RowFocus oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.id != widget.id) {
+      if (widget.nodes[oldWidget.id] == _node) {
+        widget.nodes.remove(oldWidget.id);
+      }
+      widget.nodes[widget.id] = _node;
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.nodes[widget.id] == _node) widget.nodes.remove(widget.id);
+    _node.dispose();
+    super.dispose();
+  }
+
+  void _onFocus() => setState(() {});
+
+  @override
+  Widget build(BuildContext context) {
+    final focused = _node.hasPrimaryFocus;
+    // Drawn inside the row's edge, where neither a scrolling tree nor a
+    // panel around it clips it.
+    final reach = math.max(0.0, FocusRing.reachOf(context));
+    return Focus(
+      focusNode: _node,
+      // One Tab stop for the tree: the other rows, and the controls in
+      // them, are reached with the arrows first.
+      skipTraversal: !widget.tabStop,
+      descendantsAreTraversable: widget.tabStop,
+      includeSemantics: false,
+      onFocusChange: (focused) {
+        if (focused) widget.onFocused(widget.id);
+      },
+      onKeyEvent: (node, event) => widget.onKeyEvent(widget.id, node, event),
+      child: Semantics(
+        container: true,
+        focusable: true,
+        focused: focused,
+        expanded: widget.expanded,
+        onFocus: defaultTargetPlatform != TargetPlatform.iOS
+            ? _node.requestFocus
+            : null,
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            widget.child,
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.all(reach),
+                child: FocusRing(
+                  focused: focused,
+                  radius: context.radii.radius,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The expand / collapse chevron, a button named for what a press does:
+/// the whole cell is the hit target, and keyboard focus rings the [size]
+/// square around the glyph where the caret is [focusable].
 class _Caret extends StatefulWidget {
   final bool expanded;
   final double size;
+
+  /// Whether the caret is a Tab stop: in a tree whose rows are controls of
+  /// their own, which have no key for it.
+  final bool focusable;
   final VoidCallback onTap;
 
   const _Caret({
     required this.expanded,
     required this.size,
+    required this.focusable,
     required this.onTap,
   });
 
@@ -868,8 +1386,22 @@ class _CaretState extends State<_Caret> {
 
   @override
   Widget build(BuildContext context) {
+    final material = MaterialLocalizations.of(context);
+    return Semantics(
+      container: true,
+      button: true,
+      label: widget.expanded
+          ? material.expandedIconTapHint
+          : material.collapsedIconTapHint,
+      expanded: widget.expanded,
+      child: _target(context),
+    );
+  }
+
+  Widget _target(BuildContext context) {
     return InkWell(
       onTap: widget.onTap,
+      canRequestFocus: widget.focusable,
       mouseCursor: WidgetStateMouseCursor.clickable,
       borderRadius: BorderRadius.circular(context.radii.radiusSmall),
       focusColor: Colors.transparent,

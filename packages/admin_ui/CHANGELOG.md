@@ -2,6 +2,49 @@
 
 ## 0.2.0
 
+- A drag is never the only way to resize a `SplitView`. Each divider is a
+  Tab stop, announced as a slider whose value is the share its pane takes
+  of the two panes it parts. ← and → move a divider between side-by-side
+  panes the way the arrow points, in either reading direction, and ↑ and ↓
+  one between stacked panes, 16 logical pixels a press. Home and End take
+  its pane to its smallest and its largest, within `minSizes`, and Enter
+  collapses the pane to its min size, then restores the size it had. A
+  divider's pane is the one before it, or with `initialSizes` the sized
+  pane where the other is the free one, so Enter on an inspector's divider
+  collapses the inspector. A right-click on a divider, or a long press with
+  a finger, opens a menu of the same moves, each beside its key, and a
+  screen reader's increase and decrease step the pane too. Each such move
+  fires `onWeightsChanged` or `onSizesChanged`, as the end of a drag does.
+  A focused divider is lit and ringed inside the view. `DisplayMessages`
+  has `resizePanes`, `moveLeft` and `moveRight`, new.
+- A `Tree` is operated from the keyboard, and moves a row without a drag.
+  It is one Tab stop, the row that held focus last: ↑ and ↓ move between
+  the rows on screen, Home and End go to the first and the last, → opens a
+  closed parent and then goes to its first child, ← closes an open parent
+  and otherwise goes to the row's parent, and Enter or Space opens or
+  closes a parent; right to left, → and ← trade places. Tab goes on to the
+  controls inside the focused row, then out of the tree. With `onMove`,
+  Alt+↑ and Alt+↓ move the focused row among its siblings, Alt+→ nests it
+  under the sibling above and Alt+← takes it out beside its parent, as in
+  a `TreeEditor`, and each row ends in a ⋯ menu of the same four moves;
+  focus stays on the moved row and a screen reader hears where it went. A
+  caret is a button named "Expand" or "Collapse" with its row's expanded
+  state, in a `TreeEditor` too, where it was a Tab stop with no name.
+  `TreeRowInfo.moves` hands a row its moves as a `TreeRowMoves`, new, and
+  `rowControls: false` leaves the keys and the menu to rows that are
+  controls of their own, which `TreeEditor` passes: its rows work as
+  before. `DisplayMessages` has `rowMovedUp`, `rowMovedDown`, `rowIndented`
+  and `rowOutdented`, new.
+- A `KanbanBoard` moves a card without a drag by a pointer as well as by
+  the keyboard. With `onMove`, every card is a Tab stop, whether or not
+  `onCardTap` opens it, so Alt+← and Alt+→ reach a card `canOpen` leaves
+  out, which no key reached before. A ⋯ in the card's top end corner opens
+  a menu with a "Move to …" item per other column: it shows while the
+  pointer is over the card or focus is on it, stays up where the pointer is
+  a finger, and is the Tab stop after its card. The "Move to …" actions a
+  screen reader is offered on the card are as before.
+  `CollectionMessages` has `moveCard`, the menu's name, new.
+
 - An app can show on which days someone used something, and how much:
   `CalendarHeatGrid` draws a square per day, a column per week and a row
   per day of the week, over the `weeks` up to today's (26 by default) or
@@ -278,6 +321,15 @@
 
 ### Looks
 
+- A `Tree` with `onMove` ends each row in a ⋯ button, after the row's own
+  content, which is narrower by its 28px and a 4px margin. A tree whose
+  rows carry their own menu passes `rowControls: false` to go without it,
+  as `TreeEditor` does. The Tab stop of a tree that keeps `rowControls` is
+  a row, ringed inside its edge, where it was each caret.
+- A `KanbanBoard` with `onMove` draws a ⋯ on a chip of its own over the top
+  end corner of a card, 28px square and 6px in: under the pointer and on
+  focus, and for good on a touch screen. A card keeps what must stay
+  readable out of that corner.
 - A loading `StatCard`'s delta bar is as wide as the chip of a short delta,
   "12%": the chip's padding, its arrow and its words, measured as the chip
   lays them out. It was three times as wide as it is tall, about 7 wider

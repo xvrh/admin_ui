@@ -1,14 +1,20 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../common/pointer.dart';
 import '../../common/text_metrics.dart';
+import '../../common/ui/focus_ring.dart';
 import '../../common/ui/icon_action.dart';
+import '../../common/ui/menu.dart';
+import '../../common/ui/popover.dart';
 import '../../common/ui/tappable.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../l10n/formats.dart';
+import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 
@@ -52,9 +58,24 @@ class KanbanColumn<T> {
 /// [KanbanColumn.trailing]) over a subtitle line whenever any column has a
 /// subtitle — so first cards line up across the board. The header starts
 /// where a card's content does, given a card padded by [cardPadding] inside
-/// a 1px border. Without [onMove] the cards don't drag. With it, a focused
-/// card also moves with Alt+← / Alt+→, and assistive technology offers a
-/// "Move to …" action per other column.
+/// a 1px border.
+///
+/// **Moving a card.** Without [onMove] the cards don't drag. With it a drag
+/// is never the only way:
+///
+/// - every card is a Tab stop, whether or not it opens, and Alt+← / Alt+→
+///   move the focused card a column over, the way the arrow points;
+/// - a ⋯ in the card's top end corner opens a menu with a "Move to …" item
+///   per other column. It shows while the pointer is over the card or focus
+///   is on or in it, and for good where the pointer is a finger, which has
+///   no hover; it is the Tab stop after its card either way, and a screen
+///   reader is read it while it shows. It lies over
+///   the card, on a chip of its own, 28px square and [AdminSpacing.sm] in
+///   from the corner: a card keeps what must stay readable out of there;
+/// - assistive technology is offered the same "Move to …" actions on the
+///   card itself.
+///
+/// Enter opens the focused card that [onCardTap] opens.
 ///
 /// Place inside a bounded-height slot (an [Expanded] in a [Column]); columns
 /// take the full height and scroll their cards internally.
@@ -74,8 +95,9 @@ class KanbanBoard<T> extends StatefulWidget {
   final void Function(T item)? onCardTap;
 
   /// Whether [onCardTap] opens [item]; null opens every card. A card that
-  /// does not open is no Tab stop and shows no hand, and still moves with
-  /// [onMove].
+  /// does not open shows no hand and Enter does nothing on it. It still
+  /// moves with [onMove], and is then a Tab stop to move it from; without
+  /// [onMove] it is none.
   final bool Function(T item)? canOpen;
 
   /// Placeholder for a column with no cards. Defaults to a muted "No items",
@@ -122,28 +144,45 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
 
   bool _dragging = false;
 
+  /// Whether the last pointer on the board was a finger or a pen; null
+  /// until one lands.
+  bool? _touch;
+
+  /// Whether the pointer is coarse: the last one was a finger or a pen, or
+  /// none has landed on a touch-first platform. The cards' menus then stay
+  /// up, as there is no hover to reveal them.
+  bool get _coarse => _touch ?? coarsePointerByDefault;
+
   void _setDragging(bool dragging) {
     if (dragging != _dragging) setState(() => _dragging = dragging);
+  }
+
+  void _onPointerDown(PointerDownEvent event) {
+    final coarse = isCoarsePointer(event.kind);
+    if (coarse != _touch) setState(() => _touch = coarse);
   }
 
   @override
   Widget build(BuildContext context) {
     final columns = widget.columns;
     final subtitles = columns.any((c) => c.subtitle != null);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.all(AdminSpacing.xl),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (var i = 0; i < columns.length; i++) ...[
-            if (i > 0) const Gap(AdminSpacing.lg),
-            SizedBox(
-              width: widget.columnWidth,
-              child: _column(context, i, subtitles: subtitles),
-            ),
+    return Listener(
+      onPointerDown: widget.onMove == null ? null : _onPointerDown,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.all(AdminSpacing.xl),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < columns.length; i++) ...[
+              if (i > 0) const Gap(AdminSpacing.lg),
+              SizedBox(
+                width: widget.columnWidth,
+                child: _column(context, i, subtitles: subtitles),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -325,59 +364,47 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     final onCardTap = (widget.canOpen?.call(item) ?? true)
         ? widget.onCardTap
         : null;
+    final key = ValueKey(widget.itemKey(item));
+    final open = onCardTap == null ? null : () => onCardTap(item);
 
-    Widget tile = card;
-    if (onMove != null) {
-      tile = Semantics(
-        // Its own node when no tap makes one around it.
-        container: onCardTap == null,
-        customSemanticsActions: {
-          for (final (i, other) in widget.columns.indexed)
-            if (i != index)
-              CustomSemanticsAction(
-                label: context.adminL10n.collection.moveTo(other.title),
-              ): () =>
-                  onMove(item, column.id, other.id),
-        },
-        child: Draggable<_KanbanDrag<T>>(
-          data: _KanbanDrag(item, column.id),
-          dragAnchorStrategy: pointerDragAnchorStrategy,
-          feedback: _feedback(context, card),
-          childWhenDragging: Opacity(opacity: 0.35, child: card),
-          onDragStarted: () => _setDragging(true),
-          onDragEnd: (_) => _setDragging(false),
-          child: card,
-        ),
-      );
-    }
-    if (onCardTap == null) {
-      // Nothing to open: the open hand says the card can be moved.
-      tile = MouseRegion(
-        cursor: onMove == null ? MouseCursor.defer : SystemMouseCursors.grab,
-        child: tile,
-      );
-    } else {
-      // A Tab stop that Enter opens; with onMove, Alt+arrows move it. A card
-      // that opens is a control and shows the hand, movable or not.
-      tile = Tappable(
-        onTap: () => onCardTap(item),
+    if (onMove == null) {
+      // A read-only board: a card that opens is a control, a Tab stop that
+      // shows the hand; any other is content.
+      if (open == null) return KeyedSubtree(key: key, child: card);
+      return Tappable(
+        key: key,
+        onTap: open,
         focusRadius: context.radii.radiusLarge,
-        child: tile,
+        child: card,
       );
     }
-    if (onMove != null) {
-      final rtl = Directionality.of(context) == TextDirection.rtl;
-      tile = CallbackShortcuts(
-        bindings: {
-          const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true): () =>
-              _step(index, item, rtl ? 1 : -1),
-          const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true): () =>
-              _step(index, item, rtl ? -1 : 1),
-        },
-        child: tile,
-      );
-    }
-    return KeyedSubtree(key: ValueKey(widget.itemKey(item)), child: tile);
+
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    return _MovableCard(
+      key: key,
+      onOpen: open,
+      moves: [
+        for (final (i, other) in widget.columns.indexed)
+          if (i != index)
+            (
+              context.adminL10n.collection.moveTo(other.title),
+              () => onMove(item, column.id, other.id),
+            ),
+      ],
+      // The way the arrow points, whichever way the columns run.
+      onStepLeft: () => _step(index, item, rtl ? 1 : -1),
+      onStepRight: () => _step(index, item, rtl ? -1 : 1),
+      menuRevealed: _coarse,
+      child: Draggable<_KanbanDrag<T>>(
+        data: _KanbanDrag(item, column.id),
+        dragAnchorStrategy: pointerDragAnchorStrategy,
+        feedback: _feedback(context, card),
+        childWhenDragging: Opacity(opacity: 0.35, child: card),
+        onDragStarted: () => _setDragging(true),
+        onDragEnd: (_) => _setDragging(false),
+        child: card,
+      ),
+    );
   }
 
   Widget _feedback(BuildContext context, Widget card) {
@@ -437,4 +464,187 @@ class _KanbanDrag<T> {
   final T item;
   final String from;
   const _KanbanDrag(this.item, this.from);
+}
+
+/// A card of a board that moves its cards: a Tab stop that Enter opens
+/// where [onOpen] is set, that Alt+← / Alt+→ move a column over, and that
+/// carries a ⋯ menu of [moves] in its top end corner.
+class _MovableCard extends StatefulWidget {
+  /// Opens the card; null for one that does not open.
+  final VoidCallback? onOpen;
+
+  /// The moves to the other columns, each with its name: "Move to Done".
+  final List<(String, VoidCallback)> moves;
+
+  final VoidCallback onStepLeft; // Physical: the arrow key's own way.
+  final VoidCallback onStepRight; // Physical: the arrow key's own way.
+
+  /// Keeps the menu up without hover or focus, as for a finger.
+  final bool menuRevealed;
+
+  /// The card, draggable.
+  final Widget child;
+
+  const _MovableCard({
+    super.key,
+    required this.onOpen,
+    required this.moves,
+    required this.onStepLeft,
+    required this.onStepRight,
+    required this.menuRevealed,
+    required this.child,
+  });
+
+  @override
+  State<_MovableCard> createState() => _MovableCardState();
+}
+
+class _MovableCardState extends State<_MovableCard> {
+  /// The Tab stop of a card that does not open; one that opens is a
+  /// [Tappable] with its own.
+  final _focus = FocusNode(debugLabel: 'kanban card');
+
+  bool _hover = false;
+
+  /// Focus is on the card or on its menu.
+  bool _focusWithin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // The card's own semantics and its ring carry the focus.
+    _focus.addListener(_onFocus);
+  }
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _onFocus() => setState(() {});
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = context.radii.radiusLarge;
+    final actions = {
+      for (final (label, move) in widget.moves)
+        CustomSemanticsAction(label: label): move,
+    };
+
+    final Widget tile;
+    if (widget.onOpen case final open?) {
+      // A Tab stop that Enter opens. A card that opens is a control and
+      // shows the hand, movable or not.
+      tile = Tappable(
+        onTap: open,
+        focusRadius: radius,
+        child: Semantics(customSemanticsActions: actions, child: widget.child),
+      );
+    } else {
+      // Nothing to open: a Tab stop to move the card from, under the open
+      // hand that says it can be moved.
+      final focused = _focus.hasPrimaryFocus;
+      tile = Focus(
+        focusNode: _focus,
+        includeSemantics: false,
+        child: Semantics(
+          container: true,
+          focusable: true,
+          focused: focused,
+          onFocus: defaultTargetPlatform != TargetPlatform.iOS
+              ? _focus.requestFocus
+              : null,
+          customSemanticsActions: actions,
+          child: FocusRing(
+            focused: focused,
+            radius: radius,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.grab,
+              child: widget.child,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
+            widget.onStepLeft,
+        const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
+            widget.onStepRight,
+      },
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hover = true),
+        onExit: (_) => setState(() => _hover = false),
+        child: Focus(
+          canRequestFocus: false,
+          skipTraversal: true,
+          includeSemantics: false,
+          onFocusChange: (focused) => setState(() => _focusWithin = focused),
+          child: Stack(
+            children: [
+              tile,
+              if (widget.moves.isNotEmpty)
+                PositionedDirectional(
+                  top: AdminSpacing.sm,
+                  end: AdminSpacing.sm,
+                  child: _menu(context),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The ⋯ over the card's top end corner, on a chip of its own so that it
+  /// reads over whatever the card draws there. Hidden, it keeps its place
+  /// in the Tab order, where focus shows it, and takes no pointer. A screen
+  /// reader is not read it then, as its press would do nothing: the card's
+  /// own "Move to …" actions move it.
+  Widget _menu(BuildContext context) {
+    final colors = context.colors;
+    return Menu(
+      align: PopoverAlign.end,
+      entries: [
+        for (final (label, move) in widget.moves)
+          MenuItem(label, onSelect: move),
+      ],
+      builder: (context, menu) {
+        final shown =
+            widget.menuRevealed || _hover || _focusWithin || menu.isOpen;
+        return IgnorePointer(
+          ignoring: !shown,
+          child: ExcludeSemantics(
+            excluding: !shown,
+            child: AnimatedOpacity(
+              opacity: shown ? 1 : 0,
+              duration: context.motion.fast,
+              curve: context.motion.standard,
+              // Read for as long as it takes the pointer, its fade in too.
+              alwaysIncludeSemantics: true,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(
+                    context.radii.button(ControlSize.small),
+                  ),
+                  border: Border.all(color: colors.border),
+                ),
+                child: IconAction(
+                  Icons.more_horiz_rounded,
+                  label: context.adminL10n.collection.moveCard,
+                  size: IconActionSize.small,
+                  expanded: menu.isOpen,
+                  onPressed: menu.toggle,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

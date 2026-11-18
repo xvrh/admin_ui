@@ -227,6 +227,28 @@ abstract class DisplayMessages extends AdminMessages {
 
   String outdented(String title);
 
+  /// Announced after a keyboard or menu move in a tree whose rows the app
+  /// draws, as focus stays on the row.
+  String get rowMovedUp;
+
+  String get rowMovedDown;
+
+  String get rowIndented;
+
+  String get rowOutdented;
+
+  // Split view.
+
+  /// The accessible name of a split view's divider, a slider whose value is
+  /// the share one pane takes.
+  String get resizePanes;
+
+  /// Moves a divider between side-by-side panes a step to the left.
+  String get moveLeft;
+
+  /// Moves a divider between side-by-side panes a step to the right.
+  String get moveRight;
+
   // Insert picker.
 
   /// Shows the preview of the highlighted entry.
@@ -584,6 +606,27 @@ class DisplayMessagesEn extends DisplayMessages {
 
   @override
   String outdented(String title) => '$title outdented';
+
+  @override
+  String get rowMovedUp => 'Moved up';
+
+  @override
+  String get rowMovedDown => 'Moved down';
+
+  @override
+  String get rowIndented => 'Indented';
+
+  @override
+  String get rowOutdented => 'Outdented';
+
+  @override
+  String get resizePanes => 'Resize panes';
+
+  @override
+  String get moveLeft => 'Move left';
+
+  @override
+  String get moveRight => 'Move right';
 
   @override
   String get preview => 'Preview';
@@ -970,6 +1013,27 @@ class DisplayMessagesFr extends DisplayMessages {
 
   @override
   String outdented(String title) => 'Retrait de $title diminué';
+
+  @override
+  String get rowMovedUp => 'Déplacé vers le haut';
+
+  @override
+  String get rowMovedDown => 'Déplacé vers le bas';
+
+  @override
+  String get rowIndented => 'Retrait augmenté';
+
+  @override
+  String get rowOutdented => 'Retrait diminué';
+
+  @override
+  String get resizePanes => 'Redimensionner les volets';
+
+  @override
+  String get moveLeft => 'Déplacer vers la gauche';
+
+  @override
+  String get moveRight => 'Déplacer vers la droite';
 
   @override
   String get preview => 'Aperçu';
@@ -1395,6 +1459,27 @@ class DisplayMessagesAr extends DisplayMessages {
 
   @override
   String outdented(String title) => 'أُنقصت إزاحة $title';
+
+  @override
+  String get rowMovedUp => 'نُقل لأعلى';
+
+  @override
+  String get rowMovedDown => 'نُقل لأسفل';
+
+  @override
+  String get rowIndented => 'زيدت الإزاحة';
+
+  @override
+  String get rowOutdented => 'أُنقصت الإزاحة';
+
+  @override
+  String get resizePanes => 'تغيير حجم الأجزاء';
+
+  @override
+  String get moveLeft => 'نقل لليسار';
+
+  @override
+  String get moveRight => 'نقل لليمين';
 
   @override
   String get preview => 'معاينة';
