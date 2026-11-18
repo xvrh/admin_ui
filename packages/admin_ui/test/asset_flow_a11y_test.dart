@@ -1,3 +1,5 @@
+import 'dart:ui' show SemanticsRole;
+
 import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
@@ -165,9 +167,20 @@ void main() {
         expect(find.textContaining('402'), findsNothing);
         final alert = tester.widget<Alert>(find.byType(Alert));
         expect(alert.severity, Severity.danger);
+        // An alert to assistive technology, whose words are the live
+        // region.
         expect(
-          tester.getSemantics(find.byType(Alert)),
-          isSemantics(isLiveRegion: true),
+          tester.getSemantics(find.byType(Alert)).getSemanticsData().role,
+          SemanticsRole.alert,
+        );
+        expect(
+          tester.getSemantics(message),
+          isSemantics(
+            label:
+                'Couldn’t license this image\n'
+                'That needs a paid plan or more credit.',
+            isLiveRegion: true,
+          ),
         );
       });
     }

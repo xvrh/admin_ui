@@ -10,6 +10,7 @@ import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
+import 'alert_role.dart';
 import 'button.dart';
 import 'icon_action.dart';
 import 'severity.dart';
@@ -27,6 +28,10 @@ import 'spinner.dart';
 /// one exception to the kit's rule that an overlay shows its close button
 /// exactly when it has an `onDismiss`, since a toast must always be
 /// dismissible.
+///
+/// A screen reader hears a toast as it shows and as its words change. A
+/// danger toast is an alert ([SemanticsRole.alert]), which the web reads at
+/// once, over what it was saying; any other waits its turn.
 class Toast {
   final String message;
 
@@ -751,6 +756,11 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
     _sync();
   }
 
+  /// An error cannot wait its turn: a danger toast is an alert to assistive
+  /// technology ([SemanticsRole.alert]), which the web reads at once; the
+  /// others are a live region, read when what is being said is over.
+  bool get _urgent => widget.toast.severity == Severity.danger;
+
   /// The card is a live region, so new words are read out as its label
   /// changes. The same words in a new severity leave the label as it was:
   /// say them again.
@@ -985,7 +995,8 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
                 onHorizontalDragCancel: _onDragCancel,
                 child: Semantics(
                   container: true,
-                  liveRegion: true,
+                  liveRegion: !_urgent,
+                  role: _urgent ? SemanticsRole.alert : SemanticsRole.none,
                   child: Focus(
                     canRequestFocus: false,
                     skipTraversal: true,
@@ -1067,21 +1078,27 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: centre(line)),
-              child: title == null
-                  ? Text(toast.message, style: firstLine)
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title, style: firstLine),
-                        const Gap(AdminSpacing.xxs),
-                        Text(
-                          toast.message,
-                          style: context.type.body.copyWith(
-                            color: context.colors.foregroundSecondary,
+              // An alert's words are a node of their own: the web reads an
+              // alert's text, not its label.
+              child: Semantics(
+                container: _urgent,
+                liveRegion: _urgent && !alertRoleAnnounces,
+                child: title == null
+                    ? Text(toast.message, style: firstLine)
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(title, style: firstLine),
+                          const Gap(AdminSpacing.xxs),
+                          Text(
+                            toast.message,
+                            style: context.type.body.copyWith(
+                              color: context.colors.foregroundSecondary,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+              ),
             ),
           ),
           if (hasAction) ...[

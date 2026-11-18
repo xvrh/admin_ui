@@ -3,11 +3,14 @@
 /// @docImport '../../common/ui/modal_anchor.dart';
 library;
 
+import 'dart:ui' show SemanticsRole;
+
 import 'package:flutter/foundation.dart' show internal;
 import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../common/ui/modal_anchor.dart';
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/breakpoints.dart';
 import '../../theme/palette.dart';
 import '../../theme/shell_style.dart';
@@ -286,7 +289,7 @@ class _ShellState extends State<Shell> {
         final row = Row(
           children: [
             if (!compact && !spansPage) ?sidebar,
-            Expanded(child: widget.child),
+            Expanded(child: _MainRegion(child: widget.child)),
           ],
         );
         return _ShellScope(
@@ -332,6 +335,40 @@ class _ShellState extends State<Shell> {
       },
     );
   }
+}
+
+/// The page as the main landmark ([SemanticsRole.main]), which a screen
+/// reader on the web jumps to past the navigation and the top bar. It is
+/// named, as the framework asks of a landmark there is more than one of:
+/// two shells may share a window, in a gallery of frames. A shell shown
+/// inside another's page is part of that page, and no landmark of its own,
+/// since a main landmark holds no other.
+class _MainRegion extends StatelessWidget {
+  final Widget child;
+
+  const _MainRegion({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    if (context.getInheritedWidgetOfExactType<_MainRegionScope>() != null) {
+      return child;
+    }
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      role: SemanticsRole.main,
+      label: context.adminL10n.shell.mainContent,
+      child: _MainRegionScope(child: child),
+    );
+  }
+}
+
+/// Marks what is inside a shell's main landmark.
+class _MainRegionScope extends InheritedWidget {
+  const _MainRegionScope({required super.child});
+
+  @override
+  bool updateShouldNotify(_MainRegionScope old) => false;
 }
 
 class _ShellScope extends InheritedWidget {

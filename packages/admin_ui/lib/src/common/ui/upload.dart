@@ -325,6 +325,7 @@ class _Header extends StatelessWidget {
         ProgressBar(
           value: overall,
           thickness: 4,
+          semanticLabel: summary,
           severity: failed > 0 && allDone
               ? Severity.danger
               : allDone
@@ -420,7 +421,11 @@ class _Row extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: ProgressBar(value: item.clampedProgress, thickness: 4),
+                child: ProgressBar(
+                  value: item.clampedProgress,
+                  thickness: 4,
+                  semanticLabel: item.name,
+                ),
               ),
               const Gap(AdminSpacing.md),
               Text(

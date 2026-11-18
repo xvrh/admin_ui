@@ -455,9 +455,10 @@ class CommandTrigger extends StatelessWidget {
 ///
 /// Focus stays in the field; the selected result follows the keyboard, and
 /// the pointer only when it actually moves, so a list scrolling under a
-/// still pointer keeps the keyboard's pick. Screen readers get the results
-/// as a list whose rows say whether they are selected, and hear the result
-/// count once a query settles. Below 640px wide the preview pane is left out.
+/// still pointer keeps the keyboard's pick. Screen readers get each result
+/// as a button that says whether it is selected and where it stands, "2 of
+/// 5", as an option of a `Combobox` does, and hear the result count once a
+/// query settles. Below 640px wide the preview pane is left out.
 class CommandPalette extends StatefulWidget {
   final List<PaletteItem> items;
   final List<PaletteItem> recent;
@@ -801,16 +802,15 @@ class _CommandPaletteState extends State<CommandPalette> {
     List<PaletteSection> sections,
     List<ScoredItem> flat,
   ) {
-    return Semantics(
-      container: true,
-      role: SemanticsRole.list,
-      explicitChildNodes: true,
-      child: ListView(
-        controller: _scroll,
-        shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: AdminSpacing.sm),
-        children: [for (final s in sections) ..._section(context, s, flat)],
-      ),
+    // No list role: a list's items are its direct children, and the scroll
+    // view's own nodes stand between any node around it and its rows. The
+    // scroll view is the collection Android reads, and each row says its
+    // place, as an option of a `Combobox` does.
+    return ListView(
+      controller: _scroll,
+      shrinkWrap: true,
+      padding: const EdgeInsets.symmetric(vertical: AdminSpacing.sm),
+      children: [for (final s in sections) ..._section(context, s, flat)],
     );
   }
 
@@ -829,11 +829,13 @@ class _CommandPaletteState extends State<CommandPalette> {
         ),
         child: _GroupLabel(_groupLabel(context, section.title)),
       ),
-      for (final hit in section.entries) _row(context, hit, flat.indexOf(hit)),
+      for (final hit in section.entries)
+        _row(context, hit, flat.indexOf(hit), flat.length),
     ];
   }
 
-  Widget _row(BuildContext context, ScoredItem hit, int index) {
+  /// The row of [hit], the result at [index] of [count].
+  Widget _row(BuildContext context, ScoredItem hit, int index, int count) {
     final selected = index == _controller.selected;
     final key = _rowKeys[index] ??= GlobalKey();
     final item = hit.item;
@@ -861,6 +863,7 @@ class _CommandPaletteState extends State<CommandPalette> {
           semanticLabel: secondary == null
               ? item.title
               : '${item.title}, $secondary',
+          semanticHint: context.adminL10n.countOf(index + 1, count),
           excludeSemantics: true,
           builder: (context, states) => Container(
             padding: const EdgeInsets.symmetric(

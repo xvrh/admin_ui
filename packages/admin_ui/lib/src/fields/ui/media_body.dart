@@ -718,6 +718,7 @@ class _BusyScrim extends StatelessWidget {
                 // token-literal: a progress track over a picture
                 backgroundColor: onImage.withValues(alpha: 0.24),
                 valueColor: AlwaysStoppedAnimation(onImage),
+                semanticsLabel: item.name,
               ),
             ),
           ] else
@@ -876,7 +877,13 @@ class _FileRow extends StatelessWidget {
   Widget _inlineProgress(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: ProgressBar(value: item.clampedProgress, thickness: 4)),
+        Expanded(
+          child: ProgressBar(
+            value: item.clampedProgress,
+            thickness: 4,
+            semanticLabel: item.name,
+          ),
+        ),
         const Gap(AdminSpacing.md),
         Text(
           context.adminFormats.percent(item.clampedProgress),

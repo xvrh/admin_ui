@@ -144,9 +144,8 @@ void main() {
     expect(find.text('Open'), findsOneWidget);
   });
 
-  testWidgets('results are a list of rows that say which is selected', (
-    tester,
-  ) async {
+  testWidgets('results are rows that say which is selected and where it '
+      'stands', (tester) async {
     final semantics = tester.ensureSemantics();
     await _pump(tester, count: 3);
     await _key(tester, LogicalKeyboardKey.arrowDown);
@@ -158,6 +157,7 @@ void main() {
       tester.getSemantics(find.text('Result 1')),
       isSemantics(
         label: 'Result 1, /result-1',
+        hint: '2 of 3',
         isSelected: true,
         isButton: true,
         hasTapAction: true,
@@ -165,14 +165,22 @@ void main() {
     );
     expect(
       tester.getSemantics(find.text('Result 0')),
-      isSemantics(label: 'Result 0, /result-0', isSelected: false),
+      isSemantics(
+        label: 'Result 0, /result-0',
+        hint: '1 of 3',
+        isSelected: false,
+      ),
     );
 
-    SemanticsNode? list = node('Result 0').parent;
-    while (list != null && list.getSemanticsData().role != SemanticsRole.list) {
-      list = list.parent;
+    // A list role's items are its direct children, and the scroll view's
+    // nodes stand between: no node above a row claims to be a list.
+    for (
+      SemanticsNode? above = node('Result 0').parent;
+      above != null;
+      above = above.parent
+    ) {
+      expect(above.getSemanticsData().role, isNot(SemanticsRole.list));
     }
-    expect(list, isNotNull);
     semantics.dispose();
   });
 

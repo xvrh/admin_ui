@@ -74,6 +74,7 @@ class _BlockDiffDemoState extends State<BlockDiffDemo> {
             Toggle(
               value: _showUnchanged,
               onChanged: (v) => setState(() => _showUnchanged = v),
+              semanticLabel: 'Show unchanged blocks',
             ),
           ],
         ),

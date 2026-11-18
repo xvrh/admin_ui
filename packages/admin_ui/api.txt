@@ -626,6 +626,7 @@ widgets.dart StillLinearProgress
 widgets.dart SwatchOption
 widgets.dart SwatchRow
 widgets.dart TabItem
+widgets.dart TabPanel
 widgets.dart TabScope
 widgets.dart TabSelection
 widgets.dart Tabs

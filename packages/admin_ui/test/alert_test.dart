@@ -49,7 +49,9 @@ void main() {
         _host(Alert('Message', severity: severity, liveRegion: liveRegion)),
       );
       expect(
-        tester.getSemantics(find.byType(Alert)),
+        // The node the words are in: the alert's own, or for a danger
+        // alert, which is an alert to assistive technology, one inside it.
+        tester.getSemantics(find.text('Message')),
         isSemantics(isLiveRegion: expected),
         reason: '$severity, liveRegion: $liveRegion',
       );

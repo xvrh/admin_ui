@@ -19,10 +19,15 @@ const sweepMaxHeight = 8000.0;
 /// [skipped] maps an entry's id to why it is not pumped. Nothing is skipped
 /// silently: an entry is either there or pumped in every pass, and an id
 /// there that names no entry fails.
+///
+/// With [semantics] the demo is pumped as a screen reader's user runs it,
+/// its semantics tree built from the first frame to the last, so a node the
+/// framework refuses (a role on the wrong node, say) fails the test too.
 void sweep({
   required Map<String, RenderConfig> Function(DemoEntry entry) passes,
   required Map<String, String> skipped,
   Future<void> Function(WidgetTester tester, DemoEntry entry)? check,
+  bool semantics = false,
 }) {
   final entries = demoEntries();
 
@@ -41,9 +46,11 @@ void sweep({
         '${entry.id} · $pass${reason == null ? '' : ' (skipped: $reason)'}',
         skip: reason != null,
         (tester) async {
+          final handle = semantics ? tester.ensureSemantics() : null;
           await pumpClean(tester, entry, config);
           await check?.call(tester, entry);
           await unmountAndDrain(tester);
+          handle?.dispose();
         },
       );
     }
