@@ -2,6 +2,15 @@
 
 ## 0.2.0
 
+- A theme says how a modal arrives and leaves:
+  `AdminOverlayStyle.modalMotion`, an `AdminOverlayMotion`. A modal opened
+  with `showModal` always fades, as before; `scale` grows its card from a
+  smaller size and `slide` moves it down into place from above. `speed`, a
+  `MotionSpeed`, names which of the theme's motion durations the move takes
+  (`AdminMotion.durationOf`), and `curve` and `reverseCurve` replace the
+  motion's `enter` and `exit`. The default is the fade over
+  `motion.medium` that every theme had. Under reduced motion a modal is
+  still there at once.
 - A theme draws a toast in a palette of its own:
   `AdminFeedbackStyle.toastPalette`. The toast's fill and edge, its text,
   its status colours, its action and its close button are that palette's,
@@ -513,6 +522,16 @@
 
 ### Looks
 
+- A modal opened with `showModal` arrives and leaves as each reference
+  theme's dialog does, where every theme only faded it over its medium
+  duration. Iris and Material keep that. At rest nothing moves.
+  - shadcn: the card grows from 95% as it fades.
+  - Ant: the card grows from 20%, on `motionEaseOutCirc`, and shrinks away
+    on `motionEaseInOutCirc`.
+  - Fluent: the card grows from 85% over 250ms (was 200), and leaves on
+    `curveAccelerateMin`.
+  - Carbon: the card slides down 24 into place over 240ms (was 150), on
+    the expressive entrance and exit curves.
 - A toast is drawn in the inverse scheme in Material and Carbon, where it
   was a card in the page's own colours. The other four themes keep that.
   - Material: an M3 snackbar. On the light page a `#322F35` card under

@@ -227,6 +227,11 @@ overlay.tooltipPaddingX: 8
 overlay.tooltipPaddingY: 4
 overlay.tooltipText: caption
 overlay.tooltipDelay: 400ms
+overlay.modalMotion.scale: 1
+overlay.modalMotion.slide: 0
+overlay.modalMotion.speed: medium
+overlay.modalMotion.curve: null
+overlay.modalMotion.reverseCurve: null
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: track
@@ -554,6 +559,11 @@ overlay.tooltipPaddingX: 8
 overlay.tooltipPaddingY: 4
 overlay.tooltipText: caption
 overlay.tooltipDelay: 400ms
+overlay.modalMotion.scale: 1
+overlay.modalMotion.slide: 0
+overlay.modalMotion.speed: medium
+overlay.modalMotion.curve: null
+overlay.modalMotion.reverseCurve: null
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: joined
@@ -926,6 +936,11 @@ overlay.tooltipPaddingX: 12
 overlay.tooltipPaddingY: 6
 overlay.tooltipText: caption
 overlay.tooltipDelay: 0ms
+overlay.modalMotion.scale: 0.95
+overlay.modalMotion.slide: 0
+overlay.modalMotion.speed: medium
+overlay.modalMotion.curve: null
+overlay.modalMotion.reverseCurve: null
 overlay.arrowWidth: 10
 overlay.arrowHeight: 5
 segmented.variant: track
@@ -1315,6 +1330,11 @@ overlay.tooltipPaddingX: 8
 overlay.tooltipPaddingY: 6
 overlay.tooltipText: body
 overlay.tooltipDelay: 400ms
+overlay.modalMotion.scale: 0.2
+overlay.modalMotion.slide: 0
+overlay.modalMotion.speed: medium
+overlay.modalMotion.curve: cubic(0.08, 0.82, 0.17, 1)
+overlay.modalMotion.reverseCurve: cubic(0.78, 0.14, 0.15, 0.86)
 overlay.arrowWidth: 16
 overlay.arrowHeight: 8
 segmented.variant: track
@@ -1647,6 +1667,11 @@ overlay.tooltipPaddingX: 12
 overlay.tooltipPaddingY: 6
 overlay.tooltipText: caption
 overlay.tooltipDelay: 400ms
+overlay.modalMotion.scale: 0.85
+overlay.modalMotion.slide: 0
+overlay.modalMotion.speed: slow
+overlay.modalMotion.curve: null
+overlay.modalMotion.reverseCurve: cubic(0.8, 0, 0.78, 1)
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: track
@@ -2004,6 +2029,11 @@ overlay.tooltipPaddingX: 16
 overlay.tooltipPaddingY: 16
 overlay.tooltipText: body
 overlay.tooltipDelay: 400ms
+overlay.modalMotion.scale: 1
+overlay.modalMotion.slide: 24
+overlay.modalMotion.speed: slow
+overlay.modalMotion.curve: cubic(0, 0, 0.3, 1)
+overlay.modalMotion.reverseCurve: cubic(0.4, 0.14, 1, 1)
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: joined

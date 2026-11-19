@@ -17,9 +17,14 @@ import 'severity.dart';
 /// Opens [builder] as a modal route — the scrim, focus trap, Escape-to-dismiss
 /// and return value come from [showDialog]; the surface is a [Modal]. Returns
 /// whatever the content pops. The scrim is the palette's `scrim` unless
-/// [barrierColor] overrides it. It fades in over the theme's `motion.medium`
-/// on `motion.enter` and out on `motion.exit`, and appears at once under
-/// reduced motion.
+/// [barrierColor] overrides it.
+///
+/// It arrives as the theme's `overlayStyle.modalMotion` says: the scrim and
+/// the card fade in, and the card grows from that motion's scale and slides
+/// down from above its place, over the motion's duration and on its curves
+/// (by default a fade alone over `motion.medium`, on `motion.enter`, and
+/// out on `motion.exit`). Leaving plays it back. Under reduced motion it
+/// appears at once.
 ///
 /// The card is centred 24px inside the safe area and clear of the keyboard,
 /// except a [ModalSize.fullscreen] one, which takes the whole screen and
@@ -31,15 +36,17 @@ Future<T?> showModal<T>(
   Color? barrierColor,
 }) {
   final motion = context.motion;
+  final arrival = context.overlayStyle.modalMotion;
+  final duration = motion.durationOf(arrival.speed);
   return showDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
     barrierColor: barrierColor ?? context.colors.scrim,
     animationStyle: AnimationStyle(
-      duration: motion.medium,
-      reverseDuration: motion.medium,
-      curve: motion.enter,
-      reverseCurve: motion.exit,
+      duration: duration,
+      reverseDuration: duration,
+      curve: arrival.curve ?? motion.enter,
+      reverseCurve: arrival.reverseCurve ?? motion.exit,
     ),
     // The frame keeps to the safe area itself, so a fullscreen modal can
     // reach the screen's edges.
@@ -54,6 +61,75 @@ Future<T?> showModal<T>(
 /// [_ModalFrameScope] it finds, and keeps its content inside the safe area
 /// the scope hands it. Below the frame the safe area is taken out of the
 /// [MediaQuery], as a dialog route's own `SafeArea` does.
+/// Moves the card while its route's fade plays: grown from the scale, and
+/// slid down from above its place, that the theme's
+/// `overlayStyle.modalMotion` names, on the same curves as the fade. A
+/// motion that only fades leaves the card alone. Under reduced motion the
+/// route takes no time, so the card is in place at once.
+class _ModalArrival extends StatefulWidget {
+  final Widget child;
+
+  const _ModalArrival({required this.child});
+
+  @override
+  State<_ModalArrival> createState() => _ModalArrivalState();
+}
+
+class _ModalArrivalState extends State<_ModalArrival> {
+  CurvedAnimation? _curved;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context)?.animation;
+    final look = context.overlayStyle.modalMotion;
+    final motion = context.motion;
+    final curve = look.curve ?? motion.enter;
+    final reverseCurve = look.reverseCurve ?? motion.exit;
+    final curved = _curved;
+    if (curved == null ||
+        curved.parent != route ||
+        curved.curve != curve ||
+        curved.reverseCurve != reverseCurve) {
+      curved?.dispose();
+      _curved = route == null
+          ? null
+          : CurvedAnimation(
+              parent: route,
+              curve: curve,
+              reverseCurve: reverseCurve,
+            );
+    }
+  }
+
+  @override
+  void dispose() {
+    _curved?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final look = context.overlayStyle.modalMotion;
+    final curved = _curved;
+    if (curved == null || !look.moves) return widget.child;
+    return AnimatedBuilder(
+      animation: curved,
+      child: widget.child,
+      builder: (context, child) {
+        final t = curved.value;
+        return Transform.translate(
+          offset: Offset(0, -look.slide * (1 - t)),
+          child: Transform.scale(
+            scale: look.scale + (1 - look.scale) * t,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ModalFrame extends StatefulWidget {
   final Widget child;
 
@@ -94,7 +170,11 @@ class _ModalFrameState extends State<_ModalFrame> {
           // above it so the card stays clickable. Wraps only the card (not
           // the full-screen padding) so a tap on the surrounding scrim still
           // reaches the barrier to dismiss.
-          child: Center(child: PointerInterceptor(child: widget.child)),
+          child: Center(
+            child: _ModalArrival(
+              child: PointerInterceptor(child: widget.child),
+            ),
+          ),
         ),
       ),
     );

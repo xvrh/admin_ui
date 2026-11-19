@@ -5,7 +5,105 @@ library;
 
 import 'dart:ui' show lerpDouble;
 
+import 'package:flutter/animation.dart' show Curve;
 import 'package:flutter/foundation.dart';
+
+import 'motion.dart';
+
+/// How an overlay arrives and leaves. It always fades; it can also grow
+/// from a smaller [scale] and travel a [slide] into place. Leaving plays the
+/// same move back.
+///
+/// The default is a fade alone over [AdminMotion.medium], on the motion's
+/// [AdminMotion.enter] and [AdminMotion.exit] curves.
+@immutable
+class AdminOverlayMotion {
+  /// The scale it grows from as it fades in, up to 1: 0.95 for shadcn's
+  /// `zoom-in-95`, 0.85 in Fluent, 0.2 for Ant's zoom. 1 does not scale.
+  final double scale;
+
+  /// How far above its place it starts, in logical pixels, sliding down as
+  /// it fades in: Carbon's modal travels 24. Zero does not slide.
+  final double slide;
+
+  /// Which of the motion's durations the move takes. Reduced motion zeroes
+  /// it with the rest.
+  final MotionSpeed speed;
+
+  /// The curve it arrives on; null is [AdminMotion.enter].
+  final Curve? curve;
+
+  /// The curve it leaves on; null is [AdminMotion.exit].
+  final Curve? reverseCurve;
+
+  const AdminOverlayMotion({
+    this.scale = 1,
+    this.slide = 0,
+    this.speed = MotionSpeed.medium,
+    this.curve,
+    this.reverseCurve,
+  }) : assert(scale > 0 && scale <= 1),
+       assert(slide >= 0);
+
+  /// Whether the overlay moves as well as fades.
+  bool get moves => scale != 1 || slide != 0;
+
+  /// A copy with the given members replaced. A null argument keeps the
+  /// current value, so [curve] and [reverseCurve] cannot be cleared here;
+  /// build a new motion for that.
+  AdminOverlayMotion copyWith({
+    double? scale,
+    double? slide,
+    MotionSpeed? speed,
+    Curve? curve,
+    Curve? reverseCurve,
+  }) => AdminOverlayMotion(
+    scale: scale ?? this.scale,
+    slide: slide ?? this.slide,
+    speed: speed ?? this.speed,
+    curve: curve ?? this.curve,
+    reverseCurve: reverseCurve ?? this.reverseCurve,
+  );
+
+  /// Interpolates [scale] and [slide]; the speed and the curves come from
+  /// the side [t] is nearer.
+  static AdminOverlayMotion lerp(
+    AdminOverlayMotion a,
+    AdminOverlayMotion b,
+    double t,
+  ) {
+    if (t == 0) return a;
+    if (t == 1) return b;
+    final near = t < 0.5 ? a : b;
+    return AdminOverlayMotion(
+      scale: lerpDouble(a.scale, b.scale, t)!,
+      slide: lerpDouble(a.slide, b.slide, t)!,
+      speed: near.speed,
+      curve: near.curve,
+      reverseCurve: near.reverseCurve,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is AdminOverlayMotion &&
+      other.scale == scale &&
+      other.slide == slide &&
+      other.speed == speed &&
+      other.curve == curve &&
+      other.reverseCurve == reverseCurve;
+
+  @override
+  int get hashCode => Object.hash(scale, slide, speed, curve, reverseCurve);
+
+  @override
+  String toString() =>
+      'AdminOverlayMotion(a fade'
+      '${scale == 1 ? '' : ', from scale $scale'}'
+      '${slide == 0 ? '' : ', sliding $slide'}'
+      ', ${speed.name}'
+      '${curve == null && reverseCurve == null ? '' : ', its own curves'})';
+}
 
 /// The text a tooltip is set in; see [AdminOverlayStyle.tooltipText]. The
 /// tooltip resolves it against `context.type`.
@@ -56,6 +154,11 @@ class AdminOverlayStyle {
   /// delay, not motion: reduced motion leaves it alone.
   final Duration tooltipDelay;
 
+  /// How a `Modal` arrives and leaves: shadcn's zooms in from 95%, Ant's
+  /// from 20%, Fluent's from 85%, and Carbon's slides down 24. The scrim
+  /// fades with it.
+  final AdminOverlayMotion modalMotion;
+
   /// The arrow's base, along the edge it stands on.
   final double arrowWidth;
 
@@ -72,6 +175,7 @@ class AdminOverlayStyle {
     this.tooltipPaddingY = 4,
     this.tooltipText = TooltipText.caption,
     this.tooltipDelay = const Duration(milliseconds: 400),
+    this.modalMotion = const AdminOverlayMotion(),
     this.arrowWidth = 12,
     this.arrowHeight = 6,
   }) : assert(tooltipRadius == null || tooltipRadius >= 0),
@@ -86,6 +190,7 @@ class AdminOverlayStyle {
     double? tooltipPaddingY,
     TooltipText? tooltipText,
     Duration? tooltipDelay,
+    AdminOverlayMotion? modalMotion,
     double? arrowWidth,
     double? arrowHeight,
   }) => AdminOverlayStyle(
@@ -96,6 +201,7 @@ class AdminOverlayStyle {
     tooltipPaddingY: tooltipPaddingY ?? this.tooltipPaddingY,
     tooltipText: tooltipText ?? this.tooltipText,
     tooltipDelay: tooltipDelay ?? this.tooltipDelay,
+    modalMotion: modalMotion ?? this.modalMotion,
     arrowWidth: arrowWidth ?? this.arrowWidth,
     arrowHeight: arrowHeight ?? this.arrowHeight,
   );
@@ -120,6 +226,7 @@ class AdminOverlayStyle {
       tooltipPaddingY: d(a.tooltipPaddingY, b.tooltipPaddingY),
       tooltipText: near.tooltipText,
       tooltipDelay: near.tooltipDelay,
+      modalMotion: AdminOverlayMotion.lerp(a.modalMotion, b.modalMotion, t),
       arrowWidth: d(a.arrowWidth, b.arrowWidth),
       arrowHeight: d(a.arrowHeight, b.arrowHeight),
     );
@@ -135,6 +242,7 @@ class AdminOverlayStyle {
       other.tooltipPaddingY == tooltipPaddingY &&
       other.tooltipText == tooltipText &&
       other.tooltipDelay == tooltipDelay &&
+      other.modalMotion == modalMotion &&
       other.arrowWidth == arrowWidth &&
       other.arrowHeight == arrowHeight;
 
@@ -147,6 +255,7 @@ class AdminOverlayStyle {
     tooltipPaddingY,
     tooltipText,
     tooltipDelay,
+    modalMotion,
     arrowWidth,
     arrowHeight,
   );
@@ -158,5 +267,5 @@ class AdminOverlayStyle {
       '${tooltipRadius == null ? 'the small radius' : 'radius $tooltipRadius'}, '
       'padding $tooltipPaddingX×$tooltipPaddingY, ${tooltipText.name} text, '
       'after ${tooltipDelay.inMilliseconds}ms; arrow '
-      '$arrowWidth×$arrowHeight)';
+      '$arrowWidth×$arrowHeight; modals $modalMotion)';
 }

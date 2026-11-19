@@ -356,6 +356,13 @@ final antTheme = AdminTheme.from(
     tooltipPaddingX: 8,
     tooltipPaddingY: 6,
     tooltipText: TooltipText.body,
+    // a Modal's zoom motion: antZoomIn from scale(0.2) over
+    // motionDurationMid on motionEaseOutCirc, out on motionEaseInOutCirc
+    modalMotion: AdminOverlayMotion(
+      scale: 0.2,
+      curve: Cubic(0.08, 0.82, 0.17, 1),
+      reverseCurve: Cubic(0.78, 0.14, 0.15, 0.86),
+    ),
     arrowWidth: 16,
     arrowHeight: 8,
   ),

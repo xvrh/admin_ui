@@ -1152,7 +1152,11 @@ something leaving, and `emphasized` for a larger move. Read them through
 
 `fast` is a change in place (a toggle's knob, a chevron turning), `medium` a
 panel opening in the flow (an accordion, a tree's rows, a tab indicator), and
-`slow` an overlay crossing the screen (a side sheet, a modal, a toast).
+`slow` an overlay crossing the screen (a side sheet, a toast). A token that
+says how long a move takes without fixing the milliseconds names one of the
+three as a `MotionSpeed`, and `context.motion.durationOf(speed)` gives its
+duration. A modal's is the theme's
+`overlayStyle.modalMotion`, described under Anatomy.
 
 While the platform asks for less motion (`MediaQuery.disableAnimations`),
 `context.motion` returns `AdminMotion.reduced`: every duration zero, the curves
@@ -1361,6 +1365,23 @@ Fluent's stay dark in dark mode, where the other four turn light.
 | Ant | 6 | 8 × 6 | body | 400ms |
 | Fluent | 4 | 12 × 6 | caption | 400ms |
 | Carbon | 2 | 16 × 16 | body | 400ms |
+
+`modalMotion`, an `AdminOverlayMotion`, is how a modal opened with
+`showModal` arrives and leaves. The scrim and the card always fade; the card
+can also grow from a smaller `scale` and travel a `slide` down into place.
+`speed` names which of the motion's durations it takes (`MotionSpeed.fast`,
+`medium` or `slow`, so reduced motion zeroes it with the rest), and `curve`
+and `reverseCurve` replace the motion's `enter` and `exit` where the design
+system has curves of its own for it. Leaving plays the same move back.
+
+| Theme | A modal | Over | Curves |
+|---|---|---|---|
+| Iris | fades | 180ms | enter · exit |
+| Material | fades | 200ms | enter · exit |
+| shadcn | fades, from 95% | 200ms | enter · exit |
+| Ant | fades, from 20% | 200ms (`motionDurationMid`) | `motionEaseOutCirc` · `motionEaseInOutCirc` |
+| Fluent | fades, from 85% | 250ms (gentle) | decelerate mid · accelerate min |
+| Carbon | fades, sliding down 24 | 240ms (moderate-02) | expressive entrance · expressive exit |
 
 
 Each theme also takes its design system's shadows: M3's elevation levels,
