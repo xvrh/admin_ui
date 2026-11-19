@@ -688,7 +688,8 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
   late final _curve = CurvedAnimation(
     parent: _anim,
     curve: context.motion.enter,
-    reverseCurve: context.motion.exit,
+    // Flipped: see [AdminMotion.exit].
+    reverseCurve: context.motion.exit.flipped,
   );
 
   /// How far the card is swiped, in logical pixels to the right.
@@ -733,7 +734,7 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
     _anim.duration = motion.slow;
     _curve
       ..curve = motion.enter
-      ..reverseCurve = motion.exit;
+      ..reverseCurve = motion.exit.flipped;
     if (_anim.isDismissed && !_leaving) {
       // A card first built for a toast already leaving has nothing to show.
       if (widget.leaving case final reason?) {

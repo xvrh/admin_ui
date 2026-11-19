@@ -33,7 +33,9 @@ class AdminOverlayMotion {
   /// The curve it arrives on; null is [AdminMotion.enter].
   final Curve? curve;
 
-  /// The curve it leaves on; null is [AdminMotion.exit].
+  /// The curve it leaves on as time runs, so an accelerating curve
+  /// accelerates it away; null is [AdminMotion.exit]. The overlay flips it
+  /// for the animation it plays back (see [AdminMotion.exit]).
   final Curve? reverseCurve;
 
   const AdminOverlayMotion({

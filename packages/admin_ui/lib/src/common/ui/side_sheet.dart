@@ -45,7 +45,8 @@ Future<T?> showSideSheet<T>(
       final curved = CurvedAnimation(
         parent: animation,
         curve: motion.enter,
-        reverseCurve: motion.exit,
+        // Flipped: see [AdminMotion.exit].
+        reverseCurve: motion.exit.flipped,
       );
       final begin = side == SideSheetSide.end
           ? const Offset(1, 0)

@@ -46,7 +46,8 @@ Future<T?> showModal<T>(
       duration: duration,
       reverseDuration: duration,
       curve: arrival.curve ?? motion.enter,
-      reverseCurve: arrival.reverseCurve ?? motion.exit,
+      // Flipped: see [AdminMotion.exit].
+      reverseCurve: (arrival.reverseCurve ?? motion.exit).flipped,
     ),
     // The frame keeps to the safe area itself, so a fullscreen modal can
     // reach the screen's edges.
@@ -77,6 +78,7 @@ class _ModalArrival extends StatefulWidget {
 
 class _ModalArrivalState extends State<_ModalArrival> {
   CurvedAnimation? _curved;
+  Curve? _leaving;
 
   @override
   void didChangeDependencies() {
@@ -85,19 +87,21 @@ class _ModalArrivalState extends State<_ModalArrival> {
     final look = context.overlayStyle.modalMotion;
     final motion = context.motion;
     final curve = look.curve ?? motion.enter;
-    final reverseCurve = look.reverseCurve ?? motion.exit;
+    final leaving = look.reverseCurve ?? motion.exit;
     final curved = _curved;
     if (curved == null ||
         curved.parent != route ||
         curved.curve != curve ||
-        curved.reverseCurve != reverseCurve) {
+        _leaving != leaving) {
       curved?.dispose();
+      _leaving = leaving;
       _curved = route == null
           ? null
           : CurvedAnimation(
               parent: route,
               curve: curve,
-              reverseCurve: reverseCurve,
+              // Flipped: see [AdminMotion.exit].
+              reverseCurve: leaving.flipped,
             );
     }
   }
