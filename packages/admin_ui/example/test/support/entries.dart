@@ -105,6 +105,11 @@ const previewOnly = <PreviewOnlyDemo>[
     ChartCardDemo.phone,
   ),
   PreviewOnlyDemo(
+    'ChartCardDemo.failed',
+    'Chart card (a failed load)',
+    ChartCardDemo.failed,
+  ),
+  PreviewOnlyDemo(
     'StatCardTrendDemo.phone',
     'Stat card / trend (phone width)',
     StatCardTrendDemo.phone,

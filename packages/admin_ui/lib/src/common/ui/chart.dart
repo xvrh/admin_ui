@@ -15,6 +15,8 @@ import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import '../text_metrics.dart';
 import 'empty_state.dart';
+import 'error_state.dart';
+import 'error_text.dart';
 import 'panel.dart';
 import 'skeleton.dart';
 
@@ -708,8 +710,13 @@ class BarList extends StatelessWidget {
 
 /// A dashboard tile that frames any chart: a [Panel] with a [title]/[subtitle]
 /// header, an optional [trailing] slot (e.g. a period selector), and built-in
-/// [loading] / [isEmpty] states so a chart drops in without each caller
-/// re-implementing them.
+/// [loading], [error] and [isEmpty] states so a chart drops in without each
+/// caller re-implementing them.
+///
+/// The states take the chart's place in that order: a card that is
+/// [loading] shows its skeleton whatever else is set, so a retry in flight
+/// hides the [error] it retries; an [error] shows over [isEmpty], since a
+/// load that failed has no data to call empty.
 ///
 /// [trailing] sits at the header's end while the title keeps at least
 /// [minTitleWidth] beside it (or, when shorter, the one-line width of its
@@ -719,10 +726,10 @@ class BarList extends StatelessWidget {
 /// lines rather than a sliver; given less than its own width there, it is
 /// laid out at the card's.
 ///
-/// [trailing] belongs to the header in every state: [loading] and [isEmpty]
-/// replace the chart alone, so a control that picks what the chart shows
-/// stays where it is, and usable, while its data loads or when the selection
-/// it picked has none.
+/// [trailing] belongs to the header in every state: [loading], [error] and
+/// [isEmpty] replace the chart alone, so a control that picks what the chart
+/// shows stays where it is, and usable, while its data loads, when the load
+/// failed or when the selection it picked has none.
 class ChartCard extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -732,6 +739,20 @@ class ChartCard extends StatelessWidget {
   final Widget? trailing;
   final Widget chart;
   final bool loading;
+
+  /// What this card's load failed with, or null. It is shown in the chart's
+  /// place as an [ErrorState]: the localized "Couldn't load" over the error
+  /// in words ([ErrorTextScope.describe]), never its raw text. For a
+  /// dashboard whose cards load apart; one whose cards share a load shows
+  /// one [ErrorState] for the page.
+  final Object? error;
+
+  /// Loads again. With an [error], the card shows a Retry button that calls
+  /// it; null shows none.
+  final VoidCallback? onRetry;
+
+  /// The key of the Retry button, to find it by in a test.
+  final Key? retryKey;
   final bool isEmpty;
 
   /// The narrowest the title gets before [trailing] goes under it.
@@ -748,6 +769,9 @@ class ChartCard extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.loading = false,
+    this.error,
+    this.onRetry,
+    this.retryKey,
     this.isEmpty = false,
     this.emptyMessage,
     this.bodyHeight = 220,
@@ -765,6 +789,14 @@ class ChartCard extends StatelessWidget {
     final Widget body;
     if (loading) {
       body = SizedBox(height: bodyHeight, child: const _ChartSkeleton());
+    } else if (error case final error?) {
+      body = ErrorState(
+        title: context.adminL10n.couldNotLoad,
+        message: ErrorTextScope.describe(context, error),
+        onRetry: onRetry,
+        retryKey: retryKey,
+        minHeight: bodyHeight,
+      );
     } else if (isEmpty) {
       body = EmptyState(
         icon: Icons.bar_chart_rounded,

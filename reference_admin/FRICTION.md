@@ -20,7 +20,7 @@ two together.
 | F-009 | No money or relative-time formatting in `AdminFormats`; `DecimalField` has no currency mode | missing-api | S3 | open |
 | F-010 | No documented pattern for app strings; gen-l10n pulls in `flutter_localizations` | doc-gap | S3 | open |
 | F-011 | `Collection` does not switch from table to cards by width | missing-api | S3 | open |
-| F-012 | `ChartCard` has no error slot | missing-api | S3 | open |
+| F-012 | `ChartCard` has no error slot | missing-api | S3 | fixed |
 | F-013 | `AdminModule`'s String `route` and `navLabel` do not fit a typed router or a locale change | missing-api | S3 | wontfix |
 | F-014 | No permission model beyond `ValueForm(readOnly:)`, and no forbidden-state preset | missing-api | S3 | open |
 | F-015 | Frameless kit timers (search debounce, realtime coalesce, `DelayedLoading`) make scenario settling non-obvious | test-support | S3 | open |
@@ -258,12 +258,12 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open (verified in source; the app's design does not need the slot)
+- **Status:** fixed (kit; the app's design does not need the slot)
 - **Kit:** `widgets.dart › ChartCard` (`lib/src/common/ui/chart.dart:463`): `loading`, `isEmpty`, no error.
 - **App:** none: the spec asked for a per-card error, and the dashboard shows one `ErrorState` for the page instead, by design: it reads one `stats` call for every card, so every card fails together (`lib/src/screens/dashboard/dashboard_view.dart`).
 - **Evidence:** "The dashboard when stats fail" › "Dashboard · could not load" (02_home). A dashboard whose cards load separately would need the slot.
 - **Workaround:** none needed here.
-- **Proposal:** `ChartCard(error: Object?, onRetry:)`.
+- **Proposal:** done: `ChartCard(error:, onRetry:, retryKey:)` shows an `ErrorState` in the chart's place, the localized "Couldn't load" over the error in words (`ErrorTextScope.describe`), with a Retry button where `onRetry` is given. `loading` comes first, so a retry in flight shows the skeleton, and an error shows over `isEmpty`. The header's `trailing` control stays where it is. The dashboard here still shows one `ErrorState` for the page, since its cards share one load.
 
 ### F-013 · `AdminModule`'s String `route` and `navLabel` do not fit a typed router or a locale change
 
