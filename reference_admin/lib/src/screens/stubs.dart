@@ -10,7 +10,6 @@ import '../routing/routes.dart';
 import '../services.dart';
 
 /// A page the signed-in role may not open.
-// FRICTION(F-014): no forbidden-page preset; built from EmptyState.
 class ForbiddenPage extends StatelessWidget {
   final Forbidden route;
   const ForbiddenPage(this.route, {super.key});
@@ -23,15 +22,12 @@ class ForbiddenPage extends StatelessWidget {
     return PageScaffold(
       key: ShellKeys.forbidden,
       title: asked == null ? strings.forbiddenTitle : navLabel(strings, asked),
-      body: EmptyState(
-        icon: Icons.lock_outline,
+      body: ForbiddenState(
         title: strings.forbiddenTitle,
         message: strings.forbiddenMessage,
-        action: Button(
-          strings.backToDashboard,
-          key: ShellKeys.backToDashboard,
-          onPressed: () => context.go(const Dashboard()),
-        ),
+        backLabel: strings.backToDashboard,
+        backKey: ShellKeys.backToDashboard,
+        onBack: () => context.go(const Dashboard()),
       ),
     );
   }

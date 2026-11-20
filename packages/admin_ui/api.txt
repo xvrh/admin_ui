@@ -560,6 +560,7 @@ widgets.dart FieldState
 widgets.dart FieldStateScope
 widgets.dart FieldTrigger
 widgets.dart FocusRing
+widgets.dart ForbiddenState
 widgets.dart FormFieldCommands
 widgets.dart FormFieldEntry
 widgets.dart FormFieldRegistry
