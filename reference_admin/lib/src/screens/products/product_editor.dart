@@ -252,6 +252,9 @@ class _ProductEditorScreenState extends State<ProductEditorScreen> {
         key: CatalogueKeys.tabs,
         tabs: [TabItem(strings.tabDetails), TabItem(strings.historyTitle)],
         selected: details ? 0 : 1,
+        // A tab is a route here, and History loads from the shop: the arrow
+        // keys move along the strip and Enter opens the tab.
+        activation: TabsActivation.manual,
         onChanged: (i) =>
             _showTab(i == 0 ? ProductTab.details : ProductTab.history),
       ),

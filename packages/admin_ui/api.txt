@@ -656,6 +656,7 @@ widgets.dart TabPanel
 widgets.dart TabScope
 widgets.dart TabSelection
 widgets.dart Tabs
+widgets.dart TabsActivation
 widgets.dart TabsAlignment
 widgets.dart TabsVariant
 widgets.dart Tag
