@@ -195,6 +195,15 @@ abstract class AdminLocalizations extends AdminMessages {
   /// A whole sentence for an error with no better description.
   String get somethingWentWrongTryAgain;
 
+  /// The headline of a page or a panel the signed-in user may not open.
+  String get notAllowed;
+
+  /// A whole sentence under that headline, saying who can change it.
+  String get notAllowedAskAdministrator;
+
+  /// Leaves a page the user may not open, or has no use for.
+  String get goBack;
+
   /// The overflow menu of secondary actions.
   String get moreActions;
 
@@ -337,6 +346,16 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get somethingWentWrongTryAgain => 'Something went wrong. Try again.';
+
+  @override
+  String get notAllowed => 'You don’t have access to this';
+
+  @override
+  String get notAllowedAskAdministrator =>
+      'Ask an administrator if you need it.';
+
+  @override
+  String get goBack => 'Go back';
 
   @override
   String get moreActions => 'More actions';
@@ -492,6 +511,16 @@ class AdminLocalizationsFr extends AdminLocalizations {
       'Une erreur s’est produite. Réessayez.';
 
   @override
+  String get notAllowed => 'Vous n’avez pas accès à ceci';
+
+  @override
+  String get notAllowedAskAdministrator =>
+      'Demandez-le à un administrateur si vous en avez besoin.';
+
+  @override
+  String get goBack => 'Retour';
+
+  @override
   String get moreActions => 'Plus d’actions';
 
   @override
@@ -644,6 +673,16 @@ class AdminLocalizationsAr extends AdminLocalizations {
 
   @override
   String get somethingWentWrongTryAgain => 'حدث خطأ ما. حاول مرة أخرى.';
+
+  @override
+  String get notAllowed => 'ليس لديك صلاحية الوصول إلى هذا';
+
+  @override
+  String get notAllowedAskAdministrator =>
+      'اطلب ذلك من أحد المسؤولين إذا احتجت إليه.';
+
+  @override
+  String get goBack => 'رجوع';
 
   @override
   String get moreActions => 'إجراءات إضافية';

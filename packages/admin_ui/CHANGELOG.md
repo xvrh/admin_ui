@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- `ForbiddenState` is the placeholder of a page or a panel the signed-in
+  user may not open: a muted lock, "You don't have access to this" over
+  "Ask an administrator if you need it.", and a Go back button where
+  `onBack` is given (`backKey` finds it in a test). The words are the
+  kit's, in English, French and Arabic (`AdminLocalizations.notAllowed`,
+  `notAllowedAskAdministrator`, `goBack`), until the app passes its own
+  `title`, `message` or `backLabel`. Beside `EmptyState` and `ErrorState`,
+  which it is drawn as.
 - A table row has a context menu: `CollectionTable(rowMenu:)`, and
   `Collection(rowMenu:)` for its table view, builds a row's entries. A
   right-click anywhere on the row, its padding included, or a finger's

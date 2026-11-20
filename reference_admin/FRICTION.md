@@ -280,12 +280,12 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open (confirmed by WP-C and WP-D)
+- **Status:** open (confirmed by WP-C and WP-D; narrowed: the forbidden-state preset is in the kit, the permission model is not)
 - **Kit:** `forms.dart › ValueForm.readOnly` (`lib/src/forms/value_form.dart:52`).
 - **App:** `lib/src/session/session_controller.dart` (`can`), `lib/src/screens/stubs.dart` `ForbiddenPage` (~25 lines).
 - **Evidence:** "A viewer can look but not edit" › "Product · read-only" (05_catalogue: no save bar and zero write calls, from the app's role check), "Staff cannot manage the team" › "Team · not allowed" (06_media_team: the app's forbidden page, and a forced `staff.invite` refused by the fake), and "A viewer is turned away from the team page" (smoke).
-- **Workaround:** the app's role matrix; the forbidden page from `EmptyState`.
-- **Proposal:** `EmptyState.forbidden(onBack:)` (icon, title and message from `AdminLocalizations`), and an `AdminScope(can: bool Function(Object permission))` that kit actions taking a `permission:` (`BulkAction`, `MenuItem`, `FormSaveBar`) consult to hide themselves, so a screen stops repeating the role check next to every action.
+- **Workaround:** the app's role matrix. The forbidden page is the kit's `ForbiddenState` now, with the app's words for the role and for where back leads.
+- **Proposal:** `EmptyState.forbidden(onBack:)` (icon, title and message from `AdminLocalizations`), and an `AdminScope(can: bool Function(Object permission))` that kit actions taking a `permission:` (`BulkAction`, `MenuItem`, `FormSaveBar`) consult to hide themselves, so a screen stops repeating the role check next to every action. The first half is done, as `ForbiddenState(onBack:)`: a muted lock, "You don't have access to this" and "Ask an administrator if you need it." from `AdminLocalizations`, each replaced by the app's own where given, and a Go back button with `onBack`. The second half is open: whether a permission model is the kit's to hold is not decided.
 
 ### F-015 · Frameless kit timers (search debounce, realtime coalesce, `DelayedLoading`) make scenario settling non-obvious
 

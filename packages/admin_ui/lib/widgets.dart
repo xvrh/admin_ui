@@ -94,6 +94,7 @@ export 'src/common/ui/field_registry.dart'
         FormFieldRegistry,
         FormFieldScope;
 export 'src/common/ui/focus_ring.dart' show FocusRing;
+export 'src/common/ui/forbidden_state.dart' show ForbiddenState;
 export 'src/common/ui/heat_table.dart'
     show HeatTable, HeatTableCell, HeatTableLabel, HeatTableRow;
 export 'src/common/ui/highlighted_text.dart' show HighlightedText;

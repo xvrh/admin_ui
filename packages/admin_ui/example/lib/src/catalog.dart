@@ -100,6 +100,7 @@ import 'ui/primitives/split_view.dart';
 import 'ui/primitives/stat_card.dart';
 import 'ui/primitives/states/empty_state.dart';
 import 'ui/primitives/states/error_state.dart';
+import 'ui/primitives/states/forbidden_state.dart';
 import 'ui/primitives/states/loading.dart';
 import 'ui/primitives/states/progress.dart';
 import 'ui/primitives/states/skeleton.dart';
@@ -210,6 +211,7 @@ Map<String, dynamic> genericCatalog() => {
       'Skeleton': const SkeletonDemo(),
       'Empty': const EmptyStateDemo(),
       'Error': const ErrorStateDemo(),
+      'Not allowed': const ForbiddenStateDemo(),
     },
   },
   'Fields': {
