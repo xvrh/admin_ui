@@ -9,6 +9,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../theme/tokens.dart';
 import '../motion.dart';
 import 'side_sheet.dart' show SideSheetSide;
+import 'touch_target_adjustment.dart';
 
 /// The OverlayPortal-based modal layer: a modal that inherits from its anchor
 /// rather than from above the Navigator.
@@ -371,22 +372,26 @@ class _ModalAnchorState extends State<ModalAnchor>
       container: true,
       scopesRoute: true,
       explicitChildNodes: true,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: FadeTransition(
-              opacity: _curved,
-              child: ModalBarrier(
-                dismissible: _dismissible,
-                onDismiss: () => _close(null),
-                color: _barrierColor ?? context.colors.scrim,
-                semanticsLabel: MaterialLocalizations.of(context)
-                    .modalBarrierDismissLabel,
+      // A finger's near miss reaches the modal's small controls, as on the
+      // page under it.
+      child: TouchTargetAdjustment(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: FadeTransition(
+                opacity: _curved,
+                child: ModalBarrier(
+                  dismissible: _dismissible,
+                  onDismiss: () => _close(null),
+                  color: _barrierColor ?? context.colors.scrim,
+                  semanticsLabel: MaterialLocalizations.of(context)
+                      .modalBarrierDismissLabel,
+                ),
               ),
             ),
-          ),
-          Positioned.fill(child: _AboveKeyboard(child: content)),
-        ],
+            Positioned.fill(child: _AboveKeyboard(child: content)),
+          ],
+        ),
       ),
     );
   }

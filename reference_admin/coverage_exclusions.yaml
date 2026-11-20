@@ -303,6 +303,8 @@ building_blocks:
     - TextCellBody
     - TextDiff
     - ThumbnailImage
+    - TouchTarget
+    - TouchTargetAdjustment
     - ValueFormScope
 
 implicit_types:

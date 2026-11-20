@@ -2,6 +2,22 @@
 
 ## 0.2.0
 
+- A finger's near miss presses the small control it was meant for.
+  `TouchTargetAdjustment` gives each control under it a touch area of at
+  least 48px, centred on the control, with nothing laid out larger: a
+  finger that comes down on no control, inside that area of one, presses
+  it. An `AdminScope` holds one around its page
+  (`AdminScope(adjustTouchTargets: false)` turns it off), and the kit's
+  popovers, modals and side sheets hold one around their content and
+  follow the page that opened them. Every enabled `Tappable` is a target;
+  `TouchTarget` marks a tap target of the app's own.
+  What is under the finger keeps its claim: a finger on a control presses
+  that one, a row that opens or a text field takes its own tap, a finger
+  that moves still scrolls or drags, and of two controls the one whose
+  edge is nearer is pressed. A mouse presses what it points at. So the
+  size is not guaranteed: in a tight row each control grows by half the
+  gap to its neighbour, and a small button inside a row that opens gains
+  nothing.
 - The catalog is held to the kit's public widgets:
   `example/test/catalog_coverage_test.dart` fails when a public widget is
   built by no page of the catalog, and so is pumped by no sweep. 64 of the

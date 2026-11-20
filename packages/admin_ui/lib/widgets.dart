@@ -191,6 +191,8 @@ export 'src/common/ui/toast.dart'
         ToastScope,
         ToastScopeState;
 export 'src/common/ui/toggle.dart' show Toggle;
+export 'src/common/ui/touch_target_adjustment.dart'
+    show TouchTarget, TouchTargetAdjustment;
 export 'src/common/ui/tree.dart'
     show
         Tree,

@@ -15,6 +15,7 @@ import '../../theme/overlay_style.dart';
 import '../../theme/tokens.dart';
 import '../motion.dart';
 import 'chrome_theme.dart';
+import 'touch_target_adjustment.dart';
 
 /// Which side of the anchor the popover opens on.
 ///
@@ -547,9 +548,13 @@ class _PopoverState extends State<Popover> implements PopoverController {
                             final page = context.colors;
                             return ChromeTheme(
                               palette: page.withSurface(page.popoverSurface),
-                              child: Builder(
-                                builder: (context) =>
-                                    widget.content(context, this),
+                              // A finger's near miss reaches the content's
+                              // small controls, as on the page under it.
+                              child: TouchTargetAdjustment(
+                                child: Builder(
+                                  builder: (context) =>
+                                      widget.content(context, this),
+                                ),
                               ),
                             );
                           },
