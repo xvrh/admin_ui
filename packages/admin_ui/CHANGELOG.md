@@ -2,6 +2,13 @@
 
 ## 0.2.0
 
+- The catalog is held to the kit's public widgets:
+  `example/test/catalog_coverage_test.dart` fails when a public widget is
+  built by no page of the catalog, and so is pumped by no sweep. 64 of the
+  245 are in that case today, the form-bound fields among them
+  (`DateField`, `ReferenceField`, `TagsField`), whose bodies the catalog
+  shows. They are listed in the test, and the list only shrinks. The
+  README said the catalog showed every widget.
 - A `TopBar` that runs out of room gives its `leading` the width that is
   left, where the bar's own row overflowed: on a 360px phone at twice the
   text size, a logo with its name and one action left the search icon

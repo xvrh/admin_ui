@@ -2069,9 +2069,12 @@ name kept as a deprecated alias for one release (see
 
 ## The preview catalog
 
-`example/` is a catalog of every widget with its states. Each demo is a
+`example/` is a catalog of the kit's widgets with their states. Each demo is a
 `@Preview`, wrapped in `adminUiPreview`, which adds Theme, Mode (Light/Dark),
-Brand, Direction and Locale axes. You can run the catalog as an app:
+Brand, Direction and Locale axes. A new public widget comes with its page:
+`example/test/catalog_coverage_test.dart` fails on one that no page builds,
+and lists the ones that have none yet, a list that only shrinks. You can
+run the catalog as an app:
 
 ```sh
 cd example
