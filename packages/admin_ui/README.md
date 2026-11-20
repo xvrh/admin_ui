@@ -371,6 +371,13 @@ too, centred, and reads `Sidebar.isCollapsed(context)` there to draw a
 form that fits, such as the mark without the wordmark. When compact, it is back in the bar. The page
 keeps its state when a theme changes the span.
 
+Where the bar runs out of room, as on a phone at a large text size, its
+actions and its menu button keep their size, the search icon keeps its
+place before the actions, the title ellipsizes, and `leading` is given
+the width that is left. Build a logo that can take less: its name in a
+`Flexible`, on one line and ellipsized, beside a mark of a fixed size.
+A `leading` that cannot shrink overflows its own box there.
+
 The drawer holds the `sidebar`, expanded, or `Shell(drawer:)` when the
 app gives it one of its own (to key it, say). Its head is as tall as the
 top bar, with a close button where the bar has its menu button and the

@@ -15,14 +15,6 @@ const _skipped = <String, String>{
       'translated · Re-translate" alone is wider than the row; the lane code '
       'also wraps in its fixed 26px box. Needs the hint under the row when it '
       'does not fit: example/lib/labs/lane_field_lab.dart:646 and :602',
-  'Preview / Shell (phone width)':
-      "on a 360px phone the demo's brand and its New action leave the top "
-      "bar's middle 6px, and the search icon (32px) overflows it. Needs a "
-      'rule for which gives way (the brand folding to its mark, or search '
-      'moving into a menu): lib/src/shell/ui/top_bar.dart:193',
-  'Preview / Shell (phone, drawer open)':
-      'the phone-width frame above under its open drawer: the same top bar, '
-      'which overflows the same way',
 };
 
 /// Text known to clip at twice the size, by the file it is written in

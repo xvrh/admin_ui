@@ -3,6 +3,7 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../common/text_metrics.dart';
@@ -29,6 +30,14 @@ import 'shell.dart';
 /// that palette (Carbon's g100 header): build a [leading] or an action that
 /// reads the colours itself with a context below the bar (a [Builder]) for
 /// it to read that palette.
+///
+/// **When room runs out**, as on a phone at a large text size, the bar's
+/// parts give way in an order. The [actions] and the menu button keep their
+/// size. The search icon comes next: it keeps its place before the actions.
+/// The [title] ellipsizes, to nothing if it must. Then [leading] is given
+/// only the width that is left, where it had all it asked for: a brand
+/// that can shrink (its name in a `Flexible`, ellipsized) folds toward its
+/// mark, and one that cannot overflows its own box, not the bar's.
 ///
 /// The [search] slot sits at the end, before the actions, [searchMaxWidth]
 /// wide at most and narrower as room runs out. In a bar narrower than the
@@ -132,25 +141,33 @@ class TopBar extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < context.breakpoints.medium;
-          return Row(
-            children: [
-              if (menu != null) ...[menu, const Gap(menuButtonGap)],
-              if (leading != null) ...[leading, const Gap(AdminSpacing.md)],
-              Expanded(
-                child: _Middle(
-                  title: title,
-                  titleMaxWidth: constraints.maxWidth * 0.4,
-                  search: search,
-                  compact: compact,
-                  onSearch: onSearch,
-                  searchLabel: searchLabel,
-                ),
-              ),
-              for (var i = 0; i < actions.length; i++) ...[
-                if (i > 0) const Gap(AdminSpacing.sm),
-                actions[i],
-              ],
-            ],
+          return _BarRow(
+            textDirection: Directionality.of(context),
+            // What the search icon needs, where the bar has one to show.
+            middleMin: search != null && onSearch != null
+                ? _Middle.searchIconExtentOf(context)
+                : 0,
+            menu: menu,
+            leading: leading,
+            middle: _Middle(
+              title: title,
+              titleMaxWidth: constraints.maxWidth * 0.4,
+              search: search,
+              compact: compact,
+              onSearch: onSearch,
+              searchLabel: searchLabel,
+            ),
+            actions: actions.isEmpty
+                ? null
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var i = 0; i < actions.length; i++) ...[
+                        if (i > 0) const Gap(AdminSpacing.sm),
+                        actions[i],
+                      ],
+                    ],
+                  ),
           );
         },
       ),
@@ -182,6 +199,11 @@ class _Middle extends StatelessWidget {
   });
 
   static const _gap = AdminSpacing.md;
+
+  /// The width the search icon takes with the gap before the actions: the
+  /// least the middle is given while the bar has one to show.
+  static double searchIconExtentOf(BuildContext context) =>
+      IconActionSize.medium.boxOf(context) + _gap;
 
   @override
   Widget build(BuildContext context) {
@@ -254,5 +276,165 @@ class _Middle extends StatelessWidget {
     final width = painter.width.ceilToDouble();
     painter.dispose();
     return width;
+  }
+}
+
+enum _BarSlot { menu, leading, middle, actions }
+
+/// The bar's row: the menu button, the leading widget, the middle and the
+/// actions, start to end, each centred in the bar's height.
+///
+/// A `Row` with the middle `Expanded`, but for one rule: where the menu
+/// button, the leading widget and the actions leave the middle less than
+/// [middleMin], the leading widget is laid out again in the width that
+/// leaves it [middleMin]. With room to spare the leading widget is as wide
+/// as it asks to be, unbounded as a row's child is, so one that fills the
+/// width it is given (a `Row`) keeps its own.
+class _BarRow extends SlottedMultiChildRenderObjectWidget<_BarSlot, RenderBox> {
+  final Widget? menu;
+  final Widget? leading;
+  final Widget middle;
+  final Widget? actions;
+  final double middleMin;
+  final TextDirection textDirection;
+
+  const _BarRow({
+    required this.menu,
+    required this.leading,
+    required this.middle,
+    required this.actions,
+    required this.middleMin,
+    required this.textDirection,
+  });
+
+  @override
+  Iterable<_BarSlot> get slots => _BarSlot.values;
+
+  @override
+  Widget? childForSlot(_BarSlot slot) => switch (slot) {
+    _BarSlot.menu => menu,
+    _BarSlot.leading => leading,
+    _BarSlot.middle => middle,
+    _BarSlot.actions => actions,
+  };
+
+  @override
+  _RenderBarRow createRenderObject(BuildContext context) =>
+      _RenderBarRow(middleMin: middleMin, textDirection: textDirection);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderBarRow renderObject) {
+    renderObject
+      ..middleMin = middleMin
+      ..textDirection = textDirection;
+  }
+}
+
+class _RenderBarRow extends RenderBox
+    with SlottedContainerRenderObjectMixin<_BarSlot, RenderBox> {
+  _RenderBarRow({required this._middleMin, required this._textDirection});
+
+  double get middleMin => _middleMin;
+  double _middleMin;
+  set middleMin(double value) {
+    if (value == _middleMin) return;
+    _middleMin = value;
+    markNeedsLayout();
+  }
+
+  TextDirection get textDirection => _textDirection;
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (value == _textDirection) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  /// Start to end: the order they are painted, hit and read in.
+  @override
+  Iterable<RenderBox> get children => [
+    for (final slot in _BarSlot.values) ?childForSlot(slot),
+  ];
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) => constraints.biggest;
+
+  @override
+  void performLayout() {
+    final size = this.size = constraints.biggest;
+    // As a row gives its children: any width, the bar's height at most.
+    final loose = BoxConstraints(maxHeight: size.height);
+    Size layout(RenderBox? child, BoxConstraints constraints) {
+      if (child == null) return Size.zero;
+      child.layout(constraints, parentUsesSize: true);
+      return child.size;
+    }
+
+    final menu = childForSlot(_BarSlot.menu);
+    final leading = childForSlot(_BarSlot.leading);
+    final middle = childForSlot(_BarSlot.middle);
+    final actions = childForSlot(_BarSlot.actions);
+    final menuGap = menu == null ? 0.0 : TopBar.menuButtonGap;
+    final leadingGap = leading == null ? 0.0 : AdminSpacing.md;
+
+    final menuSize = layout(menu, loose);
+    final actionsSize = layout(actions, loose);
+    final fixed = menuSize.width + menuGap + leadingGap + actionsSize.width;
+    var leadingSize = layout(leading, loose);
+    final room = math.max(0.0, size.width - fixed - middleMin);
+    if (leadingSize.width > room) {
+      leadingSize = layout(leading, loose.copyWith(maxWidth: room));
+    }
+    final middleWidth = math.max(0.0, size.width - fixed - leadingSize.width);
+    layout(
+      middle,
+      BoxConstraints(
+        minWidth: middleWidth,
+        maxWidth: middleWidth,
+        maxHeight: size.height,
+      ),
+    );
+
+    final rtl = textDirection == TextDirection.rtl;
+    var x = 0.0;
+    void place(RenderBox? child, double gapAfter) {
+      if (child == null) return;
+      final box = child.size;
+      (child.parentData! as BoxParentData).offset = Offset(
+        rtl ? size.width - x - box.width : x,
+        (size.height - box.height) / 2,
+      );
+      x += box.width + gapAfter;
+    }
+
+    place(menu, menuGap);
+    place(leading, leadingGap);
+    place(middle, 0);
+    place(actions, 0);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    for (final child in children) {
+      context.paintChild(
+        child,
+        offset + (child.parentData! as BoxParentData).offset,
+      );
+    }
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    for (final child in children.toList().reversed) {
+      final at = (child.parentData! as BoxParentData).offset;
+      final hit = result.addWithPaintOffset(
+        offset: at,
+        position: position,
+        hitTest: (result, position) =>
+            child.hitTest(result, position: position),
+      );
+      if (hit) return true;
+    }
+    return false;
   }
 }

@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- A `TopBar` that runs out of room gives its `leading` the width that is
+  left, where the bar's own row overflowed: on a 360px phone at twice the
+  text size, a logo with its name and one action left the search icon
+  6px. The actions and the menu button keep their size, the search icon
+  keeps its place, the title ellipsizes, and then `leading` is laid out
+  in what remains, so a logo whose name is in a `Flexible` and ellipsized
+  folds toward its mark. With room to spare `leading` is as wide as it
+  asks to be, as before, and nothing moves.
 - `ForbiddenState` is the placeholder of a page or a panel the signed-in
   user may not open: a muted lock, "You don't have access to this" over
   "Ask an administrator if you need it.", and a Go back button where
@@ -640,6 +648,10 @@
 
 ### Looks
 
+- A `TopBar` too narrow for its parts no longer paints its row past its
+  end. Its `leading` is cut to the room there is, and one that cannot
+  shrink (a row of fixed parts) overflows inside its own box, where the
+  search icon or the last action had been pushed out.
 - A `ReferenceBody` with `maxItems: 1` shows a Replace button on its chosen
   row, before the Remove one: a 22px disc with a swap glyph. Changing the
   record took removing it and linking again.
