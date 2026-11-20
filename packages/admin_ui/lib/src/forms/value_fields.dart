@@ -1663,7 +1663,8 @@ class MultiSelectField extends StatelessWidget {
 
 /// A reference relation — a set of related ids picked through the shared
 /// reference picker. Generic over the related domain type [T] and its id
-/// type [K]: an integer primary key, a UUID or a slug.
+/// type [K]: an integer primary key, a UUID or a slug. One related record,
+/// held as its id or null, is a [SingleReferenceField].
 class ReferenceField<T, K extends Object> extends StatelessWidget {
   final Cell<List<K>> cell;
   final String label;
@@ -1672,6 +1673,15 @@ class ReferenceField<T, K extends Object> extends StatelessWidget {
   final ReferenceResolver<T, K> resolve;
   final ReferenceSearch<T> search;
   final ReferenceTile<T> tile;
+
+  /// Records the host already holds, such as the ones a loaded record
+  /// embeds: their rows show at once, and [resolve] is asked only for the
+  /// ids not among them. Read once, as the field is first built.
+  final List<T>? seed;
+
+  /// The most records the field links. At that many the add button goes,
+  /// until a row is removed; null sets no limit.
+  final int? maxItems;
 
   /// The add button's label; "Link…" in the app's language when null.
   final String? addLabel;
@@ -1696,6 +1706,8 @@ class ReferenceField<T, K extends Object> extends StatelessWidget {
     required this.resolve,
     required this.search,
     required this.tile,
+    this.seed,
+    this.maxItems,
     this.addLabel,
     this.searchHint,
     this.required = false,
@@ -1704,7 +1716,7 @@ class ReferenceField<T, K extends Object> extends StatelessWidget {
     this.readOnly = false,
     this.errorText,
     this.warning,
-  });
+  }) : assert(maxItems == null || maxItems > 0, 'maxItems links one at least');
 
   @override
   Widget build(BuildContext context) => bind<List<K>>(
@@ -1727,6 +1739,94 @@ class ReferenceField<T, K extends Object> extends StatelessWidget {
         resolve: resolve,
         search: search,
         tile: tile,
+        seed: seed,
+        maxItems: maxItems,
+        addLabel: addLabel ?? context.adminL10n.linkPlaceholder,
+        searchHint: searchHint ?? context.adminL10n.searchPlaceholder,
+      ),
+    ),
+  );
+}
+
+/// One related record — a product's supplier, an article's author — held as
+/// its id, or null for none. With none the field shows its link button,
+/// which opens the reference picker. With one it shows that record's tile
+/// alone: its Replace button opens the picker to choose another in its
+/// place, and its remove sets the cell to null. Nothing adds a second.
+///
+/// Generic over the related domain type [T] and its id type [K], as a
+/// [ReferenceField] is, which links a list of them.
+class SingleReferenceField<T, K extends Object> extends StatelessWidget {
+  final Cell<K?> cell;
+  final String label;
+  final Widget? help;
+  final K Function(T) idOf;
+  final ReferenceResolver<T, K> resolve;
+  final ReferenceSearch<T> search;
+  final ReferenceTile<T> tile;
+
+  /// The record the host already holds for the cell's id, such as the one
+  /// a loaded record embeds: its tile shows at once, and [resolve] is not
+  /// asked for it. Read once, as the field is first built.
+  final T? seed;
+
+  /// The link button's label; "Link…" in the app's language when null.
+  final String? addLabel;
+
+  /// The search input's placeholder; "Search…" in the app's language when
+  /// null.
+  final String? searchHint;
+
+  final bool required;
+  final String? description;
+  final bool enabled;
+  final bool readOnly;
+  final String? errorText;
+  final String? warning;
+
+  const SingleReferenceField(
+    this.cell, {
+    super.key,
+    required this.label,
+    this.help,
+    required this.idOf,
+    required this.resolve,
+    required this.search,
+    required this.tile,
+    this.seed,
+    this.addLabel,
+    this.searchHint,
+    this.required = false,
+    this.description,
+    this.enabled = true,
+    this.readOnly = false,
+    this.errorText,
+    this.warning,
+  });
+
+  @override
+  Widget build(BuildContext context) => bind<K?>(
+    context,
+    cell,
+    label: label,
+    help: help,
+    required: required,
+    description: description,
+    enabled: enabled,
+    readOnly: readOnly,
+    errorText: errorText,
+    warning: warning,
+    body: (lane) => ValueListenableBuilder<K?>(
+      valueListenable: lane,
+      builder: (_, id, _) => ReferenceBody<T, K>(
+        value: [?id],
+        onChanged: readOnly ? null : (ids) => lane.set(ids.firstOrNull),
+        idOf: idOf,
+        resolve: resolve,
+        search: search,
+        tile: tile,
+        seed: [?seed],
+        maxItems: 1,
         addLabel: addLabel ?? context.adminL10n.linkPlaceholder,
         searchHint: searchHint ?? context.adminL10n.searchPlaceholder,
       ),

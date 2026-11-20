@@ -24,10 +24,9 @@ extension type ProductCells(FormScope _s) {
   );
   ValueCell<List<String>> get tags => _s.list('tags');
 
-  /// One supplier, as the one-element id list `ReferenceField` edits.
-  // FRICTION(F-304): ReferenceField edits a list; a single reference is a
-  // list of at most one.
-  ValueCell<List<String>> get supplier => _s.list('supplier');
+  /// The supplier's id, or null for none, as `SingleReferenceField` edits
+  /// it.
+  ValueCell<String?> get supplier => _s.textOrNull('supplier');
   ValueCell<bool> get featured => _s.boolean('featured');
   ValueCell<DateTime?> get availableFrom => _s.dateOrNull('availableFrom');
   ValueCell<String> get labelColor => _s.text('labelColor');
@@ -53,7 +52,7 @@ extension type ProductCells(FormScope _s) {
     categoryId: category.value,
     status: status.value,
     tags: tags.value,
-    supplierId: supplier.value.firstOrNull ?? '',
+    supplierId: supplier.value ?? '',
     featured: featured.value,
     availableFrom: () => availableFrom.value,
     labelColor: _argbOf(labelColor.value) ?? base.labelColor,
@@ -85,7 +84,7 @@ extension type ProductCells(FormScope _s) {
     category.set(product.categoryId);
     status.set(product.status);
     tags.set(product.tags);
-    supplier.set([if (product.supplierId.isNotEmpty) product.supplierId]);
+    supplier.set(product.supplierId.isEmpty ? null : product.supplierId);
     featured.set(product.featured);
     availableFrom.set(product.availableFrom);
     labelColor.set(_hexOf(product.labelColor));

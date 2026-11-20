@@ -503,15 +503,15 @@ class _DetailsView extends StatelessWidget {
               values: ProductStatus.values,
               labelOf: shell.productStatus,
             ),
-            ReferenceField<Supplier, String>(
+            SingleReferenceField<Supplier, String>(
               f.supplier,
               key: CatalogueKeys.supplier,
               label: strings.fieldSupplier,
               addLabel: strings.linkSupplier,
               searchHint: strings.searchSuppliers,
               idOf: (s) => s.id,
-              // FRICTION(F-304): the shop searches suppliers but resolves
-              // none by id, so the field resolves through a search.
+              // The shop searches suppliers but resolves none by id, so the
+              // field resolves through a search.
               resolve: (ids) async {
                 final all = await api.searchSuppliers('');
                 return [

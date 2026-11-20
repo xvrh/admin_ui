@@ -57,6 +57,7 @@ export 'src/forms/value_fields.dart'
         RecordListField,
         ReferenceField,
         SelectField,
+        SingleReferenceField,
         TagsField,
         TextCellBody,
         bind;

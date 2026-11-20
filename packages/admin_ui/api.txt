@@ -262,6 +262,7 @@ forms.dart RecordListField
 forms.dart RecordScope
 forms.dart ReferenceField
 forms.dart SelectField
+forms.dart SingleReferenceField
 forms.dart TagsField
 forms.dart TextCell
 forms.dart TextCellBody

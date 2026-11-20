@@ -61,8 +61,12 @@ class _Entry<T> {
 /// arrives, so the editor renders immediately. Selecting from [search] appends
 /// an id and seeds the cache.
 ///
-/// A null [onChanged] renders it read-only: the rows with no add, remove or
-/// reorder; with none, the field box shows "No reference" (see
+/// With [maxItems] 1 it holds one reference: the chosen row carries a Replace
+/// button, which opens the picker with that row marked, and another pick
+/// takes its place. Escape, or the pick, hands focus back to the button.
+///
+/// A null [onChanged] renders it read-only: the rows with no add, replace,
+/// remove or reorder; with none, the field box shows "No reference" (see
 /// [FieldState]). [enabled] false, or a disabled [FieldStateScope], disables
 /// it.
 class ReferenceBody<T, K extends Object> extends StatefulWidget {
@@ -82,8 +86,9 @@ class ReferenceBody<T, K extends Object> extends StatefulWidget {
   /// the skeleton on first paint.
   final List<T>? seed;
 
-  /// Cap on selections. `1` = single (replace-in-place, no reorder); `null`/N =
-  /// multi (reorderable). The add trigger hides at the cap.
+  /// Cap on selections. `1` = single: no reorder, and the chosen row's
+  /// Replace button opens the picker to choose another. `null`/N = multi
+  /// (reorderable). The add trigger hides at the cap.
   final int? maxItems;
 
   /// Label on the add trigger; null reads "Link…" in the app's language.
@@ -122,6 +127,10 @@ class _ReferenceBodyState<T, K extends Object>
   /// The picker's search box, focused when the keyboard opens the picker.
   final _searchFocus = FocusNode();
 
+  /// The Replace button of a single reference's row, which takes focus back
+  /// from the picker it opened.
+  final _replaceFocus = FocusNode(debugLabel: 'ReferenceBody replace');
+
   bool get _single => widget.maxItems == 1;
   bool get _multiple => !_single;
   bool get _atCap =>
@@ -145,6 +154,7 @@ class _ReferenceBodyState<T, K extends Object>
   @override
   void dispose() {
     _searchFocus.dispose();
+    _replaceFocus.dispose();
     super.dispose();
   }
 
@@ -207,6 +217,8 @@ class _ReferenceBodyState<T, K extends Object>
     var id = widget.idOf(item);
     _cache[id] = _Entry(_Phase.ready, item);
     if (_single) {
+      // Picking the row already chosen changes nothing.
+      if (widget.value.length == 1 && widget.value.first == id) return;
       widget.onChanged?.call([id]);
     } else if (!widget.value.contains(id) && !_atCap) {
       widget.onChanged?.call([...widget.value, id]);
@@ -241,12 +253,49 @@ class _ReferenceBodyState<T, K extends Object>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _multiple
-            ? _reorderableList(editable)
-            : _row(widget.value.first, 0, editable: editable),
+        _multiple ? _reorderableList(editable) : _singleRow(editable),
         if (editable && !_atCap) ...[const Gap(AdminSpacing.md), _trigger()],
       ],
     );
+  }
+
+  /// The row of a single reference. While it can be edited, the row is the
+  /// anchor of the picker its Replace button opens, so the picker stands
+  /// where the add trigger's would.
+  Widget _singleRow(bool editable) {
+    final id = widget.value.first;
+    if (!editable) return _row(id, 0, editable: false);
+    return Popover(
+      side: PopoverSide.bottom,
+      align: PopoverAlign.start,
+      autofocus: false,
+      anchor: (context, controller) => _row(
+        id,
+        0,
+        editable: true,
+        replace: (
+          expanded: controller.isOpen,
+          onTap: () => _toggleReplace(controller),
+        ),
+      ),
+      content: (context, controller) => _picker(
+        context,
+        onPicked: () {
+          controller.close();
+          _replaceFocus.requestFocus();
+        },
+      ),
+    );
+  }
+
+  void _toggleReplace(PopoverController controller) {
+    if (controller.isOpen) return controller.close();
+    controller.open();
+    // The search box takes focus however the picker was opened: after a key
+    // press the button still holds it, and nothing else would move it.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && controller.isOpen) _searchFocus.requestFocus();
+    });
   }
 
   Widget _reorderableList(bool editable) {
@@ -279,6 +328,7 @@ class _ReferenceBodyState<T, K extends Object>
     int index, {
     required bool editable,
     bool reorderable = false,
+    ({bool expanded, VoidCallback onTap})? replace,
   }) {
     var entry = _cache[id] ?? const _Entry(_Phase.loading);
     var content = switch (entry.phase) {
@@ -290,6 +340,9 @@ class _ReferenceBodyState<T, K extends Object>
     return _SelectedRow(
       index: index,
       reorderable: reorderable,
+      onReplace: replace?.onTap,
+      replaceExpanded: replace?.expanded,
+      replaceFocus: replace == null ? null : _replaceFocus,
       onRemove: editable ? () => _remove(id) : null,
       onRetry: entry.phase == _Phase.error ? () => _retry(id) : null,
       invalid: entry.phase == _Phase.error,
@@ -298,7 +351,6 @@ class _ReferenceBodyState<T, K extends Object>
   }
 
   Widget _trigger() {
-    var selectedIds = widget.value.toSet();
     return Popover(
       side: PopoverSide.bottom,
       align: PopoverAlign.start,
@@ -308,21 +360,28 @@ class _ReferenceBodyState<T, K extends Object>
         controller: controller,
         searchFocus: _searchFocus,
       ),
-      content: (context, controller) => _ReferencePicker<T, K>(
-        searchFocus: _searchFocus,
-        search: widget.search,
-        idOf: widget.idOf,
-        tile: widget.tile,
-        selectedIds: selectedIds,
-        single: _single,
-        maxItems: widget.maxItems,
-        hint: widget.searchHint ?? context.adminL10n.searchPlaceholder,
-        onSelect: (item) {
-          _pick(item);
-          if (_single) controller.close();
-        },
-        onDeselect: _remove,
-      ),
+      content: (context, controller) =>
+          _picker(context, onPicked: controller.close),
+    );
+  }
+
+  /// The search picker over the ids chosen so far. A single reference's
+  /// pick is its whole choice, and calls [onPicked].
+  Widget _picker(BuildContext context, {required VoidCallback onPicked}) {
+    return _ReferencePicker<T, K>(
+      searchFocus: _searchFocus,
+      search: widget.search,
+      idOf: widget.idOf,
+      tile: widget.tile,
+      selectedIds: widget.value.toSet(),
+      single: _single,
+      maxItems: widget.maxItems,
+      hint: widget.searchHint ?? context.adminL10n.searchPlaceholder,
+      onSelect: (item) {
+        _pick(item);
+        if (_single) onPicked();
+      },
+      onDeselect: _remove,
     );
   }
 }
@@ -406,12 +465,17 @@ class ReferenceTileCard extends StatelessWidget {
   }
 }
 
-/// Bordered container + leading drag handle + trailing remove, wrapped around
-/// the caller's tile content (or a skeleton / missing / error stand-in).
+/// Bordered container + leading drag handle + trailing replace, retry and
+/// remove, wrapped around the caller's tile content (or a skeleton / missing
+/// / error stand-in). Replace comes first of the three: it is the row's
+/// trigger, which Escape in its picker hands focus back to.
 class _SelectedRow extends StatelessWidget {
   final int index;
   final bool reorderable;
   final bool invalid;
+  final VoidCallback? onReplace;
+  final bool? replaceExpanded;
+  final FocusNode? replaceFocus;
   final VoidCallback? onRemove;
   final VoidCallback? onRetry;
   final Widget child;
@@ -421,6 +485,9 @@ class _SelectedRow extends StatelessWidget {
     required this.reorderable,
     required this.invalid,
     required this.child,
+    this.onReplace,
+    this.replaceExpanded,
+    this.replaceFocus,
     this.onRemove,
     this.onRetry,
   });
@@ -446,6 +513,16 @@ class _SelectedRow extends StatelessWidget {
               ),
             ),
           Expanded(child: child),
+          if (onReplace != null) ...[
+            const Gap(AdminSpacing.md),
+            CircleButton(
+              icon: Icons.swap_horiz_rounded,
+              onTap: onReplace!,
+              label: l10n.fields.replaceReference,
+              expanded: replaceExpanded,
+              focusNode: replaceFocus,
+            ),
+          ],
           if (onRetry != null) ...[
             const Gap(AdminSpacing.md),
             CircleButton(
@@ -780,6 +857,9 @@ class _ReferencePickerState<T, K extends Object>
     return PopoverMenuSurface(
       width: 360,
       maxHeight: 400,
+      // The results scroll in the room there is beside the row or the
+      // button that opened the picker, which it never covers.
+      fitAvailableHeight: true,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -68,7 +68,7 @@ two together.
 | F-301 | `FormScope` hands out no map cell, which `KeyValueField` needs | missing-api | S2 | fixed |
 | F-302 | `TableTextEditor.number` cannot refuse a draft | missing-api | S3 | open |
 | F-303 | The kit draws a `VersionDiff` but builds none from two records | missing-api | S2 | fixed |
-| F-304 | `ReferenceField` edits a list only; a single reference is a list of one | missing-api | S3 | open |
+| F-304 | `ReferenceField` edits a list only; a single reference is a list of one | missing-api | S3 | fixed |
 | F-305 | `PresenceAvatars` takes a fixed list of peers; following a channel is the page's job | awkward-default | S3 | open |
 | F-306 | `PageScaffold` has no slot for a tab strip | missing-api | S3 | fixed |
 | F-307 | Asset dialogs open on `AdminScope`'s anchor, above a page's `AssetSourceScope`, `LangScope` and keyboard inset | doc-gap | S2 | fixed |
@@ -798,12 +798,12 @@ Owned by WP-C. Every entry was met building `/products`, `/products/new` and `/p
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open (verified)
+- **Status:** fixed (kit)
 - **Kit:** `forms.dart › ReferenceField` (`lib/src/forms/value_fields.dart:1753`) takes a `Cell<List<K>>` and always shows its "Link…" trigger; `ReferenceResolver` asks for entities by id, which a search-only backend does not have.
 - **App:** `lib/src/screens/products/product_form.dart:27` (the supplier as a one-element `list` cell, read with `firstOrNull`); `lib/src/screens/products/product_editor.dart:523` resolves ids through a supplier search.
 - **Evidence:** "Editing a product" › "Product · checking SKU": the supplier card still has "Choose a supplier" under it, which would add a second supplier.
 - **Workaround:** the list of one; nothing stops a second pick.
-- **Proposal:** `ReferenceField.single(Cell<K?> …)` (or `maxItems: 1`, which hides the trigger once full and turns it into Replace).
+- **Proposal:** `ReferenceField.single(Cell<K?> …)` (or `maxItems: 1`, which hides the trigger once full and turns it into Replace). Done, as both: `SingleReferenceField(Cell<K?> …)` holds one id or null and shows the link button or the record's row, never both, and the row carries a Replace button that opens the picker with the record marked, where another pick takes its place; `ReferenceField(maxItems:)` caps a list the same way. The product editor's supplier is a `textOrNull` cell under a `SingleReferenceField`, and the "Choose a supplier" button under a chosen supplier is gone. Still the app's: the shop's API searches suppliers and resolves none by id, so the field's `resolve` goes through a search here. Both fields now take `seed`, for an app whose record embeds the related one.
 
 ### F-305 · `PresenceAvatars` takes a fixed list of peers; following a channel is the page's job
 
