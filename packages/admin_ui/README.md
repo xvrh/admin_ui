@@ -1156,7 +1156,8 @@ panel opening in the flow (an accordion, a tree's rows, a tab indicator), and
 says how long a move takes without fixing the milliseconds names one of the
 three as a `MotionSpeed`, and `context.motion.durationOf(speed)` gives its
 duration. A modal's is the theme's
-`overlayStyle.modalMotion`, described under Anatomy.
+`overlayStyle.modalMotion`, and a popover's its `popoverMotion`, both
+described under Anatomy.
 
 `exit` is the curve of something leaving as time runs: it accelerates away.
 An animation that runs forward as the thing leaves takes it as it is. One
@@ -1384,10 +1385,42 @@ system has curves of its own for it. Leaving plays the same move back.
 |---|---|---|---|
 | Iris | fades | 180ms | enter · exit |
 | Material | fades | 200ms | enter · exit |
-| shadcn | fades, from 95% | 200ms | enter · exit |
+| shadcn | fades, from 95% | 200ms | CSS `ease` both ways (tw-animate's default) |
 | Ant | fades, from 20% | 200ms (`motionDurationMid`) | `motionEaseOutCirc` · `motionEaseInOutCirc` |
 | Fluent | fades, from 85% | 250ms (gentle) | decelerate mid · accelerate min |
 | Carbon | fades, sliding down 24 | 240ms (moderate-02) | expressive entrance · expressive exit |
+
+`popoverMotion` is the same for a `Popover`, and so for every menu, select,
+picker and hover card. It is null by default: the popover is there, and
+gone, at once, with no fade. With one, the content fades in, grows from
+`scale` out of the point on its edge that faces its anchor (its arrow's, or
+else the end it is lined up by), and slides `slide` away from the anchor into
+place, so a popover that flipped above its anchor comes up from below. Three
+more members serve a popover's references. `stretch` unfolds the content from
+a share of its height, its width kept. `duration` is a duration of the
+motion's own where none of the theme's three is it. `leaves: false` plays no
+exit: the popover is gone at once. A modal takes `stretch` and `duration`
+too, and plays its arrival back whatever `leaves` says.
+
+A popover asked to close is closed at once to its controller, its trigger
+and `onOpenChanged`. Where the motion plays an exit, its content stays on
+screen until it has, taking no pointer and no focus and left out of
+semantics, and opening it again in that time brings it back from where it had
+got to. Under reduced motion it is there, and gone, at once.
+
+| Theme | A popover | Over | Curves | Leaving |
+|---|---|---|---|---|
+| Iris | at once | | | at once |
+| Material | at once | | | at once |
+| shadcn | fades, from 95%, sliding 8 | 150ms (tw-animate's default) | CSS `ease` both ways | plays it back |
+| Ant | fades, unfolding from 80% of its height | 200ms (`motionDurationMid`) | `motionEaseOutQuint` · `motionEaseInQuint` | plays it back |
+| Fluent | fades, sliding 10 | 400ms (slower) | decelerate mid | at once |
+| Carbon | at once | | | at once |
+
+Flutter's Material menu unfolds its panel and fades its items in turn, which
+one motion on the whole content does not draw, so Material's popovers stay as
+they were. Ant's own `Popover` zooms from 80% where its dropdown, select and
+pickers unfold; the kit's one motion is the dropdown's.
 
 
 Each theme also takes its design system's shadows: M3's elevation levels,

@@ -363,6 +363,15 @@ final antTheme = AdminTheme.from(
       curve: Cubic(0.08, 0.82, 0.17, 1),
       reverseCurve: Cubic(0.78, 0.14, 0.15, 0.86),
     ),
+    // a Dropdown's, a Select's and a picker's slide-up motion: antSlideUpIn
+    // from scaleY(0.8) at the edge by the trigger over motionDurationMid on
+    // motionEaseOutQuint, out on motionEaseInQuint. A Popover's own
+    // zoom-big, from scale(0.8), is not drawn: one motion serves them all.
+    popoverMotion: AdminOverlayMotion(
+      stretch: 0.8,
+      curve: Cubic(0.23, 1, 0.32, 1),
+      reverseCurve: Cubic(0.755, 0.05, 0.855, 0.06),
+    ),
     arrowWidth: 16,
     arrowHeight: 8,
   ),

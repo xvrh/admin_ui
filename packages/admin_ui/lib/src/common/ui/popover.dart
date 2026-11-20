@@ -5,12 +5,15 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import '../../theme/overlay_style.dart';
 import '../../theme/tokens.dart';
+import '../motion.dart';
 
 /// Which side of the anchor the popover opens on.
 ///
@@ -34,6 +37,10 @@ abstract class PopoverController {
   void open();
   void close();
   void toggle();
+
+  /// Whether the popover is open. It is closed from the moment it is asked
+  /// to close, though a theme whose popovers leave with a move keeps it on
+  /// screen, inert, until that has played.
   bool get isOpen;
 
   /// Width of the anchor, available once the popover is laid out — lets content
@@ -111,6 +118,17 @@ class PopoverPlacement {
 /// closes with its parent, and it answers Escape first, handing focus back
 /// to its own anchor. Focus moving into it is still inside the parent, for
 /// the parent's [closeOnFocusOut].
+///
+/// **Motion.** The theme's `overlayStyle.popoverMotion` says how the content
+/// arrives and leaves: fading, growing out of the point on its edge that
+/// faces the anchor, and sliding away from the anchor into place. With none
+/// it is there, and gone, at once, as it is under reduced motion. A popover
+/// asked to close is closed at once to its controller, its trigger and
+/// [onOpenChanged]; where the motion plays an exit, the content stays on
+/// screen until it has, taking no pointer, no focus and no part in
+/// semantics, and opening it again in that time brings it back from where
+/// it had got to. Escape pressed on its trigger in that time is taken and
+/// does nothing: the menu anchor under it still counts it open.
 class Popover extends StatefulWidget {
   final Widget Function(BuildContext context, PopoverController controller)
   anchor;
@@ -266,6 +284,13 @@ class _PopoverState extends State<Popover> implements PopoverController {
   final _contentNode = FocusNode(debugLabel: 'Popover', skipTraversal: true);
   late final _placement = _PlacementNotifier(_requested);
   bool _isOpen = false;
+
+  /// Whether the popover is playing its exit: closed to everything that
+  /// asks, and still on screen.
+  bool _leaving = false;
+
+  /// Hides the overlay once the exit has played.
+  VoidCallback? _hide;
   bool _openedByKeyboard = false;
   bool _focusWasInside = false;
   double? _anchorWidth;
@@ -285,8 +310,10 @@ class _PopoverState extends State<Popover> implements PopoverController {
   @override
   void close() => _menu.close();
 
+  // By [_isOpen], not the menu's: a popover that is leaving is still shown,
+  // and toggling it opens it again.
   @override
-  void toggle() => _menu.isOpen ? _menu.close() : _menu.open();
+  void toggle() => _isOpen ? _menu.close() : _menu.open();
 
   void _openAt(Offset globalPosition) {
     final box = context.findRenderObject();
@@ -324,15 +351,57 @@ class _PopoverState extends State<Popover> implements PopoverController {
     );
     _focusWasInside = false;
     _placement.value = _requested;
+    _hide = null;
     _track();
-    setState(() => _isOpen = true);
+    setState(() {
+      _isOpen = true;
+      _leaving = false;
+    });
     widget.onOpenChanged?.call(true);
   }
 
-  void _onClose() {
+  /// Asked to close. Where the theme's popover motion plays an exit, the
+  /// popover is closed from here on to everything that asks (its
+  /// controller, its trigger, focus) and stays on screen until
+  /// [_PopoverArrival] has played it; otherwise it is hidden at once.
+  void _onCloseRequested(VoidCallback hideOverlay) {
+    if (!mounted || !_menu.isOpen) return hideOverlay();
+    if (_leaving) return;
+    final look = context.overlayStyle.popoverMotion;
+    if (look == null ||
+        !look.leaves ||
+        !TickerMode.valuesOf(context).enabled ||
+        motionDuration(context, look.durationIn(context.motion)) ==
+            Duration.zero) {
+      return hideOverlay();
+    }
+    _hide = hideOverlay;
     _untrack();
-    setState(() => _isOpen = false);
+    setState(() {
+      _isOpen = false;
+      _leaving = true;
+    });
     widget.onOpenChanged?.call(false);
+  }
+
+  /// The exit has played: hide the overlay, which ends in [_onClose].
+  void _onLeft() {
+    final hide = _hide;
+    _hide = null;
+    hide?.call();
+  }
+
+  /// The overlay is hidden: after an exit, at once where there is none, or
+  /// without being asked (its parent closed, or it is reopened elsewhere).
+  void _onClose() {
+    final wasOpen = _isOpen;
+    _hide = null;
+    _untrack();
+    setState(() {
+      _isOpen = false;
+      _leaving = false;
+    });
+    if (wasOpen) widget.onOpenChanged?.call(false);
   }
 
   void _track() {
@@ -410,6 +479,7 @@ class _PopoverState extends State<Popover> implements PopoverController {
       controller: _menu,
       onOpen: _onOpen,
       onClose: _onClose,
+      onCloseRequested: _onCloseRequested,
       builder: (context, controller, child) => Focus(
         focusNode: _anchorNode,
         includeSemantics: false,
@@ -444,26 +514,32 @@ class _PopoverState extends State<Popover> implements PopoverController {
           availableSize: layout.availableSize(info.overlaySize),
           child: CustomSingleChildLayout(
             delegate: layout,
-            child: CallbackShortcuts(
-              bindings: {
-                const SingleActivator(LogicalKeyboardKey.escape): _dismiss,
-              },
-              child: Focus(
-                focusNode: _contentNode,
-                autofocus: widget.autofocus,
-                // A bare RawMenuAnchor's own handler only closes child
-                // submenus, so we close on taps outside the group ourselves.
-                child: TapRegion(
-                  groupId: info.tapRegionGroupId,
-                  onTapOutside: (_) => close(),
-                  child: Offstage(
-                    offstage: !placeable,
-                    // Same shim as the modals: a popover can open over a web
-                    // platform view (an embedded iframe, say), which would
-                    // otherwise take the clicks meant for its items.
-                    child: PointerInterceptor(
-                      child: Builder(
-                        builder: (context) => widget.content(context, this),
+            child: _PopoverArrival(
+              leaving: _leaving,
+              onLeft: _onLeft,
+              placement: _placement,
+              child: CallbackShortcuts(
+                bindings: {
+                  const SingleActivator(LogicalKeyboardKey.escape): _dismiss,
+                },
+                child: Focus(
+                  focusNode: _contentNode,
+                  autofocus: widget.autofocus,
+                  // A bare RawMenuAnchor's own handler only closes child
+                  // submenus, so we close on taps outside the group
+                  // ourselves.
+                  child: TapRegion(
+                    groupId: info.tapRegionGroupId,
+                    onTapOutside: (_) => close(),
+                    child: Offstage(
+                      offstage: !placeable,
+                      // Same shim as the modals: a popover can open over a
+                      // web platform view (an embedded iframe, say), which
+                      // would otherwise take the clicks meant for its items.
+                      child: PointerInterceptor(
+                        child: Builder(
+                          builder: (context) => widget.content(context, this),
+                        ),
                       ),
                     ),
                   ),
@@ -475,6 +551,376 @@ class _PopoverState extends State<Popover> implements PopoverController {
       },
     );
   }
+}
+
+/// Plays the theme's `overlayStyle.popoverMotion` on a popover's content:
+/// in as the content is first built, and back once it is [leaving], after
+/// which it calls [onLeft]. A content that is leaving takes no pointer and
+/// no focus and is left out of semantics.
+///
+/// The content fades, and moves as [_popoverMotionTransform] says.
+///
+/// The widgets it builds are the same with a motion and without, and at
+/// rest they change nothing, so a theme changing under an open popover
+/// keeps the content's state.
+class _PopoverArrival extends StatefulWidget {
+  final bool leaving;
+  final VoidCallback onLeft;
+  final _PlacementNotifier placement;
+  final Widget child;
+
+  const _PopoverArrival({
+    required this.leaving,
+    required this.onLeft,
+    required this.placement,
+    required this.child,
+  });
+
+  @override
+  State<_PopoverArrival> createState() => _PopoverArrivalState();
+}
+
+class _PopoverArrivalState extends State<_PopoverArrival>
+    with SingleTickerProviderStateMixin {
+  /// Null until something moves: a popover that is there at once never
+  /// asks for a ticker.
+  AnimationController? _controller;
+  CurvedAnimation? _curved;
+
+  AdminOverlayMotion? _look;
+  Duration _duration = Duration.zero;
+  late Curve _enter;
+  late Curve _exit;
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final look = context.overlayStyle.popoverMotion;
+    final motion = context.motion;
+    // A ticker that is muted (the anchor's page is hidden) would never
+    // finish the move.
+    final ticking = TickerMode.valuesOf(context).enabled;
+    _look = look;
+    _duration = look == null || !ticking
+        ? Duration.zero
+        : motionDuration(context, look.durationIn(motion));
+    _enter = look?.curve ?? motion.enter;
+    _exit = look?.reverseCurve ?? motion.exit;
+    _curved
+      ?..curve = _enter
+      // Flipped: see [AdminMotion.exit].
+      ..reverseCurve = _exit.flipped;
+    if (!_started) {
+      _started = true;
+      if (_duration > Duration.zero && !widget.leaving) _animation(0).forward();
+    } else if (_duration > Duration.zero) {
+      _controller?.duration = _duration;
+    } else if (widget.leaving) {
+      // Motion was reduced, or the ticker muted, under a popover on its
+      // way out.
+      _left();
+    } else {
+      _controller?.value = 1;
+    }
+  }
+
+  @override
+  void didUpdateWidget(_PopoverArrival oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.leaving == oldWidget.leaving) return;
+    if (!widget.leaving) {
+      // Opened again on its way out: back in from where it had got to.
+      _controller?.forward();
+    } else if (_duration > Duration.zero) {
+      _animation(1).reverse();
+    } else {
+      _left();
+    }
+  }
+
+  @override
+  void dispose() {
+    _curved?.dispose();
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  /// The controller, made at [value] the first time it is needed.
+  AnimationController _animation(double value) {
+    if (_controller case final controller?) return controller;
+    final controller = AnimationController(
+      vsync: this,
+      value: value,
+      duration: _duration,
+    )..addStatusListener(_onStatus);
+    _controller = controller;
+    _curved = CurvedAnimation(
+      parent: controller,
+      curve: _enter,
+      // Flipped: see [AdminMotion.exit].
+      reverseCurve: _exit.flipped,
+    );
+    return controller;
+  }
+
+  void _onStatus(AnimationStatus status) {
+    if (status == AnimationStatus.dismissed && widget.leaving) _left();
+  }
+
+  /// Tells the popover its exit has played. That hides the overlay, which
+  /// cannot be done in the middle of a build: a popover asked to close in
+  /// the frame it opened is already where its exit ends.
+  void _left() {
+    final scheduler = SchedulerBinding.instance;
+    if (scheduler.schedulerPhase != SchedulerPhase.persistentCallbacks) {
+      widget.onLeft();
+      return;
+    }
+    scheduler.addPostFrameCallback((_) {
+      if (mounted && widget.leaving) widget.onLeft();
+    }, debugLabel: 'Popover.left');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Animation<double> animation = _curved ?? kAlwaysCompleteAnimation;
+    final leaving = widget.leaving;
+    // The move is outermost, so a tap lands on the content where it is
+    // drawn, not where it will come to rest.
+    return _PopoverMoved(
+      animation: animation,
+      placement: widget.placement,
+      look: _look,
+      textDirection: Directionality.of(context),
+      child: FadeTransition(
+        opacity: animation,
+        child: IgnorePointer(
+          ignoring: leaving,
+          child: ExcludeFocus(
+            excluding: leaving,
+            child: ExcludeSemantics(excluding: leaving, child: widget.child),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Draws a popover's content where its motion has it, [animation] of the
+/// way into place.
+///
+/// Where it moves from depends on the side the popover ended on and where
+/// its arrow stands, which its layout decides after this widget is built:
+/// the transform is worked out as it paints, from [placement], so a popover
+/// that flips is right in its first frame.
+class _PopoverMoved extends SingleChildRenderObjectWidget {
+  final Animation<double> animation;
+  final _PlacementNotifier placement;
+  final AdminOverlayMotion? look;
+  final TextDirection textDirection;
+
+  const _PopoverMoved({
+    required this.animation,
+    required this.placement,
+    required this.look,
+    required this.textDirection,
+    required super.child,
+  });
+
+  @override
+  _RenderPopoverMoved createRenderObject(BuildContext context) =>
+      _RenderPopoverMoved(animation, placement, look, textDirection);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderPopoverMoved renderObject,
+  ) {
+    renderObject
+      ..animation = animation
+      ..placement = placement
+      ..look = look
+      ..textDirection = textDirection;
+  }
+}
+
+class _RenderPopoverMoved extends RenderProxyBox {
+  _RenderPopoverMoved(
+    this._animation,
+    this._placement,
+    this._look,
+    this._textDirection,
+  );
+
+  Animation<double> _animation;
+  set animation(Animation<double> value) {
+    if (identical(value, _animation)) return;
+    if (attached) _animation.removeListener(_moved);
+    _animation = value;
+    if (attached) value.addListener(_moved);
+    _moved();
+  }
+
+  _PlacementNotifier _placement;
+  set placement(_PlacementNotifier value) {
+    if (identical(value, _placement)) return;
+    if (attached) _placement.repaint.removeListener(_moved);
+    _placement = value;
+    if (attached) value.repaint.addListener(_moved);
+    _moved();
+  }
+
+  AdminOverlayMotion? _look;
+  set look(AdminOverlayMotion? value) {
+    if (value == _look) return;
+    _look = value;
+    _moved();
+  }
+
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (value == _textDirection) return;
+    _textDirection = value;
+    _moved();
+  }
+
+  void _moved() {
+    markNeedsPaint();
+    markNeedsSemanticsUpdate();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _animation.addListener(_moved);
+    _placement.repaint.addListener(_moved);
+  }
+
+  @override
+  void detach() {
+    _animation.removeListener(_moved);
+    _placement.repaint.removeListener(_moved);
+    super.detach();
+  }
+
+  /// Null at rest, where nothing is transformed.
+  Matrix4? get _transform => _popoverMotionTransform(
+    _look,
+    _animation.value,
+    _placement.value,
+    _textDirection,
+    size,
+  );
+
+  // Not by its own box, as [RenderTransform]: the content is hit where it
+  // is drawn.
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) =>
+      hitTestChildren(result, position: position);
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      result.addWithPaintTransform(
+        transform: _transform,
+        position: position,
+        hitTest: (result, position) =>
+            super.hitTestChildren(result, position: position),
+      );
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child == null) return;
+    final transform = _transform;
+    final shift = transform == null
+        ? Offset.zero
+        : MatrixUtils.getAsTranslation(transform);
+    if (shift != null) {
+      super.paint(context, offset + shift);
+      layer = null;
+      return;
+    }
+    layer = context.pushTransform(
+      needsCompositing,
+      offset,
+      transform!,
+      super.paint,
+      oldLayer: layer is TransformLayer ? layer as TransformLayer? : null,
+    );
+  }
+
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    if (_transform case final moved?) transform.multiply(moved);
+  }
+}
+
+/// Where a popover's content of [size] is drawn [t] of the way into place
+/// (1 at rest) under [look], for the placement it ended on; null where it
+/// is in place.
+///
+/// It grows from the motion's scale out of the point on its edge that faces
+/// the anchor: the arrow's, or else the end that [PopoverPlacement.align]
+/// lines up. It unfolds from the motion's stretch from its top edge, or from
+/// its bottom edge above the anchor. And it starts the motion's slide
+/// toward the anchor from its place.
+Matrix4? _popoverMotionTransform(
+  AdminOverlayMotion? look,
+  double t,
+  PopoverPlacement placed,
+  TextDirection textDirection,
+  Size size,
+) {
+  if (look == null || !look.moves || t == 1) return null;
+  final ltr = textDirection == TextDirection.ltr;
+  final toward = _directionOf(placed.side, textDirection);
+  final arrow = placed.arrowOffset;
+  // The point it grows out of.
+  final Offset origin;
+  if (axisDirectionToAxis(toward) == Axis.vertical) {
+    final x =
+        arrow ??
+        switch (placed.align) {
+          PopoverAlign.start => ltr ? 0.0 : size.width,
+          PopoverAlign.center => size.width / 2,
+          PopoverAlign.end => ltr ? size.width : 0.0,
+        };
+    origin = Offset(x, toward == AxisDirection.down ? 0 : size.height);
+  } else {
+    final y =
+        arrow ??
+        switch (placed.align) {
+          PopoverAlign.start => 0.0,
+          PopoverAlign.center => size.height / 2,
+          PopoverAlign.end => size.height,
+        };
+    origin = Offset(toward == AxisDirection.right ? 0 : size.width, y);
+  }
+  final away = look.slide * (1 - t);
+  final slide = switch (toward) {
+    AxisDirection.down => Offset(0, -away),
+    AxisDirection.up => Offset(0, away),
+    AxisDirection.right => Offset(-away, 0),
+    AxisDirection.left => Offset(away, 0),
+  };
+  final scale = look.scale + (1 - look.scale) * t;
+  final stretch = look.stretch + (1 - look.stretch) * t;
+  // The edge its height unfolds from.
+  final edge = toward == AxisDirection.up ? size.height : 0.0;
+  // A point (x, y) of the content is stretched about that edge, scaled
+  // about the origin, then slid:
+  //   x' = slide.dx + origin.dx + scale * (x - origin.dx)
+  //   y' = slide.dy + origin.dy
+  //        + scale * (edge + stretch * (y - edge) - origin.dy)
+  return Matrix4.identity()
+    ..setEntry(0, 0, scale)
+    ..setEntry(1, 1, scale * stretch)
+    ..setEntry(0, 3, slide.dx + origin.dx * (1 - scale))
+    ..setEntry(
+      1,
+      3,
+      slide.dy + origin.dy + scale * (edge * (1 - stretch) - origin.dy),
+    );
 }
 
 final _modifiers = {

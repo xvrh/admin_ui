@@ -408,6 +408,11 @@ void describeAdminOverlayStyle(
   describeValue(v.tooltipText, '${p}tooltipText', out);
   describeValue(v.tooltipDelay, '${p}tooltipDelay', out);
   describeAdminOverlayMotion(v.modalMotion, '${p}modalMotion', out);
+  if (v.popoverMotion case final f?) {
+    describeAdminOverlayMotion(f, '${p}popoverMotion', out);
+  } else {
+    out['${p}popoverMotion'] = 'null';
+  }
   describeValue(v.arrowWidth, '${p}arrowWidth', out);
   describeValue(v.arrowHeight, '${p}arrowHeight', out);
 }
@@ -419,10 +424,13 @@ void describeAdminOverlayMotion(
 ) {
   final p = path.isEmpty ? '' : '$path.';
   describeValue(v.scale, '${p}scale', out);
+  describeValue(v.stretch, '${p}stretch', out);
   describeValue(v.slide, '${p}slide', out);
   describeValue(v.speed, '${p}speed', out);
+  describeValue(v.duration, '${p}duration', out);
   describeValue(v.curve, '${p}curve', out);
   describeValue(v.reverseCurve, '${p}reverseCurve', out);
+  describeValue(v.leaves, '${p}leaves', out);
 }
 
 void describeAdminSegmentedStyle(

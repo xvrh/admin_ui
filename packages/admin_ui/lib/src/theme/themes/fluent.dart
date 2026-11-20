@@ -335,6 +335,14 @@ final fluentTheme = AdminTheme.from(
       speed: MotionSpeed.slow,
       reverseCurve: Cubic(0.8, 0, 0.78, 1),
     ),
+    // PopoverSurfaceMotion and MenuSurfaceMotion: a fade and a 10px slide
+    // from the trigger's side over durationSlower (400ms) on
+    // curveDecelerateMid; no exit, the surface unmounts at once
+    popoverMotion: AdminOverlayMotion(
+      slide: 10,
+      duration: Duration(milliseconds: 400),
+      leaves: false,
+    ),
   ),
   // the Windows Community Toolkit's Segmented: an outlined track, the
   // selected item raised in ControlFillColorDefault over a short accent

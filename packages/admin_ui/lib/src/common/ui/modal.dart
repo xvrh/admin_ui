@@ -8,6 +8,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
+import '../motion.dart';
 import 'alert.dart';
 import 'button.dart';
 import 'error_text.dart';
@@ -20,11 +21,12 @@ import 'severity.dart';
 /// [barrierColor] overrides it.
 ///
 /// It arrives as the theme's `overlayStyle.modalMotion` says: the scrim and
-/// the card fade in, and the card grows from that motion's scale and slides
-/// down from above its place, over the motion's duration and on its curves
-/// (by default a fade alone over `motion.medium`, on `motion.enter`, and
-/// out on `motion.exit`). Leaving plays it back. Under reduced motion it
-/// appears at once.
+/// the card fade in, and the card grows from that motion's scale, unfolds
+/// from its stretch and slides down from above its place, over the motion's
+/// duration and on its curves (by default a fade alone over
+/// `motion.medium`, on `motion.enter`, and out on `motion.exit`). Leaving
+/// plays it back, whatever the motion's `leaves` says: that is for a
+/// popover. Under reduced motion it appears at once.
 ///
 /// The card is centred 24px inside the safe area and clear of the keyboard,
 /// except a [ModalSize.fullscreen] one, which takes the whole screen and
@@ -37,7 +39,7 @@ Future<T?> showModal<T>(
 }) {
   final motion = context.motion;
   final arrival = context.overlayStyle.modalMotion;
-  final duration = motion.durationOf(arrival.speed);
+  final duration = motionDuration(context, arrival.durationIn(motion));
   return showDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
@@ -126,7 +128,14 @@ class _ModalArrivalState extends State<_ModalArrival> {
           offset: Offset(0, -look.slide * (1 - t)),
           child: Transform.scale(
             scale: look.scale + (1 - look.scale) * t,
-            child: child,
+            child: look.stretch == 1
+                ? child
+                : Transform.scale(
+                    scaleX: 1,
+                    scaleY: look.stretch + (1 - look.stretch) * t,
+                    alignment: Alignment.topCenter,
+                    child: child,
+                  ),
           ),
         );
       },

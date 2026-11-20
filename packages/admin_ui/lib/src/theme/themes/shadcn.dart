@@ -311,8 +311,24 @@ final shadcnTheme = AdminTheme.from(
     tooltipPaddingX: 12,
     tooltipPaddingY: 6,
     tooltipDelay: Duration.zero,
-    // DialogContent: fade-in-0 zoom-in-95 over duration-200, and back
-    modalMotion: AdminOverlayMotion(scale: 0.95),
+    // DialogContent: fade-in-0 zoom-in-95 over duration-200, and back, on
+    // tw-animate's default easing, CSS `ease`
+    modalMotion: AdminOverlayMotion(
+      scale: 0.95,
+      curve: Curves.ease,
+      reverseCurve: Curves.ease,
+    ),
+    // PopoverContent, DropdownMenuContent, SelectContent and
+    // HoverCardContent: fade-in-0 zoom-in-95 slide-in-from-*-2 out of
+    // Radix's transform origin, over tw-animate's default 150ms on `ease`,
+    // and fade-out-0 zoom-out-95 back (the kit slides back as well)
+    popoverMotion: AdminOverlayMotion(
+      scale: 0.95,
+      slide: 8,
+      speed: MotionSpeed.fast,
+      curve: Curves.ease,
+      reverseCurve: Curves.ease,
+    ),
     arrowWidth: 10,
     arrowHeight: 5,
   ),
