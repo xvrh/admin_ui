@@ -228,10 +228,14 @@ overlay.tooltipPaddingY: 4
 overlay.tooltipText: caption
 overlay.tooltipDelay: 400ms
 overlay.modalMotion.scale: 1
+overlay.modalMotion.stretch: 1
 overlay.modalMotion.slide: 0
 overlay.modalMotion.speed: medium
+overlay.modalMotion.duration: null
 overlay.modalMotion.curve: null
 overlay.modalMotion.reverseCurve: null
+overlay.modalMotion.leaves: true
+overlay.popoverMotion: null
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: track
@@ -560,10 +564,14 @@ overlay.tooltipPaddingY: 4
 overlay.tooltipText: caption
 overlay.tooltipDelay: 400ms
 overlay.modalMotion.scale: 1
+overlay.modalMotion.stretch: 1
 overlay.modalMotion.slide: 0
 overlay.modalMotion.speed: medium
+overlay.modalMotion.duration: null
 overlay.modalMotion.curve: null
 overlay.modalMotion.reverseCurve: null
+overlay.modalMotion.leaves: true
+overlay.popoverMotion: null
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: joined
@@ -937,10 +945,21 @@ overlay.tooltipPaddingY: 6
 overlay.tooltipText: caption
 overlay.tooltipDelay: 0ms
 overlay.modalMotion.scale: 0.95
+overlay.modalMotion.stretch: 1
 overlay.modalMotion.slide: 0
 overlay.modalMotion.speed: medium
-overlay.modalMotion.curve: null
-overlay.modalMotion.reverseCurve: null
+overlay.modalMotion.duration: null
+overlay.modalMotion.curve: cubic(0.25, 0.1, 0.25, 1)
+overlay.modalMotion.reverseCurve: cubic(0.25, 0.1, 0.25, 1)
+overlay.modalMotion.leaves: true
+overlay.popoverMotion.scale: 0.95
+overlay.popoverMotion.stretch: 1
+overlay.popoverMotion.slide: 8
+overlay.popoverMotion.speed: fast
+overlay.popoverMotion.duration: null
+overlay.popoverMotion.curve: cubic(0.25, 0.1, 0.25, 1)
+overlay.popoverMotion.reverseCurve: cubic(0.25, 0.1, 0.25, 1)
+overlay.popoverMotion.leaves: true
 overlay.arrowWidth: 10
 overlay.arrowHeight: 5
 segmented.variant: track
@@ -1331,10 +1350,21 @@ overlay.tooltipPaddingY: 6
 overlay.tooltipText: body
 overlay.tooltipDelay: 400ms
 overlay.modalMotion.scale: 0.2
+overlay.modalMotion.stretch: 1
 overlay.modalMotion.slide: 0
 overlay.modalMotion.speed: medium
+overlay.modalMotion.duration: null
 overlay.modalMotion.curve: cubic(0.08, 0.82, 0.17, 1)
 overlay.modalMotion.reverseCurve: cubic(0.78, 0.14, 0.15, 0.86)
+overlay.modalMotion.leaves: true
+overlay.popoverMotion.scale: 1
+overlay.popoverMotion.stretch: 0.8
+overlay.popoverMotion.slide: 0
+overlay.popoverMotion.speed: medium
+overlay.popoverMotion.duration: null
+overlay.popoverMotion.curve: cubic(0.23, 1, 0.32, 1)
+overlay.popoverMotion.reverseCurve: cubic(0.755, 0.05, 0.855, 0.06)
+overlay.popoverMotion.leaves: true
 overlay.arrowWidth: 16
 overlay.arrowHeight: 8
 segmented.variant: track
@@ -1668,10 +1698,21 @@ overlay.tooltipPaddingY: 6
 overlay.tooltipText: caption
 overlay.tooltipDelay: 400ms
 overlay.modalMotion.scale: 0.85
+overlay.modalMotion.stretch: 1
 overlay.modalMotion.slide: 0
 overlay.modalMotion.speed: slow
+overlay.modalMotion.duration: null
 overlay.modalMotion.curve: null
 overlay.modalMotion.reverseCurve: cubic(0.8, 0, 0.78, 1)
+overlay.modalMotion.leaves: true
+overlay.popoverMotion.scale: 1
+overlay.popoverMotion.stretch: 1
+overlay.popoverMotion.slide: 10
+overlay.popoverMotion.speed: medium
+overlay.popoverMotion.duration: 400ms
+overlay.popoverMotion.curve: null
+overlay.popoverMotion.reverseCurve: null
+overlay.popoverMotion.leaves: false
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: track
@@ -2030,10 +2071,14 @@ overlay.tooltipPaddingY: 16
 overlay.tooltipText: body
 overlay.tooltipDelay: 400ms
 overlay.modalMotion.scale: 1
+overlay.modalMotion.stretch: 1
 overlay.modalMotion.slide: 24
 overlay.modalMotion.speed: slow
+overlay.modalMotion.duration: null
 overlay.modalMotion.curve: cubic(0, 0, 0.3, 1)
 overlay.modalMotion.reverseCurve: cubic(0.4, 0.14, 1, 1)
+overlay.modalMotion.leaves: true
+overlay.popoverMotion: null
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: joined

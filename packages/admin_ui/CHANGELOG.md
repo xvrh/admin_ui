@@ -2,6 +2,27 @@
 
 ## 0.2.0
 
+- A theme says how a popover arrives and leaves:
+  `AdminOverlayStyle.popoverMotion`, an `AdminOverlayMotion`, null by
+  default. A `Popover` plays it on its content, and so does every menu,
+  select, combobox, picker and hover card: the content fades, grows from
+  `scale` out of the point on its edge that faces its anchor, and slides
+  `slide` away from the anchor into place. With none a popover is there,
+  and gone, at once, as every popover was until now and as it still is
+  under reduced motion.
+- A popover asked to close is closed at once to its `PopoverController`,
+  its trigger and `onOpenChanged`. Where the theme's motion plays an exit,
+  its content stays on screen until that has played, taking no pointer and
+  no focus and left out of semantics; opening it again in that time brings
+  it back from where it had got to. Escape pressed on the trigger while it
+  leaves is taken and does nothing.
+- `AdminOverlayMotion` has three more members. `stretch` unfolds an overlay
+  from a share of its height, its width kept. `duration` is a duration of
+  its own where none of the theme's three is it, read through
+  `durationIn(motion)`; reduced motion zeroes it with the rest. `leaves`,
+  false, has a popover gone at once where the motion has an entrance and no
+  exit. A modal takes the first two, and plays its arrival back whatever
+  `leaves` says.
 - An overlay that plays its arrival back as it leaves is on the theme's
   exit curve as time runs: a modal, a side sheet, a toast and a modal on a
   `ModalAnchor`. Each handed `motion.exit` to its animation as a
@@ -531,6 +552,21 @@
 
 ### Looks
 
+- A popover arrives and leaves as each reference theme's does, in the
+  three themes whose system moves it; it was there, and gone, at once in
+  every theme. This is every menu, select, combobox, date picker, hover
+  card and field popover. Iris, Material and Carbon keep that: Carbon shows
+  its menus and list boxes with no transition, and Flutter's Material menu
+  unfolds in a way this motion does not draw. At rest nothing moves.
+  - shadcn: it fades in from 95%, sliding 8 from its anchor's side, over
+    150ms on CSS `ease`, and plays that back as it leaves.
+  - Ant: it fades in unfolding from 80% of its height, from the edge by its
+    trigger, over 200ms on `motionEaseOutQuint`, and folds away on
+    `motionEaseInQuint`.
+  - Fluent: it fades in sliding 10 from its anchor's side, over 400ms on
+    `curveDecelerateMid`, and is gone at once.
+- shadcn's dialog eases in and out on CSS `ease`, tw-animate's default,
+  where it took the theme's `enter` and `exit` curves.
 - A modal, a side sheet, a toast and a modal on a `ModalAnchor` start to
   leave slowly and are fastest as they go, in every theme, as each theme's
   exit curve says; they left fast and slowed to a stop. How long they take

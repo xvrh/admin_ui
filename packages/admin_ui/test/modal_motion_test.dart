@@ -11,8 +11,13 @@ const _expected = {
   'Iris': AdminOverlayMotion(),
   // Flutter's M3 dialog fades
   'Material': AdminOverlayMotion(),
-  // DialogContent: fade-in-0 zoom-in-95 over duration-200
-  'shadcn': AdminOverlayMotion(scale: 0.95),
+  // DialogContent: fade-in-0 zoom-in-95 over duration-200, on tw-animate's
+  // default easing, CSS ease
+  'shadcn': AdminOverlayMotion(
+    scale: 0.95,
+    curve: Curves.ease,
+    reverseCurve: Curves.ease,
+  ),
   // antZoomIn from scale(0.2) over motionDurationMid, on motionEaseOutCirc
   // and out on motionEaseInOutCirc
   'Ant': AdminOverlayMotion(
@@ -124,7 +129,14 @@ void main() {
       final shadcn = _expected['shadcn']!;
       expect(plain.copyWith(), plain);
       expect(plain.copyWith().hashCode, plain.hashCode);
-      expect(plain.copyWith(scale: 0.95), shadcn);
+      expect(
+        plain.copyWith(
+          scale: 0.95,
+          curve: Curves.ease,
+          reverseCurve: Curves.ease,
+        ),
+        shadcn,
+      );
       expect(
         plain.copyWith(
           slide: 24,
@@ -156,7 +168,7 @@ void main() {
       expect(mid.curve, carbon.curve);
       final near = AdminOverlayMotion.lerp(shadcn, carbon, 0.4);
       expect(near.speed, MotionSpeed.medium);
-      expect(near.curve, isNull);
+      expect(near.curve, shadcn.curve);
 
       expect('$plain', 'AdminOverlayMotion(a fade, medium)');
       expect('$shadcn', contains('from scale 0.95'));
@@ -336,6 +348,76 @@ void main() {
       expect(find.byType(Modal), findsOneWidget);
       expect(_card(tester).center, rest.center);
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('a motion\'s stretch, duration and leaves, on a modal', () {
+    Future<void> open(WidgetTester tester, AdminOverlayMotion motion) async {
+      await tester.pumpWidget(
+        _host(
+          AdminTokens.from(
+            palette: irisPalette,
+            overlay: AdminOverlayStyle(modalMotion: motion),
+          ),
+        ),
+      );
+      await _open(tester);
+    }
+
+    testWidgets('unfolds from its top by the motion\'s stretch', (
+      tester,
+    ) async {
+      await open(
+        tester,
+        const AdminOverlayMotion(stretch: 0.5, curve: Curves.linear),
+      );
+      final first = _card(tester);
+      await tester.pumpAndSettle();
+      final rest = _card(tester);
+      expect(first.top, rest.top);
+      expect(first.width, rest.width);
+      expect(first.height, closeTo(rest.height / 2, 0.01));
+    });
+
+    testWidgets('takes the motion\'s own duration', (tester) async {
+      await open(
+        tester,
+        const AdminOverlayMotion(
+          scale: 0.5,
+          duration: Duration(milliseconds: 400),
+          curve: Curves.linear,
+        ),
+      );
+      final first = _card(tester);
+      await tester.pump(const Duration(milliseconds: 200));
+      final mid = _card(tester);
+      await tester.pumpAndSettle();
+      final rest = _card(tester);
+      expect(first.width, closeTo(rest.width / 2, 0.01));
+      expect(mid.width, closeTo(rest.width * 0.75, 0.01));
+    });
+
+    testWidgets('plays its arrival back whatever the motion\'s leaves says', (
+      tester,
+    ) async {
+      await open(
+        tester,
+        const AdminOverlayMotion(
+          scale: 0.5,
+          duration: Duration(milliseconds: 200),
+          curve: Curves.linear,
+          reverseCurve: Curves.linear,
+          leaves: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final rest = _card(tester);
+      await tester.tap(find.byType(IconAction));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(_card(tester).width, closeTo(rest.width * 0.75, 0.01));
+      await tester.pumpAndSettle();
+      expect(find.byType(Modal), findsNothing);
     });
   });
 }

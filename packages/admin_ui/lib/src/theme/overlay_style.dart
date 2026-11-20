@@ -11,8 +11,13 @@ import 'package:flutter/foundation.dart';
 import 'motion.dart';
 
 /// How an overlay arrives and leaves. It always fades; it can also grow
-/// from a smaller [scale] and travel a [slide] into place. Leaving plays the
-/// same move back.
+/// from a smaller [scale], unfold from a shorter [stretch] and travel a
+/// [slide] into place. Leaving plays the same move back, unless a popover's
+/// does not [leaves] at all.
+///
+/// A modal moves about its own middle and slides down from above. A popover
+/// moves from its anchor: it grows out of the point on its edge that faces
+/// the anchor, and slides away from the anchor into place.
 ///
 /// The default is a fade alone over [AdminMotion.medium], on the motion's
 /// [AdminMotion.enter] and [AdminMotion.exit] curves.
@@ -22,13 +27,25 @@ class AdminOverlayMotion {
   /// `zoom-in-95`, 0.85 in Fluent, 0.2 for Ant's zoom. 1 does not scale.
   final double scale;
 
-  /// How far above its place it starts, in logical pixels, sliding down as
-  /// it fades in: Carbon's modal travels 24. Zero does not slide.
+  /// The share of its height it unfolds from as it fades in, its width
+  /// kept: Ant's `slide-up` starts a menu at 0.8 of its height. It unfolds
+  /// from its top edge, or from its bottom edge where a popover opens above
+  /// its anchor. 1 does not stretch.
+  final double stretch;
+
+  /// How far from its place it starts, in logical pixels, sliding in as it
+  /// fades: a modal from above (Carbon's travels 24), a popover from the
+  /// side of its anchor (8 in shadcn, 10 in Fluent). Zero does not slide.
   final double slide;
 
   /// Which of the motion's durations the move takes. Reduced motion zeroes
   /// it with the rest.
   final MotionSpeed speed;
+
+  /// How long the move takes where none of the motion's three durations is
+  /// it: Fluent's popover takes 400ms. Null is the duration [speed] names.
+  /// Reduced motion zeroes it too.
+  final Duration? duration;
 
   /// The curve it arrives on; null is [AdminMotion.enter].
   final Curve? curve;
@@ -38,37 +55,59 @@ class AdminOverlayMotion {
   /// for the animation it plays back (see [AdminMotion.exit]).
   final Curve? reverseCurve;
 
+  /// Whether a popover plays the move back as it leaves. False, and it is
+  /// gone at once: Fluent's popover and menu have an entrance and no exit.
+  /// A modal plays its arrival back whatever this says, as its route does.
+  final bool leaves;
+
   const AdminOverlayMotion({
     this.scale = 1,
+    this.stretch = 1,
     this.slide = 0,
     this.speed = MotionSpeed.medium,
+    this.duration,
     this.curve,
     this.reverseCurve,
+    this.leaves = true,
   }) : assert(scale > 0 && scale <= 1),
+       assert(stretch > 0 && stretch <= 1),
        assert(slide >= 0);
 
   /// Whether the overlay moves as well as fades.
-  bool get moves => scale != 1 || slide != 0;
+  bool get moves => scale != 1 || stretch != 1 || slide != 0;
+
+  /// How long the move takes under [motion]: its own [duration], or the one
+  /// of the motion's three that [speed] names. A caller under reduced motion
+  /// takes zero whatever this says (`context.motion` zeroes the three, not
+  /// an authored [duration]).
+  Duration durationIn(AdminMotion motion) =>
+      duration ?? motion.durationOf(speed);
 
   /// A copy with the given members replaced. A null argument keeps the
-  /// current value, so [curve] and [reverseCurve] cannot be cleared here;
-  /// build a new motion for that.
+  /// current value, so [duration], [curve] and [reverseCurve] cannot be
+  /// cleared here; build a new motion for that.
   AdminOverlayMotion copyWith({
     double? scale,
+    double? stretch,
     double? slide,
     MotionSpeed? speed,
+    Duration? duration,
     Curve? curve,
     Curve? reverseCurve,
+    bool? leaves,
   }) => AdminOverlayMotion(
     scale: scale ?? this.scale,
+    stretch: stretch ?? this.stretch,
     slide: slide ?? this.slide,
     speed: speed ?? this.speed,
+    duration: duration ?? this.duration,
     curve: curve ?? this.curve,
     reverseCurve: reverseCurve ?? this.reverseCurve,
+    leaves: leaves ?? this.leaves,
   );
 
-  /// Interpolates [scale] and [slide]; the speed and the curves come from
-  /// the side [t] is nearer.
+  /// Interpolates [scale], [stretch] and [slide]; the speed, the duration,
+  /// the curves and whether it leaves come from the side [t] is nearer.
   static AdminOverlayMotion lerp(
     AdminOverlayMotion a,
     AdminOverlayMotion b,
@@ -79,10 +118,13 @@ class AdminOverlayMotion {
     final near = t < 0.5 ? a : b;
     return AdminOverlayMotion(
       scale: lerpDouble(a.scale, b.scale, t)!,
+      stretch: lerpDouble(a.stretch, b.stretch, t)!,
       slide: lerpDouble(a.slide, b.slide, t)!,
       speed: near.speed,
+      duration: near.duration,
       curve: near.curve,
       reverseCurve: near.reverseCurve,
+      leaves: near.leaves,
     );
   }
 
@@ -90,21 +132,35 @@ class AdminOverlayMotion {
   bool operator ==(Object other) =>
       other is AdminOverlayMotion &&
       other.scale == scale &&
+      other.stretch == stretch &&
       other.slide == slide &&
       other.speed == speed &&
+      other.duration == duration &&
       other.curve == curve &&
-      other.reverseCurve == reverseCurve;
+      other.reverseCurve == reverseCurve &&
+      other.leaves == leaves;
 
   @override
-  int get hashCode => Object.hash(scale, slide, speed, curve, reverseCurve);
+  int get hashCode => Object.hash(
+    scale,
+    stretch,
+    slide,
+    speed,
+    duration,
+    curve,
+    reverseCurve,
+    leaves,
+  );
 
   @override
   String toString() =>
       'AdminOverlayMotion(a fade'
       '${scale == 1 ? '' : ', from scale $scale'}'
+      '${stretch == 1 ? '' : ', unfolding from $stretch'}'
       '${slide == 0 ? '' : ', sliding $slide'}'
-      ', ${speed.name}'
-      '${curve == null && reverseCurve == null ? '' : ', its own curves'})';
+      ', ${duration == null ? speed.name : '${duration!.inMilliseconds}ms'}'
+      '${curve == null && reverseCurve == null ? '' : ', its own curves'}'
+      '${leaves ? '' : ', gone at once'})';
 }
 
 /// The text a tooltip is set in; see [AdminOverlayStyle.tooltipText]. The
@@ -121,12 +177,14 @@ enum TooltipText {
 
 /// The anatomy of the floating overlays: a tooltip's corner, padding, text
 /// and delay, whether it points at its target with an arrow, the width its
-/// text wraps at, and the size of the arrow a tooltip or a popover draws.
+/// text wraps at, the size of the arrow a tooltip or a popover draws, and
+/// how a modal and a popover arrive and leave.
 /// Provided via [AdminTokens]; read through `context.overlayStyle`.
 ///
 /// The defaults are the kit's own: a plain chip at the small radius, padded
-/// 8 by 4 around caption text, shown after 400ms, that wraps at 280; and a
-/// 12×6 arrow where a popover asks for one.
+/// 8 by 4 around caption text, shown after 400ms, that wraps at 280; a
+/// 12×6 arrow where a popover asks for one; a modal that fades; and a
+/// popover that is there, and gone, at once.
 @immutable
 class AdminOverlayStyle {
   /// Whether a tooltip points at its target with an arrow unless it says
@@ -161,6 +219,12 @@ class AdminOverlayStyle {
   /// fades with it.
   final AdminOverlayMotion modalMotion;
 
+  /// How a `Popover` arrives and leaves, and so every menu, select, picker
+  /// and hover card: shadcn's fades in from 95%, 8 off its anchor; Ant's
+  /// unfolds from 80% of its height; Fluent's slides in 10 and is gone at
+  /// once. Null, and it appears and vanishes at once, with no fade.
+  final AdminOverlayMotion? popoverMotion;
+
   /// The arrow's base, along the edge it stands on.
   final double arrowWidth;
 
@@ -178,12 +242,15 @@ class AdminOverlayStyle {
     this.tooltipText = TooltipText.caption,
     this.tooltipDelay = const Duration(milliseconds: 400),
     this.modalMotion = const AdminOverlayMotion(),
+    this.popoverMotion,
     this.arrowWidth = 12,
     this.arrowHeight = 6,
   }) : assert(tooltipRadius == null || tooltipRadius >= 0),
        assert(tooltipPaddingX >= 0 && tooltipPaddingY >= 0);
 
-  /// A copy with the given members replaced.
+  /// A copy with the given members replaced. A null argument keeps the
+  /// current value, so [tooltipRadius] and [popoverMotion] cannot be
+  /// cleared here; build a new style for that.
   AdminOverlayStyle copyWith({
     bool? tooltipArrow,
     double? tooltipMaxWidth,
@@ -193,6 +260,7 @@ class AdminOverlayStyle {
     TooltipText? tooltipText,
     Duration? tooltipDelay,
     AdminOverlayMotion? modalMotion,
+    AdminOverlayMotion? popoverMotion,
     double? arrowWidth,
     double? arrowHeight,
   }) => AdminOverlayStyle(
@@ -204,12 +272,14 @@ class AdminOverlayStyle {
     tooltipText: tooltipText ?? this.tooltipText,
     tooltipDelay: tooltipDelay ?? this.tooltipDelay,
     modalMotion: modalMotion ?? this.modalMotion,
+    popoverMotion: popoverMotion ?? this.popoverMotion,
     arrowWidth: arrowWidth ?? this.arrowWidth,
     arrowHeight: arrowHeight ?? this.arrowHeight,
   );
 
   /// Interpolates the lengths (a [tooltipRadius] only where both sides
-  /// author one); [tooltipArrow], [tooltipText] and [tooltipDelay] come from
+  /// author one) and the motions (a [popoverMotion] only where both sides
+  /// have one); [tooltipArrow], [tooltipText] and [tooltipDelay] come from
   /// the side [t] is nearer.
   static AdminOverlayStyle lerp(
     AdminOverlayStyle a,
@@ -229,6 +299,9 @@ class AdminOverlayStyle {
       tooltipText: near.tooltipText,
       tooltipDelay: near.tooltipDelay,
       modalMotion: AdminOverlayMotion.lerp(a.modalMotion, b.modalMotion, t),
+      popoverMotion: a.popoverMotion != null && b.popoverMotion != null
+          ? AdminOverlayMotion.lerp(a.popoverMotion!, b.popoverMotion!, t)
+          : near.popoverMotion,
       arrowWidth: d(a.arrowWidth, b.arrowWidth),
       arrowHeight: d(a.arrowHeight, b.arrowHeight),
     );
@@ -245,6 +318,7 @@ class AdminOverlayStyle {
       other.tooltipText == tooltipText &&
       other.tooltipDelay == tooltipDelay &&
       other.modalMotion == modalMotion &&
+      other.popoverMotion == popoverMotion &&
       other.arrowWidth == arrowWidth &&
       other.arrowHeight == arrowHeight;
 
@@ -258,6 +332,7 @@ class AdminOverlayStyle {
     tooltipText,
     tooltipDelay,
     modalMotion,
+    popoverMotion,
     arrowWidth,
     arrowHeight,
   );
@@ -269,5 +344,6 @@ class AdminOverlayStyle {
       '${tooltipRadius == null ? 'the small radius' : 'radius $tooltipRadius'}, '
       'padding $tooltipPaddingX×$tooltipPaddingY, ${tooltipText.name} text, '
       'after ${tooltipDelay.inMilliseconds}ms; arrow '
-      '$arrowWidth×$arrowHeight; modals $modalMotion)';
+      '$arrowWidth×$arrowHeight; modals $modalMotion; popovers '
+      '${popoverMotion ?? 'at once'})';
 }
