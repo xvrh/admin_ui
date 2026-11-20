@@ -2,6 +2,21 @@
 
 ## 0.2.0
 
+- `SingleReferenceField` edits one related record: a `Cell<K?>` holding
+  its id, or null for none. With none it shows the link button; with one,
+  that record's row alone, so nothing adds a second. The row carries a
+  Replace button, which opens the picker with the record marked, and
+  another pick takes its place; Escape, or the pick, hands focus back to
+  the button. Remove sets the cell to null. A `ReferenceField` linked a
+  list only, and one record was a list of one under a link button that
+  would add a second.
+- `ReferenceField` takes `maxItems`, the most records it links (its add
+  button goes at that many, until a row is removed), and `seed`, the
+  records the host already holds, which show at once and are not asked of
+  `resolve`. `SingleReferenceField` takes a `seed` of one.
+- `CircleButton` takes a `focusNode`, and `expanded` for one that opens a
+  popover. `FieldsMessages.replaceReference` names the Replace button, in
+  English, French and Arabic.
 - A date field shows its time on its locale's own clock. `DateBody` with a
   time, and so `DateField` and `OptionalDateField`, wrote a 24-hour "14:30"
   in every locale; it now writes what the locale does, as a chart's time
@@ -588,6 +603,13 @@
 
 ### Looks
 
+- A `ReferenceBody` with `maxItems: 1` shows a Replace button on its chosen
+  row, before the Remove one: a 22px disc with a swap glyph. Changing the
+  record took removing it and linking again.
+- A reference picker takes the room there is beside the row or the button
+  that opened it, and scrolls its results there, as a menu, a select's list
+  and a combobox do. It kept its 400px where it had less, and stood over
+  the field that opened it.
 - A stock Material widget that takes the scheme's secondary container (a
   `FilledButton.tonal`, a selected `FilterChip`, a `NavigationBar`'s
   indicator) takes the palette's `softFill` under `onSoft`, as the kit's own

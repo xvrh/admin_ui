@@ -158,8 +158,24 @@ class ReferenceFieldDemo extends StatelessWidget {
           'Empty — the link trigger opens a search picker',
           const _Live(label: 'Featured article', maxItems: 1),
         ),
+        // Second on the page, so its picker has the room to open under it.
         DemoVariant(
-          'Seeded — host already had the entity (no skeleton)',
+          'Replacing — the row\'s Replace button opens the picker under it, '
+          'the chosen one marked',
+          PinnedOpen(
+            makeRoom: true,
+            child: _Live(
+              label: 'Featured article',
+              maxItems: 1,
+              initial: const [3],
+              seed: [_articles[2]],
+              searchDelay: Duration.zero,
+            ),
+          ),
+        ),
+        DemoVariant(
+          'Seeded — host already had the entity (no skeleton); the row '
+          'carries Replace and Remove, and no second link',
           _Live(
             label: 'Featured article',
             maxItems: 1,

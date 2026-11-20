@@ -98,11 +98,19 @@ class CircleButton extends StatelessWidget {
   final VoidCallback onTap;
   final String label;
 
+  /// Whether the popover the button opens is showing, announced as its
+  /// expanded state; null for a button that opens none.
+  final bool? expanded;
+
+  final FocusNode? focusNode;
+
   const CircleButton({
     super.key,
     required this.icon,
     required this.onTap,
     required this.label,
+    this.expanded,
+    this.focusNode,
   });
 
   static const _disc = 22.0;
@@ -116,6 +124,8 @@ class CircleButton extends StatelessWidget {
       child: Tappable.states(
         onTap: onTap,
         semanticLabel: label,
+        expanded: expanded,
+        focusNode: focusNode,
         excludeSemantics: true,
         showFocusRing: false,
         builder: (context, states) {

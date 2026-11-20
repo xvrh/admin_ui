@@ -1591,6 +1591,12 @@ whole, use `ValueFormController`:
   enums, lists, a `map(field)` for a `KeyValueField`, asset references
   and record lists. The controller tracks each the same way, so a map
   field is dirty, discarded and saved with the rest.
+- A related record is its id. A `ReferenceField` links a list of them,
+  capped by `maxItems`, and a `SingleReferenceField` holds one in a
+  nullable cell (`textOrNull`, `numberOrNull`): the record's row with a
+  Replace and a Remove button, or the link button, never both. Both
+  resolve ids to records through `resolve`, find them through `search`,
+  and take the records the host already holds as `seed`.
 
 Put the form in a `ValueForm` of the controller. It shows each field's
 message under it, keeps every field's message line so a message appearing

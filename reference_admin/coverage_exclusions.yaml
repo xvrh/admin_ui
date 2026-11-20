@@ -456,6 +456,7 @@ not_needed:
     - PasswordField
     - ProgressBar
     - ProgressRing
+    - ReferenceField
     - Repeater
     - SidebarAccount
     - StatusDot

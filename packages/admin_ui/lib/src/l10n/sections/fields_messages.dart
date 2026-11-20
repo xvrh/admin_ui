@@ -151,6 +151,10 @@ abstract class FieldsMessages extends AdminMessages {
   /// A linked record that no longer exists.
   String get unavailable;
 
+  /// The button on a single reference's row that opens the picker to choose
+  /// another record in its place.
+  String get replaceReference;
+
   /// The prompt of a reference picker before anything is typed.
   String get typeToSearch;
 
@@ -468,6 +472,9 @@ class FieldsMessagesEn extends FieldsMessages {
 
   @override
   String get unavailable => 'Unavailable';
+
+  @override
+  String get replaceReference => 'Replace';
 
   @override
   String get typeToSearch => 'Type to search…';
@@ -809,6 +816,9 @@ class FieldsMessagesFr extends FieldsMessages {
   String get unavailable => 'Indisponible';
 
   @override
+  String get replaceReference => 'Remplacer';
+
+  @override
   String get typeToSearch => 'Tapez pour rechercher…';
 
   @override
@@ -1145,6 +1155,9 @@ class FieldsMessagesAr extends FieldsMessages {
 
   @override
   String get unavailable => 'غير متاح';
+
+  @override
+  String get replaceReference => 'استبدال';
 
   @override
   String get typeToSearch => 'اكتب للبحث…';
