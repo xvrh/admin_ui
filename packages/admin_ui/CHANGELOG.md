@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- A date field shows its time on its locale's own clock. `DateBody` with a
+  time, and so `DateField` and `OptionalDateField`, wrote a 24-hour "14:30"
+  in every locale; it now writes what the locale does, as a chart's time
+  axis already did: "Jun 18, 2026 2:30 PM" in English, Arabic's own day
+  period in Arabic. A locale that writes a 24-hour clock (en_GB, French,
+  German) reads as before. This changes what an English app's field shows:
+  one that wants "14:30" runs in, or passes the field as `locale`, a locale
+  that writes it. The editor's hour cell stays 00 to 23 in every locale.
 - `ChartCard` has an error state: `error` shows an `ErrorState` in the
   chart's place, the localized "Couldn't load" over the error in words
   (`ErrorTextScope.describe`), with a Retry button where `onRetry` is given

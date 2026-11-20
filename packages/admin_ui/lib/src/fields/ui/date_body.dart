@@ -44,11 +44,13 @@ enum DateEditorStyle { segmented, masked, inline }
 /// body sits inside a [FieldShell] (a real `DateTime`) or one lane of a
 /// translatable field.
 ///
-/// A clean display of the value. Pressing it opens a popover holding a strict
-/// segmented editor — numeric `DD / MM / YYYY` (and `HH : MM`), each cell
-/// bounded to its range so only valid parts can be entered, and blank until
-/// a value is set — above the calendar. Opened from the keyboard, focus lands
-/// on the calendar's day; a time-only editor takes it on its first cell.
+/// A clean display of the value, written as its locale writes a date and a
+/// time of day: "Jun 18, 2026 2:30 PM" in en_US, "18 Jun 2026 14:30" in en_GB.
+/// Pressing it opens a popover holding a strict segmented editor — numeric
+/// `DD / MM / YYYY` (and `HH : MM`, on a 24-hour clock in every locale), each
+/// cell bounded to its range so only valid parts can be entered, and blank
+/// until a value is set — above the calendar. Opened from the keyboard, focus
+/// lands on the calendar's day; a time-only editor takes it on its first cell.
 ///
 /// A null [onChanged] makes it read-only: the value stays at full contrast
 /// and focusable, but nothing opens and no chevron or clear shows. A disabled
@@ -69,8 +71,11 @@ class DateBody extends StatelessWidget {
 
   /// Overrides the locale for the displayed value and the calendar's
   /// month/weekday labels (e.g. `'fr'`, `'ja'`). Null follows the ambient
-  /// [Localizations.localeOf]. The editor cells stay ISO-numeric regardless,
-  /// so strict entry is locale-independent.
+  /// [Localizations.localeOf]. The displayed time is on the locale's own
+  /// clock, 12-hour with its day period where the locale writes one, so an
+  /// English app that wants "14:30" passes one that writes it, `'en_GB'`.
+  /// The editor cells stay numeric regardless, their hour from 00 to 23, so
+  /// strict entry is locale-independent.
   final String? locale;
 
   /// Which keyboard editor the popover shows above the calendar.
@@ -119,16 +124,17 @@ class DateBody extends StatelessWidget {
       locale ?? Localizations.maybeLocaleOf(context)?.toString();
 
   // Locale-aware skeletons — the part order localizes too (en: "Jun 18, 2026",
-  // fr: "18 juin 2026", ja: "2026年6月18日") — in the digits of the kit's
-  // numbers.
+  // fr: "18 juin 2026", ja: "2026年6月18日"), and so does the clock (en:
+  // "2:30 PM", fr: "14:30"), as a chart's time axis writes it — in the digits
+  // of the kit's numbers.
   DateFormat _format(BuildContext context, String? loc) {
     final formats = locale == null
         ? context.adminFormats
         : AdminFormats(locale!);
     return formats.dateFormat(switch (granularity) {
       DateGranularity.date => DateFormat.yMMMd(loc),
-      DateGranularity.dateTime => DateFormat.yMMMd(loc).add_Hm(),
-      DateGranularity.time => DateFormat.Hm(loc),
+      DateGranularity.dateTime => DateFormat.yMMMd(loc).add_jm(),
+      DateGranularity.time => DateFormat.jm(loc),
     });
   }
 
