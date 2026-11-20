@@ -326,7 +326,13 @@ final materialTheme = AdminTheme.from(
   ),
   // the plain tooltip: no arrow, 200dp at most (PlainTooltipMaxWidth), a
   // 4dp corner, 8×4 around bodySmall
-  overlay: const AdminOverlayStyle(tooltipMaxWidth: 200, tooltipRadius: 4),
+  // a dialog and a menu: a container at elevation 6 and 3 with no outline
+  overlay: const AdminOverlayStyle(
+    tooltipMaxWidth: 200,
+    tooltipRadius: 4,
+    modalOutline: false,
+    popoverOutline: false,
+  ),
   // the segmented button: outlined segments, the selected one in
   // secondaryContainer under a check, labelLarge
   segmented: const AdminSegmentedStyle(

@@ -510,8 +510,8 @@ class ListboxOption extends StatelessWidget {
 
   /// The inset a row's content keeps from its highlight's edge, so under a
   /// [Listbox]'s default padding its text lines up with a field trigger's —
-  /// the popover's hairline border is painted over its content, not around
-  /// it.
+  /// the popover's hairline border, where it has one, is painted over its
+  /// content, not around it.
   static double contentInset(BuildContext context) =>
       math.max(0, context.sizes.fieldPaddingX - AdminSpacing.xs);
 

@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- A theme says whether an overlay is ringed in a hairline as well as lifted
+  on its shadow: `AdminOverlayStyle.modalOutline` and `popoverOutline`, both
+  true by default, read through `modalEdge(palette)` and
+  `popoverEdge(palette)`. A modal's card, the command palette, the asset
+  picker and a side sheet's inner edge take the first. A popover's surface
+  and its arrow take the second, and so every menu, select, picker and hover
+  card. The stock Material dialog, popup menu, menu anchor and dropdown menu
+  take them from `buildAppTheme`. A dark palette always rings both.
 - A theme says how a popover arrives and leaves:
   `AdminOverlayStyle.popoverMotion`, an `AdminOverlayMotion`, null by
   default. A `Popover` plays it on its content, and so does every menu,
@@ -552,6 +560,16 @@
 
 ### Looks
 
+- An overlay stands on its shadow alone where the theme's reference system
+  draws it so, in light mode; every overlay was ringed in a hairline of the
+  palette's `border` in every theme. Iris and shadcn keep the hairline, and
+  so does dark mode in every theme: a shadow does not read on a dark page.
+  Nothing moves, since the hairline was painted over the surface.
+  - Material, Ant and Fluent: a modal, the command palette, the asset
+    picker, a side sheet's inner edge, and every menu, select, picker and
+    hover card lose it. The stock Material dialog and menus do too.
+  - Carbon: every menu, select, picker and hover card loses it. A modal
+    keeps it: Carbon's modal container is bordered in `$border-subtle-01`.
 - A popover arrives and leaves as each reference theme's does, in the
   three themes whose system moves it; it was there, and gone, at once in
   every theme. This is every menu, select, combobox, date picker, hover

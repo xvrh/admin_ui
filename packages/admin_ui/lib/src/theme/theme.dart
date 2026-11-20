@@ -52,7 +52,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
   );
   final menuShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(radii.radiusMenu),
-    side: BorderSide(color: palette.border),
+    side: tokens.overlay.popoverEdge(palette),
   );
   final buttonShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(radii.button(ControlSize.medium)),
@@ -211,7 +211,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
       surfaceTintColor: const Color(0x00000000),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radii.radiusDialog),
-        side: BorderSide(color: palette.border),
+        side: tokens.overlay.modalEdge(palette),
       ),
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(

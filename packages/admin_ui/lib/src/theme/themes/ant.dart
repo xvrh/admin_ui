@@ -372,6 +372,10 @@ final antTheme = AdminTheme.from(
       curve: Cubic(0.23, 1, 0.32, 1),
       reverseCurve: Cubic(0.755, 0.05, 0.855, 0.06),
     ),
+    // a Modal's content is `border: 0` under boxShadow, and a Dropdown's,
+    // a Select's and a Popover's stand on boxShadowSecondary alone
+    modalOutline: false,
+    popoverOutline: false,
     arrowWidth: 16,
     arrowHeight: 8,
   ),

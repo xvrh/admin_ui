@@ -541,7 +541,8 @@ enum ModalSize {
   final double? width;
 }
 
-/// The dialog surface — an elevated, rounded, hairline-bordered card with an
+/// The dialog surface — an elevated, rounded card, ringed in a hairline
+/// where the theme rings a modal (`AdminOverlayStyle.modalOutline`), with an
 /// optional [title] and [description], a close affordance while [onDismiss]
 /// is set, a [body] (or convenience [message]) and an end-aligned [actions]
 /// footer. Render it via [showModal]; it's a plain widget so the catalog can
@@ -817,7 +818,7 @@ class _ModalState extends State<Modal> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: corners,
-            side: BorderSide(color: colors.border),
+            side: context.overlayStyle.modalEdge(colors),
           ),
           clipBehavior: Clip.antiAlias,
           child: ConstrainedBox(

@@ -343,6 +343,10 @@ final fluentTheme = AdminTheme.from(
       duration: Duration(milliseconds: 400),
       leaves: false,
     ),
+    // DialogSurface, PopoverSurface and MenuPopover: a 1px
+    // colorTransparentStroke border, which shows in forced colours only
+    modalOutline: false,
+    popoverOutline: false,
   ),
   // the Windows Community Toolkit's Segmented: an outlined track, the
   // selected item raised in ControlFillColorDefault over a short accent

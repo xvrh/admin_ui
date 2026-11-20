@@ -236,6 +236,8 @@ overlay.modalMotion.curve: null
 overlay.modalMotion.reverseCurve: null
 overlay.modalMotion.leaves: true
 overlay.popoverMotion: null
+overlay.modalOutline: true
+overlay.popoverOutline: true
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: track
@@ -572,6 +574,8 @@ overlay.modalMotion.curve: null
 overlay.modalMotion.reverseCurve: null
 overlay.modalMotion.leaves: true
 overlay.popoverMotion: null
+overlay.modalOutline: false
+overlay.popoverOutline: false
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: joined
@@ -960,6 +964,8 @@ overlay.popoverMotion.duration: null
 overlay.popoverMotion.curve: cubic(0.25, 0.1, 0.25, 1)
 overlay.popoverMotion.reverseCurve: cubic(0.25, 0.1, 0.25, 1)
 overlay.popoverMotion.leaves: true
+overlay.modalOutline: true
+overlay.popoverOutline: true
 overlay.arrowWidth: 10
 overlay.arrowHeight: 5
 segmented.variant: track
@@ -1365,6 +1371,8 @@ overlay.popoverMotion.duration: null
 overlay.popoverMotion.curve: cubic(0.23, 1, 0.32, 1)
 overlay.popoverMotion.reverseCurve: cubic(0.755, 0.05, 0.855, 0.06)
 overlay.popoverMotion.leaves: true
+overlay.modalOutline: false
+overlay.popoverOutline: false
 overlay.arrowWidth: 16
 overlay.arrowHeight: 8
 segmented.variant: track
@@ -1713,6 +1721,8 @@ overlay.popoverMotion.duration: 400ms
 overlay.popoverMotion.curve: null
 overlay.popoverMotion.reverseCurve: null
 overlay.popoverMotion.leaves: false
+overlay.modalOutline: false
+overlay.popoverOutline: false
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: track
@@ -2079,6 +2089,8 @@ overlay.modalMotion.curve: cubic(0, 0, 0.3, 1)
 overlay.modalMotion.reverseCurve: cubic(0.4, 0.14, 1, 1)
 overlay.modalMotion.leaves: true
 overlay.popoverMotion: null
+overlay.modalOutline: true
+overlay.popoverOutline: false
 overlay.arrowWidth: 12
 overlay.arrowHeight: 6
 segmented.variant: joined

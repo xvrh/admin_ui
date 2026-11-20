@@ -362,6 +362,10 @@ final carbonTheme = AdminTheme.from(
       curve: Cubic(0, 0, 0.3, 1),
       reverseCurve: Cubic(0.4, 0.14, 1, 1),
     ),
+    // a modal's container is bordered in $border-subtle-01; a menu, an
+    // overflow menu, a list box's menu and a popover stand on their
+    // shadow, and take an outline only where asked (`border`)
+    popoverOutline: false,
   ),
   // the high-contrast content switcher: a $border-inverse outline, the
   // selected switch in $layer-selected-inverse under $text-inverse, rounded

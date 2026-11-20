@@ -8,9 +8,10 @@ import 'package:material_ui/material_ui.dart';
 import '../../theme/tokens.dart';
 import 'popover.dart';
 
-/// The floating card a popover menu sits in — the elevated, rounded, clipped,
-/// hairline-bordered `surface` card shared by the action [Menu] and the field
-/// dropdowns, rounded to the theme's menu radius.
+/// The floating card a popover menu sits in — the elevated, rounded, clipped
+/// `surface` card shared by the action [Menu] and the field dropdowns,
+/// rounded to the theme's menu radius and ringed in a hairline where the
+/// theme rings a popover (`AdminOverlayStyle.popoverOutline`).
 ///
 /// A popover loosens to the whole screen, so the content must declare its own
 /// width. Two modes:
@@ -21,8 +22,8 @@ import 'popover.dart';
 ///
 /// In a [Popover] with `showArrow`, the surface draws the arrow on its edge
 /// that faces the anchor, where [Popover.placementOf] puts it, outside its
-/// box and over its border. The surface must then be the content's outer
-/// box, so its edge is the one the popover placed.
+/// box and over its border where it has one. The surface must then be the
+/// content's outer box, so its edge is the one the popover placed.
 class PopoverMenuSurface extends StatelessWidget {
   final double? width;
   final double minWidth;
@@ -95,9 +96,10 @@ class PopoverMenuSurface extends StatelessWidget {
       );
     }
     final colors = context.colors;
+    final overlay = context.overlayStyle;
     final shadow = context.elevation.md;
     final corners = BorderRadius.circular(radius ?? context.radii.radiusMenu);
-    final edge = BorderSide(color: colors.border);
+    final edge = overlay.popoverEdge(colors);
     Widget surface = DecoratedBox(
       decoration: BoxDecoration(borderRadius: corners, boxShadow: shadow),
       child: Material(
@@ -110,7 +112,7 @@ class PopoverMenuSurface extends StatelessWidget {
     );
     final placement = Popover.placementOf(context);
     if (placement != null && (request?.showArrow ?? false)) {
-      final overlay = context.overlayStyle;
+      final ringed = edge.style != BorderStyle.none;
       surface = CustomPaint(
         foregroundPainter: PopoverArrowPainter(
           placement: placement,
@@ -118,8 +120,10 @@ class PopoverMenuSurface extends StatelessWidget {
           width: overlay.arrowWidth,
           height: overlay.arrowHeight,
           fill: colors.surface,
-          border: edge.color,
-          hairline: edge.width,
+          // Where the surface has no edge, the arrow's base still reaches
+          // a pixel into it, so no seam shows between them.
+          border: ringed ? edge.color : const Color(0x00000000),
+          hairline: ringed ? edge.width : 1,
           shadow: shadow,
         ),
         child: surface,

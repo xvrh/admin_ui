@@ -1422,6 +1422,26 @@ one motion on the whole content does not draw, so Material's popovers stay as
 they were. Ant's own `Popover` zooms from 80% where its dropdown, select and
 pickers unfold; the kit's one motion is the dropdown's.
 
+`modalOutline` and `popoverOutline` say whether an overlay is ringed in a
+hairline of the palette's `border` as well as lifted on its shadow. A modal's
+card, the command palette, the asset picker and a side sheet's inner edge
+read the first, through `modalEdge(palette)`. A popover's surface reads the
+second, through `popoverEdge(palette)`, and so does every menu, select,
+picker and hover card; a surface's arrow is stroked with it or not at all.
+The stock Material dialog, popup menu, menu anchor and dropdown menu take
+the same edges from `buildAppTheme`. A dark palette always rings both: a
+shadow does not read on a dark page, and a menu there is often the colour of
+the card under it. The hairline is painted over the surface, so a theme that
+drops it moves nothing.
+
+| Theme | A modal | A popover |
+|---|---|---|
+| Iris | ringed | ringed |
+| Material | on its shadow | on its shadow |
+| shadcn | ringed (`border`) | ringed (`border`) |
+| Ant | on its shadow (`border: 0`) | on its shadow |
+| Fluent | on its shadow (a transparent stroke) | on its shadow (a transparent stroke) |
+| Carbon | ringed (`$border-subtle-01`) | on its shadow |
 
 Each theme also takes its design system's shadows: M3's elevation levels,
 Tailwind's `shadow-sm`, `shadow-md` and `shadow-lg` for shadcn in light mode,
