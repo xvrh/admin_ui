@@ -45,8 +45,10 @@ class AdminPalette {
 
   // ── surfaces ──
 
-  /// Cards, inputs and overlays (menus, popovers, dialogs): the Material
-  /// `ColorScheme.surface`, and the lightest surface in both modes.
+  /// Cards and inputs, and an overlay the palette gives no fill of its own
+  /// ([popoverSurface], [modalSurface], [sheetSurface]): the Material
+  /// `ColorScheme.surface`, and the lightest of the page's surfaces in both
+  /// modes.
   final Color surface;
 
   /// The page and its rails, under [surface] cards.
@@ -158,6 +160,9 @@ class AdminPalette {
   final Color? _onNeutralFill;
   final Color? _inverseSurface;
   final Color? _onInverseSurface;
+  final Color? _popoverSurface;
+  final Color? _modalSurface;
+  final Color? _sheetSurface;
 
   const AdminPalette({
     required this.primary,
@@ -224,6 +229,9 @@ class AdminPalette {
     this._onNeutralFill,
     this._inverseSurface,
     this._onInverseSurface,
+    this._popoverSurface,
+    this._modalSurface,
+    this._sheetSurface,
   });
 
   /// Brightness inferred from [surface] — drives the Material [colorScheme]
@@ -553,6 +561,84 @@ class AdminPalette {
       _onInverseSurface ??
       (_inverseSurface == null ? surface : foregroundOn(inverseSurface));
 
+  // ── raised surfaces ── (an overlay's own fill, where a design system
+  // gives what it lifts off the page a tone of its own)
+
+  /// A popover's fill, and so a menu's, a select's list's, a picker's, a
+  /// hover card's, the command palette's and a surface-filled toast's:
+  /// authored, or [surface]. M3 fills a menu with `surfaceContainer`, and
+  /// Ant's dark algorithm fills everything raised with `colorBgElevated`, a
+  /// step lighter than its cards.
+  Color get popoverSurface => _popoverSurface ?? surface;
+
+  /// A modal's fill: authored, or [surface]. M3's dialog is
+  /// `surfaceContainerHigh`, and shadcn's is `bg-background`, the page's
+  /// colour, where its cards and popovers are a step lighter in dark mode.
+  Color get modalSurface => _modalSurface ?? surface;
+
+  /// A side sheet's fill: authored, or [modalSurface]. M3's sheets and
+  /// drawers are `surfaceContainerLow`, another tone than its dialog's.
+  Color get sheetSurface => _sheetSurface ?? modalSurface;
+
+  /// This palette as what stands on a raised surface filled with [fill]
+  /// reads it. Its [surface] is [fill], and every role left to derive from
+  /// the surface follows: a row's highlight is laid over [fill], a field
+  /// left to its default is filled with it, and text held to a contrast on
+  /// the surface is held to it on [fill].
+  ///
+  /// The authored roles are kept, but for those held to a contrast on the
+  /// surface ([foregroundMuted], [warningText], an authored [primaryText],
+  /// [dangerText], [successText], [infoText], [placeholder], [focusRing],
+  /// [controlBorder], [controlAccent], [fieldRule] or [chart]): one that no
+  /// longer reaches it on [fill] is moved as [readableOn] moves an accent,
+  /// just far enough. The three raised fills are kept as they resolve here,
+  /// so a menu opened inside a dialog is still filled as a menu.
+  ///
+  /// The palette itself where [fill] is its [surface]. Asked of a palette
+  /// this method returned, it answers from the palette that one was made
+  /// from: a menu's palette is the same inside a dialog as on the page. An
+  /// overlay draws its content in this palette; answers are cached, so it
+  /// can ask on every build.
+  AdminPalette withSurface(Color fill) {
+    if (fill == surface) return this;
+    final page = _derived.page;
+    if (page != null) return page.withSurface(fill);
+    final cache = _derived.raised;
+    final hit = cache[fill];
+    if (hit != null) return hit;
+    if (cache.length >= _raisedCacheLimit) cache.clear();
+
+    Color? held(Color? role, double min, [Color? accent]) => role == null
+        ? null
+        : _readable(role, [
+            fill,
+            // Its soft fill, as [statusFill] lays it on [fill].
+            if (accent != null) Color.lerp(accent, fill, 0.88)!,
+          ], min);
+    final raised = copyWith(
+      surface: fill,
+      foregroundMuted: held(foregroundMuted, _textContrast),
+      warningText: held(warningText, _textContrast, warning),
+      primaryText: held(_primaryText, _textContrast),
+      dangerText: held(_dangerText, _textContrast, danger),
+      successText: held(_successText, _textContrast, success),
+      infoText: held(_infoText, _textContrast, info),
+      placeholder: held(_placeholder, _textContrast),
+      focusRing: held(_focusRing, _uiContrast),
+      controlBorder: held(_controlBorder, _uiContrast),
+      controlAccent: held(_controlAccent, _uiContrast),
+      fieldRule: held(_fieldRule, _uiContrast),
+      chart: _chart == null
+          ? null
+          : [for (final color in _chart) held(color, _uiContrast)!],
+      popoverSurface: popoverSurface,
+      modalSurface: modalSurface,
+      sheetSurface: sheetSurface,
+    );
+    raised._derived.page = this;
+    return cache[fill] = raised;
+  }
+
   // ── status surfaces ── (soft fill / border derived from a status accent like
   // [success]/[warning]/[danger]/[info], so themes only author the accent)
   Color statusFill(Color accent) => Color.lerp(accent, surface, 0.88)!;
@@ -692,6 +778,9 @@ class AdminPalette {
     Color? onNeutralFill,
     Color? inverseSurface,
     Color? onInverseSurface,
+    Color? popoverSurface,
+    Color? modalSurface,
+    Color? sheetSurface,
   }) {
     return AdminPalette(
       primary: primary ?? this.primary,
@@ -758,6 +847,9 @@ class AdminPalette {
       onNeutralFill: onNeutralFill ?? _onNeutralFill,
       inverseSurface: inverseSurface ?? _inverseSurface,
       onInverseSurface: onInverseSurface ?? _onInverseSurface,
+      popoverSurface: popoverSurface ?? _popoverSurface,
+      modalSurface: modalSurface ?? _modalSurface,
+      sheetSurface: sheetSurface ?? _sheetSurface,
     );
   }
 
@@ -966,6 +1058,24 @@ class AdminPalette {
         a.onInverseSurface,
         b.onInverseSurface,
       ),
+      popoverSurface: o(
+        a._popoverSurface,
+        b._popoverSurface,
+        a.popoverSurface,
+        b.popoverSurface,
+      ),
+      modalSurface: o(
+        a._modalSurface,
+        b._modalSurface,
+        a.modalSurface,
+        b.modalSurface,
+      ),
+      sheetSurface: o(
+        a._sheetSurface,
+        b._sheetSurface,
+        a.sheetSurface,
+        b.sheetSurface,
+      ),
     );
   }
 
@@ -992,9 +1102,10 @@ class AdminPalette {
   /// [navIndicator]. The soft fill ([softFill], [onSoft]) re-derives from
   /// the brand's tint; the field roles ([fieldFill], [fieldFillHover],
   /// [fieldRule]), the neutral fill ([neutralFill] and its states,
-  /// [onNeutralFill]) and the inverse surface ([inverseSurface],
-  /// [onInverseSurface]) are kept. [chart] is kept: charts don't follow the
-  /// brand. So is the [stateLayer].
+  /// [onNeutralFill]), the inverse surface ([inverseSurface],
+  /// [onInverseSurface]) and the raised fills ([popoverSurface],
+  /// [modalSurface], [sheetSurface]) are kept. [chart] is kept: charts don't
+  /// follow the brand. So is the [stateLayer].
   AdminPalette branded(Color seed) {
     final fill = _withReadableForeground(seed);
     final dark = brightness == Brightness.dark;
@@ -1063,6 +1174,9 @@ class AdminPalette {
       onNeutralFill: _onNeutralFill,
       inverseSurface: _inverseSurface,
       onInverseSurface: _onInverseSurface,
+      popoverSurface: _popoverSurface,
+      modalSurface: _modalSurface,
+      sheetSurface: _sheetSurface,
     );
   }
 
@@ -1148,6 +1262,9 @@ class AdminPalette {
     _onNeutralFill,
     _inverseSurface,
     _onInverseSurface,
+    _popoverSurface,
+    _modalSurface,
+    _sheetSurface,
   ];
 
   /// Two palettes are equal when they author the same colours: the same
@@ -1227,6 +1344,10 @@ final _derivedCache = Expando<_DerivedRoles>('AdminPalette derived roles');
 /// a stream of arbitrary colours (a picker being dragged) ever resets it.
 const _readableCacheLimit = 512;
 
+/// [AdminPalette.withSurface] palettes kept per palette before the cache
+/// starts over: a theme has three raised fills at most.
+const _raisedCacheLimit = 8;
+
 /// One [AdminPalette.readableOn] question, compared by value.
 @immutable
 class _ReadableQuery {
@@ -1253,6 +1374,12 @@ class _ReadableQuery {
 class _DerivedRoles {
   final AdminPalette p;
   final readable = <_ReadableQuery, Color>{};
+
+  /// [AdminPalette.withSurface]'s answers, by fill.
+  final raised = <Color, AdminPalette>{};
+
+  /// The palette [AdminPalette.withSurface] made this one from, if it did.
+  AdminPalette? page;
   final _heatCeilings = <Color, double>{};
 
   _DerivedRoles(this.p);

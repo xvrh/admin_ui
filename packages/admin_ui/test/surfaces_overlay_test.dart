@@ -27,8 +27,10 @@ Material _surfaceMaterial(WidgetTester tester, Finder surface) => tester
     )
     .first;
 
-void _expectFloating(Material material, AdminPalette palette) {
-  expect(material.color, palette.surface);
+/// [material] is filled with [fill], the palette's fill for its kind of
+/// overlay, and ringed in the palette's border.
+void _expectFloating(Material material, AdminPalette palette, Color fill) {
+  expect(material.color, fill);
   final side = switch (material.shape) {
     RoundedRectangleBorder(:final side) => side,
     Border(:final left, :final right) => left.width > 0 ? left : right,
@@ -41,7 +43,7 @@ void _expectFloating(Material material, AdminPalette palette) {
 void main() {
   for (final MapEntry(key: name, value: palette) in shippedPalettes.entries) {
     group(name, () {
-      testWidgets('PopoverMenuSurface paints surface with a border', (
+      testWidgets('PopoverMenuSurface paints its fill with a border', (
         tester,
       ) async {
         await tester.pumpWidget(
@@ -50,16 +52,20 @@ void main() {
         _expectFloating(
           _surfaceMaterial(tester, find.byType(PopoverMenuSurface)),
           palette,
+          palette.popoverSurface,
         );
       });
 
-      testWidgets('Modal, CommandPalette and SideSheet are bordered surfaces', (
-        tester,
-      ) async {
+      testWidgets('Modal, CommandPalette and SideSheet are bordered, each '
+          'in its fill', (tester) async {
         await tester.pumpWidget(
           _host(palette, const Modal(title: 'Title', message: 'Body')),
         );
-        _expectFloating(_surfaceMaterial(tester, find.byType(Modal)), palette);
+        _expectFloating(
+          _surfaceMaterial(tester, find.byType(Modal)),
+          palette,
+          palette.modalSurface,
+        );
 
         await tester.pumpWidget(
           _host(palette, const CommandPalette(items: [])),
@@ -67,6 +73,7 @@ void main() {
         _expectFloating(
           _surfaceMaterial(tester, find.byType(CommandPalette)),
           palette,
+          palette.popoverSurface,
         );
 
         for (final side in SideSheetSide.values) {
@@ -74,7 +81,7 @@ void main() {
             _host(palette, SideSheet(side: side, child: const SizedBox())),
           );
           final material = _surfaceMaterial(tester, find.byType(SideSheet));
-          _expectFloating(material, palette);
+          _expectFloating(material, palette, palette.sheetSurface);
           // The hairline runs along the edge that faces the page.
           final border = material.shape! as Border;
           final inner = side == SideSheetSide.end ? border.left : border.right;
@@ -84,7 +91,9 @@ void main() {
         }
       });
 
-      testWidgets('a toast is a bordered surface card', (tester) async {
+      testWidgets('a toast is a bordered card in a popover\'s fill', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           _host(
             palette,
@@ -105,7 +114,11 @@ void main() {
           of: find.text('Saved.'),
           matching: find.byType(Material),
         );
-        _expectFloating(tester.widgetList<Material>(card).first, palette);
+        _expectFloating(
+          tester.widgetList<Material>(card).first,
+          palette,
+          palette.popoverSurface,
+        );
       });
 
       testWidgets('the command palette field shows no border when focused', (

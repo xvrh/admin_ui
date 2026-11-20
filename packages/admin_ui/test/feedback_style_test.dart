@@ -539,8 +539,9 @@ void main() {
             style.alertBar > 0 ? findsOneWidget : findsNothing,
           );
 
-          // In its own palette where the theme gives it one.
-          final tp = style.toastPalette ?? p;
+          // In its own palette where the theme gives it one, and
+          // otherwise in the page's as what stands on a popover reads it.
+          final tp = style.toastPalette ?? p.withSurface(p.popoverSurface);
           final card = tester.widget<Material>(_toastCard('Page published.'));
           expect(
             card.color,

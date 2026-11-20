@@ -38,6 +38,23 @@ void main() {
           test('orders its surfaces', () {
             expect(_orderingFailures(p), isEmpty);
           });
+
+          // What stands on a popover, a modal or a sheet is drawn in the
+          // palette of that fill, which holds the same pairs.
+          test('meets its contrast pairs on its raised surfaces', () {
+            final style = read().field;
+            for (final (name, fill) in [
+              ('a popover', p.popoverSurface),
+              ('a modal', p.modalSurface),
+              ('a sheet', p.sheetSurface),
+            ]) {
+              expect(
+                _contrastFailures(p.withSurface(fill), style),
+                isEmpty,
+                reason: 'on $name',
+              );
+            }
+          });
         });
       }
     }

@@ -11,6 +11,7 @@ import '../../theme/tokens.dart';
 import '../motion.dart';
 import 'alert.dart';
 import 'button.dart';
+import 'chrome_theme.dart';
 import 'error_text.dart';
 import 'icon_action.dart';
 import 'severity.dart';
@@ -54,7 +55,18 @@ Future<T?> showModal<T>(
     // The frame keeps to the safe area itself, so a fullscreen modal can
     // reach the screen's edges.
     useSafeArea: false,
-    builder: (context) => _ModalFrame(child: builder(context)),
+    // [builder] runs in the palette of what stands on a modal, whose
+    // `surface` is the modal's fill, so what it builds above its [Modal] is
+    // read there too.
+    builder: (context) {
+      final page = context.colors;
+      return ChromeTheme(
+        palette: page.withSurface(page.modalSurface),
+        child: Builder(
+          builder: (context) => _ModalFrame(child: builder(context)),
+        ),
+      );
+    },
   );
 }
 
@@ -541,8 +553,9 @@ enum ModalSize {
   final double? width;
 }
 
-/// The dialog surface — an elevated, rounded card, ringed in a hairline
-/// where the theme rings a modal (`AdminOverlayStyle.modalOutline`), with an
+/// The dialog surface — an elevated, rounded card filled with the
+/// palette's `modalSurface`, ringed in a hairline where the theme rings a
+/// modal (`AdminOverlayStyle.modalOutline`), with an
 /// optional [title] and [description], a close affordance while [onDismiss]
 /// is set, a [body] (or convenience [message]) and an end-aligned [actions]
 /// footer. Render it via [showModal]; it's a plain widget so the catalog can
@@ -633,6 +646,16 @@ class _ModalState extends State<Modal> {
 
   @override
   Widget build(BuildContext context) {
+    final page = context.colors;
+    return ChromeTheme(
+      palette: page.withSurface(page.modalSurface),
+      child: Builder(builder: _surface),
+    );
+  }
+
+  /// The card, under the palette of what stands on a modal: its `surface`
+  /// is the modal's fill.
+  Widget _surface(BuildContext context) {
     final fullscreen = widget.size == ModalSize.fullscreen;
     final frame = context
         .dependOnInheritedWidgetOfExactType<_ModalFrameScope>();

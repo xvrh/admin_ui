@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
+import 'chrome_theme.dart';
 import 'icon_action.dart';
 
 /// Which edge a [SideSheet] slides in from, in the reading direction: [end]
@@ -36,11 +37,19 @@ Future<T?> showSideSheet<T>(
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: barrierColor ?? context.colors.scrim,
     transitionDuration: motion.slow,
-    pageBuilder: (context, _, _) => _SideSheetHost(
-      side: side,
-      width: width,
-      child: Builder(builder: builder),
-    ),
+    // [builder] runs in the palette of what stands on a sheet, whose
+    // `surface` is the sheet's fill.
+    pageBuilder: (context, _, _) {
+      final page = context.colors;
+      return _SideSheetHost(
+        side: side,
+        width: width,
+        child: ChromeTheme(
+          palette: page.withSurface(page.sheetSurface),
+          child: Builder(builder: builder),
+        ),
+      );
+    },
     transitionBuilder: (context, animation, _, child) {
       final curved = CurvedAnimation(
         parent: animation,
@@ -157,6 +166,16 @@ class SideSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final page = context.colors;
+    return ChromeTheme(
+      palette: page.withSurface(page.sheetSurface),
+      child: Builder(builder: _surface),
+    );
+  }
+
+  /// The sheet, under the palette of what stands on one: its `surface` is
+  /// the sheet's fill.
+  Widget _surface(BuildContext context) {
     final close = onDismiss ?? () => Navigator.of(context).maybePop();
     final edge = context.overlayStyle.modalEdge(context.colors);
     final onLeft =

@@ -923,7 +923,7 @@ the plain name is the main step, and `Subtle` and `Faint` step toward
 | `primaryStrong` | `primary` a step deeper; the hover fill derives from it |
 | `primarySubtle` | A soft primary tint: a selected item's fill |
 | `primaryFaint` | A fainter tint, nearer `surface`: an unread row, a previewed selection |
-| `surface` | Cards, inputs and overlays (Material's `ColorScheme.surface`) |
+| `surface` | Cards and inputs, and an overlay the palette gives no fill of its own (Material's `ColorScheme.surface`) |
 | `background` | The page and its rails, under the cards |
 | `surfaceMuted` | A muted well: table headers, nested panels |
 | `foreground` | Body text and icons |
@@ -956,6 +956,7 @@ is not the look you want:
 | `softFill`, `onSoft` | `primarySubtle`, and `primaryText` held to 4.5:1 on it: a soft (tonal) button |
 | `neutralFill`, `neutralFillHover`, `neutralFillActive`, `onNeutralFill` | `foregroundSecondary`, `surface` over it at the hover and pressed opacities, and white or near-black on it: a filled neutral button (Carbon's secondary) |
 | `inverseSurface`, `onInverseSurface` | `foreground` and `surface`, or, under an authored surface, white or near-black: a tooltip's chip and a stock snack bar, and what reads on them |
+| `popoverSurface`, `modalSurface`, `sheetSurface` | `surface`, `surface` and `modalSurface`: what a popover, a modal and a side sheet are filled with (see [Anatomy](#anatomy)) |
 | `placeholder` | `foregroundMuted`, or `foregroundSubtle` adjusted to 4.5:1 |
 | `listHighlight`, `separator` | `foreground` over `surface` at 6% (8% dark), and the stronger of `border` and `borderSubtle`: menu hover rows and overlay dividers |
 | `navHoverFill`, `navSelectedFill`, `navSelectedText`, `navIndicator` | `foreground` over `background`, `primarySubtle`, `primaryText` and `primary`, each held to its contrast floor: the sidebar's items |
@@ -1442,6 +1443,36 @@ drops it moves nothing.
 | Ant | on its shadow (`border: 0`) | on its shadow |
 | Fluent | on its shadow (a transparent stroke) | on its shadow (a transparent stroke) |
 | Carbon | ringed (`$border-subtle-01`) | on its shadow |
+
+What an overlay is filled with is the palette's. `popoverSurface` fills a
+popover's surface (a menu, a select's list, a picker, a hover card), the
+command palette and a toast in the surface colour; `modalSurface` a modal's
+card and the asset picker; `sheetSurface` a side sheet. Each is the
+palette's `surface` unless the palette authors it, and a sheet follows the
+modal unless it has a fill of its own. The stock Material dialog and menus
+take them from `buildAppTheme`.
+
+| Theme | A popover | A modal | A side sheet |
+|---|---|---|---|
+| Iris | the surface | the surface | the surface |
+| Material | `surfaceContainer` | `surfaceContainerHigh` | `surfaceContainerLow` |
+| shadcn | the surface (`--popover`) | `--background`: the surface's white, and the page's #09090B in dark mode | as its modal |
+| Ant | `colorBgElevated`: the surface's white, and #1F1F1F in dark mode | the same | the same |
+| Fluent | the surface | the surface | the surface |
+| Carbon | the surface | the surface | the surface |
+
+What stands on an overlay is drawn in `palette.withSurface(fill)`: the
+palette with that fill as its `surface`. So under a `Popover`'s content, a
+`showModal` or `showSideSheet` builder, and inside each of the kit's overlay
+surfaces, `context.colors.surface` is the overlay's own colour, and a widget
+that draws itself on the surface needs to know nothing of where it sits. The
+roles left to derive from the surface follow the fill: a row's highlight is
+laid over it, a field left to its default is filled with it, and the text
+held to a contrast is held to it there. An authored role that no longer
+reads on the fill is moved just far enough, as `readableOn` moves an accent.
+The three fills stay what they are on the page, so a menu opened inside a
+dialog is filled, and drawn, as a menu. Where the fill is the surface, that
+palette is the page's own and nothing changes.
 
 Each theme also takes its design system's shadows: M3's elevation levels,
 Tailwind's `shadow-sm`, `shadow-md` and `shadow-lg` for shadcn in light mode,

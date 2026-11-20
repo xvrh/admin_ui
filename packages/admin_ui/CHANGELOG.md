@@ -2,6 +2,19 @@
 
 ## 0.2.0
 
+- A palette gives an overlay a fill of its own:
+  `AdminPalette.popoverSurface` (a popover's surface, the command palette, a
+  toast in the surface colour), `modalSurface` (a modal's card, the asset
+  picker) and `sheetSurface` (a side sheet). Each is `surface` unless
+  authored, and a sheet follows the modal unless it has its own. The stock
+  Material dialog and menus take them from `buildAppTheme`.
+- What stands on an overlay is drawn in `AdminPalette.withSurface(fill)`,
+  the palette with that fill as its `surface`: a `Popover`'s content, a
+  `showModal` or `showSideSheet` builder and what each overlay surface holds
+  read `context.colors.surface` as the overlay's colour. The roles left to
+  derive from the surface follow the fill, an authored role that no longer
+  reads on it is moved just far enough, and the three fills stay the
+  page's. Where the fill is the surface, this is the palette itself.
 - A theme says whether an overlay is ringed in a hairline as well as lifted
   on its shadow: `AdminOverlayStyle.modalOutline` and `popoverOutline`, both
   true by default, read through `modalEdge(palette)` and
@@ -560,6 +573,27 @@
 
 ### Looks
 
+- An overlay is filled as its theme's reference system fills it, where that
+  is not the card's colour; every overlay was the palette's `surface`. Iris,
+  Fluent and Carbon, and the light palettes of shadcn and Ant, do not
+  change: their overlays are the card's colour in the reference too.
+  - Material: a menu, a select's list, a picker, a hover card and the
+    command palette are `surfaceContainer`, #F3EDF7 (was #FEF8FF; the dark
+    palette's is already its surface). A modal and the asset picker are
+    `surfaceContainerHigh`, #ECE6F0 and #2B2930 in dark mode (was #FEF8FF
+    and #211F26). A side sheet is `surfaceContainerLow`, #F7F2FA and
+    #1D1B20.
+  - Ant, dark mode: every overlay and a toast are `colorBgElevated`,
+    #1F1F1F (was #141414). An input on one keeps `colorBgContainer`,
+    #141414.
+  - shadcn, dark mode: a modal, the asset picker and a side sheet are
+    `--background`, #09090B (was #18181B).
+  - On those fills, what is drawn on the surface is drawn on the fill: a
+    field or an outlined button in a Material dialog takes the dialog's
+    colour, and a menu row's highlight is laid over the menu's. A colour
+    held to a contrast is held to it on the fill, so some move a shade
+    there: Material's warning text is #876200 on a menu (#8A6500 on a
+    card), Ant's dark control outline #696969 on a modal (#626262).
 - An overlay stands on its shadow alone where the theme's reference system
   draws it so, in light mode; every overlay was ringed in a hairline of the
   palette's `border` in every theme. Iris and shadcn keep the hairline, and

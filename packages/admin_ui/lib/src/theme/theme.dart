@@ -59,7 +59,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
   );
   final menuElevation = _materialElevation(tokens.elevation.md);
   final menuStyle = MenuStyle(
-    backgroundColor: WidgetStatePropertyAll(palette.surface),
+    backgroundColor: WidgetStatePropertyAll(palette.popoverSurface),
     surfaceTintColor: const WidgetStatePropertyAll(Color(0x00000000)),
     shadowColor: WidgetStatePropertyAll(palette.shadow),
     elevation: WidgetStatePropertyAll(menuElevation),
@@ -131,7 +131,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
       thickness: tokens.stroke.hairline,
     ),
     popupMenuTheme: PopupMenuThemeData(
-      color: palette.surface,
+      color: palette.popoverSurface,
       surfaceTintColor: const Color(0x00000000),
       shadowColor: palette.shadow,
       elevation: menuElevation,
@@ -207,7 +207,7 @@ ThemeData buildAppTheme(AdminTokens tokens) {
       shape: surfaceShape,
     ),
     dialogTheme: base.dialogTheme.copyWith(
-      backgroundColor: palette.surface,
+      backgroundColor: palette.modalSurface,
       surfaceTintColor: const Color(0x00000000),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radii.radiusDialog),

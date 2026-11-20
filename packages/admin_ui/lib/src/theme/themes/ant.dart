@@ -111,6 +111,13 @@ const antDarkPalette = AdminPalette(
   // colorBgSpotlight stays dark in the dark algorithm: black lightened 26%
   inverseSurface: Color(0xFF424242),
   onInverseSurface: Color(0xFFFFFFFF),
+  // colorBgElevated, black lightened 12%: a dropdown, a select's list, a
+  // popover, a notification, a modal and a drawer, a step above the cards.
+  // In the light algorithm it is colorBgContainer's white
+  popoverSurface: Color(0xFF1F1F1F),
+  modalSurface: Color(0xFF1F1F1F),
+  // an input keeps colorBgContainer on a raised surface
+  fieldFill: Color(0xFF141414),
 );
 
 /// Ant Design's dark Sider and Menu (`theme="dark"`), the sidebar of the
