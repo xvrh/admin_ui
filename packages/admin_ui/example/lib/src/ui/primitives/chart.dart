@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
@@ -361,7 +363,7 @@ class ChartDemo extends StatelessWidget {
         ),
         const Gap(AdminSpacing.xxxl),
 
-        const DemoSection('Chart card — populated / loading / empty'),
+        const DemoSection('Chart card — populated / loading / empty / error'),
         ChartCard(
           title: 'Revenue',
           subtitle: 'Last 6 months',
@@ -390,6 +392,16 @@ class ChartDemo extends StatelessWidget {
           isEmpty: true,
           chart: SizedBox.shrink(),
         ),
+        const Gap(AdminSpacing.lg),
+        // A card whose own load failed: the error in words, and a retry.
+        ChartCard(
+          title: 'Revenue',
+          subtitle: 'Last 6 months',
+          trailing: Tag('6M'),
+          error: TimeoutException('revenue'),
+          onRetry: () {},
+          chart: const SizedBox.shrink(),
+        ),
         const Gap(AdminSpacing.xxxl),
 
         const DemoSection('Empty data'),
@@ -402,23 +414,54 @@ class ChartDemo extends StatelessWidget {
 /// A [ChartCard] whose `trailing` is a four-option [Segmented] picking the
 /// breakdown it charts. On a card in a column of two, about 480 wide, the
 /// control goes under the title; on a card the page's width it stays beside
-/// it. It stays in the header while the card loads and when the breakdown it
-/// picked has no data, so another can be picked.
+/// it. It stays in the header while the card loads, when the breakdown it
+/// picked has no data and when its load failed, so another can be picked.
 class ChartCardDemo extends StatelessWidget {
   /// The page's width, or null for a desktop page.
   final double? width;
 
+  /// Whether the page shows the cards whose load failed alone.
+  final bool _failedOnly;
+
   @Preview(name: 'Chart card', wrapper: adminUiPreview)
-  const ChartCardDemo({super.key}) : width = null;
+  const ChartCardDemo({super.key}) : width = null, _failedOnly = false;
 
   /// The cards at a phone's width, one column of them, every control under
   /// its title.
   @Preview(name: 'Chart card (phone width)', wrapper: adminUiPreview)
-  const ChartCardDemo.phone({super.key}) : width = 375;
+  const ChartCardDemo.phone({super.key}) : width = 375, _failedOnly = false;
+
+  /// The cards whose own load failed, at the top of the page.
+  @Preview(name: 'Chart card (a failed load)', wrapper: adminUiPreview)
+  const ChartCardDemo.failed({super.key}) : width = null, _failedOnly = true;
+
+  /// A card whose load failed and can be tried again, beside one that says
+  /// why in the app's own words and offers no retry.
+  static const _failed = <Widget>[
+    DemoSection('A failed load: the error in words, and the control stays'),
+    _Columns([
+      _BreakdownCard(failed: true),
+      ChartCard(
+        title: 'Sign-ups',
+        subtitle: 'Last 6 months',
+        trailing: Tag('6M'),
+        bodyHeight: 140,
+        error: 'Sign-ups are being recounted. They will be back shortly.',
+        chart: SizedBox.shrink(),
+      ),
+    ]),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final phone = width != null;
+    if (_failedOnly) {
+      return const DemoPage(
+        maxWidth: 1040,
+        padding: EdgeInsets.all(AdminSpacing.xxxl),
+        children: _failed,
+      );
+    }
     return DemoPage(
       // Two columns of cards about 480 wide, a gap between them.
       maxWidth: width ?? 1040,
@@ -458,6 +501,8 @@ class ChartCardDemo extends StatelessWidget {
           _BreakdownCard(initial: _Breakdown.language),
           _BreakdownCard(loading: true),
         ]),
+        const Gap(AdminSpacing.xxxl),
+        ..._failed,
       ],
     );
   }
@@ -499,11 +544,17 @@ enum _Breakdown { role, organisation, platform, language }
 
 /// Active members broken down by what its [Segmented] picks, starting at
 /// [initial]. No member has a language yet, so that breakdown is empty.
+/// [failed] is the card after its load timed out, with a Retry.
 class _BreakdownCard extends StatefulWidget {
   final _Breakdown initial;
   final bool loading;
+  final bool failed;
 
-  const _BreakdownCard({this.initial = _Breakdown.role, this.loading = false});
+  const _BreakdownCard({
+    this.initial = _Breakdown.role,
+    this.loading = false,
+    this.failed = false,
+  });
 
   @override
   State<_BreakdownCard> createState() => _BreakdownCardState();
@@ -539,6 +590,8 @@ class _BreakdownCardState extends State<_BreakdownCard> {
       subtitle: 'Signed in at least once in the last 30 days',
       bodyHeight: 140,
       loading: widget.loading,
+      error: widget.failed ? TimeoutException('members') : null,
+      onRetry: widget.failed ? () {} : null,
       isEmpty: items.isEmpty,
       emptyMessage: 'No member has picked a language yet',
       trailing: Segmented(

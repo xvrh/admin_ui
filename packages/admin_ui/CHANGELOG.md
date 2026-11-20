@@ -2,6 +2,13 @@
 
 ## 0.2.0
 
+- `ChartCard` has an error state: `error` shows an `ErrorState` in the
+  chart's place, the localized "Couldn't load" over the error in words
+  (`ErrorTextScope.describe`), with a Retry button where `onRetry` is given
+  (`retryKey` finds it in a test). `loading` comes first, so a retry in
+  flight shows the skeleton, and an error shows over `isEmpty`. The header
+  and its `trailing` control stay as they are. For a dashboard whose cards
+  load apart.
 - A palette gives an overlay a fill of its own:
   `AdminPalette.popoverSurface` (a popover's surface, the command palette, a
   toast in the surface colour), `modalSurface` (a modal's card, the asset
