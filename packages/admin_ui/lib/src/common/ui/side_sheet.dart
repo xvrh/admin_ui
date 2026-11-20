@@ -123,7 +123,8 @@ class SideSheet extends StatelessWidget {
   /// header always shows the button.
   final VoidCallback? onDismiss;
 
-  /// The edge the sheet sits on — its hairline border runs along the other,
+  /// The edge the sheet sits on. Where the theme rings a modal
+  /// (`AdminOverlayStyle.modalOutline`), a hairline runs along the other,
   /// inner edge.
   final SideSheetSide side;
 
@@ -157,7 +158,7 @@ class SideSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final close = onDismiss ?? () => Navigator.of(context).maybePop();
-    final edge = BorderSide(color: context.colors.border);
+    final edge = context.overlayStyle.modalEdge(context.colors);
     final onLeft =
         (side == SideSheetSide.start) ==
         (Directionality.of(context) == TextDirection.ltr);

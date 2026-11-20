@@ -413,6 +413,8 @@ void describeAdminOverlayStyle(
   } else {
     out['${p}popoverMotion'] = 'null';
   }
+  describeValue(v.modalOutline, '${p}modalOutline', out);
+  describeValue(v.popoverOutline, '${p}popoverOutline', out);
   describeValue(v.arrowWidth, '${p}arrowWidth', out);
   describeValue(v.arrowHeight, '${p}arrowHeight', out);
 }

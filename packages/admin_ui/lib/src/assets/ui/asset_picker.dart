@@ -242,8 +242,8 @@ class _AssetPickerDialogState extends State<_AssetPickerDialog> {
     // A titled header with a close that every tab shares, over one flat
     // strip: Library | Upload | one tab per provider. The library's own
     // embedded upload tab stays unused here so the picker never nests two
-    // tab bars. The surface is a Modal's: the dialog radius, a hairline and
-    // the large shadow.
+    // tab bars. The surface is a Modal's: the dialog radius, the theme's
+    // edge for one and the large shadow.
     final strings = context.adminL10n.assets;
     final corners = BorderRadius.circular(context.radii.radiusDialog);
     const close = IconActionSize.small;
@@ -257,7 +257,9 @@ class _AssetPickerDialogState extends State<_AssetPickerDialog> {
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
           borderRadius: corners,
-          border: Border.all(color: context.colors.border),
+          border: Border.fromBorderSide(
+            context.overlayStyle.modalEdge(context.colors),
+          ),
         ),
         child: ClipRRect(
           borderRadius: corners,

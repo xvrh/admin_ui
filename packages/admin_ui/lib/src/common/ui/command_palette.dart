@@ -684,7 +684,8 @@ class _CommandPaletteState extends State<CommandPalette> {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: corners,
-          side: BorderSide(color: context.colors.border),
+          // It opens over a scrim, as a modal does, and is edged as one.
+          side: context.overlayStyle.modalEdge(context.colors),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(

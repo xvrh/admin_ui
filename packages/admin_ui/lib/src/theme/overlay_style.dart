@@ -3,12 +3,14 @@
 /// @docImport 'typography.dart';
 library;
 
-import 'dart:ui' show lerpDouble;
+import 'dart:ui' show Brightness, lerpDouble;
 
 import 'package:flutter/animation.dart' show Curve;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart' show BorderSide;
 
 import 'motion.dart';
+import 'palette.dart';
 
 /// How an overlay arrives and leaves. It always fades; it can also grow
 /// from a smaller [scale], unfold from a shorter [stretch] and travel a
@@ -177,14 +179,15 @@ enum TooltipText {
 
 /// The anatomy of the floating overlays: a tooltip's corner, padding, text
 /// and delay, whether it points at its target with an arrow, the width its
-/// text wraps at, the size of the arrow a tooltip or a popover draws, and
-/// how a modal and a popover arrive and leave.
+/// text wraps at, the size of the arrow a tooltip or a popover draws, how a
+/// modal and a popover arrive and leave, and whether each is ringed in a
+/// hairline.
 /// Provided via [AdminTokens]; read through `context.overlayStyle`.
 ///
 /// The defaults are the kit's own: a plain chip at the small radius, padded
 /// 8 by 4 around caption text, shown after 400ms, that wraps at 280; a
-/// 12×6 arrow where a popover asks for one; a modal that fades; and a
-/// popover that is there, and gone, at once.
+/// 12×6 arrow where a popover asks for one; a modal that fades; a popover
+/// that is there, and gone, at once; and a hairline around both.
 @immutable
 class AdminOverlayStyle {
   /// Whether a tooltip points at its target with an arrow unless it says
@@ -225,6 +228,20 @@ class AdminOverlayStyle {
   /// once. Null, and it appears and vanishes at once, with no fade.
   final AdminOverlayMotion? popoverMotion;
 
+  /// Whether a modal's card is ringed in a hairline of
+  /// [AdminPalette.border] as well as lifted on its shadow, and a side
+  /// sheet edged in one on its inner side: shadcn's `DialogContent` and
+  /// Carbon's modal container have a border, and M3's, Ant's and Fluent's
+  /// dialogs stand on their shadow alone. A dark palette, where a shadow
+  /// does not read, always rings it. Read it through [modalEdge].
+  final bool modalOutline;
+
+  /// Whether a popover's surface is ringed in a hairline as well as lifted
+  /// on its shadow, and so every menu, select, picker and hover card:
+  /// shadcn's are, and M3's, Ant's, Fluent's and Carbon's are not. A dark
+  /// palette always rings it. Read it through [popoverEdge].
+  final bool popoverOutline;
+
   /// The arrow's base, along the edge it stands on.
   final double arrowWidth;
 
@@ -243,10 +260,28 @@ class AdminOverlayStyle {
     this.tooltipDelay = const Duration(milliseconds: 400),
     this.modalMotion = const AdminOverlayMotion(),
     this.popoverMotion,
+    this.modalOutline = true,
+    this.popoverOutline = true,
     this.arrowWidth = 12,
     this.arrowHeight = 6,
   }) : assert(tooltipRadius == null || tooltipRadius >= 0),
        assert(tooltipPaddingX >= 0 && tooltipPaddingY >= 0);
+
+  /// The edge of a modal's card drawn in [palette]: a hairline of its
+  /// [AdminPalette.border] where [modalOutline] says so or [palette] is
+  /// dark, and [BorderSide.none] otherwise.
+  BorderSide modalEdge(AdminPalette palette) => _edge(modalOutline, palette);
+
+  /// The edge of a popover's surface drawn in [palette]: a hairline of its
+  /// [AdminPalette.border] where [popoverOutline] says so or [palette] is
+  /// dark, and [BorderSide.none] otherwise.
+  BorderSide popoverEdge(AdminPalette palette) =>
+      _edge(popoverOutline, palette);
+
+  static BorderSide _edge(bool outlined, AdminPalette palette) =>
+      outlined || palette.brightness == Brightness.dark
+      ? BorderSide(color: palette.border)
+      : BorderSide.none;
 
   /// A copy with the given members replaced. A null argument keeps the
   /// current value, so [tooltipRadius] and [popoverMotion] cannot be
@@ -261,6 +296,8 @@ class AdminOverlayStyle {
     Duration? tooltipDelay,
     AdminOverlayMotion? modalMotion,
     AdminOverlayMotion? popoverMotion,
+    bool? modalOutline,
+    bool? popoverOutline,
     double? arrowWidth,
     double? arrowHeight,
   }) => AdminOverlayStyle(
@@ -273,14 +310,16 @@ class AdminOverlayStyle {
     tooltipDelay: tooltipDelay ?? this.tooltipDelay,
     modalMotion: modalMotion ?? this.modalMotion,
     popoverMotion: popoverMotion ?? this.popoverMotion,
+    modalOutline: modalOutline ?? this.modalOutline,
+    popoverOutline: popoverOutline ?? this.popoverOutline,
     arrowWidth: arrowWidth ?? this.arrowWidth,
     arrowHeight: arrowHeight ?? this.arrowHeight,
   );
 
   /// Interpolates the lengths (a [tooltipRadius] only where both sides
   /// author one) and the motions (a [popoverMotion] only where both sides
-  /// have one); [tooltipArrow], [tooltipText] and [tooltipDelay] come from
-  /// the side [t] is nearer.
+  /// have one); [tooltipArrow], [tooltipText], [tooltipDelay],
+  /// [modalOutline] and [popoverOutline] come from the side [t] is nearer.
   static AdminOverlayStyle lerp(
     AdminOverlayStyle a,
     AdminOverlayStyle b,
@@ -302,6 +341,8 @@ class AdminOverlayStyle {
       popoverMotion: a.popoverMotion != null && b.popoverMotion != null
           ? AdminOverlayMotion.lerp(a.popoverMotion!, b.popoverMotion!, t)
           : near.popoverMotion,
+      modalOutline: near.modalOutline,
+      popoverOutline: near.popoverOutline,
       arrowWidth: d(a.arrowWidth, b.arrowWidth),
       arrowHeight: d(a.arrowHeight, b.arrowHeight),
     );
@@ -319,6 +360,8 @@ class AdminOverlayStyle {
       other.tooltipDelay == tooltipDelay &&
       other.modalMotion == modalMotion &&
       other.popoverMotion == popoverMotion &&
+      other.modalOutline == modalOutline &&
+      other.popoverOutline == popoverOutline &&
       other.arrowWidth == arrowWidth &&
       other.arrowHeight == arrowHeight;
 
@@ -333,6 +376,8 @@ class AdminOverlayStyle {
     tooltipDelay,
     modalMotion,
     popoverMotion,
+    modalOutline,
+    popoverOutline,
     arrowWidth,
     arrowHeight,
   );
@@ -344,6 +389,8 @@ class AdminOverlayStyle {
       '${tooltipRadius == null ? 'the small radius' : 'radius $tooltipRadius'}, '
       'padding $tooltipPaddingX×$tooltipPaddingY, ${tooltipText.name} text, '
       'after ${tooltipDelay.inMilliseconds}ms; arrow '
-      '$arrowWidth×$arrowHeight; modals $modalMotion; popovers '
-      '${popoverMotion ?? 'at once'})';
+      '$arrowWidth×$arrowHeight; modals $modalMotion, '
+      '${modalOutline ? 'outlined' : 'no outline'}; popovers '
+      '${popoverMotion ?? 'at once'}, '
+      '${popoverOutline ? 'outlined' : 'no outline'})';
 }
