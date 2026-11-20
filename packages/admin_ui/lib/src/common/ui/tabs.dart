@@ -3,6 +3,7 @@
 /// @docImport 'tag.dart';
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
@@ -162,6 +163,20 @@ enum TabsAlignment {
   fill,
 }
 
+/// How the keyboard selects a tab of a [Tabs] strip. A pointer selects the
+/// tab it presses either way.
+enum TabsActivation {
+  /// The arrow keys, Home and End select the tab they move focus to. Right
+  /// where a tab's content shows at once.
+  automatic,
+
+  /// The arrow keys, Home and End only move focus along the strip, and Enter
+  /// or Space selects the focused tab. For tabs whose content takes time to
+  /// show, such as one that loads from a server or is a route of its own:
+  /// crossing the strip then loads nothing on the way.
+  manual,
+}
+
 /// A horizontal page-tab strip: labels with a primary underline under the
 /// selected one, sitting on a full-width hairline. The view is selection-only —
 /// it reports taps via [onChanged]; wiring tabs to routes/content stays with the
@@ -175,6 +190,11 @@ enum TabsAlignment {
 /// [onChanged] fires as focus lands. Enter/Space re-activate the focused tab,
 /// and the theme's [FocusRing] shows inside it on keyboard focus. Screen
 /// readers get a tab bar of tabs with their selected state.
+///
+/// With [activation] manual, moving does not select: the arrows, Home and
+/// End carry focus and its ring along the strip, the selected tab stays
+/// selected, and Enter or Space selects the focused one. Focus that leaves
+/// the strip comes back to the selected tab.
 ///
 /// Overflow is handled per [alignment] (scroll vs justify). A scrolling strip
 /// also follows a vertical mouse wheel and a mouse drag, keeps the selected
@@ -234,6 +254,11 @@ class Tabs extends StatefulWidget {
   /// fade. Null leaves the fade as the only cue.
   final String? overflowMenuLabel;
 
+  /// Whether moving focus along the strip with the keyboard selects the tab
+  /// it lands on (automatic, the default) or waits for Enter or Space
+  /// (manual).
+  final TabsActivation activation;
+
   const Tabs({
     super.key,
     required this.tabs,
@@ -244,6 +269,7 @@ class Tabs extends StatefulWidget {
     this.baseline = true,
     this.size = ControlSize.medium,
     this.overflowMenuLabel,
+    this.activation = TabsActivation.automatic,
   }) : ids = null,
        selection = null;
 
@@ -261,6 +287,7 @@ class Tabs extends StatefulWidget {
     this.baseline = true,
     this.size = ControlSize.medium,
     this.overflowMenuLabel,
+    this.activation = TabsActivation.automatic,
   }) : tabs = tabs.values.toList(),
        ids = tabs.keys.toList(),
        _selected = -1,
@@ -320,7 +347,7 @@ class _TabsState extends State<Tabs> {
   void dispose() {
     widget.selection?.removeListener(_onSelection);
     for (final node in _nodes) {
-      node.removeListener(_syncStop);
+      node.removeListener(_onFocusChange);
       node.dispose();
     }
     _scroll.dispose();
@@ -343,12 +370,13 @@ class _TabsState extends State<Tabs> {
   void _syncNodes() {
     while (_nodes.length > widget.tabs.length) {
       // The tab it served unmounts in the coming build, still holding it.
-      final node = _nodes.removeLast()..removeListener(_syncStop);
+      final node = _nodes.removeLast()..removeListener(_onFocusChange);
       WidgetsBinding.instance.addPostFrameCallback((_) => node.dispose());
     }
     while (_nodes.length < widget.tabs.length) {
       _nodes.add(
-        FocusNode(debugLabel: 'Tab ${_nodes.length}')..addListener(_syncStop),
+        FocusNode(debugLabel: 'Tab ${_nodes.length}')
+          ..addListener(_onFocusChange),
       );
     }
     _syncStop();
@@ -378,6 +406,21 @@ class _TabsState extends State<Tabs> {
     }
   }
 
+  bool _stopSyncQueued = false;
+
+  /// A tab gained or lost focus, which may move the stop: back to the
+  /// selected tab as focus leaves another. The focus manager is telling its
+  /// nodes as this runs and takes no change to a node meanwhile, so the stop
+  /// moves once it is done.
+  void _onFocusChange() {
+    if (_stopSyncQueued) return;
+    _stopSyncQueued = true;
+    scheduleMicrotask(() {
+      _stopSyncQueued = false;
+      if (mounted) _syncStop();
+    });
+  }
+
   KeyEventResult _onKey(FocusNode _, KeyEvent event) {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
@@ -403,7 +446,9 @@ class _TabsState extends State<Tabs> {
     if (target != current) {
       _nodes[target].requestFocus();
       _reveal(target, animate: true);
-      widget.onChanged(target);
+      if (widget.activation == TabsActivation.automatic) {
+        widget.onChanged(target);
+      }
     }
     return KeyEventResult.handled;
   }

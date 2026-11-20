@@ -85,6 +85,16 @@ class TabsDemo extends StatelessWidget {
 
         const DemoSection('Enclosed — folder tabs attached to a panel'),
         const _Enclosed(),
+        const Gap(AdminSpacing.xl),
+
+        const DemoSection(
+          'Manual activation — the arrow keys move focus, Enter or Space '
+          'selects',
+        ),
+        const _Tabbed(
+          tabs: [TabItem('Details'), TabItem('History'), TabItem('Audit log')],
+          activation: TabsActivation.manual,
+        ),
       ],
     );
   }
@@ -165,11 +175,14 @@ class _Tabbed extends StatefulWidget {
   /// The tab selected on first build — as a deep link would open it.
   final int initial;
 
+  final TabsActivation activation;
+
   const _Tabbed({
     required this.tabs,
     this.alignment = TabsAlignment.start,
     this.size = ControlSize.medium,
     this.initial = 0,
+    this.activation = TabsActivation.automatic,
   });
 
   @override
@@ -189,6 +202,7 @@ class _TabbedState extends State<_Tabbed> {
           selected: _selected,
           alignment: widget.alignment,
           size: widget.size,
+          activation: widget.activation,
           onChanged: (i) => setState(() => _selected = i),
         ),
         Padding(

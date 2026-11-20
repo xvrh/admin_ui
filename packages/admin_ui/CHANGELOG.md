@@ -2,6 +2,18 @@
 
 ## 0.2.0
 
+- `Tabs` takes `activation`. `TabsActivation.manual` has the arrow keys,
+  Home and End move focus along the strip and select nothing, and Enter or
+  Space select the focused tab; focus that leaves the strip comes back to
+  the selected tab. For tabs whose content takes time to show, such as a
+  tab that loads from a server or is a route of its own. The default,
+  `automatic`, selects as focus moves, as before. A pointer selects either
+  way.
+- A `Tabs` strip no longer throws as focus leaves it from a tab that is
+  not the selected one. That happened where the host refused a selection
+  made with the arrow keys, an unsaved form that would not be left for
+  one, and Tab was then pressed: the strip moved its Tab stop while the
+  focus manager was telling its nodes.
 - `SingleReferenceField` edits one related record: a `Cell<K?>` holding
   its id, or null for none. With none it shows the link button; with one,
   that record's row alone, so nothing adds a second. The row carries a

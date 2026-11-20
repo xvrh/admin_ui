@@ -172,6 +172,7 @@ export 'src/common/ui/tabs.dart'
         TabScope,
         TabSelection,
         Tabs,
+        TabsActivation,
         TabsAlignment,
         TabsVariant;
 export 'src/common/ui/tag.dart' show Tag, TagVariant;
