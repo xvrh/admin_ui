@@ -9,6 +9,7 @@ import '../demo_kit.dart';
 /// widgets it has not moved to the kit. The accent is drawn where it holds
 /// its contrast: a button's label and a selected tile in `primaryText`; a
 /// checked, selected or on control and a tab indicator in `controlAccent`.
+/// A tonal button is the palette's soft fill, as the kit's soft button is.
 /// The second column lays a light accent over the theme, the case where
 /// `primary` itself reads too faintly on the page.
 class StockMaterialDemo extends StatelessWidget {
@@ -60,6 +61,10 @@ class _Widgets extends StatelessWidget {
                   OutlinedButton(onPressed: _noop, child: const Text('Edit')),
                   ElevatedButton(onPressed: _noop, child: const Text('Export')),
                   FilledButton(onPressed: _noop, child: const Text('Save')),
+                  FilledButton.tonal(
+                    onPressed: _noop,
+                    child: const Text('Share'),
+                  ),
                   TextButton(onPressed: _noop, child: const Text('Cancel')),
                 ],
               ),

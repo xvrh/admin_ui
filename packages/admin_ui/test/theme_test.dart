@@ -564,6 +564,8 @@ void main() {
         expect(scheme.onError, p.onDanger);
         expect(scheme.primaryContainer, p.primarySubtle);
         expect(scheme.onPrimaryContainer, p.primaryText);
+        expect(scheme.secondaryContainer, p.softFill);
+        expect(scheme.onSecondaryContainer, p.onSoft);
         expect(scheme.scrim, p.scrim);
         expect(scheme.shadow, p.shadow);
         expect(
