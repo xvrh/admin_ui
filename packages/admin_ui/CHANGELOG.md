@@ -580,6 +580,14 @@
 
 ### Looks
 
+- A stock Material widget that takes the scheme's secondary container (a
+  `FilledButton.tonal`, a selected `FilterChip`, a `NavigationBar`'s
+  indicator) takes the palette's `softFill` under `onSoft`, as the kit's own
+  soft button does. It took `primarySubtle` under `primaryText`. Only
+  Material authors a soft fill, so only Material changes: its stock tonal
+  button is M3's `secondaryContainer` under `onSecondaryContainer`, #E8DEF8
+  under #1D192B (was #EADDFF under #6750A4), and in dark mode its label is
+  #E8DEF8 (was #D0BCFF) on the same #4A4458.
 - An overlay is filled as its theme's reference system fills it, where that
   is not the card's colour; every overlay was the palette's `surface`. Iris,
   Fluent and Carbon, and the light palettes of shadcn and Ant, do not

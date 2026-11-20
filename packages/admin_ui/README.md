@@ -973,7 +973,10 @@ A few roles are always derived, and follow whatever the roles above resolve to:
 | `foregroundMutedOnTint` | `foregroundMuted`, adjusted to 4.5:1 on every tinted fill (`surfaceMuted`, `primarySubtle`, `primaryFaint`, `listHighlight`, the selected table rows, a hovered `surface`); for captions and SKUs in selected or highlighted rows |
 
 `palette.colorScheme` maps every role to Material's `ColorScheme`, so stock
-Material widgets follow the palette too.
+Material widgets follow the palette too. Its secondary container is the soft
+fill, `softFill` under `onSoft`, so a stock `FilledButton.tonal`, a selected
+chip or a navigation bar's indicator is drawn as the kit's own soft button
+is.
 
 ### Control sizes and table density
 

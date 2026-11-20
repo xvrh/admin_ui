@@ -682,8 +682,10 @@ class AdminPalette {
       onPrimaryContainer: primaryText,
       secondary: primary,
       onSecondary: onPrimary,
-      secondaryContainer: primarySubtle,
-      onSecondaryContainer: primaryText,
+      // What a stock tonal button, a selected chip and a navigation bar's
+      // indicator are filled with: the soft fill, as the kit's soft button.
+      secondaryContainer: softFill,
+      onSecondaryContainer: onSoft,
       tertiary: info,
       onTertiary: onInfo,
       tertiaryContainer: statusFill(info),
