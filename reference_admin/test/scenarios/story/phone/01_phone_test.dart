@@ -80,7 +80,8 @@ void main() {
     expect(shop.route, isA<Orders>());
     expect(find.byKey(ShellKeys.drawer), findsNothing);
     if (!compact) return;
-    expect(_collectionIn(CollectionViewMode.cards), findsOneWidget);
+    expect(_cards, findsOneWidget);
+    expect(_table, findsNothing);
 
     // A strip would cut a view's name at the phone's edge: the views are a
     // menu under the active one.
@@ -239,8 +240,10 @@ void main() {
   });
 }
 
-Finder _collectionIn(CollectionViewMode mode) =>
-    find.byWidgetPredicate((w) => w is Collection && w.viewMode == mode);
+/// The layout a list is drawn in: the screen names both, and the collection
+/// picks by the window.
+final _cards = find.byWidgetPredicate((w) => w is CollectionCards);
+final _table = find.byWidgetPredicate((w) => w is CollectionTable);
 
 /// The first text input of the field keyed [field]: a translated field's
 /// lane in the language shown.

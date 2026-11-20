@@ -206,8 +206,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         columns: _columns(context),
         density: _services.appearance.density,
         onRowTap: (c) => context.go(Customers(selected: c.id)),
-        // FRICTION(F-011): the screen switches to cards on a phone.
-        viewMode: compact ? CollectionViewMode.cards : CollectionViewMode.table,
+        compactViewMode: CollectionViewMode.cards,
         cardBuilder: _card,
         empty: EmptyState(
           icon: Icons.people_outline,
