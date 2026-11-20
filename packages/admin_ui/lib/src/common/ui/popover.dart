@@ -14,6 +14,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import '../../theme/overlay_style.dart';
 import '../../theme/tokens.dart';
 import '../motion.dart';
+import 'chrome_theme.dart';
 
 /// Which side of the anchor the popover opens on.
 ///
@@ -537,8 +538,21 @@ class _PopoverState extends State<Popover> implements PopoverController {
                       // web platform view (an embedded iframe, say), which
                       // would otherwise take the clicks meant for its items.
                       child: PointerInterceptor(
+                        // The content is built in the palette of what
+                        // stands on a popover, whose `surface` is the
+                        // popover's fill: whatever it reads above its own
+                        // surface is read there too.
                         child: Builder(
-                          builder: (context) => widget.content(context, this),
+                          builder: (context) {
+                            final page = context.colors;
+                            return ChromeTheme(
+                              palette: page.withSurface(page.popoverSurface),
+                              child: Builder(
+                                builder: (context) =>
+                                    widget.content(context, this),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),

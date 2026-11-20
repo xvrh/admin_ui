@@ -82,6 +82,9 @@ const shadcnDarkPalette = AdminPalette(
   primaryFaint: Color(0xFF1F1F22),
   surface: Color(0xFF18181B), // --card
   background: Color(0xFF09090B), // --background
+  // DialogContent and SheetContent are bg-background, the page's colour,
+  // where a popover is bg-popover, the card's
+  modalSurface: Color(0xFF09090B),
   surfaceMuted: Color(0xFF111113),
   foreground: Color(0xFFFAFAFA),
   foregroundSecondary: Color(0xFFE4E4E7),

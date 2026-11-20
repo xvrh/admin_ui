@@ -13,6 +13,7 @@ import '../../theme/tokens.dart';
 import '../fuzzy.dart';
 import '../motion.dart';
 import '../text_metrics.dart';
+import 'chrome_theme.dart';
 import 'field_registry.dart' show FormFieldCommands;
 import 'highlighted_text.dart';
 import 'modal_anchor.dart';
@@ -666,6 +667,16 @@ class _CommandPaletteState extends State<CommandPalette> {
 
   @override
   Widget build(BuildContext context) {
+    final page = context.colors;
+    return ChromeTheme(
+      palette: page.withSurface(page.popoverSurface),
+      child: Builder(builder: _surface),
+    );
+  }
+
+  /// The palette, filled as a popover is (shadcn's `Command` is
+  /// `bg-popover`) and drawn in the palette of what stands on one.
+  Widget _surface(BuildContext context) {
     final sections = _controller.sections;
     final flat = [for (final s in sections) ...s.entries];
 

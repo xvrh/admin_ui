@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:mime/mime.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import '../../common/ui/chrome_theme.dart';
 import '../../common/ui/dashed_border.dart';
 import '../../common/ui/error_text.dart';
 import '../../common/ui/icon_action.dart';
@@ -233,6 +234,16 @@ class _AssetPickerDialogState extends State<_AssetPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final page = context.colors;
+    return ChromeTheme(
+      palette: page.withSurface(page.modalSurface),
+      child: Builder(builder: _dialog),
+    );
+  }
+
+  /// The dialog, under the palette of what stands on a modal: its
+  /// `surface` is the modal's fill.
+  Widget _dialog(BuildContext context) {
     final library = _LibraryPane(
       controller: _library,
       onCancel: _close,

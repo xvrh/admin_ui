@@ -6,12 +6,18 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/tokens.dart';
+import 'chrome_theme.dart';
 import 'popover.dart';
 
 /// The floating card a popover menu sits in — the elevated, rounded, clipped
-/// `surface` card shared by the action [Menu] and the field dropdowns,
-/// rounded to the theme's menu radius and ringed in a hairline where the
-/// theme rings a popover (`AdminOverlayStyle.popoverOutline`).
+/// card shared by the action [Menu] and the field dropdowns, filled with
+/// the palette's `popoverSurface`, rounded to the theme's menu radius and
+/// ringed in a hairline where the theme rings a popover
+/// (`AdminOverlayStyle.popoverOutline`).
+///
+/// Its [child] is drawn in the palette of what stands on that fill
+/// (`AdminPalette.withSurface`): under it, `context.colors.surface` is the
+/// popover's own colour, and a row's highlight is laid over it.
 ///
 /// A popover loosens to the whole screen, so the content must declare its own
 /// width. Two modes:
@@ -63,6 +69,16 @@ class PopoverMenuSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final page = context.colors;
+    return ChromeTheme(
+      palette: page.withSurface(page.popoverSurface),
+      child: Builder(builder: _surface),
+    );
+  }
+
+  /// The surface, under the palette of what stands on a popover: its
+  /// `surface` is the popover's fill.
+  Widget _surface(BuildContext context) {
     final request = popoverRequestOf(context);
     final available = fitAvailableHeight
         ? Popover.availableSizeOf(context)

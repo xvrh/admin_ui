@@ -295,7 +295,7 @@ void main() {
                     .foregroundPainter!
                 as PopoverArrowPainter;
         final edge = _edge(look.theme, tokens, modal: false);
-        expect(arrow.fill, tokens.palette.surface);
+        expect(arrow.fill, tokens.palette.popoverSurface);
         // Its slanted edges are stroked in the surface's edge, or not at
         // all; its base reaches a pixel into the surface either way.
         expect(

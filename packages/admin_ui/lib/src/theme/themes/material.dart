@@ -85,6 +85,10 @@ const materialPalette = AdminPalette(
   // a plain tooltip's and a snackbar's container, and what reads on it
   inverseSurface: Color(0xFF322F35), // inverseSurface: neutral20
   onInverseSurface: Color(0xFFF5EFF7), // inverseOnSurface: neutral95
+  // what M3 lifts off the page takes a container tone of its own
+  popoverSurface: Color(0xFFF3EDF7), // a menu: surfaceContainer
+  modalSurface: Color(0xFFECE6F0), // a dialog: surfaceContainerHigh
+  sheetSurface: Color(0xFFF7F2FA), // a sheet: surfaceContainerLow
 );
 
 /// Material 3 (dark) — the page is `surface`, cards and inputs the
@@ -129,6 +133,9 @@ const materialDarkPalette = AdminPalette(
   onSoft: Color(0xFFE8DEF8), // onSecondaryContainer
   inverseSurface: Color(0xFFE6E0E9), // inverseSurface: neutral90
   onInverseSurface: Color(0xFF322F35), // inverseOnSurface: neutral20
+  // a menu is surfaceContainer, which is the card's colour here
+  modalSurface: Color(0xFF2B2930), // a dialog: surfaceContainerHigh
+  sheetSurface: Color(0xFF1D1B20), // a sheet: surfaceContainerLow
 );
 
 /// M3's state layers: hover 8%, focus and pressed 10%, dragged 16%, for a

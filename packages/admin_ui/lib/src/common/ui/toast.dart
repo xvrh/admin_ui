@@ -986,13 +986,15 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
     final pageIsDark = context.colors.brightness == Brightness.dark;
     // Built under the toast's palette where the theme gives it one, so its
     // text, status colours, action and close button are that palette's.
-    final Widget inner = Builder(
-      builder: (context) => _card(context, look, pageIsDark: pageIsDark),
+    // Otherwise under the page's as what stands on a popover reads it: a
+    // toast in the surface colour is filled as a popover is.
+    final page = context.colors;
+    final card = ChromeTheme(
+      palette: look.toastPalette ?? page.withSurface(page.popoverSurface),
+      child: Builder(
+        builder: (context) => _card(context, look, pageIsDark: pageIsDark),
+      ),
     );
-    final palette = look.toastPalette;
-    final card = palette == null
-        ? inner
-        : ChromeTheme(palette: palette, child: inner);
 
     return AnimatedBuilder(
       animation: _curve,
