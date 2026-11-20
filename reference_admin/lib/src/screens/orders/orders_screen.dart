@@ -290,22 +290,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
   /// columns hold their header, its sort arrow and their longest value
   /// ("En préparation", an Arabic month), and at 1024 wide (the rail) the
   /// row still fits without scrolling.
-  List<TableColumn<Order>> _columns(BuildContext context, bool menus) {
+  List<TableColumn<Order>> _columns(BuildContext context) {
     final strings = context.strings.orders;
     final arabic = Localizations.localeOf(context).languageCode == 'ar';
-    // FRICTION(F-203): CollectionTable has no row context menu; each cell
-    // is wrapped in its own region, filled out to the cell's padding.
-    Widget Function(BuildContext, Order) cell(
-      Widget Function(BuildContext, Order) build, {
-      AlignmentGeometry align = AlignmentDirectional.centerStart,
-    }) => !menus
-        ? build
-        : (context, order) => ContextMenuRegion(
-            entries: (context) => _rowMenu(context, order),
-            child: SizedBox.expand(
-              child: Align(alignment: align, child: build(context, order)),
-            ),
-          );
     return [
       TableColumn(
         id: OrderFields.number,
@@ -314,12 +301,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
         pinned: true,
         hideable: false,
         sortKey: OrderFields.number,
-        cellBuilder: cell(
-          (context, o) => Text(
-            o.label,
-            key: OrdersKeys.row(o.number),
-            style: context.type.bodyStrong,
-          ),
+        cellBuilder: (context, o) => Text(
+          o.label,
+          key: OrdersKeys.row(o.number),
+          style: context.type.bodyStrong,
         ),
       ),
       TableColumn(
@@ -328,18 +313,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
         flex: 3,
         minWidth: 136,
         sortKey: OrderFields.customer,
-        cellBuilder: cell((context, o) => OrderCustomer(o)),
+        cellBuilder: (context, o) => OrderCustomer(o),
       ),
       TableColumn(
         id: OrderFields.placedAt,
         label: strings.columnPlaced,
         fixed: arabic ? 196 : 168,
         sortKey: OrderFields.placedAt,
-        cellBuilder: cell(
-          (context, o) => Text(
-            formatDateTime(context, o.placedAt),
-            style: tableMutedStyle(context),
-          ),
+        cellBuilder: (context, o) => Text(
+          formatDateTime(context, o.placedAt),
+          style: tableMutedStyle(context),
         ),
       ),
       TableColumn(
@@ -347,14 +330,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
         label: strings.columnStatus,
         fixed: 156,
         sortKey: OrderFields.status,
-        cellBuilder: cell((context, o) => OrderStatusPill(o.status)),
+        cellBuilder: (context, o) => OrderStatusPill(o.status),
       ),
       TableColumn(
         id: OrderFields.payment,
         label: strings.columnPayment,
         flex: 2,
         minWidth: 104,
-        cellBuilder: cell((context, o) => PaymentSummary(o)),
+        cellBuilder: (context, o) => PaymentSummary(o),
       ),
       TableColumn(
         id: OrderFields.items,
@@ -362,10 +345,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
         fixed: 96,
         numeric: true,
         sortKey: OrderFields.items,
-        cellBuilder: cell(
-          (context, o) => Text(context.adminFormats.integer(o.itemCount)),
-          align: AlignmentDirectional.centerEnd,
-        ),
+        cellBuilder: (context, o) =>
+            Text(context.adminFormats.integer(o.itemCount)),
       ),
       TableColumn(
         id: OrderFields.total,
@@ -373,10 +354,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         fixed: 104,
         numeric: true,
         sortKey: OrderFields.total,
-        cellBuilder: cell(
-          (context, o) => MoneyText(o.totalCents),
-          align: AlignmentDirectional.centerEnd,
-        ),
+        cellBuilder: (context, o) => MoneyText(o.totalCents),
       ),
     ];
   }
@@ -411,7 +389,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   Widget _toolbar(BuildContext context, {required bool compact}) {
     final strings = context.strings.orders;
-    final columns = _columns(context, false);
+    final columns = _columns(context);
     final filtered = _list.query.filters.length;
     return CollectionToolbar(
       key: OrdersKeys.toolbar,
@@ -518,10 +496,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
       builder: (context, _) => Collection<Order>(
         key: OrdersKeys.list,
         controller: _list,
-        columns: _layout.apply(_columns(context, !compact)),
+        columns: _layout.apply(_columns(context)),
         columnWidths: _layout.widths,
         selectable: manage,
         onRowTap: _open,
+        rowMenu: (order) => _rowMenu(context, order),
         density: _services.appearance.density,
         compactViewMode: CollectionViewMode.cards,
         cardBuilder: (context, order) => OrderCard(order, checkRoom: manage),

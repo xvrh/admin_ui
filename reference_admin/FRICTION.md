@@ -50,7 +50,7 @@ two together.
 | F-110 | `StatCard` has no loading state | missing-api | S2 | fixed |
 | F-201 | A saved view's name is stored text, so `SavedViewsBar` cannot show the shop's own views in the page's language | i18n | S3 | open |
 | F-202 | A list with saved views is read twice on open | perf | S3 | open |
-| F-203 | `CollectionTable` has no row context menu | missing-api | S3 | open |
+| F-203 | `CollectionTable` has no row context menu | missing-api | S3 | fixed |
 | F-204 | `SavedViewsBar`'s actions reach every view alike | missing-api | S3 | open |
 | F-205 | The kit has mention helpers but no mention composer | missing-api | S2 | fixed |
 | F-206 | Anything but a `FormSubmitException` out of `onSubmit` is reported as a Flutter error | awkward-default | S3 | fixed |
@@ -596,12 +596,12 @@ Owned by WP-B.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `collection.dart › CollectionTable`, `TableColumn` (`lib/src/collection/ui/collection_table.dart:46`): no row menu; `widgets.dart › ContextMenuRegion` wraps one widget.
 - **App:** `lib/src/screens/orders/orders_screen.dart` `_columns` › `cell()` (~15 lines): every cell is wrapped in a `ContextMenuRegion` stretched to the cell's padding box.
 - **Evidence:** "Right-click and hover" › "Orders · row menu". A right-click on a cell's padding opens nothing, and the row is not marked while its menu is open (the kit's own guidance for `onOpenChanged`).
 - **Workaround:** a region per cell, entries built per row.
-- **Proposal:** `CollectionTable(rowMenu: List<MenuEntry> Function(T row))` (and on `Collection`), tinting the row as selected while its menu is open; Shift+F10 on the focused row.
+- **Proposal:** `CollectionTable(rowMenu: List<MenuEntry> Function(T row))` (and on `Collection`), tinting the row as selected while its menu is open; Shift+F10 on the focused row. Done as proposed: a right-click anywhere on the row, its padding included, or a finger's long press opens the menu at the pointer, Shift+F10 or the context-menu key opens it under the focused cell, and the row is drawn as a selected one while it is open. The orders list passes `rowMenu` and its cells are no longer wrapped. Table view only: a card's long press is its selection.
 
 ### F-204 · `SavedViewsBar`'s actions reach every view alike
 
