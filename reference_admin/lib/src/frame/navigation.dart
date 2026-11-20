@@ -173,7 +173,17 @@ class ShopMark extends StatelessWidget {
           size: context.iconSizes.lg,
         ),
         const Gap(AdminSpacing.sm),
-        Text(name, style: context.type.heading),
+        // Where the top bar is short of room, the name gives way to the
+        // search icon and the actions.
+        Flexible(
+          child: Text(
+            name,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: context.type.heading,
+          ),
+        ),
       ],
     );
   }

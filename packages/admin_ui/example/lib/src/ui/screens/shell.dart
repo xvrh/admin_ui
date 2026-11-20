@@ -324,10 +324,23 @@ class _ShellDemoState extends State<ShellDemo> {
     return Padding(
       padding: const EdgeInsetsDirectional.only(end: AdminSpacing.md),
       child: Row(
+        // As wide as the mark and the name, and no wider where the bar has
+        // room to give.
+        mainAxisSize: MainAxisSize.min,
         children: [
           _workspaceMark(context),
           const Gap(AdminSpacing.md),
-          Text('Acme Admin', style: context.type.bodyStrong),
+          // Where the bar runs out of room, the name gives way, down to
+          // the mark alone.
+          Flexible(
+            child: Text(
+              'Acme Admin',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: context.type.bodyStrong,
+            ),
+          ),
         ],
       ),
     );
