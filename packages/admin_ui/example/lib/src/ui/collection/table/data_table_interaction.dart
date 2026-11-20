@@ -12,7 +12,9 @@ import '../sample.dart';
 /// Demo — the table's interaction states, one per knob value and pinned the
 /// way a person would reach them: the keyboard's focused cell and its ring,
 /// an open inline editor, an open header menu (sorted, so "Clear sort" is
-/// live), the row hover over a stripe and over a selection, the pointer on
+/// live), a row's context menu open under its focused cell with the row
+/// drawn as selected, the row hover over a stripe and over a selection, the
+/// pointer on
 /// a column boundary, and the pinned edge's rule and shadow once the columns
 /// scroll under it. The table keeps these states to itself, so the demo
 /// sends the keys, the hover or the scroll after its first frame.
@@ -32,6 +34,9 @@ class DataTableInteractionDemo extends StatelessWidget {
   @Preview(name: 'Interaction · header menu open', wrapper: adminUiPreview)
   const DataTableInteractionDemo.headerMenu({super.key})
     : _pin = _Pin.headerMenu;
+
+  @Preview(name: 'Interaction · row menu open', wrapper: adminUiPreview)
+  const DataTableInteractionDemo.rowMenu({super.key}) : _pin = _Pin.rowMenu;
 
   @Preview(name: 'Interaction · row hover on a stripe', wrapper: adminUiPreview)
   const DataTableInteractionDemo.hoverStripe({super.key})
@@ -65,6 +70,7 @@ class DataTableInteractionDemo extends StatelessWidget {
           'Focused cell': _Pin.focusedCell,
           'Editing a cell': _Pin.editing,
           'Header menu open': _Pin.headerMenu,
+          'Row menu open': _Pin.rowMenu,
           'Row hover on a stripe': _Pin.hoverStripe,
           'Row hover on a selection': _Pin.hoverSelected,
           'Pointer on a column edge': _Pin.resizeEdge,
@@ -89,6 +95,7 @@ enum _Pin {
   focusedCell,
   editing,
   headerMenu,
+  rowMenu,
   hoverStripe,
   hoverSelected,
   resizeEdge,
@@ -140,6 +147,12 @@ class _PinnedTableState extends State<_PinnedTable> {
         await _press(LogicalKeyboardKey.arrowDown);
         await _press(forward);
         await _press(LogicalKeyboardKey.f2);
+      case _Pin.rowMenu:
+        // The context-menu key, on the third row's first cell.
+        await _focusGrid();
+        await _press(LogicalKeyboardKey.arrowDown);
+        await _press(LogicalKeyboardKey.arrowDown);
+        await _press(LogicalKeyboardKey.contextMenu);
       case _Pin.headerMenu:
         final name = context.adminL10n.collection.columnOptionsFor('Price');
         final trigger = _find((w) => w is IconAction && w.label == name);
@@ -213,6 +226,7 @@ class _PinnedTableState extends State<_PinnedTable> {
       LogicalKeyboardKey.arrowLeft => PhysicalKeyboardKey.arrowLeft,
       LogicalKeyboardKey.arrowRight => PhysicalKeyboardKey.arrowRight,
       LogicalKeyboardKey.f2 => PhysicalKeyboardKey.f2,
+      LogicalKeyboardKey.contextMenu => PhysicalKeyboardKey.contextMenu,
       _ => PhysicalKeyboardKey.space,
     };
     final event = KeyDownEvent(
@@ -283,6 +297,27 @@ class _PinnedTableState extends State<_PinnedTable> {
         columnWidths: _widths,
         onColumnResize: (key, width) => setState(() => _widths[key] = width),
         onHideColumn: (_) {},
+        rowMenu: widget.pin != _Pin.rowMenu
+            ? null
+            : (p) => [
+                MenuItem(
+                  'Open ${p.name}',
+                  icon: Icons.open_in_new_rounded,
+                  onSelect: () {},
+                ),
+                MenuItem(
+                  'Duplicate',
+                  icon: Icons.copy_rounded,
+                  onSelect: () {},
+                ),
+                const MenuDivider(),
+                MenuItem(
+                  'Archive',
+                  icon: Icons.archive_outlined,
+                  danger: true,
+                  onSelect: () {},
+                ),
+              ],
         columns: [
           TableColumn(
             id: 'name',

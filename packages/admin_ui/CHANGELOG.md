@@ -2,6 +2,16 @@
 
 ## 0.2.0
 
+- A table row has a context menu: `CollectionTable(rowMenu:)`, and
+  `Collection(rowMenu:)` for its table view, builds a row's entries. A
+  right-click anywhere on the row, its padding included, or a finger's
+  long press opens the menu at the pointer; Shift+F10 or the context-menu
+  key opens it under the focused cell, on its first item. The row is drawn
+  as a selected one while its menu is open, and Escape or a choice hands
+  focus back to the table. A row that gives no entry opens none, and
+  neither does a row dimmed under a reload. A menu follows its record
+  through a sort and closes when the record leaves the page. Wrapping
+  every cell in a `ContextMenuRegion` did none of the last four.
 - `Collection` takes `compactViewMode`, the layout that takes `viewMode`'s
   place while the window is compact (`AdminBreakpoint.of`: narrower than
   the theme's `breakpoints.medium`, a phone). With

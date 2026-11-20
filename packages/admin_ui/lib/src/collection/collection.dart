@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../common/ui/error_state.dart';
 import '../common/ui/error_text.dart';
+import '../common/ui/menu.dart';
 import '../l10n/admin_ui_localizations.dart';
 import '../theme/breakpoints.dart';
 import '../theme/table_metrics.dart';
@@ -132,6 +133,11 @@ class Collection<T> extends StatelessWidget {
   /// [CollectionTable.onColumnResizeEnd].
   final void Function(String key, double width)? onColumnResizeEnd;
 
+  /// Builds a table row's context menu, opened by a right-click or a long
+  /// press on the row and by Shift+F10 on its focused cell (table view
+  /// only); see [CollectionTable.rowMenu].
+  final List<MenuEntry> Function(T row)? rowMenu;
+
   /// The key of the pager's previous-page arrow, to find it by in a test.
   final Key? previousPageKey;
 
@@ -163,6 +169,7 @@ class Collection<T> extends StatelessWidget {
     this.columnWidths,
     this.onColumnResize,
     this.onColumnResizeEnd,
+    this.rowMenu,
     this.previousPageKey,
     this.nextPageKey,
   }) : assert(
@@ -229,6 +236,7 @@ class Collection<T> extends StatelessWidget {
                   columnWidths: columnWidths,
                   onColumnResize: onColumnResize,
                   onColumnResizeEnd: onColumnResizeEnd,
+                  rowMenu: rowMenu,
                   loading: c.loading,
                   empty: empty,
                   filtered: filtered,

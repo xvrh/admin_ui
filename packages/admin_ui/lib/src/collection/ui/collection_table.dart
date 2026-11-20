@@ -10,6 +10,7 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 import '../../common/pointer.dart';
 import '../../common/text_metrics.dart';
+import '../../common/ui/browser_menu_hold.dart';
 import '../../common/ui/checkbox.dart';
 import '../../common/ui/delayed_loading.dart';
 import '../../common/ui/empty_state.dart';
@@ -220,6 +221,13 @@ class TableSort {
 /// back a column, and Alt+← widens one. Home and End stay the first and the
 /// last column.
 ///
+/// **Row menu.** With [rowMenu], a right-click anywhere on a row opens its
+/// menu at the pointer, as a long press does under a finger, and Shift+F10
+/// or the context-menu key opens it under the focused cell, on its first
+/// item. The row is tinted as a selected one while its menu is open, and
+/// Escape or a choice hands focus back to the table. On the web the
+/// browser's own menu is off over the rows.
+///
 /// Assistive technology reads it as a table — a row of column headers over
 /// rows of cells — whose one focus target is the focused cell, so a move of
 /// it is announced.
@@ -323,6 +331,13 @@ class CollectionTable<T> extends StatefulWidget {
   /// grows with the body's.
   final double? headerHeight;
 
+  /// Builds the context menu of [row]: what a right-click or a long press
+  /// on the row, and Shift+F10 or the context-menu key on its focused cell,
+  /// open. It is asked each time the menu opens and while it is open, so
+  /// the entries can follow the record. A row it gives no entry opens no
+  /// menu, and neither does a row dimmed under a reload.
+  final List<MenuEntry> Function(T row)? rowMenu;
+
   const CollectionTable({
     super.key,
     required this.rows,
@@ -351,6 +366,7 @@ class CollectionTable<T> extends StatefulWidget {
     this.onColumnResizeEnd,
     this.rowHeight,
     this.headerHeight,
+    this.rowMenu,
   });
 
   @override
@@ -377,6 +393,9 @@ class _Signals {
   /// Whether the grid itself holds focus, rather than a control in a cell.
   final active = ValueNotifier<bool>(false);
 
+  /// The data row whose context menu is open, as a grid row.
+  final menuRow = ValueNotifier<int?>(null);
+
   /// The cell focus lands on until [cursor] is set.
   _Cell home = (row: 0, col: 0);
 
@@ -393,6 +412,7 @@ class _Signals {
     ring.dispose();
     resizing.dispose();
     active.dispose();
+    menuRow.dispose();
     edges.dispose();
   }
 }
@@ -428,6 +448,15 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
 
   /// The body cells on screen, for entering one that holds a control.
   final _bodyCells = <_Cell, _BodyCellState>{};
+
+  /// The row menu, which opens at a point over the grid.
+  PopoverController? _rowMenu;
+
+  /// The record the row menu is open on, by its key.
+  Object? _menuKey;
+  bool _menuOpen = false;
+
+  final _browserMenu = BrowserMenuHold();
 
   /// Live-drag width layer, keyed by column key. Sits over
   /// [CollectionTable.columnWidths]
@@ -491,6 +520,7 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
     final session = _session;
     _session = null;
     session?.cancel();
+    _browserMenu.over = false;
     _grid.removeListener(_onGridFocus);
     _grid.dispose();
     _vertical.dispose();
@@ -503,6 +533,73 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
     final rows = widget.rows;
     _indexByKey = {for (var i = 0; i < rows.length; i++) _keyOf(rows[i]): i};
     _selectedKeys = {...?widget.selected?.map(_keyOf)};
+    if (_menuOpen) _syncMenuRow();
+  }
+
+  // ── row menu ──
+
+  /// The row the open menu is on, wherever a sort or a refresh moved it. A
+  /// record that left the page takes its menu with it.
+  void _syncMenuRow() {
+    final index = widget.rowMenu == null ? null : _indexByKey[_menuKey];
+    void apply() {
+      if (!mounted || !_menuOpen) return;
+      _signals.menuRow.value = index == null ? null : index + 1;
+      if (index == null) _rowMenu?.close();
+    }
+
+    // The rows change in a build, where a cell cannot be told to rebuild.
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      SchedulerBinding.instance.addPostFrameCallback((_) => apply());
+    } else {
+      apply();
+    }
+  }
+
+  /// The entries of the menu's record as it now stands.
+  List<MenuEntry> _menuEntries(BuildContext context) {
+    final index = _indexByKey[_menuKey];
+    final build = widget.rowMenu;
+    if (index == null || build == null) return const [];
+    return build(widget.rows[index]);
+  }
+
+  /// Opens the menu of data row [index] at [position], or under [cell] when
+  /// the keyboard asked; false when the row has none to open.
+  bool _openRowMenu(int index, {Offset? position, _Cell? cell}) {
+    final menu = _rowMenu;
+    final build = widget.rowMenu;
+    if (menu == null || build == null || _stale || index >= _rowCount) {
+      return false;
+    }
+    final row = widget.rows[index];
+    if (build(row).isEmpty) return false;
+    _menuKey = _keyOf(row);
+    if (position == null && cell != null) {
+      final box = _bodyCells[cell]?.context.findRenderObject();
+      if (box is RenderBox && box.attached && box.hasSize) {
+        final rect = MatrixUtils.transformRect(
+          box.getTransformTo(null),
+          Offset.zero & box.size,
+        );
+        position = Directionality.of(context) == TextDirection.rtl
+            ? rect.bottomRight
+            : rect.bottomLeft;
+      }
+    }
+    position == null ? menu.open() : openPopoverAt(menu, position);
+    return true;
+  }
+
+  void _onRowMenuOpenChanged(bool open) {
+    _menuOpen = open;
+    if (open) {
+      _syncMenuRow();
+    } else {
+      _signals.menuRow.value = null;
+      _menuKey = null;
+    }
   }
 
   bool _isSelected(T row) => _selectedKeys.contains(_keyOf(row));
@@ -852,7 +949,11 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
       case LogicalKeyboardKey.f2 when !repeat:
         handled = !header && (inert || _startEdit(at.row - 1, at.col));
       case LogicalKeyboardKey.f10 when shift && !repeat:
-        handled = header && _openMenu(at.col);
+        handled = header
+            ? _openMenu(at.col)
+            : _openRowMenu(at.row - 1, cell: at);
+      case LogicalKeyboardKey.contextMenu when !repeat:
+        handled = !header && _openRowMenu(at.row - 1, cell: at);
       default:
         handled = false;
     }
@@ -1074,6 +1175,20 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
 
     Widget table = _table(context, bodyRows, skeleton: skeleton);
     if (skeleton) table = SkeletonGroup(child: table);
+    final hasRowMenu = widget.rowMenu != null;
+    if (!hasRowMenu) {
+      _rowMenu = null;
+      _browserMenu.over = false;
+    } else {
+      // On the web, the rows' menu stands in for the browser's. An opaque
+      // region: one that is not answers no hit test, and the table's own
+      // pointer listener above it would see no pointer land.
+      table = MouseRegion(
+        onEnter: (_) => _browserMenu.over = true,
+        onExit: (_) => _browserMenu.over = false,
+        child: table,
+      );
+    }
 
     return Stack(
       children: [
@@ -1083,6 +1198,21 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
             child: table,
           ),
         ),
+        if (hasRowMenu)
+          // The row menu's anchor lies over the grid, which keeps its
+          // pointers and its keys: the menu opens at a point on it.
+          Positioned.fill(
+            child: Menu.region(
+              entries: _menuEntries,
+              returnFocus: () => _grid,
+              gap: 2,
+              onOpenChanged: _onRowMenuOpenChanged,
+              builder: (context, controller) {
+                _rowMenu = controller;
+                return const SizedBox.expand();
+              },
+            ),
+          ),
         if (overlay != null)
           Positioned(
             top: _headerHeight,
@@ -1259,6 +1389,9 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
         cell: cell,
         selected: selected,
         onPointerDown: () => _pointAt(cell),
+        onContextMenu: widget.rowMenu == null
+            ? null
+            : (position) => _openRowMenu(index, position: position),
         onTap: onTap,
         // With a row tap, only when asked for: the tap then waits out a
         // double.
@@ -1549,6 +1682,10 @@ class _BodyCell extends StatefulWidget {
   final _Cell cell;
   final bool selected;
   final VoidCallback onPointerDown;
+
+  /// Opens the row's context menu at a global position: a right-click, or
+  /// a finger's long press.
+  final ValueChanged<Offset>? onContextMenu;
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
   final bool tapSemantics;
@@ -1560,6 +1697,7 @@ class _BodyCell extends StatefulWidget {
     required this.cell,
     required this.selected,
     required this.onPointerDown,
+    required this.onContextMenu,
     required this.onTap,
     required this.onDoubleTap,
     required this.tapSemantics,
@@ -1580,6 +1718,10 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
 
   bool _hovered = false;
 
+  /// Whether the row's context menu is open: the row is then drawn as a
+  /// selected one.
+  bool _menuOpen = false;
+
   @override
   _Signals get signals => widget.signals;
 
@@ -1591,7 +1733,9 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
     super.initState();
     widget.registry[cell] = this;
     signals.hoveredRow.addListener(_syncHover);
+    signals.menuRow.addListener(_syncMenu);
     _hovered = signals.hoveredRow.value == cell.row;
+    _menuOpen = signals.menuRow.value == cell.row;
     watchCursor();
   }
 
@@ -1604,6 +1748,7 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
       }
       widget.registry[cell] = this;
       _hovered = signals.hoveredRow.value == cell.row;
+      _menuOpen = signals.menuRow.value == cell.row;
       resyncCursor();
     }
   }
@@ -1612,6 +1757,7 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
   void dispose() {
     if (identical(widget.registry[cell], this)) widget.registry.remove(cell);
     signals.hoveredRow.removeListener(_syncHover);
+    signals.menuRow.removeListener(_syncMenu);
     unwatchCursor();
     _scope.dispose();
     super.dispose();
@@ -1620,6 +1766,11 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
   void _syncHover() {
     final next = signals.hoveredRow.value == cell.row;
     if (next != _hovered) setState(() => _hovered = next);
+  }
+
+  void _syncMenu() {
+    final next = signals.menuRow.value == cell.row;
+    if (next != _menuOpen) setState(() => _menuOpen = next);
   }
 
   /// Moves focus to the first control in the cell; false when it has none.
@@ -1636,9 +1787,20 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    // A row whose menu is open reads as a selected one.
+    final marked = widget.selected || _menuOpen;
     Widget child = Stack(
       fit: StackFit.expand,
       children: [
+        if (_menuOpen && !widget.selected)
+          // Laid over the row's fill, short of its trailing rule.
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 1,
+            child: ColoredBox(color: colors.tableRowSelected),
+          ),
         if (_hovered)
           // Laid over the row's fill, short of its trailing rule.
           Positioned(
@@ -1647,7 +1809,7 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
             top: 0,
             bottom: 1,
             child: ColoredBox(
-              color: widget.selected
+              color: marked
                   ? colors.tableRowSelectedHover
                   : colors.tableRowHover,
             ),
@@ -1669,6 +1831,27 @@ class _BodyCellState extends State<_BodyCell> with _CursorWatch<_BodyCell> {
           excludeFromSemantics: !widget.tapSemantics,
           onTap: widget.onTap,
           onDoubleTap: widget.onDoubleTap,
+          child: child,
+        ),
+      );
+    }
+    final onContextMenu = widget.onContextMenu;
+    if (onContextMenu != null) {
+      child = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        excludeFromSemantics: true,
+        onSecondaryTapUp: (details) => onContextMenu(details.globalPosition),
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          excludeFromSemantics: true,
+          // A mouse's long press is a slow click; its menu is the right
+          // button's.
+          supportedDevices: const {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.stylus,
+            PointerDeviceKind.invertedStylus,
+          },
+          onLongPressStart: (details) => onContextMenu(details.globalPosition),
           child: child,
         ),
       );

@@ -207,6 +207,7 @@ building_blocks:
     - CommandPaletteController
     - CommandScope
     - CommandSubscription
+    - ContextMenuRegion
     - CountBadge
     - CropHandle
     - CropMode
