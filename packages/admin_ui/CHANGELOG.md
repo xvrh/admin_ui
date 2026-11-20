@@ -2,6 +2,13 @@
 
 ## 0.2.0
 
+- `Collection` takes `compactViewMode`, the layout that takes `viewMode`'s
+  place while the window is compact (`AdminBreakpoint.of`: narrower than
+  the theme's `breakpoints.medium`, a phone). With
+  `compactViewMode: CollectionViewMode.cards` a table becomes cards on a
+  phone, which each screen had to decide for itself. The page, the query
+  and the selection are the controller's and carry across. Null, the
+  default, keeps `viewMode` at every width.
 - `Tabs` takes `activation`. `TabsActivation.manual` has the arrow keys,
   Home and End move focus along the strip and select nothing, and Enter or
   Space select the focused tab; focus that leaves the strip comes back to

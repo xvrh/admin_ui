@@ -1509,6 +1509,11 @@ with `AdminTheme.from(breakpoints: …)`, for example
 animating into another switches at one set of widths or the other, never in
 between. Test a class with `isCompact`, `isMedium` and `isExpanded`.
 
+A `Collection` makes the phone's switch itself where it is told what to
+switch to: `Collection(compactViewMode: CollectionViewMode.cards,
+cardBuilder: …)` is cards in a compact window and its `viewMode`, a table
+by default, in a wider one.
+
 ### Tokens, not literals
 
 Outside `lib/src/theme/`, the kit reads sizes, radii, spacing, motion and

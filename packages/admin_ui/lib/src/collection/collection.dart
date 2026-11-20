@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../common/ui/error_state.dart';
 import '../common/ui/error_text.dart';
 import '../l10n/admin_ui_localizations.dart';
+import '../theme/breakpoints.dart';
 import '../theme/table_metrics.dart';
 import 'collection_controller.dart';
 import 'ui/collection_cards.dart';
@@ -26,6 +27,19 @@ enum CollectionViewMode { table, cards }
 /// [ErrorTextScope.describe] and a Retry. The pager hides while there is
 /// nothing to page through, and while a failed load shows its error: the
 /// rows it would count are the ones from before the failure.
+///
+/// A table has no room on a phone. With [compactViewMode] the collection
+/// lays its rows out that way, as cards for one, while its window is
+/// compact, and as [viewMode] says in a wider one:
+///
+/// ```dart
+/// Collection<Order>(
+///   controller: orders,
+///   columns: columns,
+///   compactViewMode: CollectionViewMode.cards,
+///   cardBuilder: (context, order) => OrderCard(order),
+/// )
+/// ```
 class Collection<T> extends StatelessWidget {
   final CollectionController<T> controller;
   final List<TableColumn<T>> columns;
@@ -56,6 +70,19 @@ class Collection<T> extends StatelessWidget {
   /// Which layout to render. [cardBuilder] is required for
   /// [CollectionViewMode.cards].
   final CollectionViewMode viewMode;
+
+  /// The layout that takes [viewMode]'s place while the window is compact
+  /// ([AdminBreakpoint.of]: narrower than the theme's
+  /// `context.breakpoints.medium`, a phone); null keeps [viewMode] at every
+  /// width. The selection, the page and the query are the controller's, so
+  /// they carry from one layout to the other as the window is resized.
+  ///
+  /// It follows the window, as the shell's sidebar and a dialog's full
+  /// screen do, not the collection's own width: a table beside an open pane
+  /// stays a table. For a rule of your own, leave it null and pass
+  /// [viewMode] what the rule says ([AdminBreakpoint.forWidth] classifies a
+  /// `LayoutBuilder`'s width).
+  final CollectionViewMode? compactViewMode;
 
   /// Builds one card's content in [CollectionViewMode.cards]; see
   /// [CollectionCards.cardBuilder].
@@ -122,6 +149,7 @@ class Collection<T> extends StatelessWidget {
     this.pageSizes = const [10, 25, 50],
     this.showPageSize = false,
     this.viewMode = CollectionViewMode.table,
+    this.compactViewMode,
     this.cardBuilder,
     this.empty,
     this.errorBuilder,
@@ -138,12 +166,24 @@ class Collection<T> extends StatelessWidget {
     this.previousPageKey,
     this.nextPageKey,
   }) : assert(
-         viewMode != CollectionViewMode.cards || cardBuilder != null,
+         (viewMode != CollectionViewMode.cards &&
+                 compactViewMode != CollectionViewMode.cards) ||
+             cardBuilder != null,
          'CollectionViewMode.cards requires a cardBuilder',
        );
 
+  /// The layout shown in [context]'s window: [compactViewMode] in a compact
+  /// one, where it is given, and [viewMode] otherwise. Only a collection
+  /// with a [compactViewMode] follows the window's size.
+  CollectionViewMode _viewModeIn(BuildContext context) =>
+      switch (compactViewMode) {
+        final compact? when AdminBreakpoint.of(context).isCompact => compact,
+        _ => viewMode,
+      };
+
   @override
   Widget build(BuildContext context) {
+    final viewMode = _viewModeIn(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {

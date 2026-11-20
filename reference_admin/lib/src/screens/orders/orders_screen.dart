@@ -523,9 +523,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         selectable: manage,
         onRowTap: _open,
         density: _services.appearance.density,
-        // FRICTION(F-011): Collection keeps its table at any width; the
-        // screen switches to cards on a phone.
-        viewMode: compact ? CollectionViewMode.cards : CollectionViewMode.table,
+        compactViewMode: CollectionViewMode.cards,
         cardBuilder: (context, order) => OrderCard(order, checkRoom: manage),
         onHideColumn: (key) =>
             setState(() => _layout = _layout.withVisible(key, false)),

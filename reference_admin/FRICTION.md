@@ -19,7 +19,7 @@ two together.
 | F-008 | Kit-owned controls (FormSaveBar save, ErrorState retry, BulkActionBar actions, dialog confirm) take no keys | test-support | S3 | open |
 | F-009 | No money or relative-time formatting in `AdminFormats`; `DecimalField` has no currency mode | missing-api | S3 | open |
 | F-010 | No documented pattern for app strings; gen-l10n pulls in `flutter_localizations` | doc-gap | S3 | open |
-| F-011 | `Collection` does not switch from table to cards by width | missing-api | S3 | open |
+| F-011 | `Collection` does not switch from table to cards by width | missing-api | S3 | fixed |
 | F-012 | `ChartCard` has no error slot | missing-api | S3 | fixed |
 | F-013 | `AdminModule`'s String `route` and `navLabel` do not fit a typed router or a locale change | missing-api | S3 | wontfix |
 | F-014 | No permission model beyond `ValueForm(readOnly:)`, and no forbidden-state preset | missing-api | S3 | open |
@@ -247,12 +247,12 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open (confirmed by WP-B, WP-C and WP-D)
+- **Status:** fixed (kit)
 - **Kit:** `collection.dart › Collection`, `CollectionViewMode`.
 - **App:** `lib/src/screens/orders/orders_screen.dart`, `lib/src/screens/customers/customers_screen.dart`, `lib/src/screens/products/product_list.dart` and `lib/src/screens/team/team_screen.dart` each pick `CollectionViewMode.cards` from `Breakpoint.of(context)` (~5 lines each).
 - **Evidence:** "Phone · orders as cards" (phone story), and orders, customers, products and team on `iphone-16`: without the switch, `Collection` lays its table out at 393 px.
 - **Workaround:** the screen picks `CollectionViewMode.cards` below 600.
-- **Proposal:** `Collection(compactViewMode: CollectionViewMode.cards, compactBreakpoint: 600)`.
+- **Proposal:** `Collection(compactViewMode: CollectionViewMode.cards, compactBreakpoint: 600)`. Done, without the width: `Collection(compactViewMode:)` is the layout in a compact window (`AdminBreakpoint.of`, under the theme's `breakpoints.medium`), which is the rule the four screens wrote out, and `viewMode` the layout in a wider one. The orders, customers, products and team lists pass `compactViewMode: CollectionViewMode.cards` and no longer pick the view themselves. A screen with a rule of its own still passes `viewMode`.
 
 ### F-012 · `ChartCard` has no error slot
 

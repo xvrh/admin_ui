@@ -135,7 +135,6 @@ class _TeamScreenState extends State<TeamScreen> {
     final formats = context.adminFormats;
     final active = _staff.where((m) => m.status == StaffStatus.active).length;
     final invited = _staff.where((m) => m.status == StaffStatus.invited).length;
-    final compact = AdminBreakpoint.of(context).isCompact;
 
     Widget? actionsFor(StaffMember member) =>
         canManage && member.id != me && member.status != StaffStatus.deactivated
@@ -172,10 +171,7 @@ class _TeamScreenState extends State<TeamScreen> {
           key: MediaTeamKeys.staffList,
           controller: _controller,
           density: services.appearance.density,
-          // FRICTION(F-011): the screen picks cards below the compact width.
-          viewMode: compact
-              ? CollectionViewMode.cards
-              : CollectionViewMode.table,
+          compactViewMode: CollectionViewMode.cards,
           cardBuilder: (context, member) => _MemberCard(
             member: member,
             isMe: member.id == me,

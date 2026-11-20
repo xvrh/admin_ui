@@ -283,9 +283,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 controller: _collection,
                 columns: _layout.apply(columns),
                 columnWidths: _layout.widths,
-                viewMode: compact
-                    ? CollectionViewMode.cards
-                    : CollectionViewMode.table,
+                compactViewMode: CollectionViewMode.cards,
                 cardBuilder: _card,
                 onRowTap: _open,
                 editTrigger: TableEditTrigger.doubleTap,
