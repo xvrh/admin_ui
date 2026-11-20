@@ -2,6 +2,15 @@
 
 ## 0.2.0
 
+- An overlay that plays its arrival back as it leaves is on the theme's
+  exit curve as time runs: a modal, a side sheet, a toast and a modal on a
+  `ModalAnchor`. Each handed `motion.exit` to its animation as a
+  `reverseCurve`, which Flutter evaluates at the animation's value as it
+  runs from 1 to 0, so a curve that accelerates left fast and slowed to a
+  stop. Each hands it over flipped now. `AdminOverlayMotion.reverseCurve`
+  is read the same way, as the curve the overlay leaves on as time runs.
+  An app that plays `context.motion.exit` back in an animation of its own
+  passes `exit.flipped`.
 - A theme says how a modal arrives and leaves:
   `AdminOverlayStyle.modalMotion`, an `AdminOverlayMotion`. A modal opened
   with `showModal` always fades, as before; `scale` grows its card from a
@@ -522,6 +531,10 @@
 
 ### Looks
 
+- A modal, a side sheet, a toast and a modal on a `ModalAnchor` start to
+  leave slowly and are fastest as they go, in every theme, as each theme's
+  exit curve says; they left fast and slowed to a stop. How long they take
+  is unchanged, and nothing moves at rest or on the way in.
 - A modal opened with `showModal` arrives and leaves as each reference
   theme's dialog does, where every theme only faded it over its medium
   duration. Iris and Material keep that. At rest nothing moves.

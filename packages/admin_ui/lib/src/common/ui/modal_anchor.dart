@@ -161,7 +161,8 @@ class _ModalAnchorState extends State<ModalAnchor>
   late final _curved = CurvedAnimation(
     parent: _anim,
     curve: context.motion.enter,
-    reverseCurve: context.motion.exit,
+    // Flipped: see [AdminMotion.exit].
+    reverseCurve: context.motion.exit.flipped,
   );
 
   Completer<Object?>? _completer;
@@ -192,7 +193,7 @@ class _ModalAnchorState extends State<ModalAnchor>
     final motion = context.motion;
     _curved
       ..curve = motion.enter
-      ..reverseCurve = motion.exit;
+      ..reverseCurve = motion.exit.flipped;
   }
 
   @override

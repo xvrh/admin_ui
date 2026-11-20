@@ -46,7 +46,13 @@ class AdminMotion {
   /// Something arriving: decelerates into place.
   final Curve enter;
 
-  /// Something leaving: accelerates away.
+  /// Something leaving: accelerates away, as time runs.
+  ///
+  /// Handed to an animation that runs forward as the thing leaves, it is
+  /// used as it is. As the `reverseCurve` of one that plays back, pass
+  /// `exit.flipped`: Flutter evaluates a reverse curve at the animation's
+  /// value, which runs from 1 to 0, so an accelerating curve given as it is
+  /// leaves fast and slows to a stop.
   final Curve exit;
 
   /// A larger move that should be noticed — a sheet or a dialog opening.

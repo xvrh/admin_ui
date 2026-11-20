@@ -1158,6 +1158,12 @@ three as a `MotionSpeed`, and `context.motion.durationOf(speed)` gives its
 duration. A modal's is the theme's
 `overlayStyle.modalMotion`, described under Anatomy.
 
+`exit` is the curve of something leaving as time runs: it accelerates away.
+An animation that runs forward as the thing leaves takes it as it is. One
+that plays the arrival back takes `exit.flipped` as its `reverseCurve`,
+because Flutter evaluates a reverse curve at the animation's value, which
+runs from 1 to 0; the kit's modal, side sheet and toast do.
+
 While the platform asks for less motion (`MediaQuery.disableAnimations`),
 `context.motion` returns `AdminMotion.reduced`: every duration zero, the curves
 kept, so an animation that reads its duration there lands on its end state at
