@@ -171,24 +171,15 @@ class _Loaded extends StatelessWidget {
               const Gap(_gap),
               revenue,
               const Gap(_gap),
-              // FRICTION(F-108): DonutChart's legend overflows a narrow card
-              // rather than wrapping, so the two cards stack below this width.
-              LayoutBuilder(
-                builder: (context, constraints) => constraints.maxWidth < 880
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [top, const Gap(_gap), channels],
-                      )
-                    : IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(flex: 3, child: top),
-                            const Gap(_gap),
-                            Expanded(flex: 2, child: channels),
-                          ],
-                        ),
-                      ),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(flex: 3, child: top),
+                    const Gap(_gap),
+                    Expanded(flex: 2, child: channels),
+                  ],
+                ),
               ),
             ],
     );

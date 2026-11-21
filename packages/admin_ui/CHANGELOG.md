@@ -2,6 +2,15 @@
 
 ## 0.2.0
 
+- A `DonutChart` with no room for its legend beside the ring puts it under
+  the ring, where its row overflowed: in a card 270px wide, a 148px ring
+  left the legend 6px less than its longest label needs. The legend stands
+  beside the ring while every label fits there whole, and otherwise under
+  it, centred and wrapping. Under the ring a label longer than the chart is
+  cut with an ellipsis, and in a height the chart is given the legend takes
+  what it needs and the ring draws in the rest. A chart whose legend fitted
+  does not move. The legend of a `LineChart` or a `BarChart` cuts a series
+  name longer than the chart the same way, where it overflowed too.
 - A finger's near miss presses the small control it was meant for.
   `TouchTargetAdjustment` gives each control under it a touch area of at
   least 48px, centred on the control, with nothing laid out larger: a

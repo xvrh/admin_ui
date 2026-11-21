@@ -45,7 +45,7 @@ two together.
 | F-104 | `DecimalField` takes a prefix but no unit, though its `NumberBody` has one | missing-api | S3 | open |
 | F-106 | `ValidationSummary` folds to nothing while hidden and brings no spacing, so a host cannot gap it only when it shows | awkward-default | S2 | fixed |
 | F-107 | `EmptyState` has no tone: a success end state reads as an empty list | missing-api | S3 | open |
-| F-108 | `DonutChart`'s legend overflows a narrow card instead of wrapping or eliding | bug | S3 | open |
+| F-108 | `DonutChart`'s legend overflows a narrow card instead of wrapping or eliding | bug | S3 | fixed |
 | F-109 | `LineChart` thins its category labels greedily by width, so a month's axis is spaced unevenly | awkward-default | S3 | fixed |
 | F-110 | `StatCard` has no loading state | missing-api | S2 | fixed |
 | F-201 | A saved view's name is stored text, so `SavedViewsBar` cannot show the shop's own views in the page's language | i18n | S3 | open |
@@ -537,12 +537,12 @@ Owned by WP-A.
 
 - **Kind:** bug
 - **Severity:** S3
-- **Status:** open (verified)
+- **Status:** fixed (kit)
 - **Kit:** `widgets.dart › DonutChart` (`lib/src/common/ui/chart.dart:282`): the ring and a `Flexible` legend in a `Row`, but each legend item (`:592`) is a `Row` holding an unflexed `Text`, so a label longer than the room left overflows.
-- **App:** `lib/src/screens/dashboard/dashboard_view.dart` (the best-sellers and channels cards stack below 880 px of content, ~15 lines).
+- **App:** `lib/src/screens/dashboard/dashboard_view.dart`: the best-sellers and channels cards stacked below 880 px of content (~15 lines), until the fix.
 - **Evidence:** the phone story on `ipad` (en) › "Phone · dashboard": "A RenderFlex overflowed by 5.9 pixels on the right" (and 1.2 px), the channels card 270 px wide with "Market stall" cut at the stripe. Found at integration; the desktop widths and the phone's single column never gave the card so little room.
 - **Workaround:** stack the two chart cards at medium widths.
-- **Proposal:** give each legend item's label `Flexible` with an ellipsis, and put the legend under the ring when the row is narrower than ring + legend.
+- **Proposal:** give each legend item's label `Flexible` with an ellipsis, and put the legend under the ring when the row is narrower than ring + legend. Done as proposed: the legend stands beside the ring while every label fits there whole, and otherwise under it, centred and wrapping, where a label is cut only if it is longer than the chart. In a body of a fixed height the legend under the ring takes what it needs and the ring draws in the rest. The dashboard's two cards are side by side at every width above a phone's, and the workaround is gone.
 
 ### F-109 · `LineChart` thins its category labels greedily by width, so a month's axis is spaced unevenly
 
