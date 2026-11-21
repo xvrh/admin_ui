@@ -7,6 +7,7 @@ import 'command_registry.dart';
 import 'leave_guard.dart';
 import 'modal_anchor.dart';
 import 'toast.dart';
+import 'touch_target_adjustment.dart';
 
 /// The scopes the kit's widgets reach for, mounted in one widget: the kit's
 /// theme, a [ToastScope], a [LeaveGuardScope], a [CommandScope], a
@@ -56,7 +57,9 @@ import 'toast.dart';
 ///   it disposes;
 /// - a [ModalAnchor] opened through [modals], or through `ModalAnchor.of`;
 /// - a [BrowserSwipeGuard], so a two-finger swipe does not take the browser
-///   back a page.
+///   back a page;
+/// - a [TouchTargetAdjustment], so a finger's near miss presses the small
+///   control it was meant for, unless [adjustTouchTargets] is false.
 ///
 /// Each of those scopes stays public, for an app that mounts them where it
 /// wants them.
@@ -78,6 +81,12 @@ class AdminScope extends StatefulWidget {
   /// scope above, or gives this scope a registry of its own.
   final LeaveGuardRegistry? leaveGuards;
 
+  /// Whether a finger that comes down just beside one of the kit's small
+  /// controls presses it, here and in the popovers and modals opened from
+  /// here; see [TouchTargetAdjustment]. Nothing is laid out larger. True
+  /// by default.
+  final bool adjustTouchTargets;
+
   final Widget child;
 
   const AdminScope({
@@ -86,6 +95,7 @@ class AdminScope extends StatefulWidget {
     this.commands,
     this.modals,
     this.leaveGuards,
+    this.adjustTouchTargets = true,
     required this.child,
   });
 
@@ -127,6 +137,11 @@ class _AdminScopeState extends State<AdminScope> {
   @override
   Widget build(BuildContext context) {
     Widget child = ModalAnchor(controller: widget.modals, child: widget.child);
+    // Above the anchor, so the modals opened on it follow the same choice.
+    child = TouchTargetAdjustment(
+      enabled: widget.adjustTouchTargets,
+      child: child,
+    );
     child = BrowserSwipeGuard(child: child);
     child = CommandScope(registry: _commands, child: child);
     // Mounted whichever registry it is, so the page keeps its state when

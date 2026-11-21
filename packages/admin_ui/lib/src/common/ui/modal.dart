@@ -15,6 +15,7 @@ import 'chrome_theme.dart';
 import 'error_text.dart';
 import 'icon_action.dart';
 import 'severity.dart';
+import 'touch_target_adjustment.dart';
 
 /// Opens [builder] as a modal route — the scrim, focus trap, Escape-to-dismiss
 /// and return value come from [showDialog]; the surface is a [Modal]. Returns
@@ -41,6 +42,9 @@ Future<T?> showModal<T>(
   final motion = context.motion;
   final arrival = context.overlayStyle.modalMotion;
   final duration = motionDuration(context, arrival.durationIn(motion));
+  // A finger's near miss reaches the modal's small controls, as on the page
+  // that opened it.
+  final adjusted = carryTouchTargetAdjustment(context);
   return showDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
@@ -62,8 +66,8 @@ Future<T?> showModal<T>(
       final page = context.colors;
       return ChromeTheme(
         palette: page.withSurface(page.modalSurface),
-        child: Builder(
-          builder: (context) => _ModalFrame(child: builder(context)),
+        child: adjusted(
+          Builder(builder: (context) => _ModalFrame(child: builder(context))),
         ),
       );
     },
