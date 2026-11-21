@@ -676,6 +676,8 @@ widgets.dart ToastScope
 widgets.dart ToastScopeState
 widgets.dart Toggle
 widgets.dart TopProgressBar
+widgets.dart TouchTarget
+widgets.dart TouchTargetAdjustment
 widgets.dart Tree
 widgets.dart TreeDrop
 widgets.dart TreeEditor

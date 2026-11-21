@@ -60,6 +60,7 @@ import 'ui/foundations/status_pill.dart';
 import 'ui/foundations/stock_material.dart';
 import 'ui/foundations/theme_sheet.dart';
 import 'ui/foundations/tokens.dart';
+import 'ui/foundations/touch_targets.dart';
 import 'ui/primitives/accordion.dart';
 import 'ui/primitives/announcement_bar.dart';
 import 'ui/primitives/attention_grid.dart';
@@ -150,6 +151,7 @@ Map<String, dynamic> genericCatalog() => {
     'Status pill': const StatusPillDemo(),
     'Localization': const LocalizationDemo(),
     'Stock Material': const StockMaterialDemo(),
+    'Touch targets': const TouchTargetsDemo(),
   },
   'Primitives': {
     'Button': const ButtonDemo(),

@@ -22,7 +22,6 @@ const _noPageYet = <String>{
   'AuthFieldError',
   'BrowserSwipeGuard',
   'ChangeScopeHost',
-  'CircleButton',
   'CollectionCards',
   'ColorField',
   'CommentAnnotationPin',

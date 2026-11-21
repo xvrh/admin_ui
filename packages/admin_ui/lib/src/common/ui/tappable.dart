@@ -14,6 +14,7 @@ import 'package:flutter/services.dart'
 import 'package:material_ui/material_ui.dart';
 
 import 'focus_ring.dart';
+import 'touch_target_adjustment.dart';
 
 /// Ripple-free tap target — the house alternative to [InkWell]. Components paint
 /// their own borders and fills for hover/selected state, so Material's ink would
@@ -553,6 +554,8 @@ class _TappableState extends State<Tappable> {
       onTapCancel: tracksPress ? () => _setPressed(false) : null,
       child: child,
     );
+    // A finger's near miss is sent here by a TouchTargetAdjustment above.
+    if (enabled) child = TouchTarget(child: child);
 
     final tracksHover = _tracksHover;
     child = CursorRegion(

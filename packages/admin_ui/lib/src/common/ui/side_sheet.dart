@@ -8,6 +8,7 @@ import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'chrome_theme.dart';
 import 'icon_action.dart';
+import 'touch_target_adjustment.dart';
 
 /// Which edge a [SideSheet] slides in from, in the reading direction: [end]
 /// is the right edge in left-to-right text and the left edge in right-to-left.
@@ -31,6 +32,9 @@ Future<T?> showSideSheet<T>(
   Color? barrierColor,
 }) {
   final motion = context.motion;
+  // A finger's near miss reaches the sheet's small controls, as on the page
+  // that opened it.
+  final adjusted = carryTouchTargetAdjustment(context);
   return showGeneralDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
@@ -46,7 +50,7 @@ Future<T?> showSideSheet<T>(
         width: width,
         child: ChromeTheme(
           palette: page.withSurface(page.sheetSurface),
-          child: Builder(builder: builder),
+          child: adjusted(Builder(builder: builder)),
         ),
       );
     },

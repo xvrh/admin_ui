@@ -2125,6 +2125,25 @@ framework throws in a debug build where one does.
 Its tables are generated: `fvm dart run tool/gen_accessibility.dart` after
 adding a role, a component or a test of one.
 
+### Small controls under a finger
+
+The kit's smallest controls are 24px, WCAG 2.5.8's floor, and stay that
+size on a touch screen. What a finger gets is their touch area: under a
+`TouchTargetAdjustment` each control takes touches as if it were at least
+48px, centred on itself, so a near miss presses the control it was meant
+for. Nothing is laid out larger. An `AdminScope` holds one around its page
+and the kit's popovers, modals and side sheets hold one around their
+content; `AdminScope(adjustTouchTargets: false)` turns them off. Around
+the whole app, in `MaterialApp.builder`, one covers routes and overlays of
+the app's own too. Every enabled `Tappable` is a target, and `TouchTarget`
+marks a tap target of your own.
+
+It does not guarantee the size. What is under the finger keeps its claim:
+a row that opens or a text field takes its own tap, a finger that moves
+still scrolls, and of two controls the nearer is pressed, so in a tight
+row each grows by half the gap and a small button inside a row that opens
+gains nothing. A checker that measures a control's box still reports 24px.
+
 ## Sweeps
 
 Five sweeps pump every demo of the catalog, catalog pages and preview-only
