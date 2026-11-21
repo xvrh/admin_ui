@@ -1,3 +1,4 @@
+/// @docImport 'listbox.dart';
 /// @docImport 'menu.dart';
 library;
 
@@ -25,6 +26,12 @@ import 'popover.dart';
 ///   match the trigger via `controller.anchorWidth`;
 /// - leave [width] null to size to the content between [minWidth] and [maxWidth]
 ///   (an action menu) — rows are sized to the widest via [IntrinsicWidth].
+///
+/// Sized to its content, the surface asks its [child] how wide it would like
+/// to be. A list that builds its rows as they scroll into view, a [Listbox]
+/// or a [ListView], cannot answer, which is an error. Around one, pass
+/// [width]: the trigger's, or the widest row's from [ListboxOption.widthOf].
+/// A [ListboxMenu] is this surface around a [Listbox], with both.
 ///
 /// In a [Popover] with `showArrow`, the surface draws the arrow on its edge
 /// that faces the anchor, where [Popover.placementOf] puts it, outside its

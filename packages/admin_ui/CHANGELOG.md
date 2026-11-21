@@ -2,6 +2,17 @@
 
 ## 0.2.0
 
+- A `Listbox` asked how wide it would like to be says that it cannot, and
+  what to pass. It builds its rows as they scroll into view, so a
+  `PopoverMenuSurface` with no width, which sizes itself to its content,
+  cannot hold one: that threw Flutter's "RenderShrinkWrappingViewport does
+  not support returning intrinsic dimensions", which names neither widget,
+  and then a null check from the list's own scroll into view. The error
+  now names the `Listbox` and the surface and says to give the surface a
+  width, its trigger's or the widest row's from `ListboxOption.widthOf`, as
+  `ListboxMenu` does, and nothing follows it from the list. The docs of
+  `PopoverMenuSurface` and `Listbox` say the same. A list that had a width
+  is unchanged.
 - A `Toggle` or a `Check` with no label keeps its own size in a box that
   stretches it, where it filled the box: under a `LabeledField` a switch
   drew its track the field's width, 425px in one form, and a checkbox its
