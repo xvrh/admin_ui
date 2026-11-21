@@ -91,7 +91,7 @@ two together.
 | F-502 | `SwatchRow` is the canvas toolbar's picker: 18px dots, no visible name, no keys, no group semantics | awkward-default | S3 | open |
 | F-503 | `SelectField` binds only a form cell, so an instant setting needs a `LocalScope` of its own | awkward-default | S3 | open |
 | F-504 | `ChangePasswordForm` shows a server's refusal only as an alert over the form | missing-api | S3 | open |
-| F-505 | A `Toggle` with no label stretches its track to a tight width | bug | S3 | open |
+| F-505 | A `Toggle` with no label stretches its track to a tight width | bug | S3 | fixed |
 | F-506 | `ChangePasswordForm` cannot be cleared after a successful change | missing-api | S3 | open |
 | T-001 | No hover, mouse-click, secondary-click or key-chord scenario verbs | test-support | S3 | open |
 | T-002 | `shots` has no `brightness` option and there is no app-defined (theme) axis | test-support | S3 | open |
@@ -1059,12 +1059,12 @@ Owned by WP-E.
 
 - **Kind:** bug
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `widgets.dart › Toggle` (`lib/src/common/ui/toggle.dart:23`): with a `label` the control is wrapped in `Align(widthFactor: 1)`; without one the bare track is returned and fills a tight constraint, although it is meant to be 36×20 (`toggle.dart:49`).
-- **App:** `lib/src/screens/settings/appearance/appearance_view.dart:252` (`Align` around the toggle, 4 lines).
+- **App:** `lib/src/screens/settings/appearance/appearance_view.dart`: an `Align` around the toggle (4 lines), until the fix.
 - **Evidence:** "Appearance and language" (run `e-07a`, step "Appearance · Carbon dark"): under a `LabeledField`, whose control is stretched, the "Reduce motion" switch drew a 425px-wide track with its knob at the start.
 - **Workaround:** `Align(alignment: AlignmentDirectional.centerStart, child: Toggle(…))`.
-- **Proposal:** always return the aligned, intrinsically sized toggle.
+- **Proposal:** always return the aligned, intrinsically sized toggle. Done as proposed, and for `Check`, which had the same fault: a bare checkbox under a `LabeledField` drew its box the field's width. With or without a label each keeps its own size, at the start of a box that stretches it and centred in its height, and only the control takes the tap. The appearance page's switch is the bare `Toggle` again.
 
 ### F-506 · `ChangePasswordForm` cannot be cleared after a successful change
 

@@ -19,6 +19,10 @@ import 'tappable.dart';
 /// [value]/[onChanged]; with a [label] it's a tappable row that hugs the
 /// label, otherwise just the control.
 ///
+/// It keeps its own size. In a box that stretches it, a form's control slot
+/// or a column that fills its width, it stands at the start, centred in the
+/// height, and only the switch (and its label) takes the tap.
+///
 /// A Tab stop that Space and Enter flip, announced as a switch with its on/off
 /// state. Keyboard focus rings the track.
 ///
@@ -99,7 +103,8 @@ class Toggle extends StatelessWidget {
         );
       },
     );
-    if (label == null) return toggle;
+    // Aligned with or without a label: a bare control given a tight box
+    // would fill it, its track or its box drawn that wide.
     return Align(
       alignment: AlignmentDirectional.centerStart,
       widthFactor: 1,

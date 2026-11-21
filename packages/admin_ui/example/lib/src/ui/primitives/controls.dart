@@ -37,6 +37,20 @@ class ControlsDemo extends StatelessWidget {
         const Toggle(value: true, label: 'Disabled (on)'),
         const Gap(AdminSpacing.md),
         const Toggle(value: false, label: 'Disabled (off)'),
+        const Gap(AdminSpacing.lg),
+        LiveValue<bool>(
+          initial: true,
+          builder: (v, set) => LabeledField(
+            label: 'Reduce motion',
+            description:
+                'Under a field\'s label the switch has none of its own',
+            child: Toggle(
+              value: v,
+              onChanged: set,
+              semanticLabel: 'Reduce motion',
+            ),
+          ),
+        ),
         const Gap(AdminSpacing.xl),
 
         const DemoSection('Checkbox'),

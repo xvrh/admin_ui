@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- A `Toggle` or a `Check` with no label keeps its own size in a box that
+  stretches it, where it filled the box: under a `LabeledField` a switch
+  drew its track the field's width, 425px in one form, and a checkbox its
+  box. It stands at the start, centred in the height, as one with a label
+  does, and only the control takes the tap, where the whole row did. With
+  room of its own, and with a label, nothing moves.
 - A `DonutChart` with no room for its legend beside the ring puts it under
   the ring, where its row overflowed: in a card 270px wide, a 148px ring
   left the legend 6px less than its longest label needs. The legend stands
