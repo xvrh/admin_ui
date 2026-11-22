@@ -195,18 +195,12 @@ class _InputFieldState extends State<InputField> {
     super.dispose();
   }
 
-  /// [InputField.textDirection], or left to right for an address.
-  TextDirection? get _textDirection =>
-      widget.textDirection ??
-      switch (widget.keyboardType) {
-        // Physical: an address reads left to right in any language.
-        TextInputType.emailAddress || TextInputType.url => TextDirection.ltr,
-        _ => null,
-      };
-
   Widget _input(BuildContext context) {
     final state = FieldStateScope.of(context);
-    final direction = _textDirection;
+    final direction = inputTextDirection(
+      widget.textDirection,
+      widget.keyboardType,
+    );
     final menu = widget.contextMenuBuilder;
     return MouseRegion(
       opaque: false,

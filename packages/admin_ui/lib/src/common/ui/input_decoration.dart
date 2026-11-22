@@ -1,6 +1,7 @@
 /// @docImport '../../theme/radii.dart';
 library;
 
+import 'package:flutter/foundation.dart' show internal;
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/sizes.dart';
@@ -219,3 +220,19 @@ TextStyle fieldTextStyle(
       .fieldTextOf(size)
       .copyWith(color: state.textColor(context.colors));
 }
+
+/// The direction a text input's value is typed and shown in: [textDirection]
+/// when the caller gives one, left to right for an email or URL
+/// [keyboardType], since an address reads so in every language, and null,
+/// the ambient direction, otherwise.
+@internal
+TextDirection? inputTextDirection(
+  TextDirection? textDirection,
+  TextInputType? keyboardType,
+) =>
+    textDirection ??
+    switch (keyboardType) {
+      // Physical: an address reads left to right in any language.
+      TextInputType.emailAddress || TextInputType.url => TextDirection.ltr,
+      _ => null,
+    };

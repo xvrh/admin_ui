@@ -45,6 +45,13 @@ class TextBody extends StatefulWidget {
   final TextInputType? keyboardType;
   final Iterable<String>? autofillHints;
 
+  /// The direction the value is typed and shown in, when not the ambient
+  /// one. Null reads an email or URL [keyboardType] as left to right, since
+  /// an address reads so in every language, and follows the ambient
+  /// direction otherwise. The [hint] and the [prefix] and [suffix] read with
+  /// the value; the counter stays at the ambient end.
+  final TextDirection? textDirection;
+
   /// Fixed text before and after the value — `https://`, `kg`.
   final String? prefix;
   final String? suffix;
@@ -62,6 +69,7 @@ class TextBody extends StatefulWidget {
     this.maxLength,
     this.keyboardType,
     this.autofillHints,
+    this.textDirection,
     this.prefix,
     this.suffix,
   });
@@ -101,6 +109,10 @@ class _TextBodyState extends State<TextBody> {
 
   @override
   Widget build(BuildContext context) {
+    final direction = inputTextDirection(
+      widget.textDirection,
+      widget.keyboardType,
+    );
     return FieldBodyScope(
       enabled: widget.enabled,
       readOnly: widget.controller == null && widget.onChanged == null,
@@ -115,11 +127,13 @@ class _TextBodyState extends State<TextBody> {
         maxLength: widget.maxLength,
         keyboardType: textKeyboardType(widget.keyboardType, widget.maxLines),
         autofillHints: widget.autofillHints,
+        textDirection: direction,
         decoration: textInputDecoration(
           context,
           hint: widget.hint,
           prefix: widget.prefix,
           suffix: widget.suffix,
+          textDirection: direction,
         ),
       ),
     );
@@ -129,6 +143,10 @@ class _TextBodyState extends State<TextBody> {
 /// The decoration of a text input body: [fieldInputDecoration] with [hint],
 /// the fixed [prefix] and [suffix] in the value's type and the `maxLength`
 /// counter in the caption type.
+///
+/// With a [textDirection] the hint and the affixes read in it, as the value
+/// does: a [prefix] stands before the value in the value's own direction, so
+/// `https://` is at the left of an address in a right-to-left field too.
 ///
 /// An affix is [AdminPalette.foregroundSecondary], a step above the hint's
 /// placeholder colour, and 4 from the value, so beside an empty input's
@@ -142,6 +160,7 @@ InputDecoration textInputDecoration(
   String? hint,
   String? prefix,
   String? suffix,
+  TextDirection? textDirection,
 }) {
   final colors = context.colors;
   final state = FieldStateScope.of(context);
@@ -152,15 +171,21 @@ InputDecoration textInputDecoration(
       ? null
       : Padding(
           padding: padding,
-          child: Text(text, style: style),
+          child: Text(text, style: style, textDirection: textDirection),
         );
+  // The decoration lays its two slots out in the ambient direction. A value
+  // that runs the other way takes them swapped, so that what stands before
+  // it is before it as it reads.
+  final swapped =
+      textDirection != null && textDirection != Directionality.of(context);
   return fieldInputDecoration(context, hint: hint).copyWith(
+    hintTextDirection: textDirection,
     prefix: affix(
-      prefix,
+      swapped ? suffix : prefix,
       const EdgeInsetsDirectional.only(end: AdminSpacing.xs),
     ),
     suffix: affix(
-      suffix,
+      swapped ? prefix : suffix,
       const EdgeInsetsDirectional.only(start: AdminSpacing.xs),
     ),
     counterStyle: context.type.caption.copyWith(color: state.iconColor(colors)),

@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- `Field`, `OptionalField`, `TextBody` and `TextCellBody` take a
+  `textDirection`, as `InputField` does: the direction the value is typed
+  and shown in when it is not the page's. Left null, an email or URL
+  `keyboardType` reads left to right, since an address reads so in every
+  language, and anything else follows the page. The hint and the fixed
+  `prefix` and `suffix` read with the value, a prefix standing before it in
+  its own direction; the label, the message and the counter stay on the
+  page's side.
 - Two docs say what they carry. `savedLabel` on `SaveBar`, `SaveCluster`,
   `FormSaveBar` and `FormActions`, which had none on the last two, is a
   detail after the status's own word: `'2m ago'` reads "Saved · 2m ago", and
@@ -705,6 +713,13 @@
 
 ### Looks
 
+- In a right-to-left page, a `Field` or an `OptionalField` with an email or
+  URL `keyboardType` is typed left to right from the left edge, its hint
+  there too, where both ran from the right with the caret at the left of
+  what was typed. A fixed prefix such as `https://` stands at the left of
+  the address, where it stood at the right of it. `keyboardType: null`, or
+  `textDirection: TextDirection.rtl`, keeps what it drew. Left to right,
+  nothing moves.
 - A `TopBar` too narrow for its parts no longer paints its row past its
   end. Its `leading` is cut to the room there is, and one that cannot
   shrink (a row of fixed parts) overflows inside its own box, where the

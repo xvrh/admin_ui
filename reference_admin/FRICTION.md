@@ -85,7 +85,7 @@ two together.
 | F-403 | A library asset has no crop: `Asset` carries none and `AssetSource` cannot save one | missing-api | S3 | open |
 | F-406 | `onSaveAlt` gets the whole alt text with cleared languages left out, and its doc does not say so | doc-gap | S3 | fixed |
 | F-407 | `AssetLibrary` fixes its tile size, so a phone grid is 3-up, not 2-up | missing-api | S2 | fixed |
-| F-408 | `Field` takes no text direction, so an email field reads right to left in Arabic | i18n | S3 | open |
+| F-408 | `Field` takes no text direction, so an email field reads right to left in Arabic | i18n | S3 | fixed |
 | F-409 | `showCropDialog` takes no size, so on a phone it is not full screen | missing-api | S3 | open |
 | F-501 | A `Choice` card cannot show a preview, and `Choice` cannot lay its cards out in a grid | missing-api | S3 | open |
 | F-502 | `SwatchRow` is the canvas toolbar's picker: 18px dots, no visible name, no keys, no group semantics | awkward-default | S3 | open |
@@ -989,12 +989,12 @@ Owned by WP-D.
 
 - **Kind:** i18n
 - **Severity:** S3
-- **Status:** open (verified)
+- **Status:** fixed (kit)
 - **Kit:** `forms.dart › Field` (`lib/src/forms/value_fields.dart:524`): `keyboardType` and `autofillHints`, no `textDirection`.
 - **App:** none; `lib/src/screens/team/invite_dialog.dart` keeps the email `Field` as is.
 - **Evidence:** "Inviting a teammate" › "Invite · invalid email" in `ar`: the address and its `name@example.com` hint sit against the right edge, the caret on the left of what was typed.
 - **Workaround:** none; a `Directionality` around the field would flip its label and message too.
-- **Proposal:** `Field(textDirection:)` for the input alone, or LTR by default when `keyboardType` is `emailAddress` or `url`.
+- **Proposal:** `Field(textDirection:)` for the input alone, or LTR by default when `keyboardType` is `emailAddress` or `url`. Done as both, which is what `InputField` already did: `Field`, `OptionalField` and the two text bodies take `textDirection`, and an email or URL keyboard reads left to right when it is null. The hint and a fixed prefix or suffix read with the value; the label, the message and the counter stay on the page's side. The invite dialog's `Field` is unchanged and its address now starts at the left in Arabic.
 
 ### F-409 · `showCropDialog` takes no size, so on a phone it is not full screen
 
