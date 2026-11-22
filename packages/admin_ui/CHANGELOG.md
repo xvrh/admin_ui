@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- Two docs say what they carry. `savedLabel` on `SaveBar`, `SaveCluster`,
+  `FormSaveBar` and `FormActions`, which had none on the last two, is a
+  detail after the status's own word: `'2m ago'` reads "Saved · 2m ago", and
+  `'Saved'` reads "Saved · Saved". `AssetDetailView.onSaveAlt` and
+  `AssetSource.updateAlt` are handed the whole alt text, with a language
+  the person cleared left out: store it in place of the old map, since
+  merged into it a cleared language comes back. Nothing behaves
+  differently.
 - A `Listbox` asked how wide it would like to be says that it cannot, and
   what to pass. It builds its rows as they scroll into view, so a
   `PopoverMenuSurface` with no width, which sizes itself to its content,

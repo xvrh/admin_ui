@@ -78,12 +78,12 @@ two together.
 | F-313 | Under `ValidationMode.onEdit` an edit form's `ValidationSummary` never shows | awkward-default | S3 | open |
 | F-314 | Revealing the first invalid field leaves its message under the bottom save bar | bug | S2 | fixed |
 | F-315 | The kit's own prompts and bars word some buttons through Material, which an `AdminLocalizations` override cannot reach | i18n | S3 | open |
-| F-316 | `FormSaveBar.savedLabel` has no doc, and its name reads as the word to show, not a detail after it | doc-gap | S3 | open |
+| F-316 | `FormSaveBar.savedLabel` has no doc, and its name reads as the word to show, not a detail after it | doc-gap | S3 | fixed |
 | F-400 | A media page over an `AssetSource` rewrites the picker's private host: paging, search, filters, errors | missing-api | S1 | fixed |
 | F-401 | `AssetLibrary`'s toolbar takes no filter of the app's, and `AssetSource.browse` filters by type and text only | missing-api | S2 | fixed |
 | F-402 | `showAssetDetail` / `AssetDetailView` take no action but Delete, so Crop cannot sit in the sheet | missing-api | S1 | fixed |
 | F-403 | A library asset has no crop: `Asset` carries none and `AssetSource` cannot save one | missing-api | S3 | open |
-| F-406 | `onSaveAlt` gets the whole alt text with cleared languages left out, and its doc does not say so | doc-gap | S3 | open |
+| F-406 | `onSaveAlt` gets the whole alt text with cleared languages left out, and its doc does not say so | doc-gap | S3 | fixed |
 | F-407 | `AssetLibrary` fixes its tile size, so a phone grid is 3-up, not 2-up | missing-api | S2 | fixed |
 | F-408 | `Field` takes no text direction, so an email field reads right to left in Arabic | i18n | S3 | open |
 | F-409 | `showCropDialog` takes no size, so on a phone it is not full screen | missing-api | S3 | open |
@@ -908,12 +908,12 @@ Owned by WP-C. Every entry was met building `/products`, `/products/new` and `/p
 
 - **Kind:** doc-gap
 - **Severity:** S3
-- **Status:** open (verified)
+- **Status:** fixed (kit)
 - **Kit:** `forms.dart › FormSaveBar.savedLabel` (`lib/src/forms/form_save_bar.dart:40`, no doc comment); `SaveCluster.savedLabel` and `SaveBar.savedLabel` document it as "appended to the Saved message", and `_SaveStatus` builds it through `ShellMessages.statusWithDetail`.
 - **App:** none now: the editor and the new-product page passed their own "Saved", and dropped it.
 - **Evidence:** "Editing a product" › "Product · saved": the bar read "Saved · Saved" (fr "Enregistré · Enregistré").
 - **Workaround:** pass nothing.
-- **Proposal:** copy `SaveCluster`'s doc onto `FormSaveBar.savedLabel` and `FormActions.savedLabel`, or rename it `savedDetail`.
+- **Proposal:** copy `SaveCluster`'s doc onto `FormSaveBar.savedLabel` and `FormActions.savedLabel`, or rename it `savedDetail`. Done as the first, and said more plainly on all four (`SaveBar`, `SaveCluster`, `FormSaveBar`, `FormActions`): a detail after the status's own word, with the "Saved · Saved" that passing the word gives, and `errorLabel` beside it as the one that replaces its message. Not renamed: that changes a public parameter on four widgets, with a deprecation on each, for a confusion the doc now answers where the parameter is read.
 
 ## D · Media & team (F-400–F-499)
 
@@ -967,12 +967,12 @@ Owned by WP-D.
 
 - **Kind:** doc-gap
 - **Severity:** S3
-- **Status:** open (verified in source)
+- **Status:** fixed (kit)
 - **Kit:** `forms.dart › AssetDetailView.onSaveAlt` (`lib/src/forms/asset_detail.dart:64`); `_AltEditor._save` (`:227`) sends every non-empty lane.
 - **App:** `lib/src/fake/fake_media.dart` `updateAlt` replaces the stored alt text (it merged, so a cleared language came back).
 - **Evidence:** "The media library" › "Media · alt text saved": one Arabic lane typed, and `media.updateAlt` carries en, fr and ar. A server that merges (as the fake does, `{...old, ...alt}`) never removes a language the user cleared.
 - **Workaround:** the fake replaces the map; `test/unit/model_test.dart` "saving alt text replaces it, so a language can be cleared".
-- **Proposal:** say "the complete alt text; a language missing from the map has none" on `onSaveAlt` and `AssetSource.updateAlt`, or pass the changed languages beside it.
+- **Proposal:** say "the complete alt text; a language missing from the map has none" on `onSaveAlt` and `AssetSource.updateAlt`, or pass the changed languages beside it. Done as the first: both docs say the map is the whole alt text, to store in place of the old one, and that merged into it a cleared language comes back. The fake's replace is what the doc asks for, not a workaround, and its marker is a plain comment.
 
 ### F-407 · `AssetLibrary` fixes its tile size, so a phone grid is 3-up, not 2-up
 

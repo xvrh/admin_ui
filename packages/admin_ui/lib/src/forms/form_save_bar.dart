@@ -36,6 +36,11 @@ class FormSaveBar extends StatelessWidget {
   /// live, and Material's save label under [SaveFlow.save].
   final String? commitLabel;
 
+  /// A detail after the "Saved" status ("Published" under
+  /// [SaveFlow.publish]): `'2m ago'` reads "Saved · 2m ago". It is not the
+  /// status's own word, which is the kit's in the app's language: `'Saved'`
+  /// here reads "Saved · Saved". Null leaves the status alone. [errorLabel],
+  /// by contrast, is the whole of its message.
   final String? savedLabel;
 
   /// The error status when the controller has neither a
