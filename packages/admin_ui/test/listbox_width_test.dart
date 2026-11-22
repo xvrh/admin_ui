@@ -167,13 +167,18 @@ void main() {
 
     testWidgets('passes a check of intrinsic sizes', (tester) async {
       debugCheckIntrinsicSizes = true;
-      addTearDown(() => debugCheckIntrinsicSizes = false);
-      final errors = await _pump(
-        tester,
-        PopoverMenuSurface(width: 240, child: _listbox(_controller())),
-      );
-      expect(errors, isEmpty);
-      expect(tester.getSize(find.byType(Listbox)).width, 240);
+      try {
+        final errors = await _pump(
+          tester,
+          PopoverMenuSurface(width: 240, child: _listbox(_controller())),
+        );
+        expect(errors, isEmpty);
+        expect(tester.getSize(find.byType(Listbox)).width, 240);
+      } finally {
+        // Here and not in a tear-down: the oldest Flutter the kit builds on
+        // checks the debug variables as the body ends, before any runs.
+        debugCheckIntrinsicSizes = false;
+      }
     });
   });
 
