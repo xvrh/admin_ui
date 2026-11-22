@@ -380,6 +380,11 @@ double _valueAt(ChartSeries s, int i) => i < s.values.length ? s.values[i] : 0;
 /// A donut (ring) chart for part-of-whole breakdowns, with an optional [center]
 /// widget (a total, a percentage) and a legend listing each slice. For a single
 /// progress value use [ProgressRing] instead.
+///
+/// The legend stands beside the ring where every label fits there whole, and
+/// under it, centred and wrapping, where one does not. Under the ring a label
+/// longer than the chart is cut. Given a height too, the legend under the ring
+/// takes what it needs and the ring draws in the rest.
 class DonutChart extends StatelessWidget {
   final List<ChartSlice> slices;
   final double size;
@@ -417,24 +422,306 @@ class DonutChart extends StatelessWidget {
     );
 
     if (!showLegend) return ring;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        ring,
-        const Gap(AdminSpacing.xxl),
-        Flexible(
-          child: _Legend(
-            vertical: true,
-            entries: [
-              for (var i = 0; i < slices.length; i++)
-                (slices[i].label, colors[i]),
-            ],
-          ),
-        ),
+    return _DonutLayout(
+      textDirection: Directionality.of(context),
+      ring: ring,
+      entries: [
+        for (var i = 0; i < slices.length; i++)
+          _LegendEntry(slices[i].label, colors[i]),
       ],
     );
   }
+}
+
+/// A [DonutChart]'s ring and the entries of its legend: the entries in a
+/// column beside the ring while each fits there at its own width, otherwise
+/// in centred runs under it.
+class _DonutLayout extends MultiChildRenderObjectWidget {
+  final TextDirection textDirection;
+
+  _DonutLayout({
+    required Widget ring,
+    required List<Widget> entries,
+    required this.textDirection,
+  }) : super(children: [ring, ...entries]);
+
+  @override
+  _RenderDonutLayout createRenderObject(BuildContext context) =>
+      _RenderDonutLayout(textDirection);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderDonutLayout renderObject,
+  ) => renderObject.textDirection = textDirection;
+}
+
+class _DonutParentData extends ContainerBoxParentData<RenderBox> {}
+
+typedef _DonutPlan = ({
+  Size size,
+
+  /// What the children take, which is more than [size] where the chart was
+  /// given less room than it needs.
+  Size content,
+  List<(RenderBox, Offset)> offsets,
+});
+
+class _RenderDonutLayout extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _DonutParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _DonutParentData>,
+        DebugOverflowIndicatorMixin {
+  _RenderDonutLayout(this._textDirection);
+
+  /// Between the ring and the legend beside it.
+  static const _beside = AdminSpacing.xxl;
+
+  /// Between the ring and the legend under it, as a line chart's legend
+  /// stands off its plot.
+  static const _under = AdminSpacing.lg;
+
+  /// Between two entries of a run, and between two runs or two rows: a
+  /// chart's legend above its plot wraps on the same two.
+  static const _entryGap = AdminSpacing.xl;
+  static const _rowGap = AdminSpacing.md;
+
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (value == _textDirection) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  Size _content = Size.zero;
+
+  RenderBox get _ring => firstChild!;
+
+  List<RenderBox> get _entries => [
+    for (
+      var child = childAfter(_ring);
+      child != null;
+      child = childAfter(child)
+    )
+      child,
+  ];
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _DonutParentData) {
+      child.parentData = _DonutParentData();
+    }
+  }
+
+  /// The widest entry at its own width: the legend as a column.
+  double get _legendWidth {
+    var width = 0.0;
+    for (final entry in _entries) {
+      width = math.max(width, entry.getMaxIntrinsicWidth(double.infinity));
+    }
+    return width;
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    var width = _ring.getMinIntrinsicWidth(height);
+    for (final entry in _entries) {
+      width = math.max(width, entry.getMinIntrinsicWidth(double.infinity));
+    }
+    return width;
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      _ring.getMaxIntrinsicWidth(height) + _beside + _legendWidth;
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _plan(
+    BoxConstraints(maxWidth: width),
+    ChildLayoutHelper.dryLayoutChild,
+  ).size.height;
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      computeMinIntrinsicHeight(width);
+
+  // A chart has no baseline.
+  @override
+  double? computeDryBaseline(
+    covariant BoxConstraints constraints,
+    TextBaseline baseline,
+  ) => null;
+
+  @override
+  Size computeDryLayout(covariant BoxConstraints constraints) =>
+      _plan(constraints, ChildLayoutHelper.dryLayoutChild).size;
+
+  @override
+  void performLayout() {
+    final plan = _plan(constraints, ChildLayoutHelper.layoutChild);
+    size = plan.size;
+    _content = plan.content;
+    for (final (child, offset) in plan.offsets) {
+      (child.parentData! as _DonutParentData).offset = offset;
+    }
+  }
+
+  _DonutPlan _plan(BoxConstraints constraints, ChildLayouter layoutChild) {
+    final ring = _ring;
+    final entries = _entries;
+    final natural =
+        ring.getMaxIntrinsicWidth(double.infinity) + _beside + _legendWidth;
+    return natural <= constraints.maxWidth
+        ? _planBeside(constraints, layoutChild, ring, entries)
+        : _planUnder(constraints, layoutChild, ring, entries);
+  }
+
+  /// The ring, then the entries in a column, each centred on the taller of
+  /// the two: what a row of a ring and a column drew.
+  _DonutPlan _planBeside(
+    BoxConstraints constraints,
+    ChildLayouter layoutChild,
+    RenderBox ring,
+    List<RenderBox> entries,
+  ) {
+    final ringSize = layoutChild(
+      ring,
+      BoxConstraints(maxHeight: constraints.maxHeight),
+    );
+    final room = constraints.maxWidth - ringSize.width - _beside;
+    var legendWidth = 0.0;
+    var legendHeight = 0.0;
+    final sizes = <Size>[];
+    for (final entry in entries) {
+      final entrySize = layoutChild(entry, BoxConstraints(maxWidth: room));
+      sizes.add(entrySize);
+      legendWidth = math.max(legendWidth, entrySize.width);
+      // Each entry keeps the gap under it, the last one too, as the column
+      // this layout replaced did: no chart that fitted moves.
+      legendHeight += entrySize.height + _rowGap;
+    }
+
+    final content = Size(
+      ringSize.width + _beside + legendWidth,
+      math.max(ringSize.height, legendHeight),
+    );
+    final size = constraints.constrain(content);
+    final rtl = _textDirection == TextDirection.rtl;
+    // The x of a box [w] wide starting [start] in from the leading edge.
+    double x(double start, double w) => rtl ? size.width - start - w : start;
+
+    final offsets = <(RenderBox, Offset)>[
+      (ring, Offset(x(0, ringSize.width), (size.height - ringSize.height) / 2)),
+    ];
+    var y = (size.height - legendHeight) / 2;
+    for (var i = 0; i < entries.length; i++) {
+      offsets.add((
+        entries[i],
+        Offset(x(ringSize.width + _beside, sizes[i].width), y),
+      ));
+      y += sizes[i].height + _rowGap;
+    }
+    return (size: size, content: content, offsets: offsets);
+  }
+
+  /// The ring over the entries in runs, each run and the ring centred. The
+  /// entries are laid out first, and the ring in the height they leave.
+  _DonutPlan _planUnder(
+    BoxConstraints constraints,
+    ChildLayouter layoutChild,
+    RenderBox ring,
+    List<RenderBox> entries,
+  ) {
+    final maxWidth = constraints.maxWidth;
+    final runs =
+        <({List<(RenderBox, Size)> entries, double width, double height})>[];
+    var run = <(RenderBox, Size)>[];
+    var runWidth = 0.0;
+    var runHeight = 0.0;
+    void close() {
+      if (run.isEmpty) return;
+      runs.add((entries: run, width: runWidth, height: runHeight));
+      run = [];
+      runWidth = 0;
+      runHeight = 0;
+    }
+
+    for (final entry in entries) {
+      final entrySize = layoutChild(entry, BoxConstraints(maxWidth: maxWidth));
+      if (run.isNotEmpty && runWidth + _entryGap + entrySize.width > maxWidth) {
+        close();
+      }
+      runWidth += (run.isEmpty ? 0 : _entryGap) + entrySize.width;
+      runHeight = math.max(runHeight, entrySize.height);
+      run.add((entry, entrySize));
+    }
+    close();
+
+    var legendWidth = 0.0;
+    var legendHeight = 0.0;
+    for (final (i, r) in runs.indexed) {
+      legendWidth = math.max(legendWidth, r.width);
+      legendHeight += (i == 0 ? 0 : _rowGap) + r.height;
+    }
+    final under = runs.isEmpty ? 0.0 : _under + legendHeight;
+
+    final ringSize = layoutChild(
+      ring,
+      BoxConstraints(
+        maxWidth: maxWidth,
+        maxHeight: math.max(0, constraints.maxHeight - under),
+      ),
+    );
+    final content = Size(
+      math.max(ringSize.width, legendWidth),
+      ringSize.height + under,
+    );
+    final size = constraints.constrain(content);
+    final rtl = _textDirection == TextDirection.rtl;
+
+    final offsets = <(RenderBox, Offset)>[
+      (ring, Offset((size.width - ringSize.width) / 2, 0)),
+    ];
+    var y = ringSize.height + _under;
+    for (final r in runs) {
+      var start = (size.width - r.width) / 2;
+      for (final (entry, entrySize) in r.entries) {
+        offsets.add((
+          entry,
+          Offset(
+            rtl ? size.width - start - entrySize.width : start,
+            y + (r.height - entrySize.height) / 2,
+          ),
+        ));
+        start += entrySize.width + _entryGap;
+      }
+      y += r.height + _rowGap;
+    }
+    return (size: size, content: content, offsets: offsets);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    defaultPaint(context, offset);
+    // A chart given less height than its legend needs says so, as the row
+    // and column this layout replaced did.
+    assert(() {
+      if (_content.width > size.width + precisionErrorTolerance ||
+          _content.height > size.height + precisionErrorTolerance) {
+        paintOverflowIndicator(
+          context,
+          offset,
+          Offset.zero & size,
+          Offset.zero & _content,
+        );
+      }
+      return true;
+    }());
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
 }
 
 /// A single-value progress ring (0..1) — a gauge for completion, usage, or
@@ -1100,56 +1387,62 @@ class _LoadingChart extends StatelessWidget {
 
 class _Legend extends StatelessWidget {
   final List<(String, Color)> entries;
-  final bool vertical;
 
-  const _Legend({required this.entries, this.vertical = false});
+  const _Legend({required this.entries});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: AdminSpacing.xl,
+      runSpacing: AdminSpacing.md,
+      children: [
+        for (final (label, color) in entries) _LegendEntry(label, color),
+      ],
+    );
+  }
+}
+
+/// One series or slice of a legend: its swatch and its name, on one line. An
+/// entry given less than its width cuts the name, never the swatch.
+class _LegendEntry extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _LegendEntry(this.label, this.color);
 
   /// Even, so it centres on whole pixels beside its label.
   static const _swatch = 8.0;
 
   @override
   Widget build(BuildContext context) {
-    final style = context.type.caption.copyWith(
-      color: context.colors.foregroundMuted,
-    );
     // A quarter of the swatch at most, so a rounder theme keeps a square
     // swatch rather than a dot.
     final corner = math.min(context.radii.radiusSmall, _swatch / 4);
-    final items = [
-      for (final (label, color) in entries)
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: _swatch,
-              height: _swatch,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(corner),
-              ),
-            ),
-            const Gap(AdminSpacing.sm),
-            Text(label, style: style),
-          ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: _swatch,
+          height: _swatch,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(corner),
+          ),
         ),
-    ];
-    return vertical
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final item in items)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AdminSpacing.md),
-                  child: item,
-                ),
-            ],
-          )
-        : Wrap(
-            spacing: AdminSpacing.xl,
-            runSpacing: AdminSpacing.md,
-            children: items,
-          );
+        const Gap(AdminSpacing.sm),
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: context.type.caption.copyWith(
+              color: context.colors.foregroundMuted,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

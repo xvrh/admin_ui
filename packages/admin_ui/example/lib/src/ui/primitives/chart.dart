@@ -263,6 +263,29 @@ class ChartDemo extends StatelessWidget {
             ),
           ),
         ),
+        const Gap(AdminSpacing.lg),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 280),
+            child: const ChartCard(
+              title: 'Channels',
+              subtitle: 'In a narrow card the legend goes under the ring',
+              bodyHeight: 200,
+              chart: Center(
+                child: DonutChart(
+                  size: 148,
+                  slices: [
+                    ChartSlice('Online store', 48),
+                    ChartSlice('Market stall', 21),
+                    ChartSlice('Wholesale', 14),
+                    ChartSlice('Phone', 6),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
         const Gap(AdminSpacing.xxxl),
 
         const DemoSection('Progress rings'),
