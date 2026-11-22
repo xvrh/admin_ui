@@ -126,16 +126,11 @@ class AppearanceView extends StatelessWidget {
         LabeledField(
           label: strings.reduceMotionLabel,
           description: strings.reduceMotionDescription,
-          // FRICTION(F-505): a Toggle given a tight width (a LabeledField
-          // stretches its control) draws its track that wide.
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Toggle(
-              key: SettingsKeys.reduceMotion,
-              semanticLabel: strings.reduceMotionLabel,
-              value: reduceMotion,
-              onChanged: onReduceMotion,
-            ),
+          child: Toggle(
+            key: SettingsKeys.reduceMotion,
+            semanticLabel: strings.reduceMotionLabel,
+            value: reduceMotion,
+            onChanged: onReduceMotion,
           ),
         ),
       ],
