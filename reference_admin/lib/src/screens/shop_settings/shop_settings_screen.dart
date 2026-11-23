@@ -70,7 +70,7 @@ class _ShopSettingsScreenState extends State<ShopSettingsScreen> {
       final saved = _shop = await _services.api.saveShop(shop);
       _services.session.shopRenamed(saved.name);
     } on ValidationError catch (error) {
-      throw shopSubmitError(error, ShopFields(_form.scope), _strings);
+      throw shopSubmitError(error, _strings);
     }
   }
 

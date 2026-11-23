@@ -325,12 +325,28 @@ final class FormRule extends ValidationRule {
 
 /// What a `ValueFormController`'s `onSubmit` throws when the server refuses
 /// the value: [message] becomes the controller's `submitError` (shown by the
-/// save status in place of its generic one) and each of [fieldErrors], keyed
-/// by field id, shows under its field until the field is edited. Anything
-/// else thrown becomes its `submitFailure`, which the save status words
-/// through `ErrorTextScope`.
+/// save status in place of its generic one) and each of [fieldErrors] shows
+/// under the field it names until that field is edited. Anything else
+/// thrown becomes its `submitFailure`, which the save status words through
+/// `ErrorTextScope`.
 class FormSubmitException implements Exception {
   final String? message;
+
+  /// The message of each field the server refused, keyed by the field's id
+  /// (its cell's `id`) or by its path in the form's value: the name the
+  /// scope handed its cell out under.
+  ///
+  /// - `name`, and `billing.city` under a `sub('billing')`.
+  /// - `zones[1].name` for the second row of a record list, or
+  ///   `zones.1.name` as some servers write it. A server can name a row by
+  ///   where it is; the row's cell id it cannot know. The index counts the
+  ///   rows as they stand when the refusal arrives.
+  /// - `zones` for the list itself, and `title/fr` for a lane of a
+  ///   translated field, which names that field.
+  ///
+  /// A key that names no field of the form stays under itself in the
+  /// controller's `errors`, where a `ValidationSummary` lists it, until
+  /// the next edit of any field.
   final Map<String, String> fieldErrors;
 
   const FormSubmitException({this.message, this.fieldErrors = const {}});
