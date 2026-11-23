@@ -249,8 +249,9 @@ class ValueFormController<T> extends FormController {
   /// field's.
   ///
   /// A path names a cell the scope has handed out, which a row's are once
-  /// the row was seeded, shown or saved. A message whose key names no
-  /// field of the form stays under that key until it is cleared here.
+  /// the row was seeded, shown or saved; until then it names the row's
+  /// list. A message whose key names no field of the form stays under that
+  /// key until it is cleared here.
   void setErrors(Map<String, String?> errors) {
     for (final MapEntry(:key, :value) in errors.entries) {
       final id = _fieldIdOf(key);
@@ -408,15 +409,23 @@ class ValueFormController<T> extends FormController {
       if (!_same(entry.last, entry.base)) _touched.add(id);
       _serverErrors.remove(id);
     }
+    // What the server said of a list, an edit in one of its rows answers.
+    for (final list in entry.within) {
+      _serverErrors.remove(list.cell.id);
+    }
     _dropUnplaced();
     _refresh(edited: true, changed: entry.cell);
   }
 
   /// [dropped] are the ids of the removed rows' cells: their server
-  /// messages go with them.
+  /// messages go with them, as do [list]'s own and those of the lists it
+  /// is in a row of.
   void _onStructure(_ListEntry list, Set<String> dropped) {
     if (_writeDepth > 0 || _disposed) return;
     _serverErrors.remove(list.cell.id);
+    for (final outer in list.within) {
+      _serverErrors.remove(outer.cell.id);
+    }
     dropped.forEach(_serverErrors.remove);
     _dropUnplaced();
     _touched.removeAll(dropped);
@@ -921,6 +930,11 @@ class _FieldState {
 /// The cells handed out under one scope, record element or sub-scope, keyed
 /// by their path within it.
 class _Node {
+  _Node(this.within);
+
+  /// The record lists this node's cells are in a row of, outermost first;
+  /// none for the form's own.
+  final List<_ListEntry> within;
   final values = <String, _Entry>{};
   final lists = <String, _ListEntry>{};
   final translated = <String, Object>{};
@@ -931,13 +945,17 @@ class _Node {
 /// its own, a translated field's for a lane, an asset reference's for a
 /// part.
 class _Entry {
-  _Entry(this.cell, this.owners)
+  _Entry(this.cell, this.owners, this.within)
     : first = cell.value,
       base = cell.value,
       last = cell.value;
 
   final ValueCell<Object?> cell;
   final List<String> owners;
+
+  /// The record lists the cell is in a row of: an edit of it is an edit of
+  /// each.
+  final List<_ListEntry> within;
 
   /// The value when first handed out, which the baseline takes for a key it
   /// has not seen.
@@ -955,6 +973,10 @@ class _Entry {
 
 /// A tracked record list and the nodes of its elements, by element id.
 class _ListEntry {
+  _ListEntry(this.within);
+
+  /// The record lists this one is in a row of.
+  final List<_ListEntry> within;
   late final RecordListCell<Object?> cell;
   late final VoidCallback listener;
 
@@ -965,7 +987,8 @@ class _ListEntry {
   final elements = <String, _Node>{};
   List<String>? _collecting;
 
-  _Node nodeFor(String id) => elements.putIfAbsent(id, _Node.new);
+  _Node nodeFor(String id) =>
+      elements.putIfAbsent(id, () => _Node([...within, this]));
 
   void collect(String id) => _collecting?.add(id);
 
@@ -998,7 +1021,7 @@ class _Tracker {
 
   final void Function(_Entry) _onValue;
   final void Function(_ListEntry, Set<String> dropped) _onStructure;
-  final root = _Node();
+  final root = _Node(const []);
   final entries = <_Entry>[];
   final lists = <_ListEntry>[];
 
@@ -1014,7 +1037,7 @@ class _Tracker {
     final known = node.values[key];
     if (known != null && identical(known.cell, cell)) return cell;
     if (known != null) _drop(known);
-    final entry = _Entry(cell, owners);
+    final entry = _Entry(cell, owners, node.within);
     entry.listener = () {
       final value = entry.cell.value;
       if (_same(value, entry.last)) return;
@@ -1071,7 +1094,7 @@ class _Tracker {
     if (node.lists[key] case final known?) {
       return known.cell as RecordListCell<H>;
     }
-    final entry = _ListEntry();
+    final entry = _ListEntry(node.within);
     final cell = create((element) {
       entry.collect(element.id);
       return build(_TrackedRecordScope(element, entry, this));
@@ -1158,7 +1181,9 @@ class _Tracker {
   /// row's index after a dot (`phones.1.label`), as a server may. A value
   /// answers with its field's id, which for a lane is its translated
   /// field's; a list, a translated field and an asset reference with their
-  /// own. Null when the form has handed out no cell there.
+  /// own. A path into a list that leads to no field (a row or a field the
+  /// form has not, or the row itself) answers with that list's. Null when
+  /// the form has handed out nothing there.
   String? idAt(String path) => _idAt(root, path);
 
   String? _idAt(_Node node, String path) {
@@ -1181,7 +1206,10 @@ class _Tracker {
       final element = index != null && index < ids.length
           ? list.elements[ids[index]]
           : null;
-      return element == null ? null : _idAt(element, path.substring(row.end));
+      final inRow = element == null
+          ? null
+          : _idAt(element, path.substring(row.end));
+      return inRow ?? list.cell.id;
     }
     return null;
   }

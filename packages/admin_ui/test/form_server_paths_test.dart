@@ -1,7 +1,9 @@
 // A server names the field it refuses by where it is in the value it was
 // sent: a row of a list by its index, since the row's cell id is the
-// form's own. A message that names no field of the form does not keep the
-// form from being saved again.
+// form's own. What it says of a list, or of a row the form cannot follow
+// to a field, shows under the list until one of its rows is edited. A
+// message that names no field of the form does not keep the form from
+// being saved again.
 
 import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -234,13 +236,117 @@ void main() {
     });
   });
 
-  group('a message that names no field of the form', () {
+  group('a path into a list that leads to no field names the list', () {
     for (final (what, path) in [
-      ('a field the form has not', 'vatNumber'),
       ('a row the list has not', 'zones[5].name'),
       ('an index no list could hold', 'zones[99999999999999999999].name'),
       ('a field its row has not', 'zones[0].rateCents'),
       ('a row with no field', 'zones[1]'),
+      ('a row of a list that a missing row would hold', 'zones[5].stops[0]'),
+    ]) {
+      test(what, () async {
+        final (:form, :fields, :saved) = _form({path: 'Refused here'});
+        await form.submit();
+        expect(form.errors, {fields.zones.id: 'Refused here'});
+
+        fields.name.set('Potting shed 2');
+        expect(form.errors, hasLength(1), reason: 'not an edit of the list');
+        fields.zones.elements[0].name.set('North');
+        expect(form.errors, isEmpty);
+        await form.submit();
+        expect(saved, hasLength(1), reason: 'the form saves again');
+      });
+    }
+
+    test('a row\'s own list, for a row of it the form has not', () async {
+      final (:form, :fields, saved: _) = _form({
+        'zones[1].stops[9].town': 'Unknown',
+      });
+      await form.submit();
+      expect(form.errors, {fields.zones.elements[1].stops.id: 'Unknown'});
+    });
+  });
+
+  group('what the server says of a list', () {
+    test('an edit in one of its rows answers, and the form saves', () async {
+      final (:form, :fields, :saved) = _form({'zones': 'Two zones overlap'});
+      await form.submit();
+      expect(form.errors, {fields.zones.id: 'Two zones overlap'});
+      expect(form.canSubmit, isFalse);
+
+      fields.zones.elements[1].rate.set(4);
+      expect(form.errors, isEmpty);
+      expect(form.canSubmit, isTrue);
+      await form.submit();
+      expect(saved, hasLength(1));
+    });
+
+    test('an edit under a row\'s sub-scope and in its asset reference '
+        'do too', () async {
+      for (final edit in <void Function(_Zone)>[
+        (zone) => zone.street.set('1 Quay'),
+        (zone) => zone.photo.assetId.set('m-1'),
+      ]) {
+        final (:form, :fields, saved: _) = _form({'zones': 'Refused'});
+        await form.submit();
+        edit(fields.zones.elements[0]);
+        expect(form.errors, isEmpty);
+      }
+    });
+
+    test('an edit in a row of a row answers both lists', () async {
+      final (:form, :fields, saved: _) = _form({
+        'zones': 'Two zones overlap',
+        'zones[1].stops': 'Too many stops',
+        'stock.depots': 'No depot is open',
+      });
+      await form.submit();
+      expect(form.errors, hasLength(3));
+
+      fields.zones.elements[1].stops.elements[0].town.set('Ghent');
+      expect(form.errors, {fields.depots.id: 'No depot is open'});
+    });
+
+    test('a row added to a row\'s list answers the list around it', () async {
+      final (:form, :fields, saved: _) = _form({'zones': 'Two zones overlap'});
+      await form.submit();
+      fields.zones.elements[1].stops.add();
+      expect(form.errors, isEmpty);
+    });
+
+    test('an edit in a row leaves the list within it, and another '
+        'list', () async {
+      final (:form, :fields, saved: _) = _form({
+        'zones[1].stops': 'Too many stops',
+        'stock.depots': 'No depot is open',
+      });
+      await form.submit();
+      fields.zones.elements[1].name.set('North');
+      expect(form.errors, {
+        fields.zones.elements[1].stops.id: 'Too many stops',
+        fields.depots.id: 'No depot is open',
+      });
+    });
+
+    test('an edit in one row leaves what was said of another', () async {
+      final (:form, :fields, saved: _) = _form({'zones[1].name': 'Taken'});
+      await form.submit();
+      fields.zones.elements[0].name.set('South');
+      expect(form.errors, {fields.zones.elements[1].name.id: 'Taken'});
+    });
+
+    test('an edit outside the list leaves it', () async {
+      final (:form, :fields, saved: _) = _form({'zones': 'Two zones overlap'});
+      await form.submit();
+      fields.name.set('Potting shed 2');
+      fields.city.set('Ghent');
+      expect(form.errors, {fields.zones.id: 'Two zones overlap'});
+    });
+  });
+
+  group('a message that names no field of the form', () {
+    for (final (what, path) in [
+      ('a field the form has not', 'vatNumber'),
       ('a list the form has not', 'warehouses[0].name'),
     ]) {
       test('$what: it shows under its key, and the next edit of any field '
@@ -297,11 +403,13 @@ void main() {
       });
     });
 
-    test('a path to a cell the scope has not handed out names none yet', () {
+    test('a path to a row\'s cell the scope has not handed out names the '
+        'list until it has', () {
       final (:form, :fields, saved: _) = _form();
       form.setErrors({'zones[1].name': 'Taken'});
-      expect(form.errors, {'zones[1].name': 'Taken'});
+      expect(form.errors, {fields.zones.id: 'Taken'});
       form.setErrors({'zones[1].name': null});
+      expect(form.errors, isEmpty);
 
       fields.zones.elements[1].name;
       form.setErrors({'zones[1].name': 'Taken'});

@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- What a server says of a record list, an edit in one of its rows
+  answers. A message under the list (`zones`: "Two zones overlap") stayed
+  until a row was added, removed or moved, so one that editing a row
+  answers kept the form from being saved again. An edit of any field in
+  the list's rows now takes it, a row of a row's own list included. And a
+  path into a list that leads to no field names the list, where it named
+  nothing: a row or a field the form has not (`zones[7].name`,
+  `zones[0].vat`), or the row itself (`zones[1]`).
 - A server names the field it refuses by where it is in the value. A key
   of `FormSubmitException.fieldErrors`, and of
   `ValueFormController.setErrors`, is a field's id, as before, or its path
