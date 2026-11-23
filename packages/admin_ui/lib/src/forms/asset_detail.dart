@@ -30,7 +30,8 @@ import 'value_fields.dart' show Field;
 /// [footerActions], and (when [onDelete] is supplied) a delete action.
 /// [onDelete] runs *after* the sheet closes, so the host owns confirmation
 /// and the actual removal. [onSaveAlt] enables the default-alt editor (see
-/// [AssetDetailView]), which needs a [LangScope].
+/// [AssetDetailView]), which needs a [LangScope]; it is handed the whole alt
+/// text, to store in place of the old (see [AssetDetailView.onSaveAlt]).
 ///
 /// The sheet sees the scopes above [modals]'s anchor. When that anchor sits
 /// above the page that provides them, as `AdminScope`'s does around the
@@ -95,6 +96,14 @@ class AssetDetailView extends StatelessWidget {
 
   /// Persists the edited default alt; returns the updated [Asset] (null =
   /// failed, the editor stays dirty).
+  ///
+  /// `alt` is the whole alt text, language code to trimmed text, and not
+  /// only what changed. Every language that has text is in it: one hidden
+  /// in the language switcher, and one the asset had that the page no
+  /// longer lists. A language missing from it has none, the person having
+  /// cleared it, and with every language cleared it is empty. So store the
+  /// map in place of the one that was there: merged into it, a cleared
+  /// language comes back.
   final Future<Asset?> Function(Map<String, String> alt)? onSaveAlt;
 
   /// The header's own controls, before its close button: an `IconAction`

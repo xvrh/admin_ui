@@ -64,6 +64,10 @@ abstract class AssetSource {
   /// Persists the library-level default alt text for [id] ({lang: text}),
   /// returning the updated [Asset] — or null when the source can't persist
   /// (demos, read-only sources).
+  ///
+  /// [alt] is the whole alt text, as `AssetDetailView.onSaveAlt` hands it
+  /// over: a language missing from it has none. Store it in place of the
+  /// old map; merged into it, a language the person cleared comes back.
   Future<Asset?> updateAlt(String id, Map<String, String> alt);
 }
 

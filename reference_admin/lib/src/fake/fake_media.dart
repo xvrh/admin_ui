@@ -128,8 +128,8 @@ class FakeAssetSource implements AssetSource {
           width: old.width,
           height: old.height,
           usageCount: old.usageCount,
-          // FRICTION(F-406): the kit sends the whole alt text, leaving
-          // cleared languages out, so it replaces what was stored.
+          // The whole alt text, a cleared language left out, as
+          // AssetSource.updateAlt says: it replaces what was stored.
           alt: {...alt}..removeWhere((_, v) => v.trim().isEmpty),
         );
         _db.assets[i] = updated;

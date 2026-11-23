@@ -43,7 +43,11 @@ import 'save_bar.dart';
 class SaveCluster extends StatelessWidget {
   final SaveState state;
 
-  /// Appended to the "Saved" message, e.g. `'2m ago'` → "Saved · 2m ago".
+  /// A detail after the "Saved" status ("Published" under
+  /// [SaveFlow.publish]): `'2m ago'` reads "Saved · 2m ago". It is not the
+  /// status's own word, which is the kit's in the app's language: `'Saved'`
+  /// here reads "Saved · Saved". Null leaves the status alone. [errorLabel],
+  /// by contrast, replaces its message.
   final String? savedLabel;
 
   /// Overrides the default "Couldn’t save" error message.
