@@ -2,6 +2,13 @@
 
 ## 0.2.0
 
+- `SignInForm` takes `emailErrorText` and `passwordErrorText`, as
+  `ChangePasswordForm` takes its two: a server's refusal of one field,
+  under that field, where the one `errorText` put a wrong password in an
+  alert above the email. A field's message is about what the field held
+  when it came, the form's own "is required" shows in its place, and the
+  submit that brings one takes focus to its field. `errorText` is
+  unchanged, for what is no field's.
 - `ChangePasswordFormState.reset()` empties a `ChangePasswordForm`: its
   three fields, and what a submit showed under them. The form kept both
   passwords in its fields after the host changed the password, and the
