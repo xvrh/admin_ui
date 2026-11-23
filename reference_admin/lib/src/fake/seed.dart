@@ -492,16 +492,7 @@ void _seedProducts(FakeShopDb db, Random random, DateTime now) {
   for (var i = 0; i < db.assets.length; i++) {
     final asset = db.assets[i];
     final uses = db.products.where((p) => p.photoIds.contains(asset.id)).length;
-    db.assets[i] = Asset(
-      id: asset.id,
-      name: asset.name,
-      bytes: asset.bytes,
-      thumbnail: asset.thumbnail,
-      width: asset.width,
-      height: asset.height,
-      alt: asset.alt,
-      usageCount: uses,
-    );
+    db.assets[i] = asset.copyWith(usageCount: uses);
   }
 }
 
