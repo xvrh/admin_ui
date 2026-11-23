@@ -1562,6 +1562,14 @@ kit's.
 The layout mirrors in a right-to-left locale, or under
 `Directionality(textDirection: TextDirection.rtl)`.
 
+An email or a web address is still typed left to right there. An
+`InputField`, a `Field` or an `OptionalField` whose `keyboardType` is
+`emailAddress` or `url` shows its value, its hint and its fixed prefix and
+suffix left to right, starting at the left, while its label, its message
+and its counter stay on the page's side. `textDirection` on each of them
+says so for any other field: a product code, or a name in a language that
+runs the other way.
+
 ## Forms
 
 A form edits cells: typed handles over a `FormScope`, one cell per field,

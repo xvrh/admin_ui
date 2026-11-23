@@ -227,6 +227,7 @@ Map<String, dynamic> genericCatalog() => {
       'Field anatomy': const FieldAnatomyDemo(),
       'Validation states': const FieldValidationStatesDemo(),
       'Text': const TextFieldDemo(),
+      'Text · right to left': const TextFieldRtlDemo(),
       'Boolean / toggle': const BooleanFieldDemo(),
       'Select / enum': const SelectFieldDemo(),
       'Select / open': const SelectFieldOpenDemo(),

@@ -512,6 +512,14 @@ class Field extends StatelessWidget {
   final TextInputType? keyboardType;
   final Iterable<String>? autofillHints;
 
+  /// The direction the value is typed and shown in, when not the ambient
+  /// one. Null reads an email or URL [keyboardType] as left to right, since
+  /// an address reads so in every language, and follows the ambient
+  /// direction otherwise, a translated lane's being its language's. The
+  /// [hint], [prefix] and [suffix] read with the value; the label, the
+  /// messages and the counter stay in the ambient direction.
+  final TextDirection? textDirection;
+
   /// Fixed text before and after the value — `https://`, `kg`.
   final String? prefix;
   final String? suffix;
@@ -535,6 +543,7 @@ class Field extends StatelessWidget {
     this.maxLength,
     this.keyboardType,
     this.autofillHints,
+    this.textDirection,
     this.prefix,
     this.suffix,
     this.required = false,
@@ -553,6 +562,7 @@ class Field extends StatelessWidget {
     maxLength: maxLength,
     keyboardType: keyboardType,
     autofillHints: autofillHints,
+    textDirection: textDirection,
     prefix: prefix,
     suffix: suffix,
   );
@@ -600,6 +610,9 @@ class TextCellBody extends StatefulWidget {
   final TextInputType? keyboardType;
   final Iterable<String>? autofillHints;
 
+  /// See [TextBody.textDirection].
+  final TextDirection? textDirection;
+
   /// Fixed text before and after the value — `https://`, `kg`.
   final String? prefix;
   final String? suffix;
@@ -613,6 +626,7 @@ class TextCellBody extends StatefulWidget {
     this.maxLength,
     this.keyboardType,
     this.autofillHints,
+    this.textDirection,
     this.prefix,
     this.suffix,
   });
@@ -677,6 +691,10 @@ class _TextCellBodyState extends State<TextCellBody> {
 
   @override
   Widget build(BuildContext context) {
+    final direction = inputTextDirection(
+      widget.textDirection,
+      widget.keyboardType,
+    );
     return TextField(
       controller: _controller,
       readOnly: FieldStateScope.of(context).readOnly,
@@ -686,11 +704,13 @@ class _TextCellBodyState extends State<TextCellBody> {
       maxLength: widget.maxLength,
       keyboardType: textKeyboardType(widget.keyboardType, widget.maxLines),
       autofillHints: widget.autofillHints,
+      textDirection: direction,
       decoration: textInputDecoration(
         context,
         hint: widget.hint,
         prefix: widget.prefix,
         suffix: widget.suffix,
+        textDirection: direction,
       ),
     );
   }
@@ -1042,6 +1062,9 @@ class OptionalField extends StatelessWidget {
   final TextInputType? keyboardType;
   final Iterable<String>? autofillHints;
 
+  /// See [Field.textDirection].
+  final TextDirection? textDirection;
+
   /// Fixed text before and after the value — `https://`, `kg`.
   final String? prefix;
   final String? suffix;
@@ -1064,6 +1087,7 @@ class OptionalField extends StatelessWidget {
     this.maxLength,
     this.keyboardType,
     this.autofillHints,
+    this.textDirection,
     this.prefix,
     this.suffix,
     this.required = false,
@@ -1097,6 +1121,7 @@ class OptionalField extends StatelessWidget {
         maxLength: maxLength,
         keyboardType: keyboardType,
         autofillHints: autofillHints,
+        textDirection: textDirection,
         prefix: prefix,
         suffix: suffix,
       ),

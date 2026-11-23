@@ -148,3 +148,83 @@ class _OptionalTextState extends State<_OptionalText> {
     );
   }
 }
+
+/// The text field in a right-to-left form. Text follows the page; an email
+/// or a URL still reads left to right, with its hint and its prefix, under
+/// a label and beside a counter that stay on the page's side.
+class TextFieldRtlDemo extends StatefulWidget {
+  @Preview(name: 'Text · right to left', wrapper: adminUiPreview)
+  const TextFieldRtlDemo({super.key});
+
+  @override
+  State<TextFieldRtlDemo> createState() => _TextFieldRtlDemoState();
+}
+
+class _TextFieldRtlDemoState extends State<TextFieldRtlDemo> {
+  final _scope = LocalScope();
+  late final _name = _scope.text('name')..set('أمينة');
+  late final _email = _scope.text('email')..set('amina@example.com');
+  late final _invite = _scope.text('invite');
+  late final _page = _scope.text('page');
+  late final _code = _scope.text('code')..set('AB-1234');
+
+  @override
+  void dispose() {
+    _scope.dispose();
+    super.dispose();
+  }
+
+  Widget _rtl(Widget field) =>
+      Directionality(textDirection: TextDirection.rtl, child: field);
+
+  @override
+  Widget build(BuildContext context) {
+    return DemoPage(
+      maxWidth: 460,
+      children: [
+        DemoVariant(
+          'Text follows the page',
+          _rtl(Field(_name, label: 'الاسم')),
+        ),
+        DemoVariant(
+          'An email reads left to right, from the left',
+          _rtl(
+            Field(
+              _email,
+              label: 'البريد الإلكتروني',
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ),
+        ),
+        DemoVariant(
+          'Its hint starts where the address will',
+          _rtl(
+            Field(
+              _invite,
+              label: 'دعوة',
+              hint: 'name@example.com',
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ),
+        ),
+        DemoVariant(
+          'A URL keeps its prefix in front; the counter stays the page\'s',
+          _rtl(
+            Field(
+              _page,
+              label: 'الصفحة',
+              prefix: 'https://',
+              hint: 'example.com',
+              maxLength: 60,
+              keyboardType: TextInputType.url,
+            ),
+          ),
+        ),
+        DemoVariant(
+          'textDirection — a code, whatever the keyboard',
+          _rtl(Field(_code, label: 'الرمز', textDirection: TextDirection.ltr)),
+        ),
+      ],
+    );
+  }
+}
