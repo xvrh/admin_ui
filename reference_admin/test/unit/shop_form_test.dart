@@ -57,6 +57,17 @@ void main() {
     expect(form.submitError, const RefStringsEn().shell.errorValidation);
   });
 
+  test('a zone the form has not names the zones, which an edit of a zone '
+      'answers', () async {
+    final form = _form(const {'shippingZones.7.name': 'invalid'});
+    await form.submit();
+    final f = ShopFields(form.scope);
+    expect(form.errors.keys, [f.zones.id]);
+    f.zones.elements[0].name.set('Benelux');
+    expect(form.errors, isEmpty);
+    expect(form.canSubmit, isTrue);
+  });
+
   test('a field the form has not does not keep it from saving again', () async {
     final form = _form(const {'vatNumber': 'invalid'});
     await form.submit();

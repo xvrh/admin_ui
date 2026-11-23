@@ -341,8 +341,13 @@ class FormSubmitException implements Exception {
   ///   `zones.1.name` as some servers write it. A server can name a row by
   ///   where it is; the row's cell id it cannot know. The index counts the
   ///   rows as they stand when the refusal arrives.
-  /// - `zones` for the list itself, and `title/fr` for a lane of a
-  ///   translated field, which names that field.
+  /// - `zones` for the list itself, whose message stays until a row is
+  ///   added, removed or moved, or a field of one of its rows is edited. A
+  ///   path into the list that leads to no field names the list too: a
+  ///   row or a field the form has not (`zones[7].name`, `zones[0].vat`),
+  ///   or the row itself (`zones[1]`).
+  /// - `title/fr` for a lane of a translated field, which names that
+  ///   field.
   ///
   /// A key that names no field of the form stays under itself in the
   /// controller's `errors`, where a `ValidationSummary` lists it, until
