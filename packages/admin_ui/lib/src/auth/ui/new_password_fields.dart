@@ -41,6 +41,13 @@ class NewPasswordFields extends StatefulWidget {
   /// a field above it, say.
   final FocusNode? focusNode;
 
+  /// A message about the new password from outside the block, such as a
+  /// server's that finds it too weak. It is about the password as it stood
+  /// when the message was given: it shows under the new password while
+  /// that is unchanged and the length rule has none of its own there.
+  /// Given again after a null, it is about the password as it stands then.
+  final String? errorText;
+
   /// The key of the new-password input, to find it by in a test.
   final Key? newKey;
 
@@ -57,6 +64,7 @@ class NewPasswordFields extends StatefulWidget {
     this.newLabel,
     this.confirmLabel,
     this.focusNode,
+    this.errorText,
     this.newKey,
     this.confirmKey,
   });
@@ -83,11 +91,22 @@ class NewPasswordFieldsState extends State<NewPasswordFields> {
   /// A submit was attempted: every rule shows.
   bool _attempted = false;
 
+  /// The password [NewPasswordFields.errorText] is about.
+  late String? _refused = widget.errorText == null ? null : '';
+
   @override
   void initState() {
     super.initState();
     _password.addListener(_onChanged);
     _confirm.addListener(_onChanged);
+  }
+
+  @override
+  void didUpdateWidget(NewPasswordFields oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.errorText != oldWidget.errorText) {
+      _refused = widget.errorText == null ? null : _password.text;
+    }
   }
 
   void _onChanged() {
@@ -168,7 +187,8 @@ class NewPasswordFieldsState extends State<NewPasswordFields> {
             label: widget.newLabel ?? shell.newPassword,
             controller: _password,
             focusNode: _passwordFocus,
-            errorText: _lengthError,
+            errorText:
+                _lengthError ?? (_value == _refused ? widget.errorText : null),
             enabled: widget.enabled,
             autofillHints: const [AutofillHints.newPassword],
             textInputAction: TextInputAction.next,

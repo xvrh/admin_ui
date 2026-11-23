@@ -2,6 +2,15 @@
 
 ## 0.2.0
 
+- `ChangePasswordForm` takes `currentErrorText` and `newErrorText`: a
+  server's refusal of one password, under that password's field, where
+  its one `errorText` drew every refusal as an alert above the form and
+  marked no field. A field's message is about what the field held when it
+  came: it shows while that is unchanged, and the form's own "is
+  required" or length rule shows in its place. The submit that brings one
+  takes focus to its field. `NewPasswordFields` takes the same as
+  `errorText`. `errorText` on the form is unchanged, for what is no
+  field's.
 - `Asset.copyWith`: an asset with the fields given changed and every other
   carried over, where changing its alt text or its usage count meant
   naming all eleven fields, and a field added later was dropped by a copy

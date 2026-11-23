@@ -104,13 +104,23 @@ class SetPasswordDemo extends StatelessWidget {
 
 class ChangePasswordDemo extends StatelessWidget {
   @Preview(name: 'Change password', wrapper: adminUiPreview)
-  const ChangePasswordDemo({super.key});
+  const ChangePasswordDemo({super.key}) : refused = false;
+
+  /// The form as a server left it, refusing both passwords: each message
+  /// under its field.
+  @Preview(name: 'Change password / refused', wrapper: adminUiPreview)
+  const ChangePasswordDemo.refused({super.key}) : refused = true;
+
+  /// Whether the two field refusals start on.
+  final bool refused;
 
   @override
   Widget build(BuildContext context) {
     final params = context.knobs;
     final submitting = params.bool('Submitting', false);
     final error = params.bool('Error', false);
+    final current = params.bool('Current password refused', refused);
+    final next = params.bool('New password refused', refused);
 
     void snack(String m) =>
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
@@ -128,7 +138,13 @@ class ChangePasswordDemo extends StatelessWidget {
             ChangePasswordForm(
               onSubmit: (current, next) => snack('Change password'),
               submitting: submitting,
-              errorText: error ? 'Current password is incorrect.' : null,
+              errorText: error ? 'Could not reach the server.' : null,
+              currentErrorText: current
+                  ? 'That is not your current password.'
+                  : null,
+              newErrorText: next
+                  ? 'Too easy to guess. Try a longer one.'
+                  : null,
             ),
           ],
         ),
