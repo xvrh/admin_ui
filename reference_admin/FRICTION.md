@@ -90,7 +90,7 @@ two together.
 | F-501 | A `Choice` card cannot show a preview, and `Choice` cannot lay its cards out in a grid | missing-api | S3 | open |
 | F-502 | `SwatchRow` is the canvas toolbar's picker: 18px dots, no visible name, no keys, no group semantics | awkward-default | S3 | open |
 | F-503 | `SelectField` binds only a form cell, so an instant setting needs a `LocalScope` of its own | awkward-default | S3 | open |
-| F-504 | `ChangePasswordForm` shows a server's refusal only as an alert over the form | missing-api | S3 | open |
+| F-504 | `ChangePasswordForm` shows a server's refusal only as an alert over the form | missing-api | S3 | fixed |
 | F-505 | A `Toggle` with no label stretches its track to a tight width | bug | S3 | fixed |
 | F-506 | `ChangePasswordForm` cannot be cleared after a successful change | missing-api | S3 | open |
 | T-001 | No hover, mouse-click, secondary-click or key-chord scenario verbs | test-support | S3 | open |
@@ -1048,12 +1048,12 @@ Owned by WP-E.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `auth.dart › ChangePasswordForm` (`lib/src/auth/ui/change_password_form.dart:21`): one `errorText`, drawn as an `Alert` above the fields; no per-field error.
 - **App:** `lib/src/screens/settings/profile/profile_pages.dart:55` (the shop's `validation({'current': …})` / `{'next': …}` mapped to one sentence).
 - **Evidence:** "Changing my password" › "Password · current is wrong": the message sits above the form while the field it concerns is not marked, unlike the kit's own mismatch message, which sits under the confirmation field.
 - **Workaround:** the sentence names the field ("That is not your current password…").
-- **Proposal:** `currentErrorText` and `newErrorText`, or taking a `FormSubmitException`-style map keyed `current` / `new`.
+- **Proposal:** `currentErrorText` and `newErrorText`, or taking a `FormSubmitException`-style map keyed `current` / `new`. Done as `currentErrorText` and `newErrorText`: the profile page hands each of the shop's refusals to its field, and "That is not your current password" sits under the current password.
 
 ### F-505 · A `Toggle` with no label stretches its track to a tight width
 

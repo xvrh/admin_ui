@@ -27,6 +27,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _submitting = false;
+
+  /// The shop's refusal: of the current password, of the new one, or of
+  /// neither in particular.
+  String? _currentError;
+  String? _newError;
   String? _error;
 
   /// Bumped after a change, so the form starts empty again.
@@ -37,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final toasts = ToastScope.maybeOf(context);
     setState(() {
       _submitting = true;
-      _error = null;
+      _currentError = _newError = _error = null;
     });
     try {
       await context.api.changePassword(current, next);
@@ -52,15 +57,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     } on ValidationError catch (error) {
       if (!mounted) return;
-      // FRICTION(F-504): ChangePasswordForm shows a server error only as an
-      // alert over the form, not under the field it concerns.
-      setState(
-        () => _error = switch (error.fields) {
-          {'current': _} => strings.settings.wrongCurrentPassword,
-          {'next': _} => strings.settings.passwordTooWeak,
-          _ => strings.shell.error(error),
-        },
-      );
+      setState(() {
+        switch (error.fields) {
+          case {'current': _}:
+            _currentError = strings.settings.wrongCurrentPassword;
+          case {'next': _}:
+            _newError = strings.settings.passwordTooWeak;
+          default:
+            _error = strings.shell.error(error);
+        }
+      });
     } on ShopError catch (error) {
       if (mounted) setState(() => _error = strings.shell.error(error));
     } finally {
@@ -84,6 +90,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onSubmit: _change,
           submitting: _submitting,
           errorText: _error,
+          currentErrorText: _currentError,
+          newErrorText: _newError,
         ),
       ),
     );

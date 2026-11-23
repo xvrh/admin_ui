@@ -19,10 +19,29 @@ typedef ChangePasswordCallback = void Function(String current, String next);
 /// with [SetPasswordForm] via [NewPasswordFields]; this adds the current-password
 /// field on top. Submit stays enabled: pressing it shows what is missing and
 /// focuses the first field that fails.
+///
+/// A server's refusal goes where it belongs: [currentErrorText] under the
+/// current password ("That is not your current password"),
+/// [newErrorText] under the new one ("Too easy to guess"), and
+/// [errorText], for anything that is no one field's, in an alert above the
+/// form. A field's message is about what the field held when it came: it
+/// shows while that is unchanged, and the next submit to end with it still
+/// given shows it again. The submit that brings one takes focus to its
+/// field, the current password's first.
 class ChangePasswordForm extends StatefulWidget {
   final ChangePasswordCallback onSubmit;
   final bool submitting;
+
+  /// A refusal that is no one field's, in an alert above the form.
   final String? errorText;
+
+  /// A refusal of the current password, under its field. The form's own
+  /// "is required" shows in its place while the field is empty.
+  final String? currentErrorText;
+
+  /// A refusal of the new password, under its field. The form's own length
+  /// rule shows in its place while the password is too short.
+  final String? newErrorText;
 
   final int minLength;
   final bool showStrength;
@@ -58,6 +77,8 @@ class ChangePasswordForm extends StatefulWidget {
     required this.onSubmit,
     this.submitting = false,
     this.errorText,
+    this.currentErrorText,
+    this.newErrorText,
     this.minLength = 8,
     this.showStrength = true,
     this.submitLabel,
@@ -85,11 +106,35 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
   /// that it is required.
   bool _attempted = false;
 
+  /// The current password [ChangePasswordForm.currentErrorText] is about:
+  /// what the field held when the message came.
+  late String? _refusedCurrent = widget.currentErrorText == null ? null : '';
+
   @override
   void initState() {
     super.initState();
     _current.addListener(() {
-      if (_attempted) setState(() {});
+      if (_attempted || _refusedCurrent != null) setState(() {});
+    });
+  }
+
+  @override
+  void didUpdateWidget(ChangePasswordForm oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A submit that ends brings its refusals with it, the same ones as
+    // last time included.
+    final answered = oldWidget.submitting && !widget.submitting;
+    final current = widget.currentErrorText;
+    if (answered || current != oldWidget.currentErrorText) {
+      _refusedCurrent = current == null ? null : _current.text;
+    }
+    if (!answered) return;
+    final refused = current != null
+        ? _currentFocus
+        : (widget.newErrorText != null ? _newFocus : null);
+    // Once the fields are enabled again.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) refused?.requestFocus();
     });
   }
 
@@ -132,7 +177,9 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
           focusNode: _currentFocus,
           errorText: _attempted && _current.text.isEmpty
               ? shell.isRequired(currentLabel)
-              : null,
+              : (_current.text == _refusedCurrent
+                    ? widget.currentErrorText
+                    : null),
           enabled: !widget.submitting,
           autofillHints: const [AutofillHints.password],
           textInputAction: TextInputAction.next,
@@ -147,6 +194,9 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
           showStrength: widget.showStrength,
           newLabel: widget.newLabel,
           confirmLabel: widget.confirmLabel ?? shell.confirmNewPassword,
+          // None while a submit runs, so that the one it ends with is new
+          // to the fields even when it is the last one again.
+          errorText: widget.submitting ? null : widget.newErrorText,
           newKey: widget.newKey,
           confirmKey: widget.confirmKey,
           onChanged: (value) => setState(() => _password = value),
