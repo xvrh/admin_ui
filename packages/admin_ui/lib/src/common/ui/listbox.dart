@@ -300,6 +300,12 @@ class ListboxController extends ChangeNotifier {
 ///
 /// As the keyboard moves the highlight, the new option is announced ("Banana,
 /// 2 of 3") while a screen reader is on, since focus stays where it is.
+///
+/// It takes the width it is given. Its rows are built as they scroll into
+/// view, so it cannot say how wide the widest is: on a [PopoverMenuSurface],
+/// give the surface a width, the trigger's or the widest row's from
+/// [ListboxOption.widthOf], as [ListboxMenu] does. A surface left to size
+/// itself to the list is an error, which says so.
 class Listbox extends StatefulWidget {
   final ListboxController controller;
   final int itemCount;
@@ -378,6 +384,9 @@ class _ListboxState extends State<Listbox> {
   void _reveal(int index, {required bool center, int attempt = 0}) {
     if (!mounted || !_scroll.hasClients || index >= widget.itemCount) return;
     final position = _scroll.position;
+    // A list whose layout failed has no extent to scroll in, and the failure
+    // is already reported.
+    if (!position.hasContentDimensions) return;
     final box = _rows[index]?.currentContext?.findRenderObject();
     if (box is! RenderBox || !box.attached) {
       if (attempt > 3 || widget.itemCount == 0) return;
@@ -434,14 +443,16 @@ class _ListboxState extends State<Listbox> {
 
   @override
   Widget build(BuildContext context) {
-    Widget list = ListView.builder(
-      controller: _scroll,
-      shrinkWrap: true,
-      padding: widget.padding,
-      itemCount: widget.itemCount,
-      itemBuilder: (context, index) => KeyedSubtree(
-        key: _keyFor(index),
-        child: widget.itemBuilder(context, index),
+    Widget list = _WidthIsGiven(
+      child: ListView.builder(
+        controller: _scroll,
+        shrinkWrap: true,
+        padding: widget.padding,
+        itemCount: widget.itemCount,
+        itemBuilder: (context, index) => KeyedSubtree(
+          key: _keyFor(index),
+          child: widget.itemBuilder(context, index),
+        ),
       ),
     );
     list = Semantics(
@@ -461,6 +472,53 @@ class _ListboxState extends State<Listbox> {
       },
       child: list,
     );
+  }
+}
+
+/// Answers whatever asks a [Listbox] how wide it would like to be.
+///
+/// The viewport under it refuses in words that name neither the [Listbox] nor
+/// what asked. This names both, and says what to pass instead.
+class _WidthIsGiven extends SingleChildRenderObjectWidget {
+  const _WidthIsGiven({required super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderWidthIsGiven();
+}
+
+class _RenderWidthIsGiven extends RenderProxyBox {
+  @override
+  double computeMinIntrinsicWidth(double height) => _refuse();
+
+  @override
+  double computeMaxIntrinsicWidth(double height) => _refuse();
+
+  /// Throws where assertions run, as the viewport does, and answers 0 where
+  /// they do not. A check of the intrinsic sizes themselves
+  /// ([debugCheckIntrinsicSizes]) is answered, not refused.
+  double _refuse() {
+    assert(() {
+      if (RenderObject.debugCheckingIntrinsics) return true;
+      throw FlutterError.fromParts([
+        // Not user-facing: a debug-build report for the developer.
+        ErrorSummary('A Listbox cannot say how wide it would like to be.'),
+        ErrorDescription(
+          // Not user-facing: a debug-build report for the developer.
+          'It builds its rows as they scroll into view, so it has not seen '
+          'its widest one. Something above it sizes itself to its content '
+          'and asked: a PopoverMenuSurface with no width does.',
+        ),
+        ErrorHint(
+          // Not user-facing: a debug-build report for the developer.
+          'Give that surface a width: its trigger\'s, from '
+          'PopoverController.anchorWidth, or the widest row\'s, from '
+          'ListboxOption.widthOf. A ListboxMenu is the surface and the list '
+          'together, and does both.',
+        ),
+      ]);
+    }());
+    return 0;
   }
 }
 

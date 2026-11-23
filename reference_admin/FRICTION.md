@@ -57,7 +57,7 @@ two together.
 | F-207 | A hover card needs a longer rest than any test helper knows | test-support | S3 | open |
 | F-208 | `KanbanBoard` pads itself inside the page's gutter, and its padding and gap are not exposed | awkward-default | S3 | open |
 | F-209 | `FilterBar` offers "Clear all" for conditions none of its pills shows | awkward-default | S3 | open |
-| F-210 | A `PopoverMenuSurface` sized to its content throws around a `Listbox` | bug | S3 | open |
+| F-210 | A `PopoverMenuSurface` sized to its content throws around a `Listbox` | bug | S3 | fixed |
 | F-212 | A selectable card's check sits over its content's corner | awkward-default | S3 | open |
 | F-213 | `Collection` does not pass `CollectionCards`' padding through | missing-api | S3 | open |
 | F-214 | `CollectionRealtime` refreshes the rows on reconnect, but a `SavedViewsController` whose load failed stays failed | awkward-default | S3 | open |
@@ -673,12 +673,12 @@ Owned by WP-B.
 
 - **Kind:** bug
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `widgets.dart › PopoverMenuSurface` (`lib/src/common/ui/popover_menu.dart:92`, `IntrinsicWidth`), `Listbox` (a lazy list).
 - **App:** none: the note composer is the kit's `MentionField` (F-205), which gives its suggestion list a fixed width itself. Before, `lib/src/screens/orders/note_composer.dart` gave the surface `width: 280`.
 - **Evidence:** "A note that mentions a teammate", first run: "RenderShrinkWrappingViewport does not support returning intrinsic dimensions", then a null check in `_ListboxState._reveal`.
 - **Workaround:** a fixed width.
-- **Proposal:** say so in `PopoverMenuSurface`'s docs, or have `Listbox` answer intrinsics from its rows' labels.
+- **Proposal:** say so in `PopoverMenuSurface`'s docs, or have `Listbox` answer intrinsics from its rows' labels. Done as the first: the docs of `PopoverMenuSurface` and of `Listbox` say that a surface around the list needs a width, and where to get one. The error says it too: asked how wide it would like to be, a `Listbox` now answers in its own words, naming itself and the surface and what to pass (`PopoverController.anchorWidth`, `ListboxOption.widthOf`, or a `ListboxMenu`), and the null check that followed is gone. Not the second: the list builds its rows lazily, a row is whatever its builder returns, and measuring every label on each layout is what `ListboxMenu.optionsWidth` exists to avoid.
 
 ### F-212 · A selectable card's check sits over its content's corner
 
