@@ -28,6 +28,11 @@ typedef ChangePasswordCallback = void Function(String current, String next);
 /// shows while that is unchanged, and the next submit to end with it still
 /// given shows it again. The submit that brings one takes focus to its
 /// field, the current password's first.
+///
+/// Once the password is changed, empty the form with
+/// [ChangePasswordFormState.reset], reached through a `GlobalKey`: the form
+/// cannot tell a change that went through from one the host says nothing
+/// of, and until then it keeps both passwords in its fields.
 class ChangePasswordForm extends StatefulWidget {
   final ChangePasswordCallback onSubmit;
   final bool submitting;
@@ -92,10 +97,11 @@ class ChangePasswordForm extends StatefulWidget {
   });
 
   @override
-  State<ChangePasswordForm> createState() => _ChangePasswordFormState();
+  State<ChangePasswordForm> createState() => ChangePasswordFormState();
 }
 
-class _ChangePasswordFormState extends State<ChangePasswordForm> {
+/// The state of a [ChangePasswordForm]: [reset] empties it.
+class ChangePasswordFormState extends State<ChangePasswordForm> {
   final _current = TextEditingController();
   final _currentFocus = FocusNode(debugLabel: 'Current password');
   final _newFocus = FocusNode(debugLabel: 'New password');
@@ -144,6 +150,19 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
     _currentFocus.dispose();
     _newFocus.dispose();
     super.dispose();
+  }
+
+  /// Empties the three fields and forgets what was shown under them: a
+  /// submit attempt, and a refusal still given. For the host to call once
+  /// the password is changed, so that neither password stays on screen.
+  /// Focus stays where it is.
+  void reset() {
+    _fields.currentState?.reset();
+    _current.clear();
+    setState(() {
+      _attempted = false;
+      _refusedCurrent = null;
+    });
   }
 
   void _submit() {

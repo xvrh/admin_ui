@@ -73,7 +73,8 @@ class NewPasswordFields extends StatefulWidget {
   State<NewPasswordFields> createState() => NewPasswordFieldsState();
 }
 
-/// The state of a [NewPasswordFields]: [validate] runs the submit-time check.
+/// The state of a [NewPasswordFields]: [validate] runs the submit-time check
+/// and [reset] empties the fields.
 class NewPasswordFieldsState extends State<NewPasswordFields> {
   final _password = TextEditingController();
   final _confirm = TextEditingController();
@@ -135,6 +136,19 @@ class NewPasswordFieldsState extends State<NewPasswordFields> {
       }
     }
     return _valid;
+  }
+
+  /// Empties both fields and forgets what let a message show: a field
+  /// left, a submit attempted, a message from outside still given.
+  /// [NewPasswordFields.onChanged] reports null.
+  void reset() {
+    _passwordLeft = false;
+    _confirmLeft = false;
+    _attempted = false;
+    _refused = null;
+    _password.clear();
+    _confirm.clear();
+    setState(() {});
   }
 
   String get _value => _password.text;

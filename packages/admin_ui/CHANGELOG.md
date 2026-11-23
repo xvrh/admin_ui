@@ -2,6 +2,11 @@
 
 ## 0.2.0
 
+- `ChangePasswordFormState.reset()` empties a `ChangePasswordForm`: its
+  three fields, and what a submit showed under them. The form kept both
+  passwords in its fields after the host changed the password, and the
+  only way to empty it was to give it a new key. Its state is public for
+  this, as `NewPasswordFieldsState` is, which gains the same `reset()`.
 - `ChangePasswordForm` takes `currentErrorText` and `newErrorText`: a
   server's refusal of one password, under that password's field, where
   its one `errorText` drew every refusal as an alert above the form and

@@ -9,7 +9,7 @@ library;
 export 'src/auth/ui/auth_field.dart' show AuthField, AuthFieldError;
 export 'src/auth/ui/auth_scaffold.dart' show AuthScaffold;
 export 'src/auth/ui/change_password_form.dart'
-    show ChangePasswordCallback, ChangePasswordForm;
+    show ChangePasswordCallback, ChangePasswordForm, ChangePasswordFormState;
 export 'src/auth/ui/new_password_fields.dart'
     show NewPasswordFields, NewPasswordFieldsState;
 export 'src/auth/ui/password_strength.dart'

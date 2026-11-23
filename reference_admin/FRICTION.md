@@ -92,7 +92,7 @@ two together.
 | F-503 | `SelectField` binds only a form cell, so an instant setting needs a `LocalScope` of its own | awkward-default | S3 | open |
 | F-504 | `ChangePasswordForm` shows a server's refusal only as an alert over the form | missing-api | S3 | fixed |
 | F-505 | A `Toggle` with no label stretches its track to a tight width | bug | S3 | fixed |
-| F-506 | `ChangePasswordForm` cannot be cleared after a successful change | missing-api | S3 | open |
+| F-506 | `ChangePasswordForm` cannot be cleared after a successful change | missing-api | S3 | fixed |
 | T-001 | No hover, mouse-click, secondary-click or key-chord scenario verbs | test-support | S3 | open |
 | T-002 | `shots` has no `brightness` option and there is no app-defined (theme) axis | test-support | S3 | open |
 | T-003 | `shots` `file` is documented as repeatable but read as a single string | bug | S3 | open |
@@ -1070,12 +1070,12 @@ Owned by WP-E.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `auth.dart › ChangePasswordForm` (`lib/src/auth/ui/change_password_form.dart:21`): its controllers are private state; there is no controller, `reset()` or `onSuccess` hook.
 - **App:** `lib/src/screens/settings/profile/profile_pages.dart:80` (a generation counter in the key).
 - **Evidence:** "Changing my password" › "Password · changed": without a new key the three fields keep the old and new passwords after the success toast.
 - **Workaround:** `ChangePasswordForm(key: ValueKey(_generation))`, bumped on success.
-- **Proposal:** a `clearOnSuccess` flag with `onSubmit` returning a `Future<bool>`, or a `ChangePasswordFormState.reset()`.
+- **Proposal:** a `clearOnSuccess` flag with `onSubmit` returning a `Future<bool>`, or a `ChangePasswordFormState.reset()`. Done as `ChangePasswordFormState.reset()`: the profile page keeps a `GlobalKey` to the form and resets it once the change goes through, where it bumped the form's key.
 
 ## Tooling: flutterware (T-001–T-099)
 
