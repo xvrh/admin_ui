@@ -89,6 +89,17 @@ class _VersionHistoryDemoState extends State<VersionHistoryDemo> {
   }
 }
 
+/// The diff panel with each field's key after its label, for an app whose
+/// readers know a field by the name it has in code.
+class DiffFieldKeysDemo extends StatelessWidget {
+  @Preview(name: 'Diff with field keys', wrapper: adminUiPreview)
+  const DiffFieldKeysDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      Scaffold(body: DiffView(diff: diffAgainst('v4'), showFieldKeys: true));
+}
+
 /// In-editor surface: the same diff panel inside a side sheet over a stand-in
 /// editor, shown open here; the button opens the real modal sheet.
 class DiffSheetDemo extends StatelessWidget {

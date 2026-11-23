@@ -334,6 +334,7 @@ Map<String, dynamic> genericCatalog() => {
   'History': {
     'Version diff (full screen)': const VersionHistoryDemo(),
     'Diff in side sheet': const DiffSheetDemo(),
+    'Diff with field keys': const DiffFieldKeysDemo(),
     'Inline text diff': const TextDiffDemo(),
     'Block diff': const BlockDiffDemo(),
   },

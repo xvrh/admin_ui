@@ -1905,7 +1905,9 @@ only is added or removed, and a null or empty one is absent.
 `VersionDiff.of` keeps every field in the order declared, unchanged ones
 included for the view's "Unchanged" switch, and collects the languages
 for its filter. A field's key is what `DiffView.onRestorePart` names in
-the `RestoreTarget` it hands back.
+the `RestoreTarget` it hands back. A card is headed with the field's
+label alone; `DiffView(showFieldKeys: true)` puts the key after it, for
+readers who know a field by the name it has in code.
 
 ```dart
 typedef Product = ({

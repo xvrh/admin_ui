@@ -74,7 +74,7 @@ two together.
 | F-307 | Asset dialogs open on `AdminScope`'s anchor, above a page's `AssetSourceScope`, `LangScope` and keyboard inset | doc-gap | S2 | fixed |
 | F-309 | A `FieldValidator` is handed the kit's strings only; an `AsyncFieldValidator` none | awkward-default | S3 | open |
 | F-310 | With no default view, `SavedViewsController` applies the first one, and the bar has no "every row" tab | awkward-default | S2 | fixed |
-| F-312 | `DiffView` prints each field's internal key beside its label | i18n | S3 | open |
+| F-312 | `DiffView` prints each field's internal key beside its label | i18n | S3 | fixed |
 | F-313 | Under `ValidationMode.onEdit` an edit form's `ValidationSummary` never shows | awkward-default | S3 | open |
 | F-314 | Revealing the first invalid field leaves its message under the bottom save bar | bug | S2 | fixed |
 | F-315 | The kit's own prompts and bars word some buttons through Material, which an `AdminLocalizations` override cannot reach | i18n | S3 | open |
@@ -864,12 +864,12 @@ Owned by WP-C. Every entry was met building `/products`, `/products/new` and `/p
 
 - **Kind:** i18n
 - **Severity:** S3
-- **Status:** open (verified)
+- **Status:** fixed (kit)
 - **Kit:** `history.dart › DiffView` (`lib/src/history/ui/diff_view.dart:458`, `text: field.fieldKey` after the label).
 - **App:** none possible: `fieldKey` is also what `onRestorePart` hands back.
 - **Evidence:** "What changed, and undoing it" › "Product history · diff": "Price  price", and in Arabic "السعر  price".
 - **Workaround:** none.
-- **Proposal:** `DiffView(showFieldKeys: false)`, or show the key only in a debug build.
+- **Proposal:** `DiffView(showFieldKeys: false)`, or show the key only in a debug build. Done as `DiffView.showFieldKeys`, false by default: a card is headed "Price", and an app whose readers know fields by key passes true. The app changes nothing.
 
 ### F-313 · Under `ValidationMode.onEdit` an edit form's `ValidationSummary` never shows
 
