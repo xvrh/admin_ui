@@ -7,10 +7,19 @@ import '../../demo_kit.dart';
 
 class EmptyStateDemo extends StatelessWidget {
   @Preview(name: 'Empty', wrapper: adminUiPreview)
-  const EmptyStateDemo({super.key});
+  const EmptyStateDemo({super.key}) : toned = false;
+
+  /// The states that are the end of something, not the lack of it, each in
+  /// its tone.
+  @Preview(name: 'Empty / toned', wrapper: adminUiPreview)
+  const EmptyStateDemo.toned({super.key}) : toned = true;
+
+  /// Whether the page shows the toned states.
+  final bool toned;
 
   @override
   Widget build(BuildContext context) {
+    if (toned) return _toned();
     return DemoPage(
       maxWidth: 520,
       children: [
@@ -38,6 +47,45 @@ class EmptyStateDemo extends StatelessWidget {
               icon: Icons.upload_rounded,
               onPressed: () {},
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _toned() {
+    return DemoPage(
+      maxWidth: 520,
+      children: [
+        const DemoSection('Success: the tone picks the glyph'),
+        const Panel(
+          child: EmptyState(
+            title: 'All caught up',
+            message: 'No order waits for you.',
+            tone: Severity.success,
+          ),
+        ),
+        const Gap(AdminSpacing.xl),
+
+        const DemoSection('Success, with an icon of its own and an action'),
+        Panel(
+          child: EmptyState(
+            icon: Icons.storefront_rounded,
+            title: 'Your shop is ready',
+            message: 'Customers can find it and place an order.',
+            tone: Severity.success,
+            action: Button.primary('Go to the dashboard', onPressed: () {}),
+          ),
+        ),
+        const Gap(AdminSpacing.xl),
+
+        const DemoSection('Warning: a list that waits on a step'),
+        Panel(
+          child: EmptyState(
+            title: 'No way to pay yet',
+            message: 'Orders show here once a payment method is set up.',
+            tone: Severity.warning,
+            action: Button('Set up payments', onPressed: () {}),
           ),
         ),
       ],

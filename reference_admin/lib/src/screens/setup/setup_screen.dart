@@ -237,13 +237,11 @@ class _Ready extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = context.strings.access;
     return Panel(
-      // FRICTION(F-107): EmptyState has no tone, so this success reads in
-      // the muted grey of an empty list.
       child: EmptyState(
         key: AccessKeys.ready,
-        icon: Icons.check_circle_outline_rounded,
         title: strings.readyTitle,
         message: strings.readyMessage(bidiIsolate(shop.name)),
+        tone: Severity.success,
         minHeight: 360,
         action: Wrap(
           alignment: WrapAlignment.center,

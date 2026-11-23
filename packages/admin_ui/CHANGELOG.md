@@ -2,6 +2,13 @@
 
 ## 0.2.0
 
+- `EmptyState` takes a `tone`: a `Severity` that draws its icon in the
+  tone's text-safe colour, where the icon was always the muted grey of an
+  empty list, so the last step of a setup read as "nothing here". With no
+  `icon` given the tone picks its own glyph too, so the colour is not
+  alone in saying it. `icon` is nullable for this, and is the inbox still
+  when neither is given. The title and the message keep their colours,
+  and a state with no tone draws what it drew.
 - `SignInForm` takes `emailErrorText` and `passwordErrorText`, as
   `ChangePasswordForm` takes its two: a server's refusal of one field,
   under that field, where the one `errorText` put a wrong password in an

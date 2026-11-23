@@ -212,6 +212,7 @@ Map<String, dynamic> genericCatalog() => {
       'Progress bar': const ProgressBarDemo(),
       'Skeleton': const SkeletonDemo(),
       'Empty': const EmptyStateDemo(),
+      'Empty / toned': const EmptyStateDemo.toned(),
       'Error': const ErrorStateDemo(),
       'Not allowed': const ForbiddenStateDemo(),
     },
