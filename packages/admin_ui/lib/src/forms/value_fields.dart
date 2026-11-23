@@ -723,7 +723,13 @@ class NumberField extends StatelessWidget {
   final String label;
   final Widget? help;
   final num? step;
+
+  /// A symbol ahead of the number, such as `€`.
   final String? prefix;
+
+  /// What the number counts, after it: `%`, `kg`, `px`. Like [prefix] it is
+  /// drawn in the field and read with it, and is no part of the value.
+  final String? unit;
   final bool required;
   final String? description;
   final bool enabled;
@@ -738,6 +744,7 @@ class NumberField extends StatelessWidget {
     this.help,
     this.step,
     this.prefix,
+    this.unit,
     this.required = false,
     this.description,
     this.enabled = true,
@@ -769,6 +776,7 @@ class NumberField extends StatelessWidget {
               },
         step: step ?? 1,
         prefix: prefix,
+        unit: unit,
       ),
     ),
   );
@@ -781,7 +789,13 @@ class OptionalNumberField extends StatelessWidget {
   final String label;
   final Widget? help;
   final num? step;
+
+  /// A symbol ahead of the number, such as `€`.
   final String? prefix;
+
+  /// What the number counts, after it: `%`, `kg`, `px`. Like [prefix] it is
+  /// drawn in the field and read with it, and is no part of the value.
+  final String? unit;
   final bool required;
   final String? description;
   final bool enabled;
@@ -796,6 +810,7 @@ class OptionalNumberField extends StatelessWidget {
     this.help,
     this.step,
     this.prefix,
+    this.unit,
     this.required = false,
     this.description,
     this.enabled = true,
@@ -823,6 +838,7 @@ class OptionalNumberField extends StatelessWidget {
         onChanged: readOnly ? null : (n) => lane.set(n?.round()),
         step: step ?? 1,
         prefix: prefix,
+        unit: unit,
       ),
     ),
   );
@@ -934,7 +950,13 @@ class DecimalField extends StatelessWidget {
   final Widget? help;
   final int decimals;
   final num? step;
+
+  /// A symbol ahead of the number, such as `€`.
   final String? prefix;
+
+  /// What the number counts, after it: `%`, `kg`, `px`. Like [prefix] it is
+  /// drawn in the field and read with it, and is no part of the value.
+  final String? unit;
   final bool required;
   final String? description;
   final bool enabled;
@@ -950,6 +972,7 @@ class DecimalField extends StatelessWidget {
     this.decimals = 2,
     this.step,
     this.prefix,
+    this.unit,
     this.required = false,
     this.description,
     this.enabled = true,
@@ -982,6 +1005,7 @@ class DecimalField extends StatelessWidget {
               },
         step: step ?? 1,
         prefix: prefix,
+        unit: unit,
       ),
     ),
   );
@@ -995,7 +1019,13 @@ class OptionalDecimalField extends StatelessWidget {
   final Widget? help;
   final int decimals;
   final num? step;
+
+  /// A symbol ahead of the number, such as `€`.
   final String? prefix;
+
+  /// What the number counts, after it: `%`, `kg`, `px`. Like [prefix] it is
+  /// drawn in the field and read with it, and is no part of the value.
+  final String? unit;
   final bool required;
   final String? description;
   final bool enabled;
@@ -1011,6 +1041,7 @@ class OptionalDecimalField extends StatelessWidget {
     this.decimals = 2,
     this.step,
     this.prefix,
+    this.unit,
     this.required = false,
     this.description,
     this.enabled = true,
@@ -1039,6 +1070,7 @@ class OptionalDecimalField extends StatelessWidget {
         onChanged: readOnly ? null : (n) => lane.set(n?.toDouble()),
         step: step ?? 1,
         prefix: prefix,
+        unit: unit,
       ),
     ),
   );

@@ -1,7 +1,6 @@
 import 'package:admin_ui/fields.dart';
 import 'package:admin_ui/forms.dart';
 import 'package:admin_ui/theme.dart';
-import 'package:admin_ui/widgets.dart' show FieldStateScope;
 import 'package:material_ui/material_ui.dart';
 
 import '../../api/shop_api.dart';
@@ -177,11 +176,14 @@ class ShopDetailsFields extends StatelessWidget {
               ),
           ],
         ),
-        PercentField(
+        DecimalField(
           f.taxRate,
           key: AccessKeys.taxRate,
           label: strings.access.taxRate,
           description: strings.access.taxRateDescription,
+          decimals: 1,
+          step: 0.5,
+          unit: '%',
         ),
         FormGridItem(
           fullWidth: true,
@@ -253,49 +255,6 @@ class ShippingZonesField extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-/// A percentage with its sign after the number, bound like the kit's
-/// presets.
-// FRICTION(F-104): DecimalField takes a prefix but no unit, though its
-// NumberBody has one; the field is bound by hand to reach it.
-class PercentField extends StatelessWidget {
-  final ValueCell<double> cell;
-  final String label;
-  final String? description;
-
-  const PercentField(
-    this.cell, {
-    super.key,
-    required this.label,
-    this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final state = FieldStateScope.of(context);
-    final editable = state.enabled && !state.readOnly;
-    return bind<double>(
-      context,
-      cell,
-      label: label,
-      description: description,
-      body: (lane) => ValueListenableBuilder<double>(
-        valueListenable: lane,
-        builder: (context, value, _) => NumberBody(
-          value: value,
-          decimals: 1,
-          step: 0.5,
-          unit: '%',
-          onChanged: editable
-              ? (n) {
-                  if (n != null) lane.set(n.toDouble());
-                }
-              : null,
-        ),
-      ),
     );
   }
 }

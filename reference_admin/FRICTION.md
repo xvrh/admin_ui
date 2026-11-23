@@ -42,7 +42,7 @@ two together.
 | F-101 | `StatCard` has no slot for a trend line, though the kit ships `Sparkline` for exactly that dashboard | missing-api | S3 | fixed |
 | F-102 | No rule and no wizard step can name a `RecordListCell`: "at least one row" needs a borrowed cell | missing-api | S2 | fixed |
 | F-103 | Server field errors are keyed by cell id, and a record-list row's cell ids are opaque (minted from the wall clock) | doc-gap | S3 | fixed |
-| F-104 | `DecimalField` takes a prefix but no unit, though its `NumberBody` has one | missing-api | S3 | open |
+| F-104 | `DecimalField` takes a prefix but no unit, though its `NumberBody` has one | missing-api | S3 | fixed |
 | F-106 | `ValidationSummary` folds to nothing while hidden and brings no spacing, so a host cannot gap it only when it shows | awkward-default | S2 | fixed |
 | F-107 | `EmptyState` has no tone: a success end state reads as an empty list | missing-api | S3 | open |
 | F-108 | `DonutChart`'s legend overflows a narrow card instead of wrapping or eliding | bug | S3 | fixed |
@@ -504,12 +504,12 @@ Owned by WP-A.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `forms.dart › DecimalField` (`lib/src/forms/value_fields.dart:934`) passes `prefix` only; `fields.dart › NumberBody.unit` (`lib/src/fields/ui/number_body.dart:87`) draws a trailing `%`, `px`, `kg`.
 - **App:** `lib/src/screens/setup/shop_form.dart` `PercentField` (~35 lines): the field bound by hand with `bind` over a `NumberBody(unit: '%')`, re-reading `FieldStateScope` for read-only.
 - **Evidence:** `02_home` "Setting up a brand-new shop" › "Setup · shop details": the VAT rate with its `%`.
 - **Workaround:** the hand-bound field.
-- **Proposal:** `unit:` on `DecimalField` and `NumberField`, passed through.
+- **Proposal:** `unit:` on `DecimalField` and `NumberField`, passed through. Done, on the two optional fields too: the VAT rate is a `DecimalField(unit: '%')` and `PercentField` is gone.
 
 ### F-106 · `ValidationSummary` folds to nothing while hidden and brings no spacing, so a host cannot gap it only when it shows
 

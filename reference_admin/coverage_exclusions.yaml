@@ -237,6 +237,7 @@ building_blocks:
     - FieldRequiredMarker
     - FieldShell
     - FieldState
+    - FieldStateScope
     - FieldToken
     - FieldTrigger
     - FocusRing
@@ -269,6 +270,7 @@ building_blocks:
     - NewPasswordFields
     - NewPasswordFieldsState
     - NotchedLabelBox
+    - NumberBody
     - PageHeader
     - Pager
     - PasswordStrengthMeter

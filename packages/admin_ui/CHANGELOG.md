@@ -2,6 +2,11 @@
 
 ## 0.2.0
 
+- `NumberField`, `OptionalNumberField`, `DecimalField` and
+  `OptionalDecimalField` take a `unit`, as their `NumberBody` does: what
+  the number counts, drawn after it in the field and read with it (`%`,
+  `kg`, `px`). They took a `prefix` only, so a percentage with its sign
+  meant binding a `NumberBody` by hand.
 - What a server says of a record list, an edit in one of its rows
   answers. A message under the list (`zones`: "Two zones overlap") stayed
   until a row was added, removed or moved, so one that editing a row
