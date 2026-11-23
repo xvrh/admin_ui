@@ -155,7 +155,13 @@ class LocaleDiff {
 /// [DiffOp.unchanged] as the two differ or not.
 @immutable
 class FieldDiff {
+  /// The reader's name for the field, in the admin's language: what a card
+  /// of the view is headed with.
   final String label;
+
+  /// The app's name for the field: what a restore names in its
+  /// [RestoreTarget], and unique among a [VersionDiff]'s fields. The view
+  /// shows it only when asked to.
   final String fieldKey;
   final DiffFieldKind kind;
   final bool translatable;

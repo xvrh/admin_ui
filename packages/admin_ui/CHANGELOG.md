@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- `DiffView` takes `showFieldKeys`: whether each card names its field's
+  key after its label. False by default, where the view always did: the
+  key is the app's name for the field, in no reader's language, and a
+  translated page read "السعر  price". A restore names the field by its
+  key either way. `FieldDiff.label` and `FieldDiff.fieldKey` say which is
+  which.
 - `Field`, `OptionalField`, `TextBody` and `TextCellBody` take a
   `textDirection`, as `InputField` does: the direction the value is typed
   and shown in when it is not the page's. Left null, an email or URL
@@ -713,6 +719,10 @@
 
 ### Looks
 
+- A `DiffView` card is headed with its field's label alone, where the
+  field's key followed it in small muted type: "Meta description", where
+  it read "Meta description  metaDescription". A card is announced
+  without the key too. `showFieldKeys: true` keeps what it drew.
 - In a right-to-left page, a `Field` or an `OptionalField` with an email or
   URL `keyboardType` is typed left to right from the left edge, its hint
   there too, where both ran from the right with the caret at the left of

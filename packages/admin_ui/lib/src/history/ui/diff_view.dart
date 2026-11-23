@@ -50,6 +50,14 @@ class DiffView extends StatefulWidget {
   /// Hide the layout / unchanged controls in tight surfaces.
   final bool showControls;
 
+  /// Whether each card names its field's [FieldDiff.fieldKey] after its
+  /// label: "Meta description  metaDescription". For readers who know a
+  /// field by the name it has in code. Off by default: the key is the
+  /// app's name for the field and is in no reader's language, so a card
+  /// reads "Meta description" alone. A restore names the field by its key
+  /// either way.
+  final bool showFieldKeys;
+
   const DiffView({
     super.key,
     required this.diff,
@@ -59,6 +67,7 @@ class DiffView extends StatefulWidget {
     this.restoreLabel,
     this.onRestorePart,
     this.showControls = true,
+    this.showFieldKeys = false,
   });
 
   @override
@@ -239,6 +248,7 @@ class _DiffViewState extends State<DiffView> {
               layout: _layout,
               showUnchanged: _showUnchanged,
               activeLocales: _locales,
+              showKey: widget.showFieldKeys,
               onRestorePart: widget.onRestorePart,
             ),
           ),
@@ -355,6 +365,9 @@ class _FieldDiffCard extends StatelessWidget {
   final DiffLayout layout;
   final bool showUnchanged;
   final Set<String> activeLocales;
+
+  /// Whether the header names the field's key after its label.
+  final bool showKey;
   final void Function(RestoreTarget target)? onRestorePart;
 
   const _FieldDiffCard({
@@ -362,6 +375,7 @@ class _FieldDiffCard extends StatelessWidget {
     required this.layout,
     required this.showUnchanged,
     required this.activeLocales,
+    required this.showKey,
     this.onRestorePart,
   });
 
@@ -423,6 +437,7 @@ class _FieldDiffCard extends StatelessWidget {
               layout: layout,
               showUnchanged: showUnchanged,
               activeLocales: activeLocales,
+              showKeys: showKey,
               onRestorePart: onRestorePart,
             ),
           ],
@@ -450,13 +465,15 @@ class _FieldDiffCard extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(text: field.label, style: context.type.sectionLabel),
-                  const TextSpan(text: '  '),
-                  TextSpan(
-                    text: field.fieldKey,
-                    style: context.type.micro.copyWith(
-                      color: context.colors.foregroundMutedOnTint,
+                  if (showKey) ...[
+                    const TextSpan(text: '  '),
+                    TextSpan(
+                      text: field.fieldKey,
+                      style: context.type.micro.copyWith(
+                        color: context.colors.foregroundMutedOnTint,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
               maxLines: 1,
@@ -528,6 +545,9 @@ class _RecordSection extends StatelessWidget {
   final DiffLayout layout;
   final bool showUnchanged;
   final Set<String> activeLocales;
+
+  /// Whether the record's own fields name their keys.
+  final bool showKeys;
   final void Function(RestoreTarget target)? onRestorePart;
 
   const _RecordSection({
@@ -536,6 +556,7 @@ class _RecordSection extends StatelessWidget {
     required this.layout,
     required this.showUnchanged,
     required this.activeLocales,
+    required this.showKeys,
     this.onRestorePart,
   });
 
@@ -597,6 +618,7 @@ class _RecordSection extends StatelessWidget {
               layout: layout,
               showUnchanged: showUnchanged,
               activeLocales: activeLocales,
+              showKey: showKeys,
             ),
           ],
           if (children.isEmpty)
