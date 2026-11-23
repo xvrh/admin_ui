@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- `Asset.copyWith`: an asset with the fields given changed and every other
+  carried over, where changing its alt text or its usage count meant
+  naming all eleven fields, and a field added later was dropped by a copy
+  written before it. A field that can be null (`thumbnail`, `url`,
+  `swatch`, `width`, `height`) takes a function, so that it can be made
+  null: `copyWith(thumbnail: () => null)`.
 - `NumberField`, `OptionalNumberField`, `DecimalField` and
   `OptionalDecimalField` take a `unit`, as their `NumberBody` does: what
   the number counts, drawn after it in the field and read with it (`%`,

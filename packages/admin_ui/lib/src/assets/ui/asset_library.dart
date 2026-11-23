@@ -71,6 +71,39 @@ class Asset {
     this.alt = const {},
   });
 
+  /// This asset with the fields given changed and every other carried
+  /// over: `asset.copyWith(alt: saved)` once its alt text is saved,
+  /// `asset.copyWith(usageCount: uses)` once its uses are counted.
+  ///
+  /// A field that can be null takes a function, so that it can be made
+  /// null: `copyWith(thumbnail: () => null)` drops the preview, where a
+  /// null argument leaves the field as it was.
+  Asset copyWith({
+    String? id,
+    String? name,
+    AssetType? type,
+    int? bytes,
+    ImageProvider? Function()? thumbnail,
+    String? Function()? url,
+    Color? Function()? swatch,
+    int? Function()? width,
+    int? Function()? height,
+    int? usageCount,
+    Map<String, String>? alt,
+  }) => Asset(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    type: type ?? this.type,
+    bytes: bytes ?? this.bytes,
+    thumbnail: thumbnail != null ? thumbnail() : this.thumbnail,
+    url: url != null ? url() : this.url,
+    swatch: swatch != null ? swatch() : this.swatch,
+    width: width != null ? width() : this.width,
+    height: height != null ? height() : this.height,
+    usageCount: usageCount ?? this.usageCount,
+    alt: alt ?? this.alt,
+  );
+
   /// [bytes] in [context]'s locale: '1.5 MB', '1,5 Mo'.
   String sizeOf(BuildContext context) => context.adminFormats.bytes(bytes);
 

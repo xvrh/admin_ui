@@ -115,21 +115,9 @@ class FakeAssetSource implements AssetSource {
         final i = _db.assets.indexWhere((a) => a.id == id);
         if (i < 0) throw const ShopError.notFound();
         final old = _db.assets[i];
-        // FRICTION(F-025): Asset has no copyWith; every field is carried
-        // over by hand.
-        final updated = Asset(
-          id: old.id,
-          name: old.name,
-          type: old.type,
-          bytes: old.bytes,
-          thumbnail: old.thumbnail,
-          url: old.url,
-          swatch: old.swatch,
-          width: old.width,
-          height: old.height,
-          usageCount: old.usageCount,
-          // The whole alt text, a cleared language left out, as
-          // AssetSource.updateAlt says: it replaces what was stored.
+        // The whole alt text, a cleared language left out, as
+        // AssetSource.updateAlt says: it replaces what was stored.
+        final updated = old.copyWith(
           alt: {...alt}..removeWhere((_, v) => v.trim().isEmpty),
         );
         _db.assets[i] = updated;

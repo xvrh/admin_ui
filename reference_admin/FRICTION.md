@@ -32,7 +32,7 @@ two together.
 | F-022 | A remote `SearchSource` is asked on every keystroke; debouncing is the source's job | missing-api | S3 | open |
 | F-023 | `Avatar` picks its colour from the ambient palette, so one person has two colours under a top bar with its own | theme | S3 | open |
 | F-024 | A theme of your own keeps its base theme's chart series: the README's recipe draws every chart in Iris indigo | theme | S3 | open |
-| F-025 | `Asset` has no `copyWith`: changing one field rebuilds eleven | missing-api | S3 | open |
+| F-025 | `Asset` has no `copyWith`: changing one field rebuilds eleven | missing-api | S3 | fixed |
 | F-026 | `AssetSource` resolves one id per call: a list of rows either browses the whole library or asks once per row | missing-api | S3 | open |
 | F-027 | The kit has no breakpoint vocabulary a host can read | missing-api | S3 | fixed |
 | F-028 | `SideSheet` pads the safe area in its own surface colour, and `Shell` pads none: a drawer opens on bands the frame does not have | awkward-default | S3 | fixed |
@@ -390,12 +390,12 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open (verified)
+- **Status:** fixed (kit)
 - **Kit:** `assets.dart › Asset` (`lib/src/assets/ui/asset_library.dart:33`): an immutable value with eleven fields and no `copyWith`.
 - **App:** `lib/src/fake/fake_media.dart` `FakeAssetSource.updateAlt` (13 lines), and the seed's usage counts (`lib/src/fake/seed.dart` `_seedProducts`).
 - **Evidence:** "The media library" › "Media · alt text saved": the saved asset is the old one field by field with a new `alt`; a field added to `Asset` later would be dropped silently.
 - **Workaround:** every field carried over by hand.
-- **Proposal:** `Asset.copyWith({...})`.
+- **Proposal:** `Asset.copyWith({...})`. Done: the fake's `updateAlt` is `old.copyWith(alt: …)` and the seed's usage counts `asset.copyWith(usageCount: uses)`, whose hand copy had been leaving out `type`, `url` and `swatch`.
 
 ### F-026 · `AssetSource` resolves one id per call: a list of rows either browses the whole library or asks once per row
 
