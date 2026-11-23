@@ -41,7 +41,7 @@ two together.
 | F-100 | `SignInForm` can say a server refusal only above the form: no per-field error, so `AuthFieldError` has nowhere to go | missing-api | S3 | open |
 | F-101 | `StatCard` has no slot for a trend line, though the kit ships `Sparkline` for exactly that dashboard | missing-api | S3 | fixed |
 | F-102 | No rule and no wizard step can name a `RecordListCell`: "at least one row" needs a borrowed cell | missing-api | S2 | fixed |
-| F-103 | Server field errors are keyed by cell id, and a record-list row's cell ids are opaque (minted from the wall clock) | doc-gap | S3 | open |
+| F-103 | Server field errors are keyed by cell id, and a record-list row's cell ids are opaque (minted from the wall clock) | doc-gap | S3 | fixed |
 | F-104 | `DecimalField` takes a prefix but no unit, though its `NumberBody` has one | missing-api | S3 | open |
 | F-106 | `ValidationSummary` folds to nothing while hidden and brings no spacing, so a host cannot gap it only when it shows | awkward-default | S2 | fixed |
 | F-107 | `EmptyState` has no tone: a success end state reads as an empty list | missing-api | S3 | open |
@@ -493,12 +493,12 @@ Owned by WP-A.
 
 - **Kind:** doc-gap
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `forms.dart › FormSubmitException.fieldErrors` (`lib/src/forms/validation.dart:277`) is keyed by field id; a local row's id is `r${DateTime.now().microsecondsSinceEpoch}-n` (`lib/src/forms/cell.dart:565`). The controller itself tracks rows by index path (`phones[0].label`) but does not accept one in `fieldErrors`.
 - **App:** `lib/src/screens/setup/shop_form.dart` `shopSubmitError` (~40 lines): maps a server path such as `shippingZones.1.name` to the cell by walking the handles.
 - **Evidence:** the cell-id scheme was guessable for top-level cells (the id is the field name passed to `FormScope.text('name')`), not for rows: nothing documents how a row's id is formed, and it changes every run, so a server cannot name it.
 - **Workaround:** the path-to-cell mapping.
-- **Proposal:** `FormSubmitException.fieldErrors` accepting index paths (`shippingZones[1].name`), resolved by the controller the way its baseline already is.
+- **Proposal:** `FormSubmitException.fieldErrors` accepting index paths (`shippingZones[1].name`), resolved by the controller the way its baseline already is. Done: a key of `fieldErrors`, and of `setErrors`, is a field's id or its path in the value, a row by its index in brackets or after a dot (`shippingZones[1].name`, `shippingZones.1.name`). A key that names no field of the form no longer keeps the form from being saved again: the next edit takes its message, where it stayed for good. `shopSubmitError` hands the shop's paths over as they are, renaming a zone's `rateCents`, and `test/unit/shop_form_test.dart` holds it.
 
 ### F-104 · `DecimalField` takes a prefix but no unit, though its `NumberBody` has one
 

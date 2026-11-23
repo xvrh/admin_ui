@@ -2,6 +2,19 @@
 
 ## 0.2.0
 
+- A server names the field it refuses by where it is in the value. A key
+  of `FormSubmitException.fieldErrors`, and of
+  `ValueFormController.setErrors`, is a field's id, as before, or its path
+  in the form's value: `name`, `billing.city` under a `sub('billing')`,
+  and for a row of a record list `zones[1].name` or `zones.1.name`. A
+  row's cell id is the form's own and changes every run, so a server
+  could not name a row's field, and an app mapped each path to its cell
+  by hand. `title/fr` names its translated field, and `zones` the list.
+- A refused save's message that names no field of the form no longer
+  keeps the form from being saved again. It showed in `errors` under its
+  key, as it still does, and no edit was its own, so `canSubmit` stayed
+  false until a reset. The next edit of any field now takes it. A message
+  an app sets itself with `setErrors` stays until the app clears it.
 - `DiffView` takes `showFieldKeys`: whether each card names its field's
   key after its label. False by default, where the view always did: the
   key is the app's name for the field, in no reader's language, and a

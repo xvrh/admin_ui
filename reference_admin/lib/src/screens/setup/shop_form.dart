@@ -119,49 +119,22 @@ Iterable<ValidationRule> shopRules(
 
 /// The shop's refusal as the form shows it: each field the shop named under
 /// its cell, and the reason in the save status.
+///
+/// The shop names a field by its path in the settings it was sent
+/// (`shippingZones.1.name`), which is the path the form's cells were handed
+/// out under, so the form finds each cell itself.
 FormSubmitException shopSubmitError(
   ValidationError error,
-  ShopFields f,
   RefStrings strings,
-) {
-  // FRICTION(F-103): a row's cell ids are opaque, so a server path such
-  // as `shippingZones.1.name` is mapped by walking the handles.
-  String? cellId(String path) {
-    final parts = path.split('.');
-    switch (parts) {
-      case ['name']:
-        return f.name.id;
-      case ['supportEmail']:
-        return f.supportEmail.id;
-      case ['currency']:
-        return f.currency.id;
-      case ['taxRatePercent']:
-        return f.taxRate.id;
-      case ['languages']:
-        return f.languages.id;
-      case ['shippingZones']:
-        return f.zones.id;
-      case ['shippingZones', final index, final field]:
-        final rows = f.zones.elements;
-        final i = int.tryParse(index);
-        if (i == null || i < 0 || i >= rows.length) return f.zones.id;
-        return switch (field) {
-          'name' => rows[i].name.id,
-          'countries' => rows[i].countries.id,
-          _ => rows[i].rate.id,
-        };
-    }
-    return null;
-  }
-
-  return FormSubmitException(
-    message: strings.shell.errorValidation,
-    fieldErrors: {
-      for (final path in error.fields.keys)
-        ?cellId(path): strings.shell.errorValidation,
-    },
-  );
-}
+) => FormSubmitException(
+  message: strings.shell.errorValidation,
+  fieldErrors: {
+    for (final path in error.fields.keys)
+      // A zone's rate is `rateCents` to the shop and `rate` in the form.
+      path.replaceFirst(RegExp(r'\.rateCents$'), '.rate'):
+          strings.shell.errorValidation,
+  },
+);
 
 /// Name, contact, currency, VAT and languages, on a grid of two columns
 /// that stacks on a phone.

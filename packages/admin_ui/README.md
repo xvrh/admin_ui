@@ -1588,7 +1588,10 @@ whole, use `ValueFormController`:
 - `seed(value)` loads a value and makes it the baseline, `reset()` goes
   back to it, and `submit()` calls `onSubmit` with the current value. A
   successful submit rebases; an `onSubmit` that throws a
-  `FormSubmitException` puts its messages under the fields it names.
+  `FormSubmitException` puts its messages under the fields it names, each
+  by its id or by its path in the value: `name`, or `zones[1].name` (or
+  `zones.1.name`) for a row of a record list, which a server can name by
+  its index and not by its cell's id.
   Anything else it throws shows in the save status, worded by
   `ErrorTextScope`, so an unreachable server needs no conversion. An
   `Error` is also reported to `FlutterError.onError`: it is a bug in the

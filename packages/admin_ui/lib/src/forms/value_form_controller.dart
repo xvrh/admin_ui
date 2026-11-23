@@ -127,6 +127,10 @@ class ValueFormController<T> extends FormController {
   final _validated = <String>{};
   final _serverErrors = <String, String>{};
 
+  /// The keys of a refused save's messages that named no field of the
+  /// form: no edit is theirs, so the next one takes them.
+  final _unplaced = <String>{};
+
   Map<String, String> _allErrors = const {};
   Map<String, String> _shown = const {};
   Set<String> _pending = const {};
@@ -239,19 +243,37 @@ class ValueFormController<T> extends FormController {
       _shown.isEmpty &&
       (!requireChanges || _dirty || _status == FormStatus.error);
 
-  /// Server-side messages, keyed by field id: each shows under its field
-  /// until the field is next edited. A null message clears its field's.
+  /// Server-side messages, keyed by field id or by the field's path in the
+  /// value, as [FormSubmitException.fieldErrors] is: each shows under its
+  /// field until the field is next edited. A null message clears its
+  /// field's.
+  ///
+  /// A path names a cell the scope has handed out, which a row's are once
+  /// the row was seeded, shown or saved. A message whose key names no
+  /// field of the form stays under that key until it is cleared here.
   void setErrors(Map<String, String?> errors) {
     for (final MapEntry(:key, :value) in errors.entries) {
+      final id = _fieldIdOf(key);
+      _unplaced.remove(id);
       if (value == null) {
-        _serverErrors.remove(key);
+        _serverErrors.remove(id);
       } else {
-        _serverErrors[key] = value;
+        _serverErrors[id] = value;
       }
     }
     _validateAll();
     _notifyIfChanged();
   }
+
+  /// Whether a field of the form answers to [id]: one with rules, or one
+  /// whose cell the scope handed out.
+  bool _placed(String id) => _states.containsKey(id) || _tracker.owns(id);
+
+  /// The field a server's [key] names: [key] itself when it is a field's
+  /// id, else the id of the field at that path of the value, else [key]
+  /// again, which then names no field of the form.
+  String _fieldIdOf(String key) =>
+      _placed(key) ? key : _tracker.idAt(key) ?? key;
 
   /// Reveals the messages of [fields] (every field when null), runs their
   /// async checks at once and waits for them. True when none of them has a
@@ -306,13 +328,22 @@ class ValueFormController<T> extends FormController {
       _settleBaseline(sent);
       _submitAttempted = false;
       _serverErrors.clear();
+      _unplaced.clear();
       _dirty = _diff();
       _status = _dirty ? FormStatus.dirty : FormStatus.submitted;
     } on FormSubmitException catch (e) {
       if (_disposed) return;
       _status = FormStatus.error;
       _submitError = e.message;
-      _serverErrors.addAll(e.fieldErrors);
+      for (final MapEntry(:key, value: message) in e.fieldErrors.entries) {
+        final id = _fieldIdOf(key);
+        _serverErrors[id] = message;
+        if (_placed(id)) {
+          _unplaced.remove(id);
+        } else {
+          _unplaced.add(id);
+        }
+      }
       if (e.fieldErrors.isNotEmpty) _revealRequest++;
     } catch (error, stack) {
       if (error is Error) {
@@ -377,6 +408,7 @@ class ValueFormController<T> extends FormController {
       if (!_same(entry.last, entry.base)) _touched.add(id);
       _serverErrors.remove(id);
     }
+    _dropUnplaced();
     _refresh(edited: true, changed: entry.cell);
   }
 
@@ -386,9 +418,19 @@ class ValueFormController<T> extends FormController {
     if (_writeDepth > 0 || _disposed) return;
     _serverErrors.remove(list.cell.id);
     dropped.forEach(_serverErrors.remove);
+    _dropUnplaced();
     _touched.removeAll(dropped);
     _rebuildRules();
     _refresh(edited: true);
+  }
+
+  /// Forgets the messages of a refused save that named no field: left
+  /// until one of their own was edited, they would keep the form from
+  /// being saved again.
+  void _dropUnplaced() {
+    _unplaced
+      ..forEach(_serverErrors.remove)
+      ..clear();
   }
 
   /// Whether any tracked cell differs from the baseline; a key the baseline
@@ -425,6 +467,7 @@ class ValueFormController<T> extends FormController {
     _dirty = false;
     _submitAttempted = false;
     _serverErrors.clear();
+    _unplaced.clear();
   }
 
   /// Makes the values [sent] (or, when null, the cells as they are) what
@@ -1105,6 +1148,59 @@ class _Tracker {
     walk((key, _, value, _) => out[key] = value);
     return out;
   }
+
+  /// A row's index after its list's key, in brackets or after a dot, and
+  /// the dot before what follows.
+  static final _row = RegExp(r'(?:\[(\d+)\]|\.(\d+))(?:\.|$)');
+
+  /// The id of the field at [path] of the form's value, spelled as [walk]
+  /// spells its keys (`name`, `billing.city`, `phones[1].label`) or with a
+  /// row's index after a dot (`phones.1.label`), as a server may. A value
+  /// answers with its field's id, which for a lane is its translated
+  /// field's; a list, a translated field and an asset reference with their
+  /// own. Null when the form has handed out no cell there.
+  String? idAt(String path) => _idAt(root, path);
+
+  String? _idAt(_Node node, String path) {
+    if (node.values[path] case final entry?) return entry.owners.first;
+    if (node.lists[path] case final list?) return list.cell.id;
+    if (node.assetRefs[path] case final ref?) return ref.id;
+    // A lane not handed out yet is still its field's.
+    final slash = path.lastIndexOf('/');
+    final field = slash < 0 ? path : path.substring(0, slash);
+    if (node.translated[field] case final TranslatedCell<Object?> cell) {
+      return cell.id;
+    }
+    for (final MapEntry(:key, value: list) in node.lists.entries) {
+      if (!path.startsWith(key)) continue;
+      final row = _row.matchAsPrefix(path, key.length);
+      if (row == null) continue;
+      // Null for more digits than an index holds.
+      final index = int.tryParse(row[1] ?? row[2]!);
+      final ids = list.orderedIds();
+      final element = index != null && index < ids.length
+          ? list.elements[ids[index]]
+          : null;
+      return element == null ? null : _idAt(element, path.substring(row.end));
+    }
+    return null;
+  }
+
+  /// Whether a tracked field answers to [id]: a value by its owners, which
+  /// hold its translated field or its asset reference, a list by its own
+  /// id, and a translated field with no lane handed out yet by its own.
+  bool owns(String id) => _owns(root, id);
+
+  bool _owns(_Node node, String id) =>
+      node.values.values.any((entry) => entry.owners.contains(id)) ||
+      node.translated.values.any(
+        (cell) => cell is TranslatedCell<Object?> && cell.id == id,
+      ) ||
+      node.lists.values.any(
+        (list) =>
+            list.cell.id == id ||
+            list.elements.values.any((element) => _owns(element, id)),
+      );
 
   void dispose() {
     for (final entry in entries) {
