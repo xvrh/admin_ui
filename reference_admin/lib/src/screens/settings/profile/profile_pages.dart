@@ -34,8 +34,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _newError;
   String? _error;
 
-  /// Bumped after a change, so the form starts empty again.
-  int _generation = 0;
+  /// The password form, emptied once a change goes through.
+  final _form = GlobalKey<ChangePasswordFormState>();
 
   Future<void> _change(String current, String next) async {
     final strings = context.strings;
@@ -47,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await context.api.changePassword(current, next);
       if (!mounted) return;
-      setState(() => _generation++);
+      _form.currentState?.reset();
       toasts?.show(
         Toast(
           strings.settings.passwordChangedDetail,
@@ -83,10 +83,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       subtitle: context.strings.settings.profileSubtitle,
       body: ProfileView(
         user: user,
-        // FRICTION(F-506): the form keeps what was typed after a successful
-        // change; a new key is the only way to empty it.
         password: ChangePasswordForm(
-          key: ValueKey(_generation),
+          key: _form,
           onSubmit: _change,
           submitting: _submitting,
           errorText: _error,

@@ -57,6 +57,7 @@ auth.dart AuthFieldError
 auth.dart AuthScaffold
 auth.dart ChangePasswordCallback
 auth.dart ChangePasswordForm
+auth.dart ChangePasswordFormState
 auth.dart NewPasswordFields
 auth.dart NewPasswordFieldsState
 auth.dart PasswordStrength
