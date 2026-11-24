@@ -200,6 +200,7 @@ building_blocks:
     - CircleButton
     - ClearButton
     - CollectionCards
+    - CollectionPosition
     - CollectionTable
     - ColorBody
     - ColumnChooser

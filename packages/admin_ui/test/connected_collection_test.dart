@@ -42,6 +42,56 @@ CollectionController<_Row> _controller(
 );
 
 void main() {
+  for (final mode in CollectionViewMode.values) {
+    testWidgets('${mode.name}: a new page or sort starts the rows at the top, '
+        'a refresh keeps their place', (tester) async {
+      final c = _controller(
+        () => 60,
+        query: const CollectionQuery(pageSize: 25),
+      );
+      addTearDown(c.dispose);
+      await tester.pumpWidget(
+        _host(
+          Collection<_Row>(
+            controller: c,
+            columns: _columns,
+            viewMode: mode,
+            cardBuilder: (context, row) =>
+                SizedBox(height: 120, child: Text(row.name)),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      ScrollPosition rows() => tester
+          .stateList<ScrollableState>(
+            find.byWidgetPredicate(
+              (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+            ),
+          )
+          .single
+          .position;
+      Future<void> scrolled() async {
+        rows().jumpTo(300);
+        await tester.pumpAndSettle();
+      }
+
+      await scrolled();
+      await c.refresh(background: true);
+      await tester.pumpAndSettle();
+      expect(rows().pixels, 300);
+
+      c.nextPage();
+      await tester.pumpAndSettle();
+      expect(c.pageIndex, 1);
+      expect(rows().pixels, 0);
+
+      await scrolled();
+      c.sortBy('name', false);
+      await tester.pumpAndSettle();
+      expect(rows().pixels, 0);
+    });
+  }
+
   testWidgets('forwards the table props and the controller\'s hooks', (
     tester,
   ) async {

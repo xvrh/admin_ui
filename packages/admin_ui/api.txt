@@ -78,6 +78,7 @@ collection.dart CollectionController
 collection.dart CollectionFetcher
 collection.dart CollectionHeader
 collection.dart CollectionPage
+collection.dart CollectionPosition
 collection.dart CollectionQuery
 collection.dart CollectionRealtime
 collection.dart CollectionTable

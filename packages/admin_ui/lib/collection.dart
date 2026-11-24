@@ -15,6 +15,7 @@ export 'src/collection/collection_controller.dart'
         CollectionFetcher,
         CollectionPage,
         CollectionQuery;
+export 'src/collection/collection_position.dart' show CollectionPosition;
 export 'src/collection/column_layout.dart' show ColumnLayout;
 export 'src/collection/filter.dart'
     show
