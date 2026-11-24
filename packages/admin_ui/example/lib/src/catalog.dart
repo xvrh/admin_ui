@@ -192,6 +192,7 @@ Map<String, dynamic> genericCatalog() => {
     'Input field': const InputFieldDemo(),
     'Combobox / autocomplete': const ComboboxDemo(),
     'Combobox / open': const ComboboxOpenDemo(),
+    'Combobox / grouped': const ComboboxGroupedDemo(),
     'Combobox / flips near the bottom': const ComboboxFlipDemo(),
     'Password field': const PasswordFieldDemo(),
     'Panel': const PanelDemo(),

@@ -28,6 +28,10 @@ class ComboboxOption<T> {
   final String? description;
   final IconData? icon;
 
+  /// The heading this option is listed under, or null for none; see
+  /// [Combobox] for the order the groups are listed in.
+  final String? group;
+
   /// The key of the row built for this option, to find it by in a test.
   final Key? key;
 
@@ -37,6 +41,7 @@ class ComboboxOption<T> {
     this.key,
     this.description,
     this.icon,
+    this.group,
   });
 }
 
@@ -59,6 +64,16 @@ class ComboboxOption<T> {
 /// Escape or Alt+ArrowUp close the list and restore the selected label, and
 /// focus leaving the field closes it too. After a pick focus stays in the
 /// field.
+///
+/// **Groups.** Options sharing a [ComboboxOption.group] are listed together
+/// under a heading holding its label: first the options with no group, under
+/// no heading, then each group where its first option stands, in [options]
+/// or in [onSearch]'s results, each in the order given. Typed into, the
+/// local filter keeps that shape: the matches with no group first, then each
+/// group with a match, the groups ordered by their best match and each one's
+/// matches best first, as cmdk sorts its groups. A group with no match left
+/// loses its heading. A heading is not an option: the keys pass over it, a
+/// click on it picks nothing, and screen readers hear it as a heading.
 ///
 /// **State.** A null [onChanged], or [readOnly], shows the value read-only:
 /// focusable and selectable at full contrast, with no chevron or clear, never
@@ -223,7 +238,8 @@ class _ComboboxState<T> extends State<Combobox<T>> {
       if (x.value != y.value ||
           x.label != y.label ||
           x.description != y.description ||
-          x.icon != y.icon) {
+          x.icon != y.icon ||
+          x.group != y.group) {
         return false;
       }
     }
@@ -326,7 +342,8 @@ class _ComboboxState<T> extends State<Combobox<T>> {
     }
   }
 
-  void _show(List<ComboboxOption<T>> results) {
+  void _show(List<ComboboxOption<T>> options) {
+    final results = _grouped(options);
     setState(() {
       _results = results;
       _failed = false;
@@ -347,7 +364,7 @@ class _ComboboxState<T> extends State<Combobox<T>> {
     final highlighted = at != null && at < _results.length
         ? _results[at]
         : null;
-    final results = widget.options;
+    final results = _grouped(widget.options);
     final kept = highlighted == null
         ? -1
         : results.indexWhere((o) => o.value == highlighted.value);
@@ -394,7 +411,7 @@ class _ComboboxState<T> extends State<Combobox<T>> {
     _show(results);
     if (_pendingEnter) {
       _pendingEnter = false;
-      if (_open && results.isNotEmpty) _pick(results.first);
+      if (_open && _results.isNotEmpty) _pick(_results.first);
     }
   }
 
@@ -407,6 +424,17 @@ class _ComboboxState<T> extends State<Combobox<T>> {
     }
     scored.sort((a, b) => b.$1.compareTo(a.$1));
     return [for (final s in scored) s.$2];
+  }
+
+  /// [options] with each group's listed together where the group first
+  /// appears, after the options with no group.
+  List<ComboboxOption<T>> _grouped(List<ComboboxOption<T>> options) {
+    if (options.every((o) => o.group == null)) return options;
+    final groups = <String?, List<ComboboxOption<T>>>{null: []};
+    for (final o in options) {
+      (groups[o.group] ??= []).add(o);
+    }
+    return [for (final group in groups.values) ...group];
   }
 
   void _pickAt(int index) {
@@ -570,6 +598,7 @@ class _ComboboxState<T> extends State<Combobox<T>> {
       body = Listbox(
         controller: _listbox,
         itemCount: _results.length,
+        groupOf: (i) => _results[i].group,
         itemBuilder: (context, i) {
           final o = _results[i];
           return ListboxOption(
