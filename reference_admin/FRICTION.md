@@ -55,7 +55,7 @@ two together.
 | F-205 | The kit has mention helpers but no mention composer | missing-api | S2 | fixed |
 | F-206 | Anything but a `FormSubmitException` out of `onSubmit` is reported as a Flutter error | awkward-default | S3 | fixed |
 | F-207 | A hover card needs a longer rest than any test helper knows | test-support | S3 | open |
-| F-208 | `KanbanBoard` pads itself inside the page's gutter, and its padding and gap are not exposed | awkward-default | S3 | open |
+| F-208 | `KanbanBoard` pads itself inside the page's gutter, and its padding and gap are not exposed | awkward-default | S3 | fixed |
 | F-209 | `FilterBar` offers "Clear all" for conditions none of its pills shows | awkward-default | S3 | open |
 | F-210 | A `PopoverMenuSurface` sized to its content throws around a `Listbox` | bug | S3 | fixed |
 | F-212 | A selectable card's check sits over its content's corner | awkward-default | S3 | open |
@@ -651,12 +651,12 @@ Owned by WP-B.
 
 - **Kind:** awkward-default
 - **Severity:** S3
-- **Status:** open
-- **Kit:** `collection.dart › KanbanBoard` (`lib/src/collection/ui/kanban_board.dart:127`, a fixed `EdgeInsets.all(AdminSpacing.xl)` and a fixed `AdminSpacing.lg` gap between columns; only `columnWidth` is a parameter).
-- **App:** `lib/src/screens/orders/order_board.dart` `boardColumnWidth` (~15 lines, repeating the padding and the gap).
-- **Evidence:** "The order board" › "Order board": the columns start 16 px inside the title's line, where the list's panel lines up with it; at 1024 and 1280 the viewport's edge cut the last visible column through its cards ("€23.1", "#12"), which read as an overflow, not a scroller.
-- **Workaround:** a `LayoutBuilder` shares the width out so a whole number of columns fits; the others scroll in.
-- **Proposal:** `KanbanBoard(padding:, gap:)`, and a `fitColumns: true` (or `minColumnWidth`) that does the sharing out.
+- **Status:** fixed (kit)
+- **Kit:** `collection.dart › KanbanBoard` (`lib/src/collection/ui/kanban_board.dart`) had a fixed `EdgeInsets.all(AdminSpacing.xl)` and a fixed `AdminSpacing.lg` gap between columns; only `columnWidth` was a parameter.
+- **App:** `lib/src/screens/orders/order_board.dart` (it had `boardColumnWidth`, ~15 lines, repeating the padding and the gap).
+- **Evidence:** "The order board" › "Order board": the columns started 16 px inside the title's line, where the list's panel lines up with it; at 1024 and 1280 the viewport's edge cut the last visible column through its cards ("€23.1", "#12"), which read as an overflow, not a scroller.
+- **Workaround:** was a `LayoutBuilder` that shared the width out so a whole number of columns fits; the others scroll in.
+- **Proposal:** `KanbanBoard(padding:, gap:)`, and a `fitColumns: true` (or `minColumnWidth`) that does the sharing out. Done as `KanbanBoard(padding:, columnSpacing:, fitColumns:)`: the board shares its width among whole columns itself, `columnWidth` the narrowest, and the app's sum is gone. With `padding: EdgeInsets.zero` the board starts on the title's line and ends on the page's gutter, as the list does.
 
 ### F-209 · `FilterBar` offers "Clear all" for conditions none of its pills shows
 

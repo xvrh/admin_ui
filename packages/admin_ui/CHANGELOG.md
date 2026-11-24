@@ -2,6 +2,16 @@
 
 ## 0.2.0
 
+- `KanbanBoard` takes `padding`, `columnSpacing` and `fitColumns`. Its
+  padding, 16px on every side, and the 12px between its columns were
+  fixed: a board in a page that has its own gutter started 16px inside
+  the page's line, and an app that shared the width out among the columns
+  repeated both numbers to do it. With `fitColumns` the board does the
+  sharing, each column `columnWidth` wide or wider: all of them where
+  they fit, filling the board, and where they do not, as many whole ones
+  as do, so that the board's edge falls after a column rather than
+  through its cards. Each defaults to what the board did, so nothing
+  moves.
 - `CommandSource` takes `listOnEmptyQuery`: on an empty query it lists
   every item, under its group and in the order given, where it lists
   none. A palette over one opened on "Type to search" with every page and

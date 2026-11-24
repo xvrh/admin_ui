@@ -307,6 +307,7 @@ Map<String, dynamic> genericCatalog() => {
     'One value (controller + builder)': const AsyncValueDemo(),
     'Card / grid view': const CollectionCardsDemo(),
     'Kanban board': const KanbanDemo(),
+    'Kanban board / fitted': const KanbanDemo.fitted(),
     'Advanced filtering': const CollectionAdvancedDemo(),
   },
   'Screens': {

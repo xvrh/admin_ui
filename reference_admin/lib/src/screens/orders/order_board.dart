@@ -1,6 +1,5 @@
 import 'package:admin_ui/collection.dart';
 import 'package:admin_ui/l10n.dart';
-import 'package:admin_ui/theme.dart' show AdminSpacing;
 import 'package:admin_ui/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -113,46 +112,33 @@ class _OrderBoardState extends State<OrderBoard> {
         if (_orders.loading && _orders.items.isEmpty) {
           return const LoadingPanel();
         }
-        return LayoutBuilder(
-          builder: (context, constraints) => KanbanBoard<Order>(
-            columnWidth: boardColumnWidth(constraints.maxWidth),
-            itemKey: (o) => o.number,
-            onMove: canMove ? _move : null,
-            onCardTap: widget.onOpen,
-            cardBuilder: (context, order) => OrderCard(order, framed: true),
-            columns: [
-              for (final status in boardStatuses)
-                KanbanColumn(
-                  id: status.name,
-                  title: strings.shell.orderStatus(status),
-                  subtitle: strings.orders.boardColumnSubtitle(status),
-                  accent: context.orderStatusMeta(status).color,
-                  items: [
-                    for (final o in _orders.items)
-                      if (o.status == status) o,
-                  ],
-                ),
-            ],
-          ),
+        // The page has its gutter: with no padding of its own the board
+        // starts on the title's line, as the list does. And as many whole
+        // columns as fit at 240 or wider share the width, so the page's
+        // edge falls after a column rather than through its cards.
+        return KanbanBoard<Order>(
+          padding: EdgeInsets.zero,
+          columnWidth: 240,
+          fitColumns: true,
+          itemKey: (o) => o.number,
+          onMove: canMove ? _move : null,
+          onCardTap: widget.onOpen,
+          cardBuilder: (context, order) => OrderCard(order, framed: true),
+          columns: [
+            for (final status in boardStatuses)
+              KanbanColumn(
+                id: status.name,
+                title: strings.shell.orderStatus(status),
+                subtitle: strings.orders.boardColumnSubtitle(status),
+                accent: context.orderStatusMeta(status).color,
+                items: [
+                  for (final o in _orders.items)
+                    if (o.status == status) o,
+                ],
+              ),
+          ],
         );
       },
     );
   }
-}
-
-/// A board column's width in [available]: as many whole columns as fit at
-/// 240 or wider, shared out, so the viewport's edge falls in the gap after
-/// the last one rather than through a card.
-// FRICTION(F-208): the board's own padding and gap are fixed and not
-// exposed, so they are repeated here to share the width out.
-double boardColumnWidth(double available) {
-  // The scroll view's end padding only shows at the end of the board, so
-  // the room is the width less the leading padding, and each column brings
-  // its gap.
-  const leading = AdminSpacing.xl;
-  const gap = AdminSpacing.lg;
-  const narrowest = 240.0;
-  final room = available - leading;
-  final fit = (room / (narrowest + gap)).floor().clamp(1, 99);
-  return room / fit - gap;
 }
