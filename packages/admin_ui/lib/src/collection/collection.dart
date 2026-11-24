@@ -8,6 +8,7 @@ import '../theme/breakpoints.dart';
 import '../theme/spacing.dart';
 import '../theme/table_metrics.dart';
 import 'collection_controller.dart';
+import 'collection_position.dart';
 import 'ui/collection_cards.dart';
 import 'ui/collection_table.dart';
 import 'ui/pager.dart';
@@ -29,6 +30,13 @@ enum CollectionViewMode { table, cards }
 /// [ErrorTextScope.describe] and a Retry. The pager hides while there is
 /// nothing to page through, and while a failed load shows its error: the
 /// rows it would count are the ones from before the failure.
+///
+/// A list that gives its place to the page of a row it opened comes back
+/// where it stood, with the focus on that row: the view says where it stood
+/// as it goes, and the controller, which outlives it, keeps that as its
+/// [CollectionController.position] for the next one to start from. A new
+/// page, sort, search or filter starts the rows at the top; a refresh or
+/// a realtime update keeps their place.
 ///
 /// A table has no room on a phone. With [compactViewMode] the collection
 /// lays its rows out that way, as cards for one, while its window is
@@ -139,6 +147,10 @@ class Collection<T> extends StatelessWidget {
   /// Paints every other table row with the stripe fill.
   final bool striped;
 
+  /// Whether a table back from a row's page rings the row it opened,
+  /// however it was opened; see [CollectionTable.ringOnReturn].
+  final bool ringOnReturn;
+
   /// Explicit column widths, keyed by [TableColumn.key] — typically a
   /// `ColumnLayout`'s; see [CollectionTable.columnWidths].
   final Map<String, double>? columnWidths;
@@ -187,6 +199,7 @@ class Collection<T> extends StatelessWidget {
     this.rowHeight,
     this.headerHeight,
     this.striped = false,
+    this.ringOnReturn = true,
     this.columnWidths,
     this.onColumnResize,
     this.onColumnResizeEnd,
@@ -209,6 +222,8 @@ class Collection<T> extends StatelessWidget {
         _ => viewMode,
       };
 
+  void _keep(CollectionPosition position) => controller.position = position;
+
   @override
   Widget build(BuildContext context) {
     final viewMode = _viewModeIn(context);
@@ -217,6 +232,17 @@ class Collection<T> extends StatelessWidget {
       builder: (context, _) {
         final c = controller;
         final q = c.query;
+        // Which rows are asked for: a new page, sort, search or filter
+        // starts at the top, where a refresh keeps the place.
+        final asked = (
+          q.pageIndex,
+          q.pageSize,
+          q.sortKey,
+          q.ascending,
+          q.search,
+          q.filters,
+          q.advanced,
+        );
         final error = c.error;
         final errorBody = error == null
             ? null
@@ -263,6 +289,10 @@ class Collection<T> extends StatelessWidget {
                   filtered: filtered,
                   onClearFilters: onClearFilters,
                   error: errorBody,
+                  initialPosition: c.position,
+                  onLeave: _keep,
+                  ringOnReturn: ringOnReturn,
+                  scrollToTopOn: asked,
                 ),
                 CollectionViewMode.cards => CollectionCards<T>(
                   rows: c.items,
@@ -281,6 +311,9 @@ class Collection<T> extends StatelessWidget {
                   tileHeight: tileHeight,
                   spacing: tileSpacing,
                   padding: gridPadding,
+                  initialPosition: c.position,
+                  onLeave: _keep,
+                  scrollToTopOn: asked,
                 ),
               },
             ),

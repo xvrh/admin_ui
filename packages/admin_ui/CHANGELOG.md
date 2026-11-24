@@ -2,6 +2,34 @@
 
 ## 0.2.0
 
+- A `Collection` back from a row's page stands where it stood: the row
+  that was opened is where it was on screen, and holds the focus, ringed
+  to say where the user came from until their next click. With
+  `ringOnReturn: false` the ring shows only when the keyboard opened the
+  row, as a browser shows focus. The list kept its page, sort and
+  search across the visit, but its view was built again at the top, a
+  row in the lower half of a page out of sight. The view says where it
+  stands as it leaves (`onLeave`), its `CollectionController` keeps that
+  as `position`, and the next view starts from it (`initialPosition`).
+  A table puts the opened row back at its height, so rows a refresh or a
+  realtime update put above it do not move it; a card view is scrolled
+  as it was. A row scrolled out of sight before the list left takes no
+  focus, the focus another control holds stays there — not that of a
+  `SelectionArea` around the list, which a click anywhere under it
+  takes — and a query changed meanwhile starts the list at the top.
+  `CollectionTable` and `CollectionCards` take the two on their own, for
+  a list that is not a `Collection`, and `CollectionTable` takes
+  `ringOnReturn` too.
+- A `Collection` given a new page, page size, sort, search, filters or
+  saved view starts its rows at the top. It stayed where it was
+  scrolled, so the next page opened at its bottom; a refresh or a
+  realtime update still keeps the place. `CollectionTable` and
+  `CollectionCards` take `scrollToTopOn`: what names the rows asked
+  for, whose change scrolls them back to the top.
+- A table cell a click focused stays without a ring when the window or
+  the page loses focus and gets it back. Flutter takes the focus away
+  then and gives it back, and the table took its return for the
+  keyboard's, so the ring showed on a cell nobody had moved to.
 - `SignInForm` takes `emailErrorText` and `passwordErrorText`, as
   `ChangePasswordForm` takes its two: a server's refusal of one field,
   under that field, where the one `errorText` put a wrong password in an
