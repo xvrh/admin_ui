@@ -17,6 +17,12 @@ import 'ui/filter_bar.dart' show FilterOption;
 /// sort keys and the [FilterBar]'s fields carry. [searchFields] narrows the
 /// global search to some of them; by default it looks in every field.
 ///
+/// A field may read several values, as an [Iterable]: the teams a member
+/// belongs to, the tags on a ticket. A filter keeps the row when one of them
+/// matches, [options] offers each of them, the search looks in all of them,
+/// and the row sorts by the first of them in the field's order. A row that
+/// reads none is a row with no value.
+///
 /// Text sorts ignoring case and Latin accents, so "École" sorts among the
 /// Es rather than after "z", the same in every locale. It is not a full
 /// collator: other scripts keep their code-point order, and no language's
@@ -98,7 +104,11 @@ class LocalCollectionSource<T> {
       // Merge sort is stable: rows that tie keep their order in [rows].
       mergeSort(
         result,
-        compare: (a, b) => _compareNullsLast(read(a), read(b), query.ascending),
+        compare: (a, b) => _compareNullsLast(
+          _sortValue(read(a)),
+          _sortValue(read(b)),
+          query.ascending,
+        ),
       );
     }
     return result;
@@ -106,6 +116,7 @@ class LocalCollectionSource<T> {
 
   /// The distinct values [field] takes across [rows], sorted, as the options
   /// of an `OptionsFilterField` — with the ids an [OptionsFilter] on it matches.
+  /// A field that reads several values offers each of them.
   List<FilterOption> options(
     FieldId field, {
     String Function(Object value)? label,
@@ -113,7 +124,7 @@ class LocalCollectionSource<T> {
     final read = _field(field);
     final values = <String, Object>{};
     for (final row in rows) {
-      if (read(row) case final value?) {
+      for (final value in _values(read(row))) {
         values.putIfAbsent(_optionId(value), () => value);
       }
     }
@@ -124,6 +135,12 @@ class LocalCollectionSource<T> {
     ];
   }
 
+  /// What a row sorts by in a field that reads several values: the first of
+  /// them in the field's order.
+  Object? _sortValue(Object? value) => value is Iterable<Object?>
+      ? _values(value).sorted(_compare).firstOrNull
+      : value;
+
   // A condition on a field this source cannot read would otherwise pass every
   // row, and an unfiltered result is the worst answer a filter can give.
   Object? Function(T row) _field(FieldId id) =>
@@ -131,22 +148,33 @@ class LocalCollectionSource<T> {
       (throw ArgumentError.value(id, 'field', 'Not one of the source fields'));
 }
 
-bool _accepts(FilterCondition condition, Object? value) => switch (condition) {
-  TextFilter(value: final text) => _text(
-    value,
-  ).contains(text.trim().toLowerCase()),
-  OptionsFilter(:final selected) =>
-    value != null && selected.contains(_optionId(value)),
-  NumberRangeFilter(:final min, :final max) =>
-    value is num &&
-        (min == null || value >= min) &&
-        (max == null || value <= max),
-  DateRangeFilter(:final from, :final to) =>
-    value is DateTime &&
-        (from == null || !value.isBefore(from)) &&
-        (to == null || value.isBefore(_endOf(to))),
-  BoolFilter(value: final wanted) => value == wanted,
+/// The values a field read: none for null, each of an [Iterable]'s but its
+/// nulls, or the one.
+Iterable<Object> _values(Object? value) => switch (value) {
+  null => const [],
+  Iterable<Object?>() => value.nonNulls,
+  _ => [value],
 };
+
+bool _accepts(FilterCondition condition, Object? value) =>
+    value is Iterable<Object?>
+    ? value.nonNulls.any((one) => _accepts(condition, one))
+    : switch (condition) {
+        TextFilter(value: final text) => _text(
+          value,
+        ).contains(text.trim().toLowerCase()),
+        OptionsFilter(:final selected) =>
+          value != null && selected.contains(_optionId(value)),
+        NumberRangeFilter(:final min, :final max) =>
+          value is num &&
+              (min == null || value >= min) &&
+              (max == null || value <= max),
+        DateRangeFilter(:final from, :final to) =>
+          value is DateTime &&
+              (from == null || !value.isBefore(from)) &&
+              (to == null || value.isBefore(_endOf(to))),
+        BoolFilter(value: final wanted) => value == wanted,
+      };
 
 // The filter bar's date editor picks days, so a bare date as the upper bound
 // means that whole day rather than its first instant.
@@ -166,6 +194,7 @@ DateTime _endOf(DateTime to) {
 String _text(Object? value) => switch (value) {
   null => '',
   Enum() => value.name.toLowerCase(),
+  Iterable<Object?>() => value.map(_text).join('\n'),
   _ => '$value'.toLowerCase(),
 };
 

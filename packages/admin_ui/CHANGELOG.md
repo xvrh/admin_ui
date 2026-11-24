@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- A `LocalCollectionSource` field may read several values, as an
+  `Iterable`: the teams a member belongs to, the tags on a ticket. A
+  filter keeps a row when one of its values matches, `options` offers
+  each value once, the search looks in all of them, and the row sorts by
+  the first of them in the field's order, a row with none last. A list
+  read before was one value, its `toString`, so no option matched it.
 - `ThumbnailImage` takes an `alignment`, as `Image` does: where the image
   sits in its box, and so the part a cropping `fit` keeps. A portrait
   cropped to a square lost as much at its top as at its bottom, whatever
