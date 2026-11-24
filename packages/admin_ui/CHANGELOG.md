@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- `CommandSource` takes `listOnEmptyQuery`: on an empty query it lists
+  every item, under its group and in the order given, where it lists
+  none. A palette over one opened on "Type to search" with every page and
+  command registered, and an app that wanted them listed gave each group
+  a `RecentsSource` of its own. Off by default, and a typed query matches
+  as it does without.
 - `EmptyState` takes a `tone`: a `Severity` that draws its icon in the
   tone's text-safe colour, where the icon was always the muted grey of an
   empty list, so the last step of a setup read as "nothing here". With no
