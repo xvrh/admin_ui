@@ -2,8 +2,9 @@
 /// @docImport 'checkbox.dart';
 library;
 
-import 'dart:ui' show SemanticsRole;
+import 'dart:math' as math;
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -72,8 +73,10 @@ class Choice<T> extends StatefulWidget {
   final ValueChanged<T>? onChanged;
   final ChoiceStyle style;
 
-  /// Lay the options out horizontally. Best with [ChoiceStyle.plain] and a few
-  /// short options.
+  /// Lay the options out horizontally. Plain options hug their labels, best
+  /// for a few short ones. Cards share the width evenly and stand as tall as
+  /// the tallest; with no width to share, in a horizontal scroll view, each is
+  /// as wide as the widest card's content on one line.
   final Axis direction;
 
   /// The group's accessible name — the question the options answer.
@@ -211,21 +214,25 @@ class _ChoiceState<T> extends State<Choice<T>> {
   Widget build(BuildContext context) {
     final style = widget.style;
     final vertical = widget.direction == Axis.vertical;
-    final options = widget.options;
-    final children = <Widget>[
-      for (var i = 0; i < options.length; i++) ...[
-        // A plain row's 24px target already holds air around its line.
-        if (i > 0) Gap(vertical ? AdminSpacing.md : AdminSpacing.xl),
+    final options = <Widget>[
+      for (final (i, option) in widget.options.indexed)
         _Option<T>(
-          option: options[i],
-          selected: options[i].value == widget.value,
+          option: option,
+          selected: option.value == widget.value,
           style: style,
           enabled: _enabled(i),
-          readOnly: widget.readOnly && options[i].enabled,
+          readOnly: widget.readOnly && option.enabled,
           groupEnabled: widget.onChanged != null,
           focusNode: _nodes[i],
           onTap: () => _select(i),
         ),
+    ];
+    // A plain row's 24px target already holds air around its line.
+    final gap = vertical ? AdminSpacing.md : AdminSpacing.xl;
+    final children = <Widget>[
+      for (final (i, option) in options.indexed) ...[
+        if (i > 0) Gap(gap),
+        option,
       ],
     ];
 
@@ -245,7 +252,13 @@ class _ChoiceState<T> extends State<Choice<T>> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: children,
                 )
-              : Row(mainAxisSize: MainAxisSize.min, children: children),
+              : switch (style) {
+                  ChoiceStyle.plain => Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: children,
+                  ),
+                  ChoiceStyle.card => _CardRow(spacing: gap, children: options),
+                },
         ),
       ),
     );
@@ -517,4 +530,177 @@ class _Dot extends StatelessWidget {
           : null,
     );
   }
+}
+
+/// Cards side by side, all one width and as tall as the tallest. A bounded
+/// width is shared evenly; with none, each card is as wide as the widest
+/// card's content wants.
+class _CardRow extends MultiChildRenderObjectWidget {
+  final double spacing;
+
+  const _CardRow({required this.spacing, required super.children});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => _RenderCardRow(
+    spacing: spacing,
+    textDirection: Directionality.of(context),
+  );
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderCardRow renderObject) {
+    renderObject
+      ..spacing = spacing
+      ..textDirection = Directionality.of(context);
+  }
+}
+
+class _CardRowParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _RenderCardRow extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _CardRowParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _CardRowParentData> {
+  _RenderCardRow({required this._spacing, required this._textDirection});
+
+  double _spacing;
+  set spacing(double value) {
+    if (value == _spacing) return;
+    _spacing = value;
+    markNeedsLayout();
+  }
+
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (value == _textDirection) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _CardRowParentData) {
+      child.parentData = _CardRowParentData();
+    }
+  }
+
+  double get _gaps => math.max(0, childCount - 1) * _spacing;
+
+  double _most(double Function(RenderBox child) extent) {
+    var most = 0.0;
+    var child = firstChild;
+    while (child != null) {
+      most = math.max(most, extent(child));
+      child = childAfter(child);
+    }
+    return most;
+  }
+
+  /// Each card's width: a share of a bounded width, else the widest card's.
+  double _cardWidth(double maxWidth) {
+    if (childCount == 0) return 0;
+    if (maxWidth.isFinite) return math.max(0, (maxWidth - _gaps) / childCount);
+    return _most((c) => c.getMaxIntrinsicWidth(double.infinity));
+  }
+
+  double _width(double card) => card * childCount + _gaps;
+
+  @override
+  double computeMinIntrinsicWidth(double height) =>
+      _width(_most((c) => c.getMinIntrinsicWidth(height)));
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      _width(_most((c) => c.getMaxIntrinsicWidth(height)));
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    final card = _cardWidth(width);
+    return _most((c) => c.getMinIntrinsicHeight(card));
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    final card = _cardWidth(width);
+    return _most((c) => c.getMaxIntrinsicHeight(card));
+  }
+
+  /// The width every card takes under [constraints], and the height of the
+  /// tallest at that width, as [heightOf] measures it.
+  ({double width, double height}) _measure(
+    BoxConstraints constraints,
+    double Function(RenderBox child, BoxConstraints natural) heightOf,
+  ) {
+    final width = _cardWidth(constraints.maxWidth);
+    final natural = BoxConstraints.tightFor(width: width);
+    final height = _most((c) => heightOf(c, natural));
+    return (width: width, height: constraints.constrainHeight(height));
+  }
+
+  /// A card at [width], at least [height] tall. Not tight, so that a card
+  /// whose content grows lays the row out again, and the others with it; and
+  /// open below, as in a column, where a card's content would fill a bound.
+  BoxConstraints _card(double width, double height) =>
+      BoxConstraints(minWidth: width, maxWidth: width, minHeight: height);
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final (:width, :height) = _measure(
+      constraints,
+      (c, natural) => c.getDryLayout(natural).height,
+    );
+    return constraints.constrain(Size(_width(width), height));
+  }
+
+  @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final (:width, :height) = _measure(
+      constraints,
+      (c, natural) => c.getDryLayout(natural).height,
+    );
+    final card = _card(width, height);
+    var result = BaselineOffset.noBaseline;
+    var child = firstChild;
+    while (child != null) {
+      result = result.minOf(
+        BaselineOffset(child.getDryBaseline(card, baseline)),
+      );
+      child = childAfter(child);
+    }
+    return result.offset;
+  }
+
+  @override
+  void performLayout() {
+    final (:width, :height) = _measure(constraints, (c, natural) {
+      c.layout(natural, parentUsesSize: true);
+      return c.size.height;
+    });
+    size = constraints.constrain(Size(_width(width), height));
+    final card = _card(width, height);
+    final rtl = _textDirection == TextDirection.rtl;
+    var x = 0.0;
+    var child = firstChild;
+    while (child != null) {
+      child.layout(card, parentUsesSize: true);
+      final data = child.parentData! as _CardRowParentData;
+      data.offset = Offset(rtl ? size.width - x - width : x, 0);
+      x += width + _spacing;
+      child = data.nextSibling;
+    }
+  }
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) =>
+      defaultComputeDistanceToHighestActualBaseline(baseline);
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
+
+  @override
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
 }

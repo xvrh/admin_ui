@@ -9,6 +9,23 @@
   when it came, the form's own "is required" shows in its place, and the
   submit that brings one takes focus to its field. `errorText` is
   unchanged, for what is no field's.
+- A `Choice` lays its cards side by side. `style: ChoiceStyle.card` with
+  `direction: Axis.horizontal` threw in any parent, a form field's or a
+  modal's included: the row gave each card an unbounded width, which a
+  card's text cannot fill, and Flutter reported "RenderFlex children have
+  non-zero flex but incoming width constraints are unbounded". The cards
+  now share the width they are given evenly and stand as tall as the
+  tallest, so their edges line up. With no width to share, in a horizontal
+  scroll view, each is as wide as the widest card's content on one line.
+  Plain options side by side, and cards in a column, are unchanged.
+- `Collection` takes the sizing of its card grid: `minTileWidth`,
+  `tileHeight`, `tileSpacing` and `gridPadding`, handed to its
+  `CollectionCards` as `minTileWidth`, `tileHeight`, `spacing` and
+  `padding`. Its cards could not be made wider than the grid's 240px
+  minimum allowed, nor given one height, so an app that wanted either
+  built a `CollectionCards` itself and wired the controller's loading,
+  error, empty result and pager to it by hand. Each defaults to what
+  `CollectionCards` takes, so nothing moves.
 - `ChangePasswordFormState.reset()` empties a `ChangePasswordForm`: its
   three fields, and what a submit showed under them. The form kept both
   passwords in its fields after the host changed the password, and the

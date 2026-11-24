@@ -294,6 +294,31 @@ class ControlsDemo extends StatelessWidget {
             ],
           ),
         ),
+        const Gap(AdminSpacing.lg),
+        LiveValue<String>(
+          initial: 'monthly',
+          builder: (v, set) => Choice<String>(
+            value: v,
+            onChanged: set,
+            style: ChoiceStyle.card,
+            direction: Axis.horizontal,
+            semanticLabel: 'Billing',
+            options: const [
+              ChoiceOption(
+                'monthly',
+                'Monthly',
+                description: 'Billed on the first of each month.',
+              ),
+              ChoiceOption(
+                'yearly',
+                'Yearly',
+                description:
+                    'Billed once a year, on the day the plan started, '
+                    'with two months free.',
+              ),
+            ],
+          ),
+        ),
         const Gap(AdminSpacing.xl),
 
         const DemoSection('Tag — status'),
