@@ -22,6 +22,11 @@ class ThumbnailImage extends StatelessWidget {
   final double? width;
   final double? height;
   final BoxFit fit;
+
+  /// Where the image sits in its box, and so the part a cropping [fit]
+  /// keeps: `Alignment(0, -0.2)` keeps more of a portrait's upper half.
+  final AlignmentGeometry alignment;
+
   final BorderRadiusGeometry? borderRadius;
 
   /// Drawn in the box when [image] fails to load.
@@ -38,6 +43,7 @@ class ThumbnailImage extends StatelessWidget {
     double? width,
     double? height,
     this.fit = BoxFit.cover,
+    this.alignment = Alignment.center,
     this.borderRadius,
     this.fallback,
     this.semanticLabel,
@@ -72,6 +78,7 @@ class ThumbnailImage extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
+      alignment: alignment,
       semanticLabel: semanticLabel,
       excludeFromSemantics: semanticLabel == null,
       gaplessPlayback: true,

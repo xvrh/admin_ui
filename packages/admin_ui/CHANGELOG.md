@@ -14,6 +14,10 @@
   options: one above each option whose group is not the one before it's.
   The `ListboxController` counts and moves through the options alone, so
   "n of m" and the keys are the options', as they were.
+- `ThumbnailImage` takes an `alignment`, as `Image` does: where the image
+  sits in its box, and so the part a cropping `fit` keeps. A portrait
+  cropped to a square lost as much at its top as at its bottom, whatever
+  it showed. It is still centred by default.
 - `CommandSource` takes `listOnEmptyQuery`: on an empty query it lists
   every item, under its group and in the order given, where it lists
   none. A palette over one opened on "Type to search" with every page and
