@@ -66,7 +66,7 @@ two together.
 | F-217 | A page that is not a table has no loader: the customer card reads its customer through `FutureBuilder` | missing-api | S3 | fixed |
 | F-300 | A table that opens rows on tap cannot start an inline edit from a pointer | awkward-default | S2 | fixed |
 | F-301 | `FormScope` hands out no map cell, which `KeyValueField` needs | missing-api | S2 | fixed |
-| F-302 | `TableTextEditor.number` cannot refuse a draft | missing-api | S3 | open |
+| F-302 | `TableTextEditor.number` cannot refuse a draft | missing-api | S3 | fixed |
 | F-303 | The kit draws a `VersionDiff` but builds none from two records | missing-api | S2 | fixed |
 | F-304 | `ReferenceField` edits a list only; a single reference is a list of one | missing-api | S3 | fixed |
 | F-305 | `PresenceAvatars` takes a fixed list of peers; following a channel is the page's job | awkward-default | S3 | open |
@@ -776,12 +776,12 @@ Owned by WP-C. Every entry was met building `/products`, `/products/new` and `/p
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open (verified)
-- **Kit:** `collection.dart › TableTextEditor.number` (`lib/src/collection/ui/table_edit_session.dart:112`): it stays open only on text that does not parse; `onCommit` is a `ValueChanged<num>`, with no integer mode, minimum or validator.
-- **App:** `lib/src/screens/products/product_list.dart:140` (`_commitStock`, ~25 lines): a fraction is refused after the editor closed, a negative count is sent and rolled back when the shop refuses it.
-- **Evidence:** "Browsing the catalogue", the unnamed steps after "Products · editing stock": `-3` closes the editor, one refused `products.patchStock`, the row goes back to 42 and a "Stock not saved" toast explains.
-- **Workaround:** optimistic update, rollback and a toast.
-- **Proposal:** `TableTextEditor.number(integer: true, min: 0, validate: (num) => String?)`, keeping the editor open and marked invalid with the message as its tooltip.
+- **Status:** fixed (kit)
+- **Kit:** `collection.dart › TableTextEditor.number` (`lib/src/collection/ui/table_edit_session.dart`): it stayed open only on text that did not parse; `onCommit` is a `ValueChanged<num>`, and there was no integer mode, minimum or validator.
+- **App:** `lib/src/screens/products/product_list.dart` (`_commitStock` was ~25 lines: a fraction was refused after the editor closed, a negative count was sent and rolled back when the shop refused it).
+- **Evidence:** "Browsing the catalogue" › "Products · stock refused": `-3` keeps the editor open with "Enter 0 or more" under the cell, and no `products.patchStock` goes out. Before, it closed the editor, one refused call went out, the row went back to 42 and a "Stock not saved" toast explained.
+- **Workaround:** was an optimistic update, a rollback and a toast. They stay for what only the shop can refuse.
+- **Proposal:** `TableTextEditor.number(integer: true, min: 0, validate: (num) => String?)`, keeping the editor open and marked invalid with the message as its tooltip. Done, with a `max` too, and `validate` on the text editor as well. The message is not a tooltip, which shows on hover: it is on a card under the cell from the moment the draft is refused until it is edited.
 
 ### F-303 · The kit draws a `VersionDiff` but builds none from two records
 

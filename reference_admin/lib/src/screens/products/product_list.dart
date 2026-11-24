@@ -125,18 +125,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 
-  /// Saves a stock count typed into the table. The row changes at once and
-  /// goes back if the shop refuses.
-  // FRICTION(F-302): TableTextEditor.number cannot refuse a fraction or a
-  // negative, so a count the shop will refuse still closes the editor.
-  void _commitStock(Product product, num typed) {
-    if (typed != typed.truncate()) {
-      _stockRefused(
-        const ShopError.validation({'stock': ValidationCodes.invalid}),
-      );
-      return;
-    }
-    final stock = typed.toInt();
+  /// Saves a stock count typed into the table: a whole number, zero or
+  /// more, which is all the cell's editor lets through. The row changes at
+  /// once and goes back if the shop refuses.
+  void _commitStock(Product product, int stock) {
     if (stock == product.stock) return;
     unawaited(
       _collection
@@ -402,8 +394,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 key: CatalogueKeys.stockEditor,
                 session: session,
                 value: p.stock,
-                fractionDigits: 0,
-                onCommit: (value) => _commitStock(p, value),
+                integer: true,
+                min: 0,
+                onCommit: (value) => _commitStock(p, value.toInt()),
               )
             : null,
       ),

@@ -2,6 +2,20 @@
 
 ## 0.2.0
 
+- A table cell's editor can refuse a draft, and says why.
+  `TableTextEditor.number` takes `integer`, `min`, `max` and `validate`,
+  and `TableTextEditor` takes `validate`. A number editor refused only
+  text that was no number: a fraction typed into a count, or a count
+  below zero, closed the editor and was the app's to undo. Now a draft
+  that has a fraction where `integer` is set, that is outside `min` to
+  `max`, or that `validate` gives a message for, is not saved: the editor
+  stays open, marked invalid, with the message on a card under the cell,
+  or over it where it does not fit below. The card follows the cell as
+  the table scrolls, takes no pointer and no focus, and goes once the
+  draft is edited; a screen reader hears it, and reads it as the editor's
+  hint. With `integer`, `onCommit` receives an `int`, and the keyboard has
+  no decimal key; with a `min` of zero or more it has no minus. An editor
+  given none of them saves what it saved.
 - `KanbanBoard` takes `padding`, `columnSpacing` and `fitColumns`. Its
   padding, 16px on every side, and the 12px between its columns were
   fixed: a board in a page that has its own gutter started 16px inside
@@ -862,6 +876,9 @@
 
 ### Looks
 
+- A table's number editor holding text that is no number says so: "Enter
+  a number like 1,234.5", on a card under the cell. It was marked invalid
+  and said nothing.
 - A `DiffView` card is headed with its field's label alone, where the
   field's key followed it in small muted type: "Meta description", where
   it read "Meta description  metaDescription". A card is announced

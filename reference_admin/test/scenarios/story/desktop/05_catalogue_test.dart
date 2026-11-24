@@ -40,11 +40,12 @@ Future<void> _doubleTap(ScenarioTester s, Object target) async {
 
 /// A tap on the page's title: away from the cell being edited, which saves
 /// it.
-Future<void> _tapAway(ScenarioTester s) => s.tap(
+Future<void> _tapAway(ScenarioTester s, {Shot? shot}) => s.tap(
   find.descendant(
     of: find.byKey(CatalogueKeys.productsPage),
     matching: find.text(s.strings.shell.navProducts),
   ),
+  shot: shot,
 );
 
 /// Width over height of the library picture [assetId].
@@ -109,10 +110,23 @@ void main() {
     expect(shop.calls.countOf(Endpoint.patchStock), 1);
     expect(shop.db.productById(row).stock, 42);
 
-    // A count the shop refuses goes back on the row.
+    // A count that cannot be one is refused in its cell: the editor stays
+    // open and says why, and the shop is not asked.
     await _doubleTap(s, CatalogueKeys.stock(row));
     await s.enterText(CatalogueKeys.stockEditor, '-3');
+    await _tapAway(s, shot: const Shot('Products · stock refused'));
+    expect(find.byKey(CatalogueKeys.stockEditor), findsOneWidget);
+    expect(find.text(s.kit.fields.numberAtLeast('0')), findsOneWidget);
+    expect(shop.calls.countOf(Endpoint.patchStock), 1);
+
+    // A count the shop refuses goes back on the row.
+    shop.faults.failNext(
+      Endpoint.patchStock,
+      const ShopError.validation({'stock': ValidationCodes.invalid}),
+    );
+    await s.enterText(CatalogueKeys.stockEditor, '7');
     await _tapAway(s);
+    expect(find.byKey(CatalogueKeys.stockEditor), findsNothing);
     expect(shop.calls.countOf(Endpoint.patchStock), 2);
     expect(shop.db.productById(row).stock, 42);
     expect(_in(CatalogueKeys.stock(row), '42'), findsOneWidget);
