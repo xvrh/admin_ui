@@ -44,7 +44,7 @@ two together.
 | F-103 | Server field errors are keyed by cell id, and a record-list row's cell ids are opaque (minted from the wall clock) | doc-gap | S3 | fixed |
 | F-104 | `DecimalField` takes a prefix but no unit, though its `NumberBody` has one | missing-api | S3 | fixed |
 | F-106 | `ValidationSummary` folds to nothing while hidden and brings no spacing, so a host cannot gap it only when it shows | awkward-default | S2 | fixed |
-| F-107 | `EmptyState` has no tone: a success end state reads as an empty list | missing-api | S3 | open |
+| F-107 | `EmptyState` has no tone: a success end state reads as an empty list | missing-api | S3 | fixed |
 | F-108 | `DonutChart`'s legend overflows a narrow card instead of wrapping or eliding | bug | S3 | fixed |
 | F-109 | `LineChart` thins its category labels greedily by width, so a month's axis is spaced unevenly | awkward-default | S3 | fixed |
 | F-110 | `StatCard` has no loading state | missing-api | S2 | fixed |
@@ -526,12 +526,12 @@ Owned by WP-A.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
-- **Kit:** `widgets.dart › EmptyState` (`lib/src/common/ui/empty_state.dart:9`): the icon is always muted.
-- **App:** `lib/src/screens/setup/setup_screen.dart` `_Ready`: accepted as is (no workaround).
-- **Evidence:** `02_home` "Setting up a brand-new shop" › "Shop ready": the check mark is the grey of "No sales yet".
-- **Workaround:** none; accepted as is.
-- **Proposal:** `EmptyState(tone: Severity?)`, colouring the icon (and its halo, where a theme draws one) from `severityStyleOf`.
+- **Status:** fixed (kit)
+- **Kit:** `widgets.dart › EmptyState` (`lib/src/common/ui/empty_state.dart:13`): the icon was always muted.
+- **App:** `lib/src/screens/setup/setup_screen.dart` `_Ready`.
+- **Evidence:** `02_home` "Setting up a brand-new shop" › "Shop ready": the check mark was the grey of "No sales yet".
+- **Workaround:** none; it was accepted as is.
+- **Proposal:** `EmptyState(tone: Severity?)`, colouring the icon (and its halo, where a theme draws one) from `severityStyleOf`. Done: `tone` draws the icon in the tone's text-safe colour and, with no `icon` given, picks the tone's glyph; the ready state is `EmptyState(tone: Severity.success)` and its check is green. No theme draws a halo.
 
 ### F-108 · `DonutChart`'s legend overflows a narrow card instead of wrapping or eliding
 

@@ -2,6 +2,13 @@
 
 ## 0.2.0
 
+- `EmptyState` takes a `tone`: a `Severity` that draws its icon in the
+  tone's text-safe colour, where the icon was always the muted grey of an
+  empty list, so the last step of a setup read as "nothing here". With no
+  `icon` given the tone picks its own glyph too, so the colour is not
+  alone in saying it. `icon` is nullable for this, and is the inbox still
+  when neither is given. The title and the message keep their colours,
+  and a state with no tone draws what it drew.
 - A `Collection` back from a row's page stands where it stood: the row
   that was opened is where it was on screen, and holds the focus, ringed
   to say where the user came from until their next click. With
