@@ -26,7 +26,10 @@ import '../../l10n/sections/collection_messages.dart';
 import '../../theme/spacing.dart';
 import '../../theme/table_metrics.dart';
 import '../../theme/tokens.dart';
+import '../collection_position.dart';
 import '../filter.dart';
+import 'return_focus.dart';
+import 'start_scroll_controller.dart';
 import 'table_edit_session.dart';
 import 'view_support.dart';
 
@@ -228,6 +231,13 @@ class TableSort {
 /// Escape or a choice hands focus back to the table. On the web the
 /// browser's own menu is off over the rows.
 ///
+/// **Coming back.** A table that gives its place to the page of a row it
+/// opened, and is built again when that page is left, can stand where it
+/// stood: [onLeave] says where that is as it goes, and [initialPosition]
+/// starts the new one there — the opened row at the height it was, so rows
+/// that came or went above it do not move it, and the focused cell on it,
+/// ringed to say where the user came from ([ringOnReturn]).
+///
 /// Assistive technology reads it as a table — a row of column headers over
 /// rows of cells — whose one focus target is the focused cell, so a move of
 /// it is announced.
@@ -338,6 +348,29 @@ class CollectionTable<T> extends StatefulWidget {
   /// menu, and neither does a row dimmed under a reload.
   final List<MenuEntry> Function(T row)? rowMenu;
 
+  /// Where the table starts, once it has rows: the row
+  /// [CollectionPosition.opened] at [CollectionPosition.openedTop], and
+  /// focused unless another control holds the focus, or else scrolled to
+  /// [CollectionPosition.offset]. Read once, as the table is first built;
+  /// rows that land later are scrolled to as they land.
+  final CollectionPosition? initialPosition;
+
+  /// Called as the table leaves the screen, with where it stands — for the
+  /// table built in its place to start there through [initialPosition].
+  final ValueChanged<CollectionPosition>? onLeave;
+
+  /// Whether the cell [initialPosition] puts the focus back on shows its
+  /// ring, however the row was opened: the mark of where the user came
+  /// from, until their next click. With false it shows only when the
+  /// keyboard opened the row, as a browser shows focus.
+  final bool ringOnReturn;
+
+  /// What names the rows asked for — a page, a sort, a search, filters.
+  /// When it changes, by `==`, the rows scroll back to the top: the place
+  /// in other rows means nothing. Leave out what changes rows in place,
+  /// as a refresh does, which keeps the place.
+  final Object? scrollToTopOn;
+
   const CollectionTable({
     super.key,
     required this.rows,
@@ -367,6 +400,10 @@ class CollectionTable<T> extends StatefulWidget {
     this.rowHeight,
     this.headerHeight,
     this.rowMenu,
+    this.initialPosition,
+    this.onLeave,
+    this.ringOnReturn = true,
+    this.scrollToTopOn,
   });
 
   @override
@@ -423,8 +460,14 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
     debugLabel: 'CollectionTable',
     descendantsAreTraversable: false,
   );
-  final _vertical = ScrollController();
-  final _horizontal = ScrollController();
+  final _vertical = StartScrollController();
+  final _horizontal = StartScrollController();
+
+  /// [CollectionTable.initialPosition] until there are rows to start from.
+  CollectionPosition? _start;
+
+  /// The row opened last, by its key, and whether the keyboard opened it.
+  ({Object? key, bool keyboard})? _opened;
 
   /// Whether a pointer rather than a key last moved the focused cell: the
   /// ring then stays hidden, as `:focus-visible` would have it.
@@ -495,8 +538,15 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
   @override
   void initState() {
     super.initState();
+    _start = widget.initialPosition;
     _grid.addListener(_onGridFocus);
     _syncRows();
+  }
+
+  @override
+  void deactivate() {
+    widget.onLeave?.call(_position());
+    super.deactivate();
   }
 
   @override
@@ -504,6 +554,10 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
     super.didUpdateWidget(old);
     _syncRows();
     if (!identical(widget.columnWidths, old.columnWidths)) _resized.clear();
+    if (widget.scrollToTopOn != old.scrollToTopOn) {
+      _start = null;
+      _vertical.toTopAfterFrame();
+    }
     final editing = _editing;
     if (editing != null &&
         (!_indexByKey.containsKey(editing.row) ||
@@ -785,7 +839,12 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
 
   void _onGridFocus() {
     _signals.active.value = _grid.hasPrimaryFocus;
-    if (!_grid.hasFocus) _pointerFocus = false;
+    // Focus parked on the root scope went with the window or the page, and
+    // comes back as it left: a click's, without a ring.
+    final primary = FocusManager.instance.primaryFocus;
+    final parked =
+        primary == null || primary == FocusManager.instance.rootScope;
+    if (!_grid.hasFocus && !parked) _pointerFocus = false;
     if (_grid.hasPrimaryFocus) {
       final cursor = _signals.cursor.value ??= _home;
       if (!_pointerFocus) _reveal(cursor);
@@ -998,8 +1057,90 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
     } else if (_bodyCells[at]?.enter() ?? false) {
       return;
     } else if (_opens(row)) {
-      widget.onRowTap!(row);
+      _open(row, keyboard: true);
     }
+  }
+
+  void _open(T row, {required bool keyboard}) {
+    _opened = (key: _keyOf(row), keyboard: keyboard);
+    widget.onRowTap!(row);
+  }
+
+  // ── coming back ──
+
+  /// Where the table stands, as [CollectionTable.onLeave] reports it: the
+  /// opened row only while some of it is in sight, since focus put back on
+  /// a row scrolled away from would scroll back to it.
+  CollectionPosition _position() {
+    if (_start case final start?) return start;
+    final offset = _vertical.lastPixels;
+    final crossOffset = _horizontal.lastPixels;
+    final opened = _opened;
+    final index = opened == null ? null : _indexByKey[opened.key];
+    if (opened != null &&
+        index != null &&
+        index < _rowCount &&
+        _vertical.hasClients) {
+      final top = index * _rowHeight - offset;
+      final body = _vertical.positions.last.viewportDimension - _headerHeight;
+      if (top > -_rowHeight && top < body) {
+        return CollectionPosition(
+          offset: offset,
+          crossOffset: crossOffset,
+          opened: opened.key,
+          openedTop: top,
+          openedByKeyboard: opened.keyboard,
+        );
+      }
+    }
+    return CollectionPosition(offset: offset, crossOffset: crossOffset);
+  }
+
+  /// Takes up [_start] once the first rows are in: built in this layout,
+  /// the grid's scroll positions start there; the rows of a load that lands
+  /// in a grid already built are scrolled to after the frame. A load that
+  /// ends with no rows drops it.
+  void _startFrom(BoxConstraints constraints) {
+    final start = _start;
+    if (start == null || (_rowCount == 0 && widget.loading)) return;
+    _start = null;
+    if (_rowCount == 0) return;
+    final index = start.opened == null ? null : _indexByKey[start.opened];
+    final maxVertical = math.max(
+      0.0,
+      _headerHeight + _rowCount * _rowHeight - constraints.maxHeight,
+    );
+    final maxHorizontal = math.max(
+      0.0,
+      _widths.fold(0.0, (a, w) => a + w) - constraints.maxWidth,
+    );
+    final vertical =
+        (index == null ? start.offset : index * _rowHeight - start.openedTop)
+            .clamp(0.0, maxVertical);
+    final horizontal = start.crossOffset.clamp(0.0, maxHorizontal);
+    if (_vertical.hasClients || _horizontal.hasClients) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (_vertical.hasClients) _vertical.jumpTo(vertical);
+        if (_horizontal.hasClients) _horizontal.jumpTo(horizontal);
+      });
+    } else {
+      _vertical.start = vertical;
+      _horizontal.start = horizontal;
+    }
+    if (index == null) return;
+    _opened = (key: start.opened, keyboard: start.openedByKeyboard);
+    _pointerFocus = !widget.ringOnReturn && !start.openedByKeyboard;
+    // After the frame: this is a layout, where a cell cannot be told to
+    // rebuild.
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _signals.cursor.value = (
+        row: index + 1,
+        col: math.min(_selectable ? 1 : 0, _cols.length - 1),
+      );
+    });
+    focusOnReturn(context, _grid.requestFocus);
   }
 
   bool _opens(T row) =>
@@ -1148,6 +1289,7 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
     // Frozen columns that would take most of a narrow viewport scroll away
     // with the rest instead.
     _pinnedCount = pinnedWidth > constraints.maxWidth / 2 ? 0 : declaredPinned;
+    _startFrom(constraints);
 
     final Widget? overlay;
     if (widget.error != null) {
@@ -1380,7 +1522,7 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
       final onTap = selectionColumn
           ? () => _toggleRow(row)
           : opens
-          ? () => widget.onRowTap!(row)
+          ? () => _open(row, keyboard: false)
           : null;
       final cell = (row: v.row, col: v.column);
       return _BodyCell(

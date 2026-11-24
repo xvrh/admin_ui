@@ -1,3 +1,5 @@
+import 'dart:ui' show ViewFocusDirection, ViewFocusEvent, ViewFocusState;
+
 import 'package:admin_ui/src/collection/ui/collection_table.dart';
 import 'package:admin_ui/src/common/ui/focus_ring.dart';
 import 'package:flutter/services.dart';
@@ -344,6 +346,52 @@ void main() {
     await _key(tester, LogicalKeyboardKey.arrowDown);
     expect(_ringOn(tester, find.text('Item 3')), isTrue);
   });
+
+  testWidgets(
+    'a click\'s focus comes back without a ring when the window does',
+    (tester) async {
+      await _pump(tester, _Harness(rows: _items));
+      await tester.tap(find.text('Item 2'));
+      await tester.pump();
+      expect(_ring, findsNothing);
+
+      // On the desktop and the web, a window that loses focus takes it from
+      // the grid, and gives it back as it regains it.
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      await tester.pump();
+      expect(_gridFocused, isFalse);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      expect(_gridFocused, isTrue);
+      expect(_ring, findsNothing);
+
+      // So does a web page whose view loses focus: it is told so first.
+      final viewId = tester.view.viewId;
+      tester.binding.handleViewFocusChanged(
+        ViewFocusEvent(
+          viewId: viewId,
+          state: ViewFocusState.unfocused,
+          direction: ViewFocusDirection.undefined,
+        ),
+      );
+      await tester.pump();
+      expect(_gridFocused, isFalse);
+      tester.binding.handleViewFocusChanged(
+        ViewFocusEvent(
+          viewId: viewId,
+          state: ViewFocusState.focused,
+          direction: ViewFocusDirection.undefined,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(_gridFocused, isTrue);
+      expect(_ring, findsNothing);
+
+      await _key(tester, LogicalKeyboardKey.arrowDown);
+      expect(_ringOn(tester, find.text('Item 3')), isTrue);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
 
   testWidgets('a control in a cell keeps its arrows; Escape or F2 leaves it', (
     tester,

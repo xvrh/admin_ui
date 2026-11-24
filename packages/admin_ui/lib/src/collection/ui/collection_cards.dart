@@ -1,4 +1,5 @@
 /// @docImport '../../theme/palette.dart';
+/// @docImport 'collection_table.dart';
 library;
 
 import 'dart:math' as math;
@@ -17,6 +18,9 @@ import '../../common/ui/tappable.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
+import '../collection_position.dart';
+import 'return_focus.dart';
+import 'start_scroll_controller.dart';
 import 'view_support.dart';
 
 /// A presentational card/grid view of a collection — the gallery counterpart to
@@ -45,6 +49,12 @@ import 'view_support.dart';
 /// sketches skeleton cards. An empty result reads "No results" with a "Clear
 /// filters" action ([onClearFilters]) while [filtered], and [empty] (by
 /// default "Nothing here yet") otherwise.
+///
+/// **Coming back.** A card view that gives its place to the page of a card
+/// it opened, and is built again when that page is left, can stand where it
+/// stood: [onLeave] says where that is as it goes, and [initialPosition]
+/// starts the new one there, scrolled as it was and with the focus on that
+/// card.
 class CollectionCards<T> extends StatefulWidget {
   final List<T> rows;
 
@@ -89,6 +99,20 @@ class CollectionCards<T> extends StatefulWidget {
   final double spacing;
   final EdgeInsetsGeometry padding;
 
+  /// Where the view starts, once it has rows: scrolled to
+  /// [CollectionPosition.offset], with the focus on the card
+  /// [CollectionPosition.opened] if nothing else holds it. Read once, as
+  /// the view is first built.
+  final CollectionPosition? initialPosition;
+
+  /// Called as the view leaves the screen, with where it stands — for the
+  /// view built in its place to start there through [initialPosition].
+  final ValueChanged<CollectionPosition>? onLeave;
+
+  /// What names the rows asked for; when it changes, the cards scroll back
+  /// to the top. See [CollectionTable.scrollToTopOn].
+  final Object? scrollToTopOn;
+
   const CollectionCards({
     super.key,
     required this.rows,
@@ -107,6 +131,9 @@ class CollectionCards<T> extends StatefulWidget {
     this.tileHeight,
     this.spacing = AdminSpacing.xl,
     this.padding = const EdgeInsets.all(AdminSpacing.xl),
+    this.initialPosition,
+    this.onLeave,
+    this.scrollToTopOn,
   });
 
   @override
@@ -114,6 +141,56 @@ class CollectionCards<T> extends StatefulWidget {
 }
 
 class _CollectionCardsState<T> extends State<CollectionCards<T>> {
+  final _scroll = StartScrollController();
+
+  /// [CollectionCards.initialPosition] until there are cards to start from.
+  CollectionPosition? _start;
+
+  /// The card opened last, by its key.
+  Object? _opened;
+
+  /// The focus of each card on screen, by its key.
+  final _tileFocus = <Object?, FocusNode>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _start = widget.initialPosition;
+  }
+
+  @override
+  void didUpdateWidget(CollectionCards<T> old) {
+    super.didUpdateWidget(old);
+    if (widget.scrollToTopOn != old.scrollToTopOn) {
+      _start = null;
+      _scroll.toTopAfterFrame();
+    }
+  }
+
+  @override
+  void deactivate() {
+    widget.onLeave?.call(
+      _start ?? CollectionPosition(offset: _scroll.lastPixels, opened: _opened),
+    );
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  /// Takes up [_start] as the first cards are built.
+  void _startFrom(CollectionPosition start) {
+    _start = null;
+    _scroll.start = start.offset;
+    final opened = _opened = start.opened;
+    if (opened != null) {
+      focusOnReturn(context, () => _tileFocus[opened]?.requestFocus());
+    }
+  }
+
   /// Whether the last pointer on the grid was a finger or a pen; null until
   /// one lands.
   bool? _touch;
@@ -162,6 +239,9 @@ class _CollectionCardsState<T> extends State<CollectionCards<T>> {
         loading: widget.loading,
         builder: (context, show) {
           final hasRows = widget.rows.isNotEmpty;
+          if (widget.error != null || (!hasRows && !widget.loading)) {
+            _start = null;
+          }
           final Widget body;
           if (widget.error != null) {
             body = Center(child: widget.error!);
@@ -207,6 +287,7 @@ class _CollectionCardsState<T> extends State<CollectionCards<T>> {
   }
 
   Widget _grid() {
+    if (_start case final start?) _startFrom(start);
     final selectable = _selectable;
     final keys = selectable
         ? {for (final r in widget.selected!) _key(r)}
@@ -225,7 +306,14 @@ class _CollectionCardsState<T> extends State<CollectionCards<T>> {
         selectable: selectable,
         selected: selected,
         showCheck: checks,
-        onOpen: opens ? () => open(row) : null,
+        rowKey: _key(row),
+        focusRegistry: _tileFocus,
+        onOpen: opens
+            ? () {
+                _opened = _key(row);
+                open(row);
+              }
+            : null,
         onToggle: selectable ? () => _toggle(row, keys) : null,
         child: Builder(builder: (context) => widget.cardBuilder(context, row)),
       );
@@ -237,6 +325,7 @@ class _CollectionCardsState<T> extends State<CollectionCards<T>> {
         final count = widget.rows.length;
         if (widget.tileHeight case final height?) {
           return GridView.builder(
+            controller: _scroll,
             padding: widget.padding,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: cols,
@@ -251,6 +340,7 @@ class _CollectionCardsState<T> extends State<CollectionCards<T>> {
         final width = _tileWidth(constraints.maxWidth, cols);
         final rows = (count / cols).ceil();
         return ListView.builder(
+          controller: _scroll,
           padding: widget.padding,
           itemCount: rows,
           itemBuilder: (context, r) {
@@ -347,6 +437,10 @@ class _CardTile extends StatefulWidget {
 
   /// Keeps the checkbox up whatever the pointer and focus do.
   final bool showCheck;
+
+  /// The row's key, by which [focusRegistry] holds the card's focus.
+  final Object? rowKey;
+  final Map<Object?, FocusNode> focusRegistry;
   final VoidCallback? onOpen;
   final VoidCallback? onToggle;
   final Widget child;
@@ -357,6 +451,8 @@ class _CardTile extends StatefulWidget {
     required this.selectable,
     required this.selected,
     required this.showCheck,
+    required this.rowKey,
+    required this.focusRegistry,
     required this.onOpen,
     required this.onToggle,
     required this.child,
@@ -375,12 +471,38 @@ class _CardTileState extends State<_CardTile> {
   /// own, not a second stop on the card.
   final _within = FocusNode(debugLabel: 'card and its checkbox');
 
+  /// The card's own Tab stop.
+  final _focus = FocusNode(debugLabel: 'card');
+
   bool _focusWithin = false;
 
   @override
+  void initState() {
+    super.initState();
+    widget.focusRegistry[widget.rowKey] = _focus;
+  }
+
+  @override
+  void didUpdateWidget(_CardTile old) {
+    super.didUpdateWidget(old);
+    if (old.rowKey != widget.rowKey) {
+      _unregister(old);
+      widget.focusRegistry[widget.rowKey] = _focus;
+    }
+  }
+
+  @override
   void dispose() {
+    _unregister(widget);
     _within.dispose();
+    _focus.dispose();
     super.dispose();
+  }
+
+  void _unregister(_CardTile tile) {
+    if (identical(tile.focusRegistry[tile.rowKey], _focus)) {
+      tile.focusRegistry.remove(tile.rowKey);
+    }
   }
 
   /// Hidden, [child] takes no pointer: a click there opens the card.
@@ -404,6 +526,7 @@ class _CardTileState extends State<_CardTile> {
     Widget tile = Tappable.states(
       // Without an open action, a tap selects.
       onTap: widget.onOpen ?? toggle,
+      focusNode: _focus,
       selected: widget.selectable ? selected : null,
       showFocusRing: false,
       builder: (context, states) {

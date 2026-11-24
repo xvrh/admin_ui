@@ -7,6 +7,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
+import 'collection_position.dart';
 import 'filter.dart';
 import 'latest_load.dart';
 
@@ -108,6 +109,10 @@ typedef CollectionFetcher<T> = Future<CollectionPage<T>> Function(
 /// takes it back if the commit fails; [undoable] also holds the commit until
 /// an Undo is no longer offered. [patchLocal] and [removeLocal] change the
 /// loaded rows with nothing to commit, as after a save the server confirmed.
+///
+/// **Where the list stood** is kept as [position] when its view leaves the
+/// screen, so the list a record's page gave way to comes back scrolled as it
+/// was, with the focus on the row that was opened.
 class CollectionController<T> extends ChangeNotifier with LatestLoad {
   final CollectionFetcher<T> fetcher;
   final Duration searchDebounce;
@@ -208,6 +213,13 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
   Set<Object?> get selectedKeys => Set.unmodifiable(_selected.keys);
 
   bool isSelected(T row) => _selected.containsKey(_keyOf(row));
+
+  /// Where the list's view stood when it last left the screen, which the
+  /// next view starts from; null before one has. A [Collection] sets it
+  /// as its view goes, and changing which rows the query asks for clears
+  /// it: a place among other rows means nothing. Setting it notifies no
+  /// one, since no view on screen reads it.
+  CollectionPosition? position;
 
   Object? _keyOf(T row) => rowKey == null ? row : rowKey!(row);
 
@@ -480,6 +492,7 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
 
   void _apply(CollectionQuery q, {bool resetPage = true}) {
     _query = resetPage ? q.copyWith(pageIndex: 0) : q;
+    position = null;
     load();
   }
 
