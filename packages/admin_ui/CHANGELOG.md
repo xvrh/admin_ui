@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- A `LocalCollectionSource` field may read several values, as an
+  `Iterable`: the teams a member belongs to, the tags on a ticket. A
+  filter keeps a row when one of its values matches, `options` offers
+  each value once, the search looks in all of them, and the row sorts by
+  the first of them in the field's order, a row with none last. A list
+  read before was one value, its `toString`, so no option matched it.
 - `EmptyState` takes a `tone`: a `Severity` that draws its icon in the
   tone's text-safe colour, where the icon was always the muted grey of an
   empty list, so the last step of a setup read as "nothing here". With no
