@@ -248,12 +248,13 @@ class CommandPaletteResultsDemo extends StatefulWidget {
 }
 
 class _CommandPaletteResultsDemoState extends State<CommandPaletteResultsDemo> {
+  late final _all = _suggestions(
+    (key) => shortcutLabel(context, primaryModifierActivator(key)),
+  );
+
+  // Everything on an empty query, and fuzzy matches on a typed one.
   late final _controller = CommandPaletteController(
-    sources: [
-      _Suggestions(
-        (key) => shortcutLabel(context, primaryModifierActivator(key)),
-      ),
-    ],
+    sources: [CommandSource(() => _all, listOnEmptyQuery: true)],
     groupOrder: const ['Commands', 'Pages', 'Products', 'People'],
   );
 
@@ -284,56 +285,12 @@ class _CommandPaletteResultsDemoState extends State<CommandPaletteResultsDemo> {
   }
 }
 
-/// Everything on an empty query, and fuzzy matches on a typed one.
-class _Suggestions implements SearchSource {
-  _Suggestions(this.shortcut);
-
-  /// A command's shortcut with the platform's modifier, as it writes it.
-  final String Function(LogicalKeyboardKey key) shortcut;
-
-  late final _all = [
-    for (final (title, icon, key) in const [
-      ('New page', Icons.note_add_outlined, LogicalKeyboardKey.keyN),
-      ('New product', Icons.add_box_outlined, null),
-      ('Manage menus', Icons.account_tree_outlined, null),
-      ('Open settings', Icons.settings_outlined, LogicalKeyboardKey.comma),
-      ('Toggle dark theme', Icons.dark_mode_outlined, null),
-      ('Publish changes', Icons.cloud_upload_outlined, null),
-    ])
-      _item(
-        title,
-        'Commands',
-        icon,
-        shortcut: key == null ? null : shortcut(key),
-      ),
-    for (final name in _samplePages.take(22))
-      _item(
-        name,
-        'Pages',
-        Icons.description_outlined,
-        subtitle: '/${name.toLowerCase().replaceAll(' ', '-')}',
-      ),
-    for (final (name, sku) in const [
-      ('Acme Widget', 'SKU-1024'),
-      ('Acme Gadget Pro', 'SKU-2048'),
-      ('Gizmo Mini', 'SKU-4096'),
-      ('Acme Anvil', 'SKU-8192'),
-      ('Rocket Skates', 'SKU-1638'),
-      ('Portable Hole', 'SKU-3276'),
-    ])
-      _item(name, 'Products', Icons.inventory_2_outlined, subtitle: sku),
-    for (final (name, email) in const [
-      ('Marina Cole', 'marina@example.com'),
-      ('Diego Ruiz', 'diego@example.com'),
-      ('Aisha Khan', 'aisha@example.com'),
-      ('Tom Lee', 'tom@example.com'),
-      ('Maya Patel', 'maya@example.com'),
-      ('Noah Smith', 'noah@example.com'),
-    ])
-      _item(name, 'People', Icons.person_outline_rounded, subtitle: email),
-  ];
-
-  static PaletteItem _item(
+/// Forty items in four groups. [shortcut] is a command's shortcut with the
+/// platform's modifier, as it writes it.
+List<PaletteItem> _suggestions(
+  String Function(LogicalKeyboardKey key) shortcut,
+) {
+  PaletteItem item(
     String title,
     String group,
     IconData icon, {
@@ -349,19 +306,47 @@ class _Suggestions implements SearchSource {
     onSelect: () {},
   );
 
-  @override
-  List<PaletteSection> search(String query) {
-    final q = query.trim();
-    final byGroup = <String, List<ScoredItem>>{};
-    for (final it in _all) {
-      final m = q.isEmpty ? null : fuzzyMatch(q, it.title);
-      if (q.isNotEmpty && m == null) continue;
-      (byGroup[it.group] ??= []).add(
-        ScoredItem(it, m?.matched ?? const [], m?.score ?? 0),
-      );
-    }
-    return [for (final e in byGroup.entries) PaletteSection(e.key, e.value)];
-  }
+  return [
+    for (final (title, icon, key) in const [
+      ('New page', Icons.note_add_outlined, LogicalKeyboardKey.keyN),
+      ('New product', Icons.add_box_outlined, null),
+      ('Manage menus', Icons.account_tree_outlined, null),
+      ('Open settings', Icons.settings_outlined, LogicalKeyboardKey.comma),
+      ('Toggle dark theme', Icons.dark_mode_outlined, null),
+      ('Publish changes', Icons.cloud_upload_outlined, null),
+    ])
+      item(
+        title,
+        'Commands',
+        icon,
+        shortcut: key == null ? null : shortcut(key),
+      ),
+    for (final name in _samplePages.take(22))
+      item(
+        name,
+        'Pages',
+        Icons.description_outlined,
+        subtitle: '/${name.toLowerCase().replaceAll(' ', '-')}',
+      ),
+    for (final (name, sku) in const [
+      ('Acme Widget', 'SKU-1024'),
+      ('Acme Gadget Pro', 'SKU-2048'),
+      ('Gizmo Mini', 'SKU-4096'),
+      ('Acme Anvil', 'SKU-8192'),
+      ('Rocket Skates', 'SKU-1638'),
+      ('Portable Hole', 'SKU-3276'),
+    ])
+      item(name, 'Products', Icons.inventory_2_outlined, subtitle: sku),
+    for (final (name, email) in const [
+      ('Marina Cole', 'marina@example.com'),
+      ('Diego Ruiz', 'diego@example.com'),
+      ('Aisha Khan', 'aisha@example.com'),
+      ('Tom Lee', 'tom@example.com'),
+      ('Maya Patel', 'maya@example.com'),
+      ('Noah Smith', 'noah@example.com'),
+    ])
+      item(name, 'People', Icons.person_outline_rounded, subtitle: email),
+  ];
 }
 
 /// The selected row's secondary line on its tinted fill: a page's path, and a

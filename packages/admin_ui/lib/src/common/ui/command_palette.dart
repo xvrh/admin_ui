@@ -97,16 +97,37 @@ List<PaletteSection> _groupByItem(List<ScoredItem> scored) {
 }
 
 /// Fuzzy-matches a flat command/content list locally, grouping by
-/// [PaletteItem.group]. An empty query yields nothing — recents are a separate
-/// source. [items] is a builder so it reflects live registry state.
+/// [PaletteItem.group]. [items] is a builder so it reflects live registry
+/// state.
+///
+/// An empty query yields nothing — recents are a separate source — so a
+/// palette with no recents opens on "Type to search". With
+/// [listOnEmptyQuery] it yields every item instead, and the palette opens on
+/// what it can do.
 class CommandSource implements SearchSource {
   final List<PaletteItem> Function() items;
-  const CommandSource(this.items);
+
+  /// Whether an empty query lists every item, each under its group and in
+  /// the order [items] gives them, where it lists none. For a palette that
+  /// opens on its pages and commands; leave it off for a list too long to
+  /// read through, which only a query narrows.
+  ///
+  /// It is this source's alone: a palette can open on one source's items
+  /// and keep another's, a form's fields say, for a typed query. And a
+  /// typed query matches as it does without.
+  final bool listOnEmptyQuery;
+
+  const CommandSource(this.items, {this.listOnEmptyQuery = false});
 
   @override
   List<PaletteSection> search(String query) {
     final q = query.trim();
-    if (q.isEmpty) return const [];
+    if (q.isEmpty) {
+      if (!listOnEmptyQuery) return const [];
+      return _groupByItem([
+        for (final it in items()) ScoredItem(it, const [], 0),
+      ]);
+    }
     final scored = <ScoredItem>[];
     for (final it in items()) {
       final m = fuzzyMatch(q, it.title);

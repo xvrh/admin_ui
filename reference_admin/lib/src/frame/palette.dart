@@ -54,7 +54,6 @@ Future<void> openCommandPalette(BuildContext context) {
       group: strings.groupCommands,
       onSelect: services.router.signOut,
     ),
-    ...services.commands.active(),
   ];
 
   List<PaletteItem> recent() => [
@@ -76,27 +75,15 @@ Future<void> openCommandPalette(BuildContext context) {
       ),
   ];
 
-  List<PaletteItem> inGroup(String group) => [
-    for (final item in commands())
-      if (item.group == group) item,
-  ];
-
   return showCommandPalette(
     context,
     hint: strings.searchHint,
     sources: [
-      CommandSource(commands),
-      // FRICTION(F-021): CommandSource lists nothing until something is
-      // typed; RecentsSource, which shows only on an empty query, offers
-      // the pages and commands meanwhile.
-      RecentsSource(
-        () => inGroup(strings.groupPages),
-        title: strings.groupPages,
-      ),
-      RecentsSource(
-        () => inGroup(strings.groupCommands),
-        title: strings.groupCommands,
-      ),
+      // Listed before anything is typed, so the palette opens on the pages
+      // and the commands.
+      CommandSource(commands, listOnEmptyQuery: true),
+      // What the open page registered, a form's fields: found by typing.
+      CommandSource(services.commands.active),
       _ShopSearch(services.api, strings, language, open),
       RecentsSource(recent, title: strings.groupRecent),
     ],

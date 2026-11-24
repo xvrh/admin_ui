@@ -28,7 +28,7 @@ two together.
 | F-017 | `NotificationCenter` bundles its bell with its panel, so the inbox cannot be a sheet on a phone | missing-api | S2 | fixed |
 | F-019 | Toasts start at the window's top edge, over the shell's top bar and its actions | awkward-default | S3 | open |
 | F-020 | `showSideSheet` draws no surface around a bare builder, and its doc reads as if it did | doc-gap | S3 | fixed |
-| F-021 | `CommandSource` lists nothing on an empty query, so a palette opens blank until something is typed | awkward-default | S3 | open |
+| F-021 | `CommandSource` lists nothing on an empty query, so a palette opens blank until something is typed | awkward-default | S3 | fixed |
 | F-022 | A remote `SearchSource` is asked on every keystroke; debouncing is the source's job | missing-api | S3 | open |
 | F-023 | `Avatar` picks its colour from the ambient palette, so one person has two colours under a top bar with its own | theme | S3 | open |
 | F-024 | A theme of your own keeps its base theme's chart series: the README's recipe draws every chart in Iris indigo | theme | S3 | open |
@@ -346,12 +346,12 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 
 - **Kind:** awkward-default
 - **Severity:** S3
-- **Status:** open (verified)
-- **Kit:** `widgets.dart › CommandSource.search` (`lib/src/common/ui/command_palette.dart:104`) returns `[]` for an empty query; only `RecentsSource` answers one.
-- **App:** `lib/src/frame/palette.dart` `openCommandPalette` (two `RecentsSource`s over the pages and the commands, ~10 lines).
+- **Status:** fixed (kit)
+- **Kit:** `widgets.dart › CommandSource.search` (`lib/src/common/ui/command_palette.dart:123`) returned `[]` for an empty query; only `RecentsSource` answered one.
+- **App:** `lib/src/frame/palette.dart` `openCommandPalette` (it had two `RecentsSource`s over the pages and the commands, ~15 lines).
 - **Evidence:** "Jumping with the command palette" › "Command palette": before the workaround the panel held "Type to search" and nothing else, although every page and command was registered.
-- **Workaround:** `RecentsSource(() => pages, title: groupPages)` and one for the commands: `RecentsSource` shows a fixed list only while the query is empty, which is the behaviour wanted.
-- **Proposal:** `CommandSource(items, showWhenEmpty: true)`, or a `SuggestedSource` named for what it is.
+- **Workaround:** was `RecentsSource(() => pages, title: groupPages)` and one for the commands: `RecentsSource` shows a fixed list only while the query is empty, which is the behaviour wanted.
+- **Proposal:** `CommandSource(items, showWhenEmpty: true)`, or a `SuggestedSource` named for what it is. Done as `CommandSource(items, listOnEmptyQuery: true)`: the source of the pages and the commands lists them before anything is typed, and the two `RecentsSource`s are gone. What the open page registers, a form's fields, is a source of its own without the flag, found by typing as before.
 
 ### F-022 · A remote `SearchSource` is asked on every keystroke; debouncing is the source's job
 

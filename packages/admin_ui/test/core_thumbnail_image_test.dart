@@ -136,6 +136,23 @@ void main() {
     });
   });
 
+  testWidgets('alignment sets the part a crop keeps', (tester) async {
+    final portrait = (await tester.runAsync(() => _png(200, 400)))!;
+    await tester.pumpWidget(
+      _host(
+        ThumbnailImage(
+          image: MemoryImage(portrait),
+          size: 48,
+          alignment: Alignment.topCenter,
+        ),
+      ),
+    );
+    expect(
+      tester.widget<RawImage>(find.byType(RawImage)).alignment,
+      Alignment.topCenter,
+    );
+  });
+
   group('a failed load', () {
     for (final async in [false, true]) {
       testWidgets(
