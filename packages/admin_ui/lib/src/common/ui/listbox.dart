@@ -1,4 +1,5 @@
 /// @docImport '../../theme/palette.dart';
+/// @docImport 'menu.dart';
 library;
 
 import 'dart:async';
@@ -301,6 +302,8 @@ class ListboxController extends ChangeNotifier {
 /// As the keyboard moves the highlight, the new option is announced ("Banana,
 /// 2 of 3") while a screen reader is on, since focus stays where it is.
 ///
+/// With [groupOf] the options are listed under headings: see there.
+///
 /// It takes the width it is given. Its rows are built as they scroll into
 /// view, so it cannot say how wide the widest is: on a [PopoverMenuSurface],
 /// give the surface a width, the trigger's or the widest row's from
@@ -321,6 +324,18 @@ class Listbox extends StatefulWidget {
   /// Names the list for assistive technology.
   final String? semanticLabel;
 
+  /// The group option `index` is listed under, or null for none. A heading
+  /// with the group's label, styled as a [MenuHeader], is drawn above each
+  /// option whose group is not the one before it's. The options stay in the
+  /// order given, so list a group's options together, and the ones with no
+  /// group first: one listed after a group reads as part of it.
+  ///
+  /// A heading is not an option. The [controller] counts and moves through
+  /// the options only, so the keys, the typeahead and "n of m" never reach
+  /// it, and it takes neither the pointer's highlight nor a tap. Screen
+  /// readers hear it as a heading.
+  final String? Function(int index)? groupOf;
+
   const Listbox({
     super.key,
     required this.controller,
@@ -330,6 +345,7 @@ class Listbox extends StatefulWidget {
     this.focusNode,
     this.onKeyEvent,
     this.semanticLabel,
+    this.groupOf,
   });
 
   @override
@@ -438,6 +454,16 @@ class _ListboxState extends State<Listbox> {
 
   GlobalKey _keyFor(int index) => _rows[index] ??= GlobalKey();
 
+  /// The group whose heading opens at option [index], if one does.
+  String? _headingAt(int index) {
+    final groupOf = widget.groupOf;
+    final group = groupOf?.call(index);
+    if (group == null || (index > 0 && groupOf!(index - 1) == group)) {
+      return null;
+    }
+    return group;
+  }
+
   /// [Listbox.padding] in the ambient direction.
   EdgeInsets get _padding => widget.padding.resolve(Directionality.of(context));
 
@@ -449,10 +475,22 @@ class _ListboxState extends State<Listbox> {
         shrinkWrap: true,
         padding: widget.padding,
         itemCount: widget.itemCount,
-        itemBuilder: (context, index) => KeyedSubtree(
-          key: _keyFor(index),
-          child: widget.itemBuilder(context, index),
-        ),
+        // A heading shares its first option's row, so revealing the option
+        // brings its heading into view with it.
+        itemBuilder: (context, index) {
+          final option = widget.itemBuilder(context, index);
+          final group = _headingAt(index);
+          return KeyedSubtree(
+            key: _keyFor(index),
+            child: group == null
+                ? option
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [_GroupHeading(group), option],
+                  ),
+          );
+        },
       ),
     );
     list = Semantics(
@@ -471,6 +509,21 @@ class _ListboxState extends State<Listbox> {
         return widget.controller.handleKey(event);
       },
       child: list,
+    );
+  }
+}
+
+class _GroupHeading extends StatelessWidget {
+  final String label;
+
+  const _GroupHeading(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      header: true,
+      child: MenuGroupLabel(label, inset: ListboxOption.contentInset(context)),
     );
   }
 }

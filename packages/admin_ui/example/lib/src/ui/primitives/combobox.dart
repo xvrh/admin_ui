@@ -18,6 +18,61 @@ const _countries = [
   ComboboxOption('au', 'Australia', description: 'Oceania · AUD'),
 ];
 
+/// Where a link leads, by kind: the option with no kind first, under no
+/// heading.
+const _destinations = [
+  ComboboxOption('none', 'No link', icon: Icons.link_off_rounded),
+  ComboboxOption(
+    'dashboard',
+    'Dashboard',
+    icon: Icons.dashboard_outlined,
+    group: 'Pages',
+  ),
+  ComboboxOption(
+    'orders',
+    'Orders',
+    icon: Icons.receipt_long_outlined,
+    group: 'Pages',
+  ),
+  ComboboxOption(
+    'customers',
+    'Customers',
+    icon: Icons.people_outline_rounded,
+    group: 'Pages',
+  ),
+  ComboboxOption(
+    'settings',
+    'Settings',
+    icon: Icons.settings_outlined,
+    group: 'Pages',
+  ),
+  ComboboxOption(
+    'invoice',
+    'An invoice',
+    icon: Icons.description_outlined,
+    group: 'Documents',
+  ),
+  ComboboxOption(
+    'price-list',
+    'A price list',
+    icon: Icons.sell_outlined,
+    group: 'Documents',
+  ),
+  ComboboxOption(
+    'web',
+    'A web page',
+    description: 'Any https:// address',
+    icon: Icons.public_rounded,
+    group: 'Elsewhere',
+  ),
+  ComboboxOption(
+    'email',
+    'An email address',
+    icon: Icons.alternate_email_rounded,
+    group: 'Elsewhere',
+  ),
+];
+
 String _countryName(String code) =>
     _countries.firstWhere((o) => o.value == code).label;
 
@@ -231,6 +286,64 @@ class _OpenSearch extends StatelessWidget {
         onSearch: search,
         labelFor: _countryName,
       ),
+    );
+  }
+}
+
+/// Options listed under group headings, two dropdowns pinned open side by
+/// side: from the top with no value, and centred on a value in the last
+/// group.
+class ComboboxGroupedDemo extends StatelessWidget {
+  @Preview(name: 'Combobox / grouped', wrapper: adminUiPreview)
+  const ComboboxGroupedDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const DemoPage(
+      maxWidth: 680,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _Grouped(title: 'Under group headings', initial: null),
+            ),
+            Gap(AdminSpacing.xl),
+            Expanded(
+              child: _Grouped(title: 'Opened on a value', initial: 'web'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _Grouped extends StatelessWidget {
+  final String title;
+  final String? initial;
+
+  const _Grouped({required this.title, required this.initial});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DemoSection(title),
+        PinnedOpen(
+          makeRoom: true,
+          child: LiveValue<String?>(
+            initial: initial,
+            builder: (v, set) => Combobox<String>(
+              value: v,
+              onChanged: set,
+              options: _destinations,
+              hint: 'Where the link leads',
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

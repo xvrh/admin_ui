@@ -1,5 +1,6 @@
 /// @docImport 'button.dart';
 /// @docImport 'context_menu.dart';
+/// @docImport 'listbox.dart';
 /// @docImport '../../theme/typography.dart';
 library;
 
@@ -156,7 +157,8 @@ class MenuDivider extends MenuEntry {
 /// capitals where its type spec sets [AdminTypeSpec.uppercaseLabels], as
 /// Iris does, and otherwise in sentence case, a muted caption as shadcn's
 /// `DropdownMenuLabel`, Ant's group title and Fluent's `MenuGroupHeader` are.
-/// Screen readers get the label as written.
+/// Screen readers get the label as written. A [Listbox]'s group headings
+/// look the same.
 class MenuHeader extends MenuEntry {
   final String label;
   const MenuHeader(this.label);
@@ -296,7 +298,7 @@ class Menu extends StatefulWidget {
         ),
       ),
       MenuDivider() => const _MenuDividerRow(),
-      MenuHeader() => _MenuHeaderRow(entry),
+      MenuHeader(:final label) => MenuGroupLabel(label, inset: AdminSpacing.lg),
     };
   }
 
@@ -1340,39 +1342,6 @@ class _MenuDividerRow extends StatelessWidget {
         height: context.stroke.hairline,
         thickness: context.stroke.hairline,
         color: context.colors.separator,
-      ),
-    );
-  }
-}
-
-class _MenuHeaderRow extends StatelessWidget {
-  final MenuHeader header;
-
-  const _MenuHeaderRow(this.header);
-
-  @override
-  Widget build(BuildContext context) {
-    final type = context.type;
-    final capitals = type.spec.uppercaseLabels;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AdminSpacing.lg,
-        AdminSpacing.md,
-        AdminSpacing.lg,
-        AdminSpacing.xs,
-      ),
-      // A 16px line box keeps the header on the rows' 4px grid: 28 tall, 32
-      // on Ant's 20px caption line.
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 16),
-        alignment: AlignmentDirectional.centerStart,
-        child: Text(
-          capitals ? header.label.toUpperCase() : header.label,
-          semanticsLabel: capitals ? header.label : null,
-          style: capitals
-              ? type.micro
-              : type.weighted(type.caption, type.spec.strong),
-        ),
       ),
     );
   }

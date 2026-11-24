@@ -2,6 +2,18 @@
 
 ## 0.2.0
 
+- `ComboboxOption` takes a `group`: the heading it is listed under, for a
+  long list of options of a few kinds. Options sharing a group are listed
+  together under one heading, after the options with no group, the groups
+  in the order they first appear. Typed into, a group keeps its heading
+  while it has a match, and the groups follow their best match, as cmdk
+  orders them. A heading is not an option: the arrow keys pass over it, a
+  click on it picks nothing, and screen readers hear it as a heading. It
+  is drawn as a `MenuHeader` is. Options with no group list as before.
+- `Listbox` takes `groupOf`, which draws those headings over any list of
+  options: one above each option whose group is not the one before it's.
+  The `ListboxController` counts and moves through the options alone, so
+  "n of m" and the keys are the options', as they were.
 - A `LocalCollectionSource` field may read several values, as an
   `Iterable`: the teams a member belongs to, the tags on a ticket. A
   filter keeps a row when one of its values matches, `options` offers
