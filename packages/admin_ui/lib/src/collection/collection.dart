@@ -5,6 +5,7 @@ import '../common/ui/error_text.dart';
 import '../common/ui/menu.dart';
 import '../l10n/admin_ui_localizations.dart';
 import '../theme/breakpoints.dart';
+import '../theme/spacing.dart';
 import '../theme/table_metrics.dart';
 import 'collection_controller.dart';
 import 'ui/collection_cards.dart';
@@ -89,6 +90,22 @@ class Collection<T> extends StatelessWidget {
   /// [CollectionCards.cardBuilder].
   final Widget Function(BuildContext context, T row)? cardBuilder;
 
+  /// Smallest a card may get before the grid drops a column, in
+  /// [CollectionViewMode.cards]; see [CollectionCards.minTileWidth].
+  final double minTileWidth;
+
+  /// Every card's height in [CollectionViewMode.cards], or null to size each
+  /// row of cards to its tallest; see [CollectionCards.tileHeight].
+  final double? tileHeight;
+
+  /// The space between cards in [CollectionViewMode.cards]; see
+  /// [CollectionCards.spacing].
+  final double tileSpacing;
+
+  /// The space around the grid of cards in [CollectionViewMode.cards]; see
+  /// [CollectionCards.padding].
+  final EdgeInsetsGeometry gridPadding;
+
   /// Body shown when an unfiltered load returns no rows.
   final Widget? empty;
 
@@ -157,6 +174,10 @@ class Collection<T> extends StatelessWidget {
     this.viewMode = CollectionViewMode.table,
     this.compactViewMode,
     this.cardBuilder,
+    this.minTileWidth = 240,
+    this.tileHeight,
+    this.tileSpacing = AdminSpacing.xl,
+    this.gridPadding = const EdgeInsets.all(AdminSpacing.xl),
     this.empty,
     this.errorBuilder,
     this.onHideColumn,
@@ -256,6 +277,10 @@ class Collection<T> extends StatelessWidget {
                   filtered: filtered,
                   onClearFilters: onClearFilters,
                   error: errorBody,
+                  minTileWidth: minTileWidth,
+                  tileHeight: tileHeight,
+                  spacing: tileSpacing,
+                  padding: gridPadding,
                 ),
               },
             ),
