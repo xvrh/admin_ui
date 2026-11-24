@@ -36,13 +36,23 @@ Widget _googleButton(VoidCallback onTap) => Button(
 
 class SignInDemo extends StatelessWidget {
   @Preview(name: 'Sign in', wrapper: adminUiPreview)
-  const SignInDemo({super.key});
+  const SignInDemo({super.key}) : refused = false;
+
+  /// The form as a server left it, refusing the password: the message
+  /// under its field.
+  @Preview(name: 'Sign in / refused', wrapper: adminUiPreview)
+  const SignInDemo.refused({super.key}) : refused = true;
+
+  /// Whether the password's refusal starts on.
+  final bool refused;
 
   @override
   Widget build(BuildContext context) {
     final params = context.knobs;
     final submitting = params.bool('Submitting', false);
     final error = params.bool('Error', false);
+    final email = params.bool('Email refused', false);
+    final password = params.bool('Password refused', refused);
     final google = params.bool('Google SSO', true);
     final ssoOnly = params.bool('SSO only', false);
     final forgot = params.bool('Forgot link', true);
@@ -62,7 +72,9 @@ class SignInDemo extends StatelessWidget {
             ? null
             : (email, password) => snack('Sign in: $email'),
         submitting: submitting,
-        errorText: error ? 'Invalid email or password.' : null,
+        errorText: error ? 'Could not reach the server.' : null,
+        emailErrorText: email ? 'This account is locked.' : null,
+        passwordErrorText: password ? 'Wrong password.' : null,
         onForgotPassword: forgot ? () => snack('Forgot password') : null,
         providerButtons: google
             ? [_googleButton(() => snack('Google'))]

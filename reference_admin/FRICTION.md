@@ -38,7 +38,7 @@ two together.
 | F-028 | `SideSheet` pads the safe area in its own surface colour, and `Shell` pads none: a drawer opens on bands the frame does not have | awkward-default | S3 | fixed |
 | F-029 | A click on a submenu row with no level of the menu under it closes the menu and chooses nothing | bug | S2 | fixed |
 | F-030 | A script fallback set a field's baseline where the theme's own family is absent, lifting field text | bug | S2 | fixed |
-| F-100 | `SignInForm` can say a server refusal only above the form: no per-field error, so `AuthFieldError` has nowhere to go | missing-api | S3 | open |
+| F-100 | `SignInForm` can say a server refusal only above the form: no per-field error, so `AuthFieldError` has nowhere to go | missing-api | S3 | fixed |
 | F-101 | `StatCard` has no slot for a trend line, though the kit ships `Sparkline` for exactly that dashboard | missing-api | S3 | fixed |
 | F-102 | No rule and no wizard step can name a `RecordListCell`: "at least one row" needs a borrowed cell | missing-api | S2 | fixed |
 | F-103 | Server field errors are keyed by cell id, and a record-list row's cell ids are opaque (minted from the wall clock) | doc-gap | S3 | fixed |
@@ -460,12 +460,12 @@ Owned by WP-A.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
+- **Status:** fixed (kit)
 - **Kit:** `auth.dart › SignInForm` (`lib/src/auth/ui/sign_in_form.dart:30`) takes one `errorText`, shown as an `Alert`; `auth.dart › AuthFieldError` (`lib/src/auth/ui/auth_field.dart:28`) exists but the form builds its own fields.
 - **App:** `lib/src/screens/access/sign_in_page.dart` (`_errorText`, ~10 lines): wrong password, locked account and inactive account all go into the one alert.
 - **Evidence:** `01_access` "Signing in" › "Sign in · wrong password": the message sits above the email field although only the password was wrong.
 - **Workaround:** the form-level alert, worded per `ShopError` case.
-- **Proposal:** `SignInForm(emailError:, passwordError:)`, each shown under its field through `AuthFieldError`, beside the existing `errorText`. `ChangePasswordForm` has the same gap (F-504).
+- **Proposal:** `SignInForm(emailError:, passwordError:)`, each shown under its field through `AuthFieldError`, beside the existing `errorText`. `ChangePasswordForm` has the same gap (F-504). Done as `emailErrorText` and `passwordErrorText`, drawn by the fields themselves: the sign-in page puts a locked account under the email and a wrong password under the password, and keeps the alert for an inactive account and for anything else.
 
 ### F-101 · `StatCard` has no slot for a trend line, though the kit ships `Sparkline` for exactly that dashboard
 

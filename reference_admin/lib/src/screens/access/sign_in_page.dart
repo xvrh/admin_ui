@@ -51,12 +51,25 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
+  /// Whether the shop refused the account itself, which it has locked.
+  bool get _locked => switch (_error) {
+    ValidationError(:final fields) => fields['email'] == ValidationCodes.locked,
+    _ => false,
+  };
+
+  /// The shop's refusal of the account, under the email.
+  String? _emailError(RefStrings strings) =>
+      _locked ? strings.access.accountLocked : null;
+
+  /// Its refusal of what was typed, under the password.
+  String? _passwordError(RefStrings strings) =>
+      _error is ValidationError && !_locked
+      ? strings.access.wrongPassword
+      : null;
+
+  /// What is no one field's, above the form.
   String? _errorText(RefStrings strings) => switch (_error) {
-    null => null,
-    ValidationError(:final fields)
-        when fields['email'] == ValidationCodes.locked =>
-      strings.access.accountLocked,
-    ValidationError() => strings.access.wrongPassword,
+    null || ValidationError() => null,
     ForbiddenError() => strings.access.accountInactive,
     final error => strings.shell.error(error),
   };
@@ -81,14 +94,13 @@ class _SignInPageState extends State<SignInPage> {
             ),
       child: KeyedSubtree(
         key: AccessKeys.signInForm,
-        // FRICTION(F-100): a wrong password can only be said above the
-        // form: SignInForm has no per-field error, so AuthFieldError has no
-        // place in it.
         child: SignInForm(
           key: ValueKey(picked),
           onSignIn: _signIn,
           submitting: _submitting,
           errorText: _errorText(strings),
+          emailErrorText: _emailError(strings),
+          passwordErrorText: _passwordError(strings),
           initialEmail: picked ?? '',
           initialPassword: picked == null ? '' : demo?.password ?? '',
           emailKey: AccessKeys.signInEmail,

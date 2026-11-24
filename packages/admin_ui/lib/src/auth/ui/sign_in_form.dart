@@ -27,11 +27,29 @@ typedef SignInCallback = void Function(String email, String password);
 ///   credential block and providers are present.
 /// * [onForgotPassword] null → no "forgot password?" link.
 ///
+/// A server's refusal goes where it belongs: [emailErrorText] under the
+/// email ("This account is locked"), [passwordErrorText] under the password
+/// ("Wrong password"), and [errorText], for anything that is no one
+/// field's, in an alert above the form. A field's message is about what
+/// the field held when it came: it shows while that is unchanged, and the
+/// next submit to end with it still given shows it again. The submit that
+/// brings one takes focus to its field, the email's first.
+///
 /// Each label, when null, reads the kit's own in the app's language.
 class SignInForm extends StatefulWidget {
   final SignInCallback? onSignIn;
   final bool submitting;
+
+  /// A refusal that is no one field's, in an alert above the form.
   final String? errorText;
+
+  /// A refusal of the email, under its field. The form's own "is required"
+  /// shows in its place while the field is empty.
+  final String? emailErrorText;
+
+  /// A refusal of the password, under its field. The form's own "is
+  /// required" shows in its place while the field is empty.
+  final String? passwordErrorText;
 
   final VoidCallback? onForgotPassword;
 
@@ -65,6 +83,8 @@ class SignInForm extends StatefulWidget {
     this.onSignIn,
     this.submitting = false,
     this.errorText,
+    this.emailErrorText,
+    this.passwordErrorText,
     this.onForgotPassword,
     this.providerButtons = const [],
     this.initialEmail = '',
@@ -94,11 +114,44 @@ class _SignInFormState extends State<SignInForm> {
   /// shows that it is required.
   bool _attempted = false;
 
+  /// What each field held when its refusal came: the message is about
+  /// that text.
+  late String? _refusedEmail = widget.emailErrorText == null
+      ? null
+      : _email.text;
+  late String? _refusedPassword = widget.passwordErrorText == null
+      ? null
+      : _password.text;
+
   @override
   void initState() {
     super.initState();
     _email.addListener(_revalidate);
     _password.addListener(_revalidate);
+  }
+
+  @override
+  void didUpdateWidget(SignInForm oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A submit that ends brings its refusals with it, the same ones as
+    // last time included.
+    final answered = oldWidget.submitting && !widget.submitting;
+    final email = widget.emailErrorText;
+    final password = widget.passwordErrorText;
+    if (answered || email != oldWidget.emailErrorText) {
+      _refusedEmail = email == null ? null : _email.text;
+    }
+    if (answered || password != oldWidget.passwordErrorText) {
+      _refusedPassword = password == null ? null : _password.text;
+    }
+    if (!answered) return;
+    final refused = email != null
+        ? _emailFocus
+        : (password != null ? _passwordFocus : null);
+    // Once the fields are enabled again.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) refused?.requestFocus();
+    });
   }
 
   @override
@@ -111,7 +164,9 @@ class _SignInFormState extends State<SignInForm> {
   }
 
   void _revalidate() {
-    if (_attempted) setState(() {});
+    if (_attempted || _refusedEmail != null || _refusedPassword != null) {
+      setState(() {});
+    }
   }
 
   void _submit() {
@@ -156,7 +211,9 @@ class _SignInFormState extends State<SignInForm> {
               focusNode: _emailFocus,
               icon: Icons.mail_outline_rounded,
               hint: shell.emailHint,
-              errorText: _required(_email.text.trim(), emailLabel),
+              errorText:
+                  _required(_email.text.trim(), emailLabel) ??
+                  (_email.text == _refusedEmail ? widget.emailErrorText : null),
               enabled: !widget.submitting,
               autofocus: true,
               keyboardType: TextInputType.emailAddress,
@@ -177,7 +234,11 @@ class _SignInFormState extends State<SignInForm> {
                     ),
               controller: _password,
               focusNode: _passwordFocus,
-              errorText: _required(_password.text, passwordLabel),
+              errorText:
+                  _required(_password.text, passwordLabel) ??
+                  (_password.text == _refusedPassword
+                      ? widget.passwordErrorText
+                      : null),
               enabled: !widget.submitting,
               autofillHints: const [AutofillHints.password],
               textInputAction: TextInputAction.done,

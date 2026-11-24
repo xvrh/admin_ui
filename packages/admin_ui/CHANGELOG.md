@@ -30,6 +30,13 @@
   the page loses focus and gets it back. Flutter takes the focus away
   then and gives it back, and the table took its return for the
   keyboard's, so the ring showed on a cell nobody had moved to.
+- `SignInForm` takes `emailErrorText` and `passwordErrorText`, as
+  `ChangePasswordForm` takes its two: a server's refusal of one field,
+  under that field, where the one `errorText` put a wrong password in an
+  alert above the email. A field's message is about what the field held
+  when it came, the form's own "is required" shows in its place, and the
+  submit that brings one takes focus to its field. `errorText` is
+  unchanged, for what is no field's.
 - A `Choice` lays its cards side by side. `style: ChoiceStyle.card` with
   `direction: Axis.horizontal` threw in any parent, a form field's or a
   modal's included: the row gave each card an unbounded width, which a
