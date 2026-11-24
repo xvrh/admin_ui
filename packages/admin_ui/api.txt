@@ -631,6 +631,7 @@ widgets.dart CursorRegion
 widgets.dart DashedBorder
 widgets.dart DateRangePicker
 widgets.dart DateRangePreset
+widgets.dart DebouncedSource
 widgets.dart DelayedLoading
 widgets.dart DescriptionItem
 widgets.dart DescriptionLayout

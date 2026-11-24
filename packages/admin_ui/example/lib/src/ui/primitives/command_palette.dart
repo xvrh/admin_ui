@@ -174,8 +174,9 @@ class CommandPaletteDemo extends StatelessWidget {
       sources: [
         // Local commands — match instantly, no spinner.
         CommandSource(() => commands),
-        // Content — simulated server latency so the progress line shows.
-        _DelayedSource([...pages, ...products, ...people]),
+        // Content — asked once the typing pauses, as a server is, and with
+        // simulated latency so the progress line shows.
+        DebouncedSource(_DelayedSource([...pages, ...products, ...people])),
         RecentsSource(
           () => [
             page('pg-about-us', 'About us', '/about-us'),

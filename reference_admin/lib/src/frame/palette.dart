@@ -84,7 +84,8 @@ Future<void> openCommandPalette(BuildContext context) {
       CommandSource(commands, listOnEmptyQuery: true),
       // What the open page registered, a form's fields: found by typing.
       CommandSource(services.commands.active),
-      _ShopSearch(services.api, strings, language, open),
+      // Asked once the typing pauses: each query is a request.
+      DebouncedSource(_ShopSearch(services.api, strings, language, open)),
       RecentsSource(recent, title: strings.groupRecent),
     ],
     groupOrder: [
@@ -98,10 +99,7 @@ Future<void> openCommandPalette(BuildContext context) {
   );
 }
 
-/// Orders, products and customers from `ShopApi.search`, asked once the
-/// typing pauses.
-// FRICTION(F-022): the palette asks every source on every keystroke, and
-// drops only the stale answers; a remote source debounces itself.
+/// Orders, products and customers from `ShopApi.search`.
 class _ShopSearch implements SearchSource {
   final ShopApi _api;
   final ShellStrings _strings;
@@ -110,16 +108,10 @@ class _ShopSearch implements SearchSource {
 
   _ShopSearch(this._api, this._strings, this._language, this._open);
 
-  static const debounce = Duration(milliseconds: 200);
-  var _latest = '';
-
   @override
   Future<List<PaletteSection>> search(String query) async {
     final q = query.trim();
-    _latest = q;
     if (q.isEmpty) return const [];
-    await Future<void>.delayed(debounce);
-    if (q != _latest) return const [];
     final SearchHits hits;
     try {
       hits = await _api.search(q);
