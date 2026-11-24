@@ -266,6 +266,7 @@ Map<String, dynamic> genericCatalog() => {
   },
   'Auth': {
     'Sign in': const SignInDemo(),
+    'Sign in / refused': const SignInDemo.refused(),
     'Set password': const SetPasswordDemo(),
     'Change password': const ChangePasswordDemo(),
     'Change password / refused': const ChangePasswordDemo.refused(),
