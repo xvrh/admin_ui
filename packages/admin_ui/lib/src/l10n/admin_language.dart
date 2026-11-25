@@ -203,9 +203,11 @@ class AdminLanguage {
 ///
 /// The [delegates] load the kit's strings, Material's, Cupertino's and the
 /// widgets' for the app's locale, from the language with its language code,
-/// and intl's date data for every listed language and English. They support
-/// only those languages: an app locale outside them has the kit's strings
-/// in English, and Flutter warns that it has no Material strings for it.
+/// and intl's date data for every listed language and English. The kit's
+/// accepts every locale: one with no language listed gets English, or the
+/// first language when English is not listed. Material's, Cupertino's and
+/// the widgets' support the listed languages only, so for another locale
+/// Flutter warns that it has no Material strings.
 ///
 /// On the web, a language the app does not list is not in its build. An app
 /// that wants Material's own widgets in more languages than the kit's lists
@@ -239,6 +241,11 @@ class AdminLanguages {
     }
     return null;
   }
+
+  /// The language the kit's strings are in for [locale]: its own, else
+  /// English, else the first.
+  AdminLanguage _stringsFor(Locale locale) =>
+      resolve(locale) ?? resolve(const Locale('en')) ?? languages.first;
 
   static AdminLanguages? _loaded;
 
@@ -311,12 +318,12 @@ class _LanguageDelegate extends LocalizationsDelegate<AdminLanguage> {
   final AdminLanguages languages;
 
   @override
-  bool isSupported(Locale locale) => languages.resolve(locale) != null;
+  bool isSupported(Locale locale) => true;
 
   @override
   Future<AdminLanguage> load(Locale locale) {
     languages.load();
-    return SynchronousFuture(languages.resolve(locale)!);
+    return SynchronousFuture(languages._stringsFor(locale));
   }
 
   @override

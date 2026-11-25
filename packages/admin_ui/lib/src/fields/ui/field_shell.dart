@@ -476,7 +476,10 @@ class _FieldShellState extends State<FieldShell> {
                       if (markLeads) mark,
                       Flexible(
                         child: Text(
-                          context.type.fieldLabelText(widget.label),
+                          context.type.fieldLabelText(
+                            widget.label,
+                            locale: Localizations.maybeLocaleOf(context),
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: context.type.fieldLabel.copyWith(

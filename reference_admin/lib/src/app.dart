@@ -56,11 +56,10 @@ class _ReferenceAdminAppState extends State<ReferenceAdminApp> {
         darkTheme: buildAppTheme(appearance.darkTokens),
         themeMode: appearance.mode,
         locale: appearance.locale,
-        supportedLocales: AdminLocalizations.supportedLocales,
-        localizationsDelegates: const [
+        supportedLocales: pottingShedKitLanguages.locales,
+        localizationsDelegates: [
           RefStrings.delegate,
-          PottingShedKitStrings.delegate,
-          ...AdminLocalizations.localizationsDelegates,
+          ...pottingShedKitLanguages.delegates,
         ],
         routerConfig: _router,
         builder: (context, child) {

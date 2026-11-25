@@ -7,8 +7,8 @@ import 'admin_ui_localizations.dart';
 /// Numbers, percentages and byte sizes in the app's locale.
 ///
 /// The locale is the app's own ([Localizations.maybeLocaleOf]), not the one
-/// the kit's strings are in: an app running in German gets German digits and
-/// separators even though the kit has no German strings. Outside any
+/// the kit's strings are in: an app running in Swedish gets Swedish digits
+/// and separators even though the kit has no Swedish strings. Outside any
 /// [Localizations] it is intl's current locale.
 ///
 /// ```dart

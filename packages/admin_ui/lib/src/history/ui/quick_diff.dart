@@ -9,6 +9,7 @@ import '../../common/ui/tappable.dart';
 import '../../common/ui/tip.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
+import '../../theme/text_case.dart';
 import '../../theme/tokens.dart';
 import '../diff_model.dart';
 import 'diff_op_style.dart';
@@ -243,7 +244,10 @@ class QuickDiffSurface extends StatelessWidget {
               Semantics(
                 header: true,
                 child: Text(
-                  context.type.fieldLabelText(title),
+                  context.type.fieldLabelText(
+                    title,
+                    locale: Localizations.maybeLocaleOf(context),
+                  ),
                   semanticsLabel: title,
                   style: context.type.fieldLabel.copyWith(
                     color: context.colors.foregroundMuted,
@@ -280,7 +284,7 @@ class _LaneChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      label.toUpperCase(),
+      upperCaseIn(label, Localizations.maybeLocaleOf(context)),
       style: context.type
           .weighted(context.type.caption, FontWeight.w700)
           .copyWith(letterSpacing: 0.3),

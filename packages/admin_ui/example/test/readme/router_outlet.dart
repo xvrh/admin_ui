@@ -7,6 +7,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutterware/router_outlet.dart';
 import 'package:material_ui/material_ui.dart';
 
+const languages = AdminLanguages([adminEn]);
+
 void main() => runApp(const MyAdmin());
 
 class MyAdmin extends StatelessWidget {
@@ -17,8 +19,8 @@ class MyAdmin extends StatelessWidget {
   Widget build(BuildContext context) => RouterOutlet.root(
     child: MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: languages.delegates,
+      supportedLocales: languages.locales,
       builder: (context, child) => ToastScope(child: child!),
       home: const AdminScope(child: Frame()),
     ),

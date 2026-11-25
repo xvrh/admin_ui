@@ -25,6 +25,7 @@ const _kit = 'packages/admin_ui';
 const _snapshots = {
   'api.txt': 'tool/gen_barrels.dart',
   'looks.txt': 'tool/gen_looks.dart',
+  'lib/src/l10n/languages': 'tool/gen_date_data.dart',
 };
 
 Future<void> main(List<String> args) async {
@@ -194,6 +195,10 @@ String _summary(List<String> pubspecs, List<String> failed) {
         'looks.txt' =>
           '`looks.txt` moved, a change of look: record it in '
               '`$_kit/CHANGELOG.md` under a heading of its own.',
+        'lib/src/l10n/languages' =>
+          "intl's date data moved, and the kit languages' copies with it: "
+              'record the dates that now read differently in '
+              '`$_kit/CHANGELOG.md`.',
         _ =>
           '`api.txt` moved: record the change of API in '
               '`$_kit/CHANGELOG.md`.',

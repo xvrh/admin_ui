@@ -1,0 +1,16 @@
+name: admin_ui_tree_shaking
+description: "An app that ships admin_ui in English alone, built by tool/check_tree_shaking.dart."
+publish_to: 'none'
+
+resolution: workspace
+
+environment:
+  sdk: ^3.14.0-0
+  flutter: '>=3.48.0-0.5.pre'
+
+dependencies:
+  admin_ui:
+    path: ..
+  flutter:
+    sdk: flutter
+  material_ui: ^1.4.0

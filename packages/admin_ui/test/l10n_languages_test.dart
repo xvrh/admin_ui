@@ -1,6 +1,16 @@
 import 'dart:io';
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/de.dart';
+import 'package:admin_ui/l10n/es.dart';
+import 'package:admin_ui/l10n/it.dart';
+import 'package:admin_ui/l10n/ja.dart';
+import 'package:admin_ui/l10n/ko.dart';
+import 'package:admin_ui/l10n/nl.dart';
+import 'package:admin_ui/l10n/pl.dart';
+import 'package:admin_ui/l10n/pt.dart';
+import 'package:admin_ui/l10n/tr.dart';
+import 'package:admin_ui/l10n/zh.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/date_time_patterns.dart';
@@ -8,7 +18,21 @@ import 'package:material_ui/material_ui.dart';
 
 /// Every language of the kit. One added under lib/src/l10n/languages is
 /// added here too, or the first test fails.
-const _all = [adminEn, adminFr, adminAr];
+const _all = [
+  adminEn,
+  adminFr,
+  adminAr,
+  adminEs,
+  adminDe,
+  adminIt,
+  adminPt,
+  adminNl,
+  adminPl,
+  adminJa,
+  adminZh,
+  adminKo,
+  adminTr,
+];
 
 const _languages = AdminLanguages(_all);
 

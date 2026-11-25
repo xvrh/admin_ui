@@ -230,7 +230,10 @@ class _Panel extends StatelessWidget {
         child: Semantics(
           header: true,
           child: Text(
-            context.type.fieldLabelText(heading),
+            context.type.fieldLabelText(
+              heading,
+              locale: Localizations.maybeLocaleOf(context),
+            ),
             semanticsLabel: heading,
             style: context.type.fieldLabel.copyWith(
               color: context.colors.foregroundMuted,
@@ -274,7 +277,10 @@ class _Panel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            context.type.fieldLabelText(l10n.fields.pendingEdit),
+            context.type.fieldLabelText(
+              l10n.fields.pendingEdit,
+              locale: Localizations.maybeLocaleOf(context),
+            ),
             semanticsLabel: l10n.fields.pendingEdit,
             style: context.type.fieldLabel.copyWith(color: colors.warningText),
           ),

@@ -2,9 +2,11 @@
 // down. docs_barrels_readme_test.dart fails when the two differ.
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/es.dart';
 import 'package:material_ui/material_ui.dart';
 
-const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+/// The languages the app ships the kit in. No other is in its build.
+const languages = AdminLanguages([adminEn, adminFr, adminEs]);
 
 void main() => runApp(const MyAdmin());
 
@@ -19,8 +21,8 @@ class MyAdmin extends StatelessWidget {
       theme: buildAppTheme(theme.tokens),
       darkTheme: buildAppTheme(theme.dark ?? theme.tokens),
       themeMode: ThemeMode.system,
-      localizationsDelegates: _kitLanguages.delegates,
-      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: languages.delegates,
+      supportedLocales: languages.locales,
       // Above the Navigator, so toasts paint over route dialogs too.
       // AdminScope uses this one.
       builder: (context, child) => ToastScope(child: child!),

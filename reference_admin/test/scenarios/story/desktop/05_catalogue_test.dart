@@ -19,13 +19,6 @@ Finder _in(Key key, Object text) => find.descendant(
   matching: text is IconData ? find.byIcon(text) : find.text('$text'),
 );
 
-/// Material's words as the mounted app reads them: the leave prompt's
-/// cancel is Material's.
-// FRICTION(F-315): the kit's own prompts take some words from Material,
-// which `s.kit` does not carry.
-MaterialLocalizations _material(ScenarioTester s) =>
-    MaterialLocalizations.of(s.tester.element(find.byType(Navigator).first));
-
 /// Two taps close together, which open a table cell's editor. Raw, then
 /// settled: flutterware has no double-tap verb, and an `act` would name a
 /// step the export does not want.
@@ -161,7 +154,7 @@ void main() {
       Nav.dashboard,
       shot: const Shot('Product · leave without saving?'),
     );
-    await s.tap(find.text(_material(s).cancelButtonLabel));
+    await s.tap(find.text(s.kit.cancel));
     expect(shop.route, const ProductDetail(_fern));
 
     shop.calls.clear();
@@ -235,10 +228,10 @@ void main() {
       shot: const Shot('Product · sign out with unsaved edits?'),
     );
     // Signing out leaves the page like any other way out: it asks first.
-    expect(find.text(_material(s).cancelButtonLabel), findsOneWidget);
+    expect(find.text(s.kit.cancel), findsOneWidget);
     expect(shop.calls.countOf(Endpoint.signOut), 0);
 
-    await s.tap(find.text(_material(s).cancelButtonLabel));
+    await s.tap(find.text(s.kit.cancel));
     expect(shop.route, const ProductDetail(_fern));
     expect(shop.api.currentStaff, isNotNull);
     expect(shop.calls.countOf(Endpoint.signOut), 0);

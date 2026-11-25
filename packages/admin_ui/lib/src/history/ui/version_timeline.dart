@@ -5,6 +5,7 @@ import '../../common/ui/tag.dart';
 import '../../common/ui/tappable.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
+import '../../theme/text_case.dart';
 import '../../theme/tokens.dart';
 import '../diff_model.dart';
 
@@ -180,13 +181,19 @@ class _Row extends StatelessWidget {
             // solid, the older one soft.
             if (isCompare)
               Tag(
-                strings.after.toUpperCase(),
+                upperCaseIn(
+                  strings.after,
+                  Localizations.maybeLocaleOf(context),
+                ),
                 color: context.colors.primary,
                 variant: TagVariant.solid,
               )
             else if (isBase)
               Tag(
-                strings.before.toUpperCase(),
+                upperCaseIn(
+                  strings.before,
+                  Localizations.maybeLocaleOf(context),
+                ),
                 color: context.colors.primary,
                 variant: TagVariant.soft,
               ),

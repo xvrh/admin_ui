@@ -405,8 +405,8 @@ abstract class AdminLocalizations extends AdminMessages {
   String get keyboardKeyFn;
 }
 
-/// English [AdminLocalizations], and the fallback for every language the
-/// kit has no strings for.
+/// English [AdminLocalizations], and the fallback for every locale an app
+/// lists no language for.
 class AdminLocalizationsEn extends AdminLocalizations {
   const AdminLocalizationsEn([super.localeName = 'en']);
 

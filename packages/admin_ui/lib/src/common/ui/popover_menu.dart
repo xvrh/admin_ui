@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart' show internal;
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/spacing.dart';
+import '../../theme/text_case.dart';
 import '../../theme/tokens.dart';
 import 'chrome_theme.dart';
 import 'popover.dart';
@@ -185,7 +186,9 @@ class MenuGroupLabel extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 16),
         alignment: AlignmentDirectional.centerStart,
         child: Text(
-          capitals ? label.toUpperCase() : label,
+          capitals
+              ? upperCaseIn(label, Localizations.maybeLocaleOf(context))
+              : label,
           semanticsLabel: capitals ? label : null,
           style: capitals
               ? type.micro

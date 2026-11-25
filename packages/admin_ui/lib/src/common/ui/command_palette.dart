@@ -9,6 +9,7 @@ import '../../l10n/bidi.dart';
 import '../../l10n/shortcut_label.dart';
 import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
+import '../../theme/text_case.dart';
 import '../../theme/tokens.dart';
 import '../fuzzy.dart';
 import '../motion.dart';
@@ -1189,7 +1190,7 @@ class _GroupLabel extends StatelessWidget {
       return Text(label, style: type.weighted(type.caption, type.spec.strong));
     }
     return Text(
-      label.toUpperCase(),
+      upperCaseIn(label, Localizations.maybeLocaleOf(context)),
       semanticsLabel: label,
       style: type.weighted(
         type.micro.copyWith(

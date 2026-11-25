@@ -741,7 +741,10 @@ class _SectionCaption extends StatelessWidget {
         ),
         child: _OnGrid(
           child: Text(
-            context.type.fieldLabelText(title),
+            context.type.fieldLabelText(
+              title,
+              locale: Localizations.maybeLocaleOf(context),
+            ),
             semanticsLabel: title,
             style: context.type.micro,
           ),

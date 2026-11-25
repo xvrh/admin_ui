@@ -5,7 +5,7 @@
 import 'package:admin_ui/admin_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
-const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+const languages = AdminLanguages([adminEn]);
 
 void main() => runApp(const MyAdmin());
 
@@ -151,8 +151,8 @@ class _MyAdminState extends State<MyAdmin> {
   @override
   Widget build(BuildContext context) => MaterialApp.router(
     theme: buildAppTheme(irisTheme.tokens),
-    localizationsDelegates: _kitLanguages.delegates,
-    supportedLocales: _kitLanguages.locales,
+    localizationsDelegates: languages.delegates,
+    supportedLocales: languages.locales,
     builder: (context, child) => ToastScope(child: child!),
     routerDelegate: _router,
     routeInformationParser: RouteParser(),

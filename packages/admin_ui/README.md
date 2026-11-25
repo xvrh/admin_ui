@@ -22,8 +22,8 @@ each with a light and a dark mode:
 Any of them can take a brand accent, and you can define your own theme without
 changing the package. The colour roles meet their WCAG contrast targets in
 every theme, mode and brand, and the tests hold them to it. The kit works with
-the keyboard and screen readers, ships English, French and Arabic strings, and
-lays out right to left.
+the keyboard and screen readers, speaks thirteen languages, of which an app
+ships only those it lists, and lays out right to left.
 
 - [Install](#install)
 - [material_ui, not flutter/material](#material_ui-not-fluttermaterial)
@@ -93,8 +93,8 @@ it can read: a debug build throws a `FlutterError` that names the fix, and a
 release build draws the Iris defaults.
 
 **Wire it as [the minimal app](#a-minimal-app) does**: `buildAppTheme` for
-`theme` and `darkTheme`, `AdminLocalizations.localizationsDelegates` and
-`supportedLocales`, a `ToastScope` in `MaterialApp.builder`, and
+`theme` and `darkTheme`, the delegates and locales of the `AdminLanguages`
+it ships, a `ToastScope` in `MaterialApp.builder`, and
 `AdminScope` around the home page, which mounts the scopes the kit's
 widgets need (see [Ancestor scopes](#ancestor-scopes)). Import the barrels,
 never `package:admin_ui/src/…`: the `src` tree moves between releases.
@@ -221,7 +221,11 @@ dart fix --apply --code=migrate_design_widgets
 
 ```dart
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/es.dart';
 import 'package:material_ui/material_ui.dart';
+
+/// The languages the app ships the kit in. No other is in its build.
+const languages = AdminLanguages([adminEn, adminFr, adminEs]);
 
 void main() => runApp(const MyAdmin());
 
@@ -236,8 +240,8 @@ class MyAdmin extends StatelessWidget {
       theme: buildAppTheme(theme.tokens),
       darkTheme: buildAppTheme(theme.dark ?? theme.tokens),
       themeMode: ThemeMode.system,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: languages.delegates,
+      supportedLocales: languages.locales,
       // Above the Navigator, so toasts paint over route dialogs too.
       // AdminScope uses this one.
       builder: (context, child) => ToastScope(child: child!),
@@ -469,6 +473,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutterware/router_outlet.dart';
 import 'package:material_ui/material_ui.dart';
 
+const languages = AdminLanguages([adminEn]);
+
 void main() => runApp(const MyAdmin());
 
 class MyAdmin extends StatelessWidget {
@@ -479,8 +485,8 @@ class MyAdmin extends StatelessWidget {
   Widget build(BuildContext context) => RouterOutlet.root(
     child: MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: languages.delegates,
+      supportedLocales: languages.locales,
       builder: (context, child) => ToastScope(child: child!),
       home: const AdminScope(child: Frame()),
     ),
@@ -575,6 +581,8 @@ parser, for the edits its product and settings pages hold.
 ```dart
 import 'package:admin_ui/admin_ui.dart';
 import 'package:material_ui/material_ui.dart';
+
+const languages = AdminLanguages([adminEn]);
 
 void main() => runApp(const MyAdmin());
 
@@ -720,8 +728,8 @@ class _MyAdminState extends State<MyAdmin> {
   @override
   Widget build(BuildContext context) => MaterialApp.router(
     theme: buildAppTheme(irisTheme.tokens),
-    localizationsDelegates: AdminLocalizations.localizationsDelegates,
-    supportedLocales: AdminLocalizations.supportedLocales,
+    localizationsDelegates: languages.delegates,
+    supportedLocales: languages.locales,
     builder: (context, child) => ToastScope(child: child!),
     routerDelegate: _router,
     routeInformationParser: RouteParser(),
@@ -740,7 +748,7 @@ Import `package:admin_ui/admin_ui.dart` for everything, or a narrower barrel:
 | `shell.dart` | `Shell` and its phone drawer (`showNavigationDrawer`, `ShellMenuButton`), `Sidebar`, `TopBar`, page headers and scaffolds, `SaveBar` and its `SaveCluster`, `AppearancePicker` |
 | `auth.dart` | Sign-in and password forms |
 | `history.dart` | Revision and diff views, and `VersionDiff.of` to build a diff from two records |
-| `l10n.dart` | `AdminLocalizations`, formats, shortcut labels |
+| `l10n.dart` | `AdminLanguages`, the kit in English (`adminEn`), `AdminLocalizations`, formats, shortcut labels; each other language is a library of its own, such as `l10n/es.dart` |
 | `fields.dart` | Field bodies, the pure views over a typed `Cell`; the language lanes and their model (`LocaleInfo`, `LocaleStatus`, `LangScope`); `SourceTargetPair`; `ChangeScope`; `FormGrid` |
 | `forms.dart` | Cells, `bind()` and its `FieldBinder` hook, field presets, `ValueFormController` and `ValueForm`, `Validators`, `FormWizard`, `FormSaveBar`, `AssetDetailView` |
 | `collection.dart` | `CollectionController`, `CollectionTable`, cards, kanban, toolbar, saved views and `showSaveViewDialog`; `AsyncValueController` and `AsyncValueBuilder` for one value outside a table |
@@ -854,8 +862,8 @@ class _MyAdminState extends State<MyAdmin> {
       theme: _look.themeData(Brightness.light),
       darkTheme: _look.themeData(Brightness.dark),
       themeMode: _look.mode,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: languages.delegates,
+      supportedLocales: languages.locales,
       home: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(AdminSpacing.xxl),
@@ -1591,27 +1599,75 @@ does the same for colour literals, which only the palette may name.
 
 ## Localisation and right-to-left
 
-Register the delegates as in the minimal app above.
-`AdminLocalizations.localizationsDelegates` holds the kit's delegate plus
-material_ui's Material, Cupertino and widgets delegates. The kit ships English,
-French and Arabic (`AdminLocalizations.supportedLocales`). For any other
-language it falls back to English, while numbers and dates still follow the
-app's locale. Without the delegate nothing fails: the kit falls back to
+The kit speaks English, French, Arabic, Spanish, German, Italian, Brazilian
+Portuguese, Dutch, Polish, Japanese, Simplified Chinese, Korean and
+Turkish. An app lists the languages it ships, and imports each one but
+English from a library of its own:
+
+```dart
+import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/de.dart';
+import 'package:admin_ui/l10n/es.dart';
+
+/// The languages the app ships the kit in. No other is in its build.
+const languages = AdminLanguages([adminEn, adminEs, adminDe]);
+```
+
+and registers them as the minimal app above does: `languages.delegates`
+for `localizationsDelegates`, `languages.locales` for `supportedLocales`.
+Each language brings the kit's strings, Material's, Cupertino's and the
+widgets' (the reading direction among them), intl's date data and the
+names of languages, so an app ships none of Material's 82 languages but
+those. On the web, a language the app does not list is not in its build:
+`tool/check_tree_shaking.dart` builds an app that lists English alone and
+fails when another language is in it. For a locale with no language
+listed, the kit's strings are English, while numbers and dates still
+follow the app's locale. An app that wants Material's own widgets in more
+languages lists material_ui's `GlobalMaterialLocalizations.delegates` after
+the kit's. Without the delegates nothing fails: the kit falls back to
 English.
+
+The ten languages after English, French and Arabic are machine-translated
+from the English. The buttons and labels Material also has (Cancel, Save,
+Rows per page, the key names of a shortcut) take Material's own
+translations, so they read as Material's widgets on the same screen do.
 
 Kit widgets read their strings from `context.adminL10n` and format numbers,
 sizes and dates with `context.adminFormats`. Most widgets that show text also
-take a label parameter that overrides the string. To change strings globally,
-subclass `AdminLocalizationsEn` and list your own delegate first. The class
-documentation shows how.
+take a label parameter that overrides the string. To change strings for the
+whole app, subclass the language's class and give it to that language:
+
+```dart
+class ShopStringsEs extends AdminLocalizationsEs {
+  const ShopStringsEs();
+
+  @override
+  String get searchPlaceholder => 'Buscar pedidos…';
+}
+
+final shopLanguages = AdminLanguages([
+  adminEn,
+  adminEs.copyWith(strings: const ShopStringsEs()),
+]);
+```
+
+A language the kit does not have is an `AdminLanguage` of the app's own:
+its strings in a subclass of `AdminLocalizationsEn`, which shows English for
+any string it leaves out, or of `AdminLocalizations`, which fails to compile
+until it has them all, beside material_ui's, cupertino_ui's and
+flutter_localizations' classes for that language. The class documentation
+shows how. `AdminLocalizations.localizationsDelegates`, which loaded
+English, French and Arabic and all 82 of Material's, still does, and is
+deprecated.
 
 The strings are grouped in sections, one per part of the kit. The language
 lanes read theirs from the `fields` section (`context.adminL10n.fields`): the
 per-language status words (Source, Up to date, Needs review, Outdated,
 Missing), Re-translate, the source lane's label, the language menu, and the
-Inherited and Custom modes. A package built on the kit keeps its own
-strings in localizations of its own, whose delegates it lists beside the
-kit's.
+Inherited and Custom modes. They name each language in the app's own
+(`languageNameOf`), from the names its languages brought. A package built
+on the kit keeps its own strings in localizations of its own, whose
+delegates it lists beside the kit's.
 
 The layout mirrors in a right-to-left locale, or under
 `Directionality(textDirection: TextDirection.rtl)`.
