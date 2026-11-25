@@ -213,6 +213,37 @@ void main() {
       expect(isOpen(tester), isFalse, reason: 'the menu has let it go');
     });
 
+    testWidgets('the window losing focus leaves a menu opened from the rail '
+        'working', (tester) async {
+      await pumpShell(tester);
+      final pointer = await mouse(tester);
+      await pointer.moveTo(tester.getCenter(find.byType(Avatar)));
+      await tester.pump(Sidebar.railOpenDelay);
+      await tester.pumpAndSettle();
+      await pointer.down(tester.getCenter(find.text('Jane Doe')));
+      await pointer.up();
+      await tester.pumpAndSettle();
+      final signOut = find.text('Sign out');
+      await pointer.moveTo(tester.getCenter(signOut));
+      await tester.pumpAndSettle();
+
+      // A browser window or an embedding view losing focus for a moment, as
+      // some do on a press: the app is inactive, and its focus is parked.
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      await tester.pumpAndSettle();
+      expect(isOpen(tester), isTrue, reason: 'parked focus is not the user');
+      expect(signOut, findsOneWidget);
+
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      await pointer.down(tester.getCenter(signOut));
+      await pointer.up();
+      await tester.pumpAndSettle();
+      expect(chosen, ['out']);
+      // Focus is parked by the app's lifecycle on the web and the desktop
+      // only.
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
     testWidgets('right to left, it opens from the right edge', (tester) async {
       await pumpShell(tester, direction: TextDirection.rtl);
       final pointer = await mouse(tester);
