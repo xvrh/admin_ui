@@ -1,5 +1,7 @@
 // AdminIcons: the glyphs the kit draws on its own, a theme's to replace.
 
+import 'dart:io';
+
 import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -62,5 +64,29 @@ void main() {
       Icons.tv,
     );
     expect(assetGlyph(AssetType.video), const AdminIcons().fileVideo);
+  });
+
+  // Both constructors must set every slot, or the class does not compile;
+  // copyWith and the list that ==, hashCode and toString read are not
+  // checked that way, so a slot added and missed there is caught here.
+  test('every slot is in the constructors, copyWith and the slot list', () {
+    final source = File('lib/src/theme/icons.dart').readAsStringSync();
+    final slots = [
+      for (final m in RegExp(r'final IconData (\w+);').allMatches(source))
+        m[1]!,
+    ];
+    expect(slots, hasLength(greaterThan(100)));
+    final missing = [
+      for (final slot in slots)
+        for (final form in [
+          'this.$slot = Icons.',
+          'required this.$slot,',
+          'IconData? $slot,',
+          '$slot: $slot ?? this.$slot,',
+          "('$slot', $slot),",
+        ])
+          if (!source.contains(form)) '$slot: $form',
+    ];
+    expect(missing, isEmpty);
   });
 }

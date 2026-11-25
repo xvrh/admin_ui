@@ -25,9 +25,11 @@
   Icons glyph the kit draws there, so a theme that names none draws what
   it drew but for the glyphs under Looks. An app drawn in another icon
   set gives the kit its glyphs, and the kit's chrome follows, where it
-  stayed in Material's beside the app's. It copies and compares by value;
-  a glyph does not interpolate, so a lerp takes the nearer set.
-  `looks.txt` lists every slot of every theme.
+  stayed in Material's beside the app's. `AdminIcons.all` requires every
+  slot, for an app drawn wholly in its own set: a slot it leaves out, or
+  one the kit adds later, is a compile error rather than a Material glyph.
+  It copies and compares by value; a glyph does not interpolate, so a lerp
+  takes the nearer set. `looks.txt` lists every slot of every theme.
 - A constructor that defaulted to a glyph of the kit's takes a nullable
   `icon` and draws the theme's slot when it is null: `ErrorState`
   (`error`), `ForbiddenState` (`lock`), `AddRowButton` (`add`),

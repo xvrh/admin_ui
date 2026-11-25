@@ -1265,8 +1265,11 @@ final acmeIconTheme = AdminTheme.from(
 
 On a token set that exists, `tokens.copyWith(icons:
 tokens.icons.copyWith(close: …))` replaces one. A slot left out keeps the
-kit's glyph, so an app that moves wholesale gives every slot; `looks.txt`
-lists them under `icons.`, and `toString` names the ones a set replaces.
+kit's glyph. An app drawn wholly in its own set builds it with
+`AdminIcons.all(…)` instead, where every slot is required: one it leaves
+out is a compile error rather than a Material glyph in its chrome, and so
+is a slot a later version of the kit adds. `looks.txt` lists the slots
+under `icons.`, and `toString` names the ones a set replaces.
 The glyphs an app passes a control (a `Button`'s `icon`, a nav item's, an
 `EmptyState`'s) are its own, and none is read from here.
 
