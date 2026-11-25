@@ -318,7 +318,7 @@ void main() {
       );
       expect(title.didExceedMaxLines, isTrue, reason: 'ellipsised');
 
-      final more = find.widgetWithIcon(IconAction, Icons.more_horiz);
+      final more = find.widgetWithIcon(IconAction, Icons.more_horiz_rounded);
       expect(tester.getSize(more), const Size.square(36));
       await tester.tap(more);
       await tester.pumpAndSettle();
@@ -434,7 +434,10 @@ void main() {
       await _pumpWindow(tester, bar(), width: 1000);
       expect(tester.takeException(), isNull);
       expect(find.widgetWithText(Button, 'Discard'), findsOneWidget);
-      expect(find.widgetWithIcon(IconAction, Icons.more_horiz), findsNothing);
+      expect(
+        find.widgetWithIcon(IconAction, Icons.more_horiz_rounded),
+        findsNothing,
+      );
       expect(find.text('Unsaved changes'), findsOneWidget);
     });
 
@@ -448,7 +451,7 @@ void main() {
         ),
         width: 1000,
       );
-      final more = find.widgetWithIcon(IconAction, Icons.more_horiz);
+      final more = find.widgetWithIcon(IconAction, Icons.more_horiz_rounded);
       expect(tester.getSize(more), const Size.square(36));
       expect(tester.widget<IconAction>(more).label, 'More actions');
       expect(tester.widget<IconAction>(more).expanded, isFalse);
@@ -478,7 +481,7 @@ void main() {
       ),
       width: 800,
     );
-    final more = find.widgetWithIcon(IconAction, Icons.more_horiz);
+    final more = find.widgetWithIcon(IconAction, Icons.more_horiz_rounded);
     expect(tester.getSize(more), const Size.square(36));
     expect(tester.getSize(find.byType(FormActions)).height, 36);
   });

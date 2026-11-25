@@ -645,7 +645,7 @@ class _FieldTriggerState extends State<FieldTrigger> {
 }
 
 /// The one chevron every field trigger shows — combobox, select, multi-select,
-/// date, date range and colour: a 16px [Icons.keyboard_arrow_down_rounded]
+/// date, date range and colour: a 16px `context.icons.dropdown`
 /// centred in the 24px inline slot, in [AdminPalette.foregroundMuted]
 /// ([AdminPalette.foregroundSubtle] when disabled). A read-only field shows
 /// none: this renders nothing. Decorative — the trigger announces its own
@@ -670,7 +670,7 @@ class FieldChevron extends StatelessWidget {
         dimension: IconActionSize.inline.box,
         child: Center(
           child: Icon(
-            Icons.keyboard_arrow_down_rounded,
+            context.icons.dropdown,
             size: context.sizes.fieldIcon,
             color: state.iconColor(context.colors),
           ),

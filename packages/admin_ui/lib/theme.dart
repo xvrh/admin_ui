@@ -25,6 +25,7 @@ export 'src/theme/field_style.dart'
     show AdminFieldStyle, FieldFocusIndicator, FieldRequiredMark, FieldVariant;
 export 'src/theme/focus.dart' show AdminFocusSpec;
 export 'src/theme/fonts.dart' show AdminFonts;
+export 'src/theme/icons.dart' show AdminIcons;
 export 'src/theme/motion.dart' show AdminMotion, MotionSpeed, defaultMotion;
 export 'src/theme/overlay_style.dart'
     show AdminOverlayMotion, AdminOverlayStyle, TooltipText;

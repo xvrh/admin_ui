@@ -2,9 +2,14 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/sizes.dart';
+import '../../theme/tokens.dart';
 import 'field_chrome.dart';
 import 'icon_action.dart';
 import 'input_field.dart';
+
+/// [PasswordField.icon]'s default, which stands for the theme's lock: a
+/// default must be a constant, and null already drops the glyph.
+const _themeLock = IconData(0);
 
 /// A password input with a reveal toggle: an [InputField] whose text is hidden
 /// until the eye at its end — an inline [IconAction], the localized "Show
@@ -35,7 +40,8 @@ class PasswordField extends StatefulWidget {
   /// Validation message under the input; also turns its border red.
   final String? errorText;
 
-  /// Leading glyph; defaults to a lock. Pass null to drop it.
+  /// Leading glyph; the theme's `context.icons.lock` unless given. Pass null
+  /// to drop it.
   final IconData? icon;
 
   final ControlSize size;
@@ -62,7 +68,7 @@ class PasswordField extends StatefulWidget {
     this.description,
     this.hint,
     this.errorText,
-    this.icon = Icons.lock_outline_rounded,
+    this.icon = _themeLock,
     this.size = ControlSize.medium,
     this.controller,
     this.focusNode,
@@ -91,7 +97,10 @@ class _PasswordFieldState extends State<PasswordField> {
       description: widget.description,
       hint: widget.hint,
       errorText: widget.errorText,
-      icon: widget.icon,
+      icon: switch (widget.icon) {
+        _themeLock => context.icons.lock,
+        final icon => icon,
+      },
       size: widget.size,
       controller: widget.controller,
       focusNode: widget.focusNode,
@@ -104,7 +113,7 @@ class _PasswordFieldState extends State<PasswordField> {
       suffix: Builder(
         // Under the field's state, so a disabled field disables it too.
         builder: (context) => IconAction(
-          _obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+          _obscured ? context.icons.show : context.icons.hide,
           label: _obscured
               ? context.adminL10n.inputs.showPassword
               : context.adminL10n.inputs.hidePassword,

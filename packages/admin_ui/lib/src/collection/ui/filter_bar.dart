@@ -361,7 +361,7 @@ class _FieldButton extends StatelessWidget {
                 SizedBox(width: glyph)
               else
                 Icon(
-                  Icons.expand_more,
+                  context.icons.dropdown,
                   size: glyph,
                   color: active ? activeText : colors.foregroundMuted,
                 ),
@@ -381,7 +381,7 @@ class _FieldButton extends StatelessWidget {
           width: slot.box,
           child: Center(
             child: IconAction(
-              Icons.close,
+              context.icons.close,
               label: strings.clearFilter(field.label),
               size: slot,
               color: activeText,
@@ -900,7 +900,7 @@ class _ClearAll extends StatelessWidget {
   Widget build(BuildContext context) {
     return Button.ghost(
       context.adminL10n.collection.clearAll,
-      icon: Icons.close,
+      icon: context.icons.close,
       onPressed: onTap,
     );
   }

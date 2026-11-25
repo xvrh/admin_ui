@@ -22,7 +22,9 @@ class ErrorState extends StatelessWidget {
 
   /// The key of the retry button, to find it by in a test.
   final Key? retryKey;
-  final IconData icon;
+
+  /// The glyph over the title; the theme's `context.icons.error` when null.
+  final IconData? icon;
   final double minHeight;
 
   const ErrorState({
@@ -32,7 +34,7 @@ class ErrorState extends StatelessWidget {
     this.onRetry,
     this.retryLabel,
     this.retryKey,
-    this.icon = Icons.error_outline_rounded,
+    this.icon,
     this.minHeight = 160,
   });
 
@@ -48,7 +50,7 @@ class ErrorState extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                icon,
+                icon ?? context.icons.error,
                 size: context.iconSizes.xl,
                 color: context.colors.danger,
               ),
@@ -71,7 +73,7 @@ class ErrorState extends StatelessWidget {
                 Button(
                   retryLabel ?? l10n.retry,
                   key: retryKey,
-                  icon: Icons.refresh_rounded,
+                  icon: context.icons.retry,
                   onPressed: onRetry,
                 ),
               ],

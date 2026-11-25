@@ -291,7 +291,7 @@ class _FormFieldCommandsState extends State<FormFieldCommands> {
             PaletteItem(
               id: 'field:${f.id}',
               title: f.label,
-              icon: Icons.my_location_outlined,
+              icon: context.icons.jumpTo,
               group: widget.group ?? FormFieldCommands.defaultGroup,
               keywords: const ['field', 'jump to'],
               onSelect: f.reveal,

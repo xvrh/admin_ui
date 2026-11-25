@@ -103,12 +103,15 @@ void main() {
           onRemove: (_) {},
         ),
       );
-      final handle = _rect(tester, find.byIcon(Icons.drag_indicator).first);
+      final handle = _rect(
+        tester,
+        find.byIcon(Icons.drag_indicator_rounded).first,
+      );
       final row = _rect(
         tester,
         find
             .ancestor(
-              of: find.byIcon(Icons.drag_indicator).first,
+              of: find.byIcon(Icons.drag_indicator_rounded).first,
               matching: find.byWidgetPredicate(
                 (w) =>
                     w is Container &&
@@ -146,7 +149,10 @@ void main() {
         tile: (context, t) => ReferenceTileCard(title: 'Story $t'),
       ),
     );
-    final handle = _rect(tester, find.byIcon(Icons.drag_indicator).first);
+    final handle = _rect(
+      tester,
+      find.byIcon(Icons.drag_indicator_rounded).first,
+    );
     final card = _rect(tester, find.byType(ReferenceTileCard).first);
     final remove = _rect(tester, find.bySemanticsLabel('إزالة').first);
     expect(handle.left, greaterThan(card.right), reason: 'the handle leads');

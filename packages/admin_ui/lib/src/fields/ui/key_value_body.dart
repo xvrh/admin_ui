@@ -250,7 +250,7 @@ class _RowEditor extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AdminSpacing.sm),
           child: Icon(
-            Icons.arrow_forward_rounded,
+            context.icons.arrowForward,
             size: context.iconSizes.sm,
             color: state.iconColor(context.colors),
           ),
@@ -272,7 +272,7 @@ class _RowEditor extends StatelessWidget {
         if (onRemove != null) ...[
           const Gap(AdminSpacing.sm),
           IconAction(
-            Icons.close_rounded,
+            context.icons.close,
             label: row.key.text.trim().isEmpty
                 ? context.adminL10n.fields.removeRow
                 : context.adminL10n.removeItem(row.key.text.trim()),

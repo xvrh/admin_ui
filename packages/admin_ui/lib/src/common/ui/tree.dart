@@ -1011,30 +1011,30 @@ class _TreeState extends State<Tree> {
     return Padding(
       padding: const EdgeInsetsDirectional.only(end: AdminSpacing.xs),
       child: MenuButton(
-        icon: Icons.more_horiz_rounded,
+        icon: context.icons.more,
         tooltip: l10n.moreActions,
         entries: [
           MenuItem(
             l10n.moveUp,
-            icon: Icons.arrow_upward_rounded,
+            icon: context.icons.moveUp,
             shortcut: keys.up,
             onSelect: _announced(moves.up, strings.rowMovedUp),
           ),
           MenuItem(
             l10n.moveDown,
-            icon: Icons.arrow_downward_rounded,
+            icon: context.icons.moveDown,
             shortcut: keys.down,
             onSelect: _announced(moves.down, strings.rowMovedDown),
           ),
           MenuItem(
             strings.indent,
-            icon: Icons.format_indent_increase_rounded,
+            icon: context.icons.indent,
             shortcut: keys.indent,
             onSelect: _announced(moves.indent, strings.rowIndented),
           ),
           MenuItem(
             strings.outdent,
-            icon: Icons.format_indent_decrease_rounded,
+            icon: context.icons.outdent,
             shortcut: keys.outdent,
             onSelect: _announced(moves.outdent, strings.rowOutdented),
           ),
@@ -1424,7 +1424,7 @@ class _CaretState extends State<_Caret> {
                 duration: context.motion.fast,
                 curve: context.motion.standard,
                 child: Icon(
-                  Icons.chevron_right_rounded,
+                  context.icons.chevronForward,
                   size: context.iconSizes.md,
                   color: context.colors.foregroundMuted,
                 ),
@@ -1473,7 +1473,7 @@ class _DragHandle extends StatelessWidget {
         child: SizedBox(
           width: width,
           child: Icon(
-            Icons.drag_indicator_rounded,
+            context.icons.dragHandle,
             size: context.iconSizes.md,
             color: context.colors.foregroundMuted,
           ),

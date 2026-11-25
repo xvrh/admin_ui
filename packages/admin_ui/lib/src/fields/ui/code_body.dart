@@ -392,7 +392,7 @@ class _CodeBodyState extends State<CodeBody> {
         children: [
           if (isJson && !empty) ...[
             Icon(
-              error == null ? Icons.check_circle_outline : Icons.error_outline,
+              error == null ? context.icons.success : context.icons.error,
               size: context.iconSizes.sm,
               color: error == null ? colors.successText : colors.dangerText,
             ),

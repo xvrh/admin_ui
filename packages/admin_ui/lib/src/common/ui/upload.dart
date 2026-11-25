@@ -208,7 +208,7 @@ class _Target extends StatelessWidget {
                     border: Border.all(color: colors.border),
                   ),
                   child: Icon(
-                    Icons.cloud_upload_outlined,
+                    context.icons.upload,
                     size: context.iconSizes.xl,
                     color: dragOver ? colors.onPrimary : colors.foregroundMuted,
                   ),
@@ -389,10 +389,10 @@ class _Row extends StatelessWidget {
       ),
       child: Icon(
         error
-            ? Icons.error_outline
+            ? context.icons.error
             : done
-            ? Icons.check_circle_outline
-            : (item.icon ?? _iconFor(item.name)),
+            ? context.icons.success
+            : (item.icon ?? _iconFor(context, item.name)),
         size: context.iconSizes.md,
         color: error
             ? context.colors.dangerText
@@ -479,29 +479,30 @@ class _Row extends StatelessWidget {
     return [
       if (error && onRetry != null)
         action(
-          Icons.refresh_rounded,
+          context.icons.retry,
           strings.retryUpload,
           onRetry!,
           color: context.colors.primaryText,
         ),
       if (settled && onRemove != null)
-        action(Icons.close_rounded, strings.removeFile, onRemove!),
+        action(context.icons.close, strings.removeFile, onRemove!),
       if (!settled && onCancel != null)
-        action(Icons.close_rounded, strings.cancelUpload, onCancel!),
+        action(context.icons.close, strings.cancelUpload, onCancel!),
     ];
   }
 
-  IconData _iconFor(String name) {
+  IconData _iconFor(BuildContext context, String name) {
+    final icons = context.icons;
     var ext = name.contains('.') ? name.split('.').last.toLowerCase() : '';
     return switch (ext) {
-      'png' || 'jpg' || 'jpeg' || 'gif' || 'webp' => Icons.image_outlined,
-      'pdf' => Icons.picture_as_pdf_outlined,
-      'zip' || 'gz' || 'tar' => Icons.folder_zip_outlined,
-      'mp4' || 'mov' || 'webm' => Icons.movie_outlined,
-      'mp3' || 'wav' || 'flac' => Icons.audiotrack_outlined,
-      'csv' || 'xlsx' || 'xls' => Icons.table_chart_outlined,
-      'doc' || 'docx' || 'txt' || 'md' => Icons.description_outlined,
-      _ => Icons.insert_drive_file_outlined,
+      'png' || 'jpg' || 'jpeg' || 'gif' || 'webp' => icons.fileImage,
+      'pdf' => icons.filePdf,
+      'zip' || 'gz' || 'tar' => icons.fileArchive,
+      'mp4' || 'mov' || 'webm' => icons.fileVideo,
+      'mp3' || 'wav' || 'flac' => icons.fileAudio,
+      'csv' || 'xlsx' || 'xls' => icons.fileSpreadsheet,
+      'doc' || 'docx' || 'txt' || 'md' => icons.fileDocument,
+      _ => icons.file,
     };
   }
 }

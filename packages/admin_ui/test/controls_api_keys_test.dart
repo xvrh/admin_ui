@@ -53,7 +53,7 @@ Widget _menu(List<MenuEntry> entries) => Menu(
 Future<void> _openMenu(WidgetTester tester) =>
     _tap(tester, find.text('Actions'));
 
-final _more = find.byIcon(Icons.more_horiz);
+final _more = find.byIcon(Icons.more_horiz_rounded);
 
 class _Form extends FormController {
   var submits = 0;

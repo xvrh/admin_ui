@@ -39,7 +39,7 @@ class MatchCell extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
-          Icons.title_rounded,
+          context.icons.matchedField,
           size: context.iconSizes.sm,
           color: muted.color,
         ),

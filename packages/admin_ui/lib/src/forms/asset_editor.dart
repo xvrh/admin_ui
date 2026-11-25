@@ -312,12 +312,12 @@ class _AssetEditorDialogState extends State<_AssetEditorDialog> {
                 ),
                 _Preview.missing => _status(
                   context,
-                  Icons.broken_image_outlined,
+                  context.icons.imageBroken,
                   strings.assetNotFound,
                 ),
                 _Preview.failed => _status(
                   context,
-                  Icons.error_outline,
+                  context.icons.error,
                   strings.assets.couldNotLoadPreview,
                   action: Button(
                     strings.retry,
@@ -330,7 +330,7 @@ class _AssetEditorDialogState extends State<_AssetEditorDialog> {
                   color: swatch,
                   alignment: Alignment.center,
                   child: Icon(
-                    Icons.image_outlined,
+                    context.icons.image,
                     // token-literal: a glyph drawn over a colour swatch
                     color: colors.foregroundOn(swatch).withValues(alpha: 0.7),
                     size: 32,

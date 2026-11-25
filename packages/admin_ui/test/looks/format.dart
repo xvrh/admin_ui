@@ -28,6 +28,7 @@ String formatValue(Object? value) => switch (value) {
   ThreePointCubic() =>
     'cubic3(${[value.a1, value.b1, value.midpoint, value.a2, value.b2].map(_offset).join(', ')})',
   TextStyle() => _style(value),
+  IconData() => _icon(value),
   _ => throw ArgumentError(
     'looks.txt has no form for ${value.runtimeType}: add one to '
     'test/looks/format.dart',
@@ -36,6 +37,13 @@ String formatValue(Object? value) => switch (value) {
 
 String _color(Color color) =>
     '#${color.toARGB32().toRadixString(16).padLeft(8, '0')}';
+
+String _icon(IconData icon) => [
+  icon.fontFamily ?? 'no family',
+  if (icon.fontPackage case final package?) 'package $package',
+  'U+${icon.codePoint.toRadixString(16).toUpperCase().padLeft(4, '0')}',
+  if (icon.matchTextDirection) 'mirrored',
+].join(' ');
 
 String _num(num value) {
   if (value == value.roundToDouble()) return '${value.round()}';

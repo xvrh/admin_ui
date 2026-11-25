@@ -45,6 +45,7 @@ theme_internals:
     - AdminFieldStyle
     - AdminFocusSpec
     - AdminIconSizes
+    - AdminIcons
     - AdminMotion
     - AdminOverlayMotion
     - AdminOverlayStyle

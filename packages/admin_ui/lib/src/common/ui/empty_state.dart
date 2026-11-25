@@ -54,7 +54,7 @@ class EmptyState extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                icon ?? style?.icon ?? Icons.inbox_outlined,
+                icon ?? style?.icon ?? context.icons.empty,
                 size: context.iconSizes.xl,
                 color: style?.foreground ?? context.colors.foregroundMuted,
               ),

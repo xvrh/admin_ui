@@ -304,13 +304,13 @@ class _Node extends StatelessWidget {
     switch (state) {
       case _NodeState.complete:
         content = Icon(
-          Icons.check_rounded,
+          context.icons.check,
           size: context.iconSizes.sm,
           color: fg,
         );
       case _NodeState.error:
         content = Icon(
-          Icons.priority_high_rounded,
+          context.icons.stepError,
           size: context.iconSizes.sm,
           color: fg,
         );

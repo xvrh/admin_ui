@@ -296,7 +296,7 @@ class NotificationBell extends StatelessWidget {
             borderRadius: BorderRadius.circular(context.radii.radiusSmall),
           ),
           child: IconAction(
-            Icons.notifications_none_rounded,
+            context.icons.notifications,
             label: unreadCount > 0
                 ? strings.unreadCount(title, unreadCount)
                 : title,
@@ -607,7 +607,7 @@ class _NotificationInboxState extends State<NotificationInbox> {
                 minHeight: 0,
               )
             : EmptyState(
-                icon: Icons.notifications_none_rounded,
+                icon: context.icons.notifications,
                 title: widget.emptyText ?? strings.allCaughtUp,
                 minHeight: 0,
               ),
@@ -793,9 +793,7 @@ class _RowState extends State<_Row> {
       if (item.onReadChanged case final onReadChanged?)
         MenuItem(
           item.unread ? strings.markAsRead : strings.markAsUnread,
-          icon: item.unread
-              ? Icons.mark_email_read_outlined
-              : Icons.mark_email_unread_outlined,
+          icon: item.unread ? context.icons.markRead : context.icons.markUnread,
           onSelect: () => onReadChanged(item.unread),
         ),
       ...item.menu,
@@ -806,7 +804,7 @@ class _RowState extends State<_Row> {
         if (entries.isNotEmpty) const MenuDivider(),
         MenuItem(
           MaterialLocalizations.of(context).modalBarrierDismissLabel,
-          icon: Icons.close_rounded,
+          icon: context.icons.close,
           onSelect: onDismiss,
         ),
       ],
@@ -1000,7 +998,7 @@ class _RowState extends State<_Row> {
                     // Hidden, it keeps its Tab stop and its name, and a click
                     // there opens the row.
                     MenuButton(
-                      icon: Icons.more_horiz_rounded,
+                      icon: context.icons.more,
                       size: menuSize,
                       tooltip: context.adminL10n.moreActions,
                       revealed: showMenu,
@@ -1110,7 +1108,7 @@ class _ErrorRow extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            Icons.error_outline_rounded,
+            context.icons.error,
             size: context.iconSizes.md,
             color: colors.danger,
           ),

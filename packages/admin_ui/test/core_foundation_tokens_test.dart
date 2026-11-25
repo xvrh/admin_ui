@@ -336,5 +336,13 @@ void main() {
     expect(tokens.lerp(other, 1).stroke, stroke);
     expect(tokens.lerp(other, 1).iconSizes, icons);
     expect(tokens.lerp(other, 0.5).stroke.fieldFocus, 1.75);
+
+    final glyphs = const AdminIcons().copyWith(close: Icons.cancel);
+    final drawn = tokens.copyWith(icons: glyphs);
+    expect(drawn, isNot(tokens));
+    expect(drawn.copyWith(), drawn);
+    expect(drawn.copyWith().hashCode, drawn.hashCode);
+    expect(tokens.lerp(drawn, 0.25).icons, const AdminIcons());
+    expect(tokens.lerp(drawn, 0.75).icons, glyphs);
   });
 }

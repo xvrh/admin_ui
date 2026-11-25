@@ -55,6 +55,7 @@ void main() {
           (tokens.motion.copyWith(), tokens.motion),
           (tokens.stroke.copyWith(), tokens.stroke),
           (tokens.iconSizes.copyWith(), tokens.iconSizes),
+          (tokens.icons.copyWith(), tokens.icons),
           (palette.stateLayer.copyWith(), palette.stateLayer),
           (tokens.field.copyWith(), tokens.field),
           (tokens.button.copyWith(), tokens.button),

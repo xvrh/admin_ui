@@ -234,7 +234,7 @@ class _Middle extends StatelessWidget {
           } else if (onSearch != null) {
             slotWidth = IconActionSize.medium.boxOf(context);
             slot = IconAction(
-              Icons.search_rounded,
+              context.icons.search,
               label:
                   searchLabel ??
                   MaterialLocalizations.of(context).searchFieldLabel,

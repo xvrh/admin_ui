@@ -333,13 +333,13 @@ void main() {
     );
     expect(label.overflow, TextOverflow.ellipsis);
 
-    await tester.tap(find.byIcon(Icons.more_horiz));
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Publish'));
     await tester.pumpAndSettle();
     expect(published, 1);
 
-    await tester.tap(find.byIcon(Icons.more_horiz));
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Select all 40'));
     await tester.pumpAndSettle();
@@ -353,7 +353,7 @@ void main() {
     for (var width = 280.0; width <= 900; width += 3) {
       await _pump(tester, _bar(), width: width);
       expect(tester.takeException(), isNull, reason: '$width');
-      if (find.byIcon(Icons.more_horiz).evaluate().isNotEmpty) folded++;
+      if (find.byIcon(Icons.more_horiz_rounded).evaluate().isNotEmpty) folded++;
     }
     // It folds only where the full row can't fit.
     expect(folded, greaterThan(0));
@@ -364,7 +364,7 @@ void main() {
     tester,
   ) async {
     await _pump(tester, _bar(), width: 900);
-    expect(find.byIcon(Icons.more_horiz), findsNothing);
+    expect(find.byIcon(Icons.more_horiz_rounded), findsNothing);
     final bar = _rect(tester, find.byType(BulkActionBar));
     final delete = _rect(
       tester,

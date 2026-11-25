@@ -137,7 +137,7 @@ class _Pill extends StatelessWidget {
               ),
               const Gap(AdminSpacing.xxs),
               Icon(
-                Icons.expand_more_rounded,
+                context.icons.dropdown,
                 size: context.iconSizes.sm,
                 color: on
                     ? colors.foregroundMutedOnTint

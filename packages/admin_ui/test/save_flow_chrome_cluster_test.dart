@@ -418,11 +418,11 @@ void main() {
       const labels = ['Discard', 'Save', 'Publish'];
       await tester.pumpWidget(bar(SaveState.unsaved));
       final unsaved = await rects(tester, labels);
-      final more = tester.getRect(find.byIcon(Icons.more_horiz));
+      final more = tester.getRect(find.byIcon(Icons.more_horiz_rounded));
 
       await tester.pumpWidget(bar(SaveState.saving));
       expect(await rects(tester, labels), unsaved);
-      expect(tester.getRect(find.byIcon(Icons.more_horiz)), more);
+      expect(tester.getRect(find.byIcon(Icons.more_horiz_rounded)), more);
       expect(find.byType(Spinner), findsOneWidget);
 
       await tester.pumpWidget(bar(SaveState.unsaved, publishing: true));

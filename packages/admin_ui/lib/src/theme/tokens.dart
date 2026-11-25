@@ -6,6 +6,7 @@ import 'elevation.dart';
 import 'feedback_style.dart';
 import 'field_style.dart';
 import 'focus.dart';
+import 'icons.dart';
 import 'motion.dart';
 import 'overlay_style.dart';
 import 'palette.dart';
@@ -59,6 +60,10 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
   /// Glyph sizes.
   final AdminIconSizes iconSizes;
 
+  /// The glyphs the kit draws on its own: close, check, carets, sort
+  /// arrows, file types. Read through `context.icons`.
+  final AdminIcons icons;
+
   /// The anatomy of a field's box. Read through `context.fieldStyle`.
   final AdminFieldStyle field;
 
@@ -107,6 +112,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     this.motion = defaultMotion,
     this.stroke = const AdminStroke(),
     this.iconSizes = const AdminIconSizes(),
+    this.icons = const AdminIcons(),
     this.field = const AdminFieldStyle(),
     this.button = const AdminButtonStyle(),
     this.shell = const AdminShellStyle(),
@@ -121,7 +127,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
 
   /// Builds a token set from a [palette], with optional [radii], typography
   /// [type] spec, [elevation], [focus] ring, control [sizes], [table]
-  /// metrics, [motion], [stroke] widths, [iconSizes], the [field],
+  /// metrics, [motion], [stroke] widths, [iconSizes], [icons], the [field],
   /// [button], [shell], [overlay], [segmented], [selection], [slider],
   /// [tabs] and [feedback] anatomy, and the layout [breakpoints]. Typography
   /// colours are derived from the palette so they stay in sync (and [copyWith] keeps
@@ -139,6 +145,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     AdminMotion? motion,
     AdminStroke? stroke,
     AdminIconSizes? iconSizes,
+    AdminIcons? icons,
     AdminFieldStyle? field,
     AdminButtonStyle? button,
     AdminShellStyle? shell,
@@ -165,6 +172,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       motion: motion ?? defaultMotion,
       stroke: stroke ?? const AdminStroke(),
       iconSizes: iconSizes ?? const AdminIconSizes(),
+      icons: icons ?? const AdminIcons(),
       field: field ?? const AdminFieldStyle(),
       button: button ?? const AdminButtonStyle(),
       shell: shell ?? const AdminShellStyle(),
@@ -209,6 +217,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     AdminMotion? motion,
     AdminStroke? stroke,
     AdminIconSizes? iconSizes,
+    AdminIcons? icons,
     AdminFieldStyle? field,
     AdminButtonStyle? button,
     AdminShellStyle? shell,
@@ -231,6 +240,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       motion: motion ?? this.motion,
       stroke: stroke ?? this.stroke,
       iconSizes: iconSizes ?? this.iconSizes,
+      icons: icons ?? this.icons,
       field: field ?? this.field,
       button: button ?? this.button,
       shell: shell ?? this.shell,
@@ -267,6 +277,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
       motion: AdminMotion.lerp(motion, other.motion, t),
       stroke: AdminStroke.lerp(stroke, other.stroke, t),
       iconSizes: AdminIconSizes.lerp(iconSizes, other.iconSizes, t),
+      icons: AdminIcons.lerp(icons, other.icons, t),
       field: AdminFieldStyle.lerp(field, other.field, t),
       button: AdminButtonStyle.lerp(button, other.button, t),
       shell: AdminShellStyle.lerp(shell, other.shell, t),
@@ -294,6 +305,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
           other.motion == motion &&
           other.stroke == stroke &&
           other.iconSizes == iconSizes &&
+          other.icons == icons &&
           other.field == field &&
           other.button == button &&
           other.shell == shell &&
@@ -306,7 +318,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
           other.breakpoints == breakpoints;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     palette,
     radii,
     typography,
@@ -317,6 +329,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     motion,
     stroke,
     iconSizes,
+    icons,
     field,
     button,
     shell,
@@ -327,7 +340,7 @@ class AdminTokens extends ThemeExtension<AdminTokens> {
     tabs,
     feedback,
     breakpoints,
-  );
+  ]);
 }
 
 /// Iris's palette and metrics in the platform font, light: what the kit
@@ -449,6 +462,9 @@ extension AdminTokensContext on BuildContext {
 
   /// The active glyph sizes. `context.iconSizes.md`, …
   AdminIconSizes get iconSizes => adminTokens.iconSizes;
+
+  /// The glyphs the kit draws on its own. `context.icons.close`, …
+  AdminIcons get icons => adminTokens.icons;
 
   /// The active field anatomy. `context.fieldStyle.variant`, … (resolved
   /// per state by `resolveFieldChrome`).

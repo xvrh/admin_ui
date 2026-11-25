@@ -40,8 +40,9 @@ class MediaThumb extends StatelessWidget {
   /// A stand-in colour for a picture with no [image] — demos and fixtures.
   final Color? swatch;
 
-  /// The glyph on a [swatch] or on the neutral fill.
-  final IconData icon;
+  /// The glyph on a [swatch] or on the neutral fill; the theme's
+  /// `context.icons.image` when null.
+  final IconData? icon;
 
   /// The [icon]'s size; the theme's extra-large icon when null.
   final double? iconSize;
@@ -54,7 +55,7 @@ class MediaThumb extends StatelessWidget {
     super.key,
     this.image,
     this.swatch,
-    this.icon = Icons.image_outlined,
+    this.icon,
     this.iconSize,
     this.fit = BoxFit.cover,
   });
@@ -63,6 +64,7 @@ class MediaThumb extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final iconSize = this.iconSize ?? context.iconSizes.xl;
+    final icon = this.icon ?? context.icons.image;
     if (image case final image?) {
       return ThumbnailImage(image: image, fit: fit);
     }
@@ -409,7 +411,7 @@ class _CheckDisc extends StatelessWidget {
       ),
       child: selected
           ? Icon(
-              Icons.check,
+              context.icons.check,
               size: context.iconSizes.sm,
               color: colors.onControlAccent,
             )
@@ -1143,8 +1145,9 @@ class FilterMenuButton<T> extends StatelessWidget {
   final ValueChanged<T>? onChanged;
   final String tooltip;
 
-  /// The trigger's glyph while unfiltered, or when the choice has none.
-  final IconData icon;
+  /// The trigger's glyph while unfiltered, or when the choice has none; the
+  /// theme's `context.icons.filter` when null.
+  final IconData? icon;
 
   const FilterMenuButton({
     super.key,
@@ -1152,7 +1155,7 @@ class FilterMenuButton<T> extends StatelessWidget {
     required this.options,
     required this.onChanged,
     required this.tooltip,
-    this.icon = Icons.filter_list_rounded,
+    this.icon,
   });
 
   @override
@@ -1164,6 +1167,7 @@ class FilterMenuButton<T> extends StatelessWidget {
     );
     final active = !identical(current, options.first);
     final change = onChanged;
+    final icon = this.icon ?? context.icons.filter;
     return Menu(
       entries: [
         for (final option in options)
@@ -1257,7 +1261,7 @@ class FilterMenuButton<T> extends StatelessWidget {
           ),
           const Gap(AdminSpacing.xs),
           Icon(
-            Icons.expand_more_rounded,
+            context.icons.dropdown,
             size: context.iconSizes.md,
             color: enabled ? colors.foregroundMuted : colors.foregroundSubtle,
           ),

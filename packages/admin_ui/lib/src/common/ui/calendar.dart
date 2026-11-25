@@ -392,7 +392,7 @@ class _CalendarState extends State<Calendar> {
     return Row(
       children: [
         IconAction(
-          Icons.chevron_left_rounded,
+          context.icons.chevronBack,
           label: strings.previousMonthTooltip,
           size: IconActionSize.small,
           onPressed: min == null || _monthOf(min).isBefore(_month)
@@ -410,7 +410,7 @@ class _CalendarState extends State<Calendar> {
           ),
         ),
         IconAction(
-          Icons.chevron_right_rounded,
+          context.icons.chevronForward,
           label: strings.nextMonthTooltip,
           size: IconActionSize.small,
           onPressed: max == null || _monthOf(max).isAfter(_month)

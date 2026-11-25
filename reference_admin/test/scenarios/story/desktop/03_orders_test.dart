@@ -132,7 +132,7 @@ void main() {
     await s.tap(
       find.descendant(
         of: find.byType(SavedViewsBar),
-        matching: find.byIcon(Icons.add),
+        matching: find.byIcon(Icons.add_rounded),
       ),
     );
     final collection = s.kit.collection;

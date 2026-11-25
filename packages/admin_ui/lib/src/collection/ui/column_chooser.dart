@@ -334,7 +334,7 @@ class _RowState extends State<_Row> {
     final handle = Padding(
       padding: const EdgeInsets.all(AdminSpacing.xs),
       child: Icon(
-        Icons.drag_indicator,
+        context.icons.dragHandle,
         size: context.iconSizes.md,
         color: widget.draggable
             ? colors.foregroundMuted
@@ -418,7 +418,7 @@ class _RowState extends State<_Row> {
                 ),
                 if (choice.locked)
                   Icon(
-                    Icons.lock_outline,
+                    context.icons.lock,
                     size: context.iconSizes.sm,
                     semanticLabel: strings.collection.locked,
                     color: colors.foregroundMuted,
@@ -495,7 +495,7 @@ class ColumnChooserButton extends StatelessWidget {
           ? Stack(
               children: [
                 IconAction(
-                  Icons.view_column_outlined,
+                  context.icons.columns,
                   label: named,
                   expanded: controller.isOpen,
                   onPressed: controller.toggle,
@@ -524,8 +524,8 @@ class ColumnChooserButton extends StatelessWidget {
             )
           : Button(
               named,
-              icon: Icons.view_column_outlined,
-              trailingIcon: Icons.keyboard_arrow_down,
+              icon: context.icons.columns,
+              trailingIcon: context.icons.dropdown,
               size: size,
               onPressed: controller.toggle,
             ),

@@ -713,7 +713,7 @@ class _MovableCardState extends State<_MovableCard> {
                   border: Border.all(color: colors.border),
                 ),
                 child: IconAction(
-                  Icons.more_horiz_rounded,
+                  context.icons.more,
                   label: context.adminL10n.collection.moveCard,
                   size: IconActionSize.small,
                   expanded: menu.isOpen,

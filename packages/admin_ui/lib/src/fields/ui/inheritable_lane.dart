@@ -138,7 +138,7 @@ class _Trigger extends StatelessWidget {
                 Text(label, style: style),
                 const Gap(AdminSpacing.xxs),
                 Icon(
-                  Icons.expand_more_rounded,
+                  context.icons.dropdown,
                   size: context.iconSizes.sm,
                   color: colors.primaryText,
                 ),

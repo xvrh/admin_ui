@@ -726,7 +726,7 @@ class ListboxOption extends StatelessWidget {
           SizedBox(
             height: line,
             child: Icon(
-              Icons.check_rounded,
+              context.icons.check,
               size: sizes.fieldIcon,
               color: enabled ? colors.primaryText : colors.foregroundSubtle,
             ),
@@ -1000,7 +1000,7 @@ class _ListboxMenuState extends State<ListboxMenu> {
                               widget.filterHint ??
                               context.adminL10n.filterPlaceholder,
                           size: ControlSize.small,
-                          leadingIcon: Icons.search_rounded,
+                          leadingIcon: context.icons.search,
                         ),
                       ),
                     ),

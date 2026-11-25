@@ -378,9 +378,7 @@ class FieldMessage extends StatelessWidget {
                   child: Spinner(size: glyph, color: color, announce: false),
                 )
               : Icon(
-                  error != null
-                      ? Icons.error_outline_rounded
-                      : Icons.warning_amber_rounded,
+                  error != null ? context.icons.error : context.icons.warning,
                   size: glyph,
                   color: color,
                 ),

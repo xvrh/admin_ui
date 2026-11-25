@@ -123,7 +123,7 @@ class Breadcrumbs extends StatelessWidget {
   Widget _trail(BuildContext context, double maxWidth) {
     final rtl = Directionality.of(context) == TextDirection.rtl;
     // The chevron mirrors itself right to left, pointing along the trail.
-    final sep = separator ?? Icons.chevron_right_rounded;
+    final sep = separator ?? context.icons.chevronForward;
     final n = items.length;
     final last = n - 1;
 
@@ -332,7 +332,7 @@ class _CrumbView extends StatelessWidget {
         Menu(
           minWidth: 160,
           builder: (context, c) => IconAction(
-            Icons.expand_more_rounded,
+            context.icons.dropdown,
             label: context.adminL10n.display.switchPage,
             size: IconActionSize.inline,
             expanded: c.isOpen,
@@ -440,7 +440,7 @@ class _OverflowCrumb extends StatelessWidget {
   Widget build(BuildContext context) {
     return Menu(
       builder: (context, c) => IconAction(
-        Icons.more_horiz_rounded,
+        context.icons.more,
         label: context.adminL10n.display.showMore(collapsed.length),
         size: IconActionSize.inline,
         expanded: c.isOpen,

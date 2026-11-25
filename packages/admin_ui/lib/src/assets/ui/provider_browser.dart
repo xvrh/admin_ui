@@ -9,6 +9,7 @@ import '../../common/ui/search_field.dart';
 import '../../common/ui/spinner.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
+import '../../theme/tokens.dart';
 import '../external_provider.dart';
 import 'asset_library.dart' show AssetLibrary;
 import 'media_tile.dart';
@@ -115,7 +116,7 @@ class ProviderBrowser extends StatelessWidget {
         const Divider(height: 1),
         Flexible(child: _body(context)),
         SelectionFooter(
-          icon: Icons.workspace_premium_outlined,
+          icon: context.icons.license,
           status: picked
               ? strings.licenseNotice(1)
               : strings.selectImageToLicense,
@@ -154,7 +155,7 @@ class ProviderBrowser extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AdminSpacing.xxl),
         child: EmptyState(
           minHeight: 0,
-          icon: searching ? Icons.search_off_rounded : Icons.search_rounded,
+          icon: searching ? context.icons.noResults : context.icons.search,
           title: searching
               ? context.adminL10n.noResults
               : strings.findStockImages,
@@ -255,7 +256,7 @@ class _Toolbar extends StatelessWidget {
     final orientation = FilterMenuButton<ProviderOrientation?>(
       value: filters.orientation,
       tooltip: strings.orientation,
-      icon: Icons.crop_rounded,
+      icon: context.icons.orientation,
       onChanged: change == null
           ? null
           : (v) => change(filters.copyWith(orientation: () => v)),
@@ -269,7 +270,7 @@ class _Toolbar extends StatelessWidget {
     final imageType = FilterMenuButton<ProviderImageType?>(
       value: filters.imageType,
       tooltip: strings.imageType,
-      icon: Icons.category_outlined,
+      icon: context.icons.imageType,
       onChanged: change == null
           ? null
           : (v) => change(filters.copyWith(imageType: () => v)),

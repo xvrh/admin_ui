@@ -577,8 +577,8 @@ class _NumberBodyState extends State<NumberBody> {
                       _Segment(
                         width: segment,
                         icon: direction < 0
-                            ? Icons.remove_rounded
-                            : Icons.add_rounded,
+                            ? context.icons.decrement
+                            : context.icons.increment,
                         label: direction < 0
                             ? context.adminL10n.fields.decrease
                             : context.adminL10n.fields.increase,

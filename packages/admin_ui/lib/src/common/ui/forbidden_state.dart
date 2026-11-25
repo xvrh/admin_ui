@@ -31,7 +31,9 @@ class ForbiddenState extends StatelessWidget {
 
   /// The key of the button, to find it by in a test.
   final Key? backKey;
-  final IconData icon;
+
+  /// The glyph over the title; the theme's `context.icons.lock` when null.
+  final IconData? icon;
   final double minHeight;
 
   const ForbiddenState({
@@ -41,7 +43,7 @@ class ForbiddenState extends StatelessWidget {
     this.onBack,
     this.backLabel,
     this.backKey,
-    this.icon = Icons.lock_outline_rounded,
+    this.icon,
     this.minHeight = 160,
   });
 
@@ -58,7 +60,7 @@ class ForbiddenState extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                icon,
+                icon ?? context.icons.lock,
                 size: context.iconSizes.xl,
                 color: context.colors.foregroundMuted,
               ),

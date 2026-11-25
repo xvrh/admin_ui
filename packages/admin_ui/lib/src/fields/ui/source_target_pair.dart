@@ -164,7 +164,7 @@ class _SourceTargetPairState extends State<SourceTargetPair> {
                     alignment: Alignment.topCenter,
                     child: ExcludeSemantics(
                       child: Icon(
-                        Icons.arrow_forward_rounded,
+                        context.icons.arrowForward,
                         size: arrow,
                         color: context.colors.foregroundMuted,
                       ),

@@ -273,7 +273,7 @@ class _Section extends StatelessWidget {
                       duration: motion.fast,
                       curve: motion.standard,
                       child: Icon(
-                        Icons.expand_more_rounded,
+                        context.icons.expand,
                         size: icons.lg,
                         color: colors.foregroundMuted,
                       ),

@@ -888,7 +888,7 @@ class _ZoomControls extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconAction(
-                  Icons.remove_rounded,
+                  context.icons.zoomOut,
                   label: strings.zoomOut,
                   size: IconActionSize.small,
                   onPressed: canZoomOut ? view._zoomOut : null,
@@ -924,13 +924,13 @@ class _ZoomControls extends StatelessWidget {
                   ),
                 ),
                 IconAction(
-                  Icons.add_rounded,
+                  context.icons.zoomIn,
                   label: strings.zoomIn,
                   size: IconActionSize.small,
                   onPressed: view._canZoomIn ? view._zoomIn : null,
                 ),
                 IconAction(
-                  Icons.fit_screen_rounded,
+                  context.icons.zoomFit,
                   label: strings.zoomToFit,
                   size: IconActionSize.small,
                   onPressed: canZoomOut ? view._fit : null,

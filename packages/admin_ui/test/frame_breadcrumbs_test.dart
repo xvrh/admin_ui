@@ -192,7 +192,7 @@ void main() {
       for (final icon in [
         Icons.home_outlined,
         Icons.chevron_right_rounded,
-        Icons.expand_more_rounded,
+        Icons.keyboard_arrow_down_rounded,
       ]) {
         expect(tester.getSize(find.byIcon(icon).first), const Size.square(16));
       }
@@ -224,7 +224,7 @@ void main() {
       expect(tester.getSize(_overflow), const Size.square(24));
       expect(
         tester.getSize(
-          find.widgetWithIcon(IconAction, Icons.expand_more_rounded),
+          find.widgetWithIcon(IconAction, Icons.keyboard_arrow_down_rounded),
         ),
         const Size.square(24),
       );

@@ -138,9 +138,9 @@ class DateBody extends StatelessWidget {
     });
   }
 
-  IconData get _icon => granularity == DateGranularity.time
-      ? Icons.schedule_rounded
-      : Icons.calendar_month_outlined;
+  IconData _iconOf(BuildContext context) => granularity == DateGranularity.time
+      ? context.icons.time
+      : context.icons.calendar;
 
   DateTime get _today => DateUtils.dateOnly(today ?? DateTime.now());
 
@@ -222,7 +222,7 @@ class DateBody extends StatelessWidget {
           return Row(
             children: [
               Icon(
-                _icon,
+                _iconOf(context),
                 size: sizes.fieldIcon,
                 color: FieldStateScope.of(context).iconColor(context.colors),
               ),
@@ -844,7 +844,7 @@ class _CalendarButtonState extends State<_CalendarButton> {
               dimension: side - 2 * context.stroke.control,
               child: Center(
                 child: Icon(
-                  Icons.calendar_month_outlined,
+                  context.icons.calendar,
                   size: context.sizes.fieldIcon,
                   color: state.iconColor(context.colors),
                 ),

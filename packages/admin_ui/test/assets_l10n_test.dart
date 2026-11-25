@@ -365,7 +365,7 @@ void main() {
         ),
       );
       final tile = tester.getRect(find.byType(MediaTile));
-      final disc = tester.getRect(find.byIcon(Icons.check));
+      final disc = tester.getRect(find.byIcon(Icons.check_rounded));
       return disc.shift(-tile.topLeft);
     }
 

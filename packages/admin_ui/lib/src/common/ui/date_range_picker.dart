@@ -242,7 +242,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
             return Row(
               children: [
                 Icon(
-                  Icons.date_range_outlined,
+                  context.icons.dateRange,
                   size: sizes.fieldIcon,
                   color: FieldStateScope.of(context).iconColor(context.colors),
                 ),

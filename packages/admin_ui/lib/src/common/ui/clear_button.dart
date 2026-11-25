@@ -4,11 +4,12 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import '../../theme/tokens.dart';
 import 'field_chrome.dart';
 import 'icon_action.dart';
 
 /// The bare "×" clear/dismiss affordance used inside field triggers, search
-/// boxes and chips — a muted [Icons.close_rounded] in an inline [IconAction]:
+/// boxes and chips — a muted `context.icons.close` in an inline [IconAction]:
 /// a 16px glyph in a 24px hit box, focusable, announced and tooltipped as
 /// [label]. For the bordered circular variant overlaid on tiles use
 /// `CircleButton` instead.
@@ -35,7 +36,7 @@ class ClearButton extends StatelessWidget {
     final state = FieldStateScope.of(context);
     if (!state.enabled || state.readOnly) return const SizedBox.shrink();
     return IconAction(
-      Icons.close_rounded,
+      context.icons.close,
       label: label ?? MaterialLocalizations.of(context).clearButtonTooltip,
       onPressed: onPressed,
       size: IconActionSize.inline,

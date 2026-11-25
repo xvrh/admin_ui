@@ -413,7 +413,7 @@ class _SegmentedState<T> extends State<Segmented<T>>
     // M3's check takes the place of the selected segment's icon, or comes
     // before its label; an icon-only segment keeps its icon.
     final check = style.checkmark && selected && !iconOnly;
-    final glyph = check ? Icons.check_rounded : seg.icon;
+    final glyph = check ? context.icons.check : seg.icon;
     // A label-only segment keeps the check's room either side of its label
     // while it is not selected, so it is as wide either way.
     final reserve = style.checkmark && !iconOnly && seg.icon == null && !check
@@ -679,7 +679,7 @@ class SegmentToggle extends StatelessWidget {
     // As in a segment, M3's check takes the icon's place, and a label-only
     // toggle keeps its room while off.
     final check = style.checkmark && active;
-    final glyph = check ? Icons.check_rounded : icon;
+    final glyph = check ? context.icons.check : icon;
     final reserve = style.checkmark && icon == null && !active
         ? (m.icon + m.gap) / 2
         : 0.0;

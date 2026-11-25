@@ -318,7 +318,7 @@ class _InsertPickerState extends State<InsertPicker> {
                 Expanded(child: _searchField()),
                 const Gap(AdminSpacing.sm),
                 IconAction(
-                  Icons.visibility_outlined,
+                  context.icons.show,
                   label: context.adminL10n.display.preview,
                   selected: _showPreview,
                   expanded: _showPreview,
@@ -358,9 +358,7 @@ class _InsertPickerState extends State<InsertPicker> {
                 child: Row(
                   children: [
                     Icon(
-                      hasLive
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                      hasLive ? context.icons.show : context.icons.hide,
                       size: context.iconSizes.sm,
                       color: c.foregroundMuted,
                     ),
@@ -451,7 +449,7 @@ class _InsertPickerState extends State<InsertPicker> {
       decoration: fieldInputDecoration(
         context,
         hint: widget.hint ?? context.adminL10n.searchPlaceholder,
-        leadingIcon: Icons.search,
+        leadingIcon: context.icons.search,
       ),
     ),
   );
@@ -593,7 +591,7 @@ class _InsertPickerState extends State<InsertPicker> {
                       start: AdminSpacing.sm,
                     ),
                     child: Icon(
-                      Icons.keyboard_return,
+                      context.icons.enterKey,
                       size: context.iconSizes.sm,
                       color: muted,
                     ),
@@ -604,7 +602,7 @@ class _InsertPickerState extends State<InsertPicker> {
                       start: AdminSpacing.sm,
                     ),
                     child: Icon(
-                      Icons.visibility_outlined,
+                      context.icons.show,
                       size: context.iconSizes.sm,
                       color: muted,
                     ),

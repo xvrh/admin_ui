@@ -50,7 +50,9 @@ enum IconActionSize {
 /// primary-tinted fill and glyph — and announces it as selected. A null
 /// [onPressed] renders the disabled look.
 class IconAction extends StatelessWidget {
-  final IconData icon;
+  /// The glyph. Null only for [IconAction.close], which draws the theme's
+  /// `context.icons.close`.
+  final IconData? icon;
 
   /// The accessible name and tooltip. Null only for [IconAction.close], which
   /// reads the localized "Close".
@@ -89,7 +91,7 @@ class IconAction extends StatelessWidget {
   final WidgetStatesController? statesController;
 
   const IconAction(
-    this.icon, {
+    IconData this.icon, {
     super.key,
     required String this.label,
     this.onPressed,
@@ -118,7 +120,7 @@ class IconAction extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.statesController,
-  }) : icon = Icons.close_rounded,
+  }) : icon = null,
        danger = false,
        selected = false,
        expanded = null;
@@ -169,7 +171,11 @@ class IconAction extends StatelessWidget {
               borderRadius: BorderRadius.circular(radius),
             ),
             child: Center(
-              child: Icon(icon, size: iconSize ?? size.glyph, color: glyph),
+              child: Icon(
+                icon ?? context.icons.close,
+                size: iconSize ?? size.glyph,
+                color: glyph,
+              ),
             ),
           ),
         );

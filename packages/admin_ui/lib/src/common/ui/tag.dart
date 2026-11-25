@@ -130,7 +130,7 @@ class Tag extends StatelessWidget {
           ),
           if (removable)
             IconAction(
-              Icons.close_rounded,
+              context.icons.close,
               label: context.adminL10n.removeItem(label),
               onPressed: onRemove,
               size: IconActionSize.inline,

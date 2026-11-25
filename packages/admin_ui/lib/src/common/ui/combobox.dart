@@ -712,7 +712,7 @@ class _ErrorRow extends StatelessWidget {
       liveRegion: true,
       child: _MessageRow(
         leading: Icon(
-          Icons.error_outline_rounded,
+          context.icons.error,
           size: context.sizes.fieldIcon,
           color: colors.dangerText,
         ),

@@ -90,7 +90,7 @@ class _Button extends StatelessWidget {
     final label = context.adminL10n.fields.comments(math.max(0, count));
     if (count <= 0) {
       return IconAction(
-        Icons.mode_comment_outlined,
+        context.icons.comment,
         label: label,
         size: IconActionSize.inline,
         selected: on,
@@ -130,7 +130,7 @@ class _Button extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.mode_comment_outlined,
+                  context.icons.comment,
                   size: size.glyph,
                   color: colors.primaryText,
                 ),
@@ -354,7 +354,7 @@ class _ThreadState extends State<_Thread> {
           ),
           const Gap(AdminSpacing.md),
           Button.icon(
-            Icons.arrow_upward,
+            context.icons.send,
             semanticLabel: messages.sendReply,
             variant: ButtonVariant.primary,
             onPressed: _send,
@@ -406,7 +406,7 @@ class _ResolveAction extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check, size: context.iconSizes.sm, color: ink),
+              Icon(context.icons.check, size: context.iconSizes.sm, color: ink),
               const Gap(AdminSpacing.xs),
               Text(
                 context.adminL10n.fields.resolve,

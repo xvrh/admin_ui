@@ -313,14 +313,8 @@ class _AssetPickerDialogState extends State<_AssetPickerDialog> {
                   onChanged: _showTab,
                   baseline: false,
                   tabs: [
-                    TabItem(
-                      strings.libraryTab,
-                      icon: Icons.photo_library_outlined,
-                    ),
-                    TabItem(
-                      strings.uploadTab,
-                      icon: Icons.cloud_upload_outlined,
-                    ),
+                    TabItem(strings.libraryTab, icon: context.icons.library),
+                    TabItem(strings.uploadTab, icon: context.icons.upload),
                     for (final p in widget.providers)
                       TabItem(p.label, icon: p.icon),
                   ],
@@ -412,7 +406,7 @@ class _DropOverlay extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.cloud_upload_outlined,
+                    context.icons.upload,
                     size: 40,
                     color: context.colors.primaryText,
                   ),

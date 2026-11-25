@@ -97,7 +97,7 @@ void main() {
     await tester.pump();
     expect(written.last, r'$.customer.email');
     // The path action confirms, then reverts.
-    IconData glyph() =>
+    IconData? glyph() =>
         tester.widget<IconAction>(_pathAction(r'$.customer.email')).icon;
     expect(glyph(), Icons.check_rounded);
     await tester.pump(const Duration(seconds: 2));

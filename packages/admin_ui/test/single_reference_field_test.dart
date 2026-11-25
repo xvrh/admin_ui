@@ -20,8 +20,8 @@ const _makers = [
 ];
 
 const _replace = Icons.swap_horiz_rounded;
-const _remove = Icons.close;
-const _retry = Icons.refresh;
+const _remove = Icons.close_rounded;
+const _retry = Icons.refresh_rounded;
 
 /// What the field under test was asked to resolve, a batch per call.
 final _asked = <List<String>>[];

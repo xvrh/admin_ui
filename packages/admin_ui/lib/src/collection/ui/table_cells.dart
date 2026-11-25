@@ -54,7 +54,7 @@ class TableThumb extends StatelessWidget {
           ? ThumbnailImage(image: image!, size: size, borderRadius: radius)
           : color == null
           ? Icon(
-              icon ?? Icons.image_outlined,
+              icon ?? context.icons.image,
               size: size * 0.5,
               color: colors.foregroundFaint,
             )

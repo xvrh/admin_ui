@@ -162,7 +162,7 @@ void main() {
     expect(clear, findsOneWidget);
     final box = tester.getSize(
       find.ancestor(
-        of: find.byIcon(Icons.close),
+        of: find.byIcon(Icons.close_rounded),
         matching: find.byType(IconAction),
       ),
     );

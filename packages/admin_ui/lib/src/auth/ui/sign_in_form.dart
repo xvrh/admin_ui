@@ -209,7 +209,7 @@ class _SignInFormState extends State<SignInForm> {
               label: emailLabel,
               controller: _email,
               focusNode: _emailFocus,
-              icon: Icons.mail_outline_rounded,
+              icon: context.icons.email,
               hint: shell.emailHint,
               errorText:
                   _required(_email.text.trim(), emailLabel) ??

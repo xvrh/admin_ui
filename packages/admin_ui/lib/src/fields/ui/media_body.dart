@@ -446,8 +446,8 @@ class _DropZone extends StatelessWidget {
             children: [
               Icon(
                 kind == MediaKind.image
-                    ? Icons.add_photo_alternate_outlined
-                    : Icons.upload_file_outlined,
+                    ? context.icons.addImage
+                    : context.icons.addFile,
                 size: context.iconSizes.xl,
                 color: dragOver
                     ? context.colors.primaryText
@@ -559,7 +559,7 @@ class _ImageTile extends StatelessWidget {
               top: AdminSpacing.xxs,
               end: AdminSpacing.xxs,
               child: CircleButton(
-                icon: Icons.close,
+                icon: context.icons.close,
                 label: item.isBusy
                     ? l10n.fields.cancelUpload(item.name)
                     : l10n.removeItem(item.name),
@@ -645,7 +645,7 @@ class _ImageTile extends StatelessWidget {
           ? null
           : Center(
               child: Icon(
-                item.icon ?? Icons.image_outlined,
+                item.icon ?? context.icons.image,
                 size: context.iconSizes.xl,
                 color: context.colors.foregroundOn(c),
               ),
@@ -672,7 +672,11 @@ class _CoverBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.star, size: context.iconSizes.xs, color: onImage),
+          Icon(
+            context.icons.defaultBadge,
+            size: context.iconSizes.xs,
+            color: onImage,
+          ),
           const Gap(AdminSpacing.xs),
           Text(
             context.adminL10n.fields.cover,
@@ -755,7 +759,7 @@ class _ErrorScrim extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.refresh, size: context.iconSizes.xl, color: onImage),
+          Icon(context.icons.retry, size: context.iconSizes.xl, color: onImage),
           const Gap(AdminSpacing.xs),
           Text(
             context.adminL10n.retry,
@@ -810,7 +814,7 @@ class _FileRow extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsetsDirectional.only(end: AdminSpacing.sm),
                 child: Icon(
-                  Icons.drag_indicator,
+                  context.icons.dragHandle,
                   size: context.iconSizes.md,
                   color: context.colors.foregroundFaint,
                 ),
@@ -836,7 +840,7 @@ class _FileRow extends StatelessWidget {
         border: Border.all(color: context.colors.border),
       ),
       child: Icon(
-        item.icon ?? _iconFor(item.name),
+        item.icon ?? _iconFor(context, item.name),
         size: context.iconSizes.lg,
         color: context.colors.foregroundMuted,
       ),
@@ -905,7 +909,7 @@ class _FileRow extends StatelessWidget {
     final l10n = context.adminL10n;
     if (error && !readOnly) {
       return CircleButton(
-        icon: Icons.refresh,
+        icon: context.icons.retry,
         label: l10n.fields.retryItem(item.name),
         onTap: () => onRetry?.call(item.id),
       );
@@ -919,7 +923,7 @@ class _FileRow extends StatelessWidget {
           spinner,
           const Gap(AdminSpacing.md),
           CircleButton(
-            icon: Icons.close,
+            icon: context.icons.close,
             label: l10n.fields.cancelUpload(item.name),
             onTap: () => onRemove?.call(item.id),
           ),
@@ -928,22 +932,23 @@ class _FileRow extends StatelessWidget {
     }
     if (readOnly) return const SizedBox.shrink();
     return CircleButton(
-      icon: Icons.close,
+      icon: context.icons.close,
       label: l10n.removeItem(item.name),
       onTap: () => onRemove?.call(item.id),
     );
   }
 
-  IconData _iconFor(String name) {
+  IconData _iconFor(BuildContext context, String name) {
+    final icons = context.icons;
     var ext = name.contains('.') ? name.split('.').last.toLowerCase() : '';
     return switch (ext) {
-      'pdf' => Icons.picture_as_pdf_outlined,
-      'zip' || 'gz' || 'tar' => Icons.folder_zip_outlined,
-      'mp4' || 'mov' || 'webm' => Icons.movie_outlined,
-      'mp3' || 'wav' || 'flac' => Icons.audiotrack_outlined,
-      'csv' || 'xlsx' || 'xls' => Icons.table_chart_outlined,
-      'doc' || 'docx' || 'txt' || 'md' => Icons.description_outlined,
-      _ => Icons.insert_drive_file_outlined,
+      'pdf' => icons.filePdf,
+      'zip' || 'gz' || 'tar' => icons.fileArchive,
+      'mp4' || 'mov' || 'webm' => icons.fileVideo,
+      'mp3' || 'wav' || 'flac' => icons.fileAudio,
+      'csv' || 'xlsx' || 'xls' => icons.fileSpreadsheet,
+      'doc' || 'docx' || 'txt' || 'md' => icons.fileDocument,
+      _ => icons.file,
     };
   }
 }
@@ -983,7 +988,7 @@ class _AddTile extends StatelessWidget {
             radius: context.radii.radiusSmall,
             child: Center(
               child: Icon(
-                Icons.add,
+                context.icons.add,
                 size: context.iconSizes.xl,
                 color: hovered
                     ? context.colors.foregroundSecondary

@@ -413,7 +413,7 @@ class _TokensState extends State<_Tokens> {
           ? l10n.fields.filterOrAdd
           : l10n.filterPlaceholder,
       footer: footer,
-      footerIcon: _atCap ? Icons.info_outline_rounded : null,
+      footerIcon: _atCap ? context.icons.info : null,
       itemBuilder: (context, i) {
         if (i < offset) return _createRow(context);
         return _row(context, items[i - offset], i);
@@ -433,7 +433,7 @@ class _TokensState extends State<_Tokens> {
       index: 0,
       label: label,
       leading: Icon(
-        Icons.add_rounded,
+        context.icons.add,
         size: context.sizes.fieldIcon,
         color: colors.primaryText,
       ),
@@ -687,7 +687,7 @@ class _Segmented extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              selected ? Icons.check_rounded : Icons.add_rounded,
+              selected ? context.icons.check : context.icons.add,
               size: context.sizes.fieldIcon,
               color: fg,
             ),

@@ -248,7 +248,7 @@ class TreeEditor extends StatelessWidget {
             alignment: AlignmentDirectional.centerStart,
             child: Button(
               addLabel ?? context.adminL10n.display.addItem,
-              icon: Icons.add_rounded,
+              icon: context.icons.add,
               onPressed: onAddRoot,
             ),
           ),
@@ -594,7 +594,7 @@ class _TreeEntryRowState extends State<_TreeEntryRow> {
               Padding(
                 padding: const EdgeInsetsDirectional.only(end: AdminSpacing.sm),
                 child: Icon(
-                  Icons.segment_rounded,
+                  context.icons.sectionHeader,
                   size: context.iconSizes.md,
                   color: c.foregroundMuted,
                 ),
@@ -659,25 +659,25 @@ class _TreeEntryRowState extends State<_TreeEntryRow> {
       if (widget.moves != null) ...[
         MenuItem(
           l10n.moveUp,
-          icon: Icons.arrow_upward_rounded,
+          icon: context.icons.moveUp,
           shortcut: shortcutLabel(context, _upKey),
           onSelect: up,
         ),
         MenuItem(
           l10n.moveDown,
-          icon: Icons.arrow_downward_rounded,
+          icon: context.icons.moveDown,
           shortcut: shortcutLabel(context, _downKey),
           onSelect: down,
         ),
         MenuItem(
           strings.indent,
-          icon: Icons.format_indent_increase_rounded,
+          icon: context.icons.indent,
           shortcut: shortcutLabel(context, _inwardKey(context)),
           onSelect: indent,
         ),
         MenuItem(
           strings.outdent,
-          icon: Icons.format_indent_decrease_rounded,
+          icon: context.icons.outdent,
           shortcut: shortcutLabel(context, _outwardKey(context)),
           onSelect: outdent,
         ),
@@ -687,13 +687,13 @@ class _TreeEntryRowState extends State<_TreeEntryRow> {
         if (addChild != null)
           MenuItem(
             strings.addChild,
-            icon: Icons.subdirectory_arrow_right_rounded,
+            icon: context.icons.addChild,
             onSelect: addChild,
           ),
         if (onDelete != null)
           MenuItem(
             delete,
-            icon: Icons.delete_outline_rounded,
+            icon: context.icons.delete,
             danger: true,
             onSelect: onDelete,
           ),
@@ -718,13 +718,13 @@ class _TreeEntryRowState extends State<_TreeEntryRow> {
                 children: [
                   _action(
                     context,
-                    Icons.subdirectory_arrow_right_rounded,
+                    context.icons.addChild,
                     strings.addChild,
                     addChild,
                   ),
                   _action(
                     context,
-                    Icons.delete_outline_rounded,
+                    context.icons.delete,
                     delete,
                     onDelete,
                     danger: true,
@@ -736,15 +736,13 @@ class _TreeEntryRowState extends State<_TreeEntryRow> {
         ),
         _action(
           context,
-          entry.visible
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
+          entry.visible ? context.icons.show : context.icons.hide,
           entry.visible ? strings.hideEntry : strings.showEntry,
           widget.onToggleVisible,
         ),
         if (menu.isNotEmpty)
           MenuButton(
-            icon: Icons.more_horiz_rounded,
+            icon: context.icons.more,
             tooltip: l10n.moreActions,
             entries: menu,
           ),

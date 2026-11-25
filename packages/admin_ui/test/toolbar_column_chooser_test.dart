@@ -196,7 +196,7 @@ void main() {
         ),
       );
       expect(find.text('Columns (2 hidden)'), findsOneWidget);
-      expect(find.byIcon(Icons.keyboard_arrow_down), findsOneWidget);
+      expect(find.byIcon(Icons.keyboard_arrow_down_rounded), findsOneWidget);
 
       await _pump(
         tester,
@@ -209,7 +209,7 @@ void main() {
         ),
       );
       expect(find.text('Columns'), findsOneWidget);
-      expect(find.byIcon(Icons.keyboard_arrow_down), findsOneWidget);
+      expect(find.byIcon(Icons.keyboard_arrow_down_rounded), findsOneWidget);
     });
 
     testWidgets('small: a kit IconAction named with the count, and a dot', (

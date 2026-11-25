@@ -114,7 +114,7 @@ void main() {
     expect(find.widgetWithText(Button, 'Discard'), findsNothing);
     expect(find.text('Unsaved changes'), findsNothing);
     expect(find.byType(Tip), findsWidgets);
-    await tester.tap(find.byIcon(Icons.more_horiz));
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Discard'));
     await tester.pumpAndSettle();
@@ -217,7 +217,7 @@ void main() {
         ),
       ),
     );
-    await tester.tap(find.byIcon(Icons.more_horiz));
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Discard'), warnIfMissed: false);
     await tester.pumpAndSettle();

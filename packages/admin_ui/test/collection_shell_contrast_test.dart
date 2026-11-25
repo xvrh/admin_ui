@@ -152,8 +152,8 @@ void main() {
             ),
           );
 
-          final check = tester.widget<Icon>(find.byIcon(Icons.check));
-          final disc = _fillBehind(tester, Icons.check);
+          final check = tester.widget<Icon>(find.byIcon(Icons.check_rounded));
+          final disc = _fillBehind(tester, Icons.check_rounded);
           // A glyph is a UI graphic: WCAG 1.4.11 asks 3:1.
           _expectContrast(check.color!, disc, 3, 'check on its disc');
 

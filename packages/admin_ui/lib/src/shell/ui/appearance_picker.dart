@@ -102,13 +102,9 @@ class AppearancePicker extends StatelessWidget {
             size: size,
             onChanged: edit((mode) => value.copyWith(mode: mode)),
             options: [
-              (ThemeMode.light, l10n.modeLight, Icons.light_mode_outlined),
-              (ThemeMode.dark, l10n.modeDark, Icons.dark_mode_outlined),
-              (
-                ThemeMode.system,
-                l10n.modeSystem,
-                Icons.brightness_auto_outlined,
-              ),
+              (ThemeMode.light, l10n.modeLight, context.icons.themeLight),
+              (ThemeMode.dark, l10n.modeDark, context.icons.themeDark),
+              (ThemeMode.system, l10n.modeSystem, context.icons.themeSystem),
             ],
           ),
         ),

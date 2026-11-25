@@ -208,7 +208,7 @@ class SaveCluster extends StatelessWidget {
           SaveBarAction(
             key: discardKey,
             label: discardLabel,
-            icon: Icons.undo_rounded,
+            icon: context.icons.undo,
             onPressed: discard,
           ),
         ],
@@ -382,7 +382,7 @@ class _OverflowMenu extends StatelessWidget {
             ),
       ],
       builder: (context, controller) => IconAction(
-        Icons.more_horiz,
+        context.icons.more,
         label: label,
         expanded: controller.isOpen,
         onPressed: enabled ? controller.toggle : null,
@@ -450,7 +450,7 @@ class _SaveStatus extends StatelessWidget {
             ),
             SaveState.saved => (
               Icon(
-                Icons.check_rounded,
+                context.icons.check,
                 size: context.iconSizes.sm,
                 color: colors.successText,
               ),
