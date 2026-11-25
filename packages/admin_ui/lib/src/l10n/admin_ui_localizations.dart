@@ -38,7 +38,8 @@ import 'sections/shell_messages.dart';
 ///    [shell] or [assets].
 ///
 /// These come from [MaterialLocalizations] and are not repeated here:
-/// `cancelButtonLabel`, `okButtonLabel`, `closeButtonTooltip` and
+/// `cancelButtonLabel`, `okButtonLabel`, `continueButtonLabel`,
+/// `closeButtonTooltip` and
 /// `closeButtonLabel`, `searchFieldLabel`, `clearButtonTooltip`,
 /// `modalBarrierDismissLabel`, `copyButtonLabel`, `deleteButtonTooltip`,
 /// `saveButtonLabel`, `moreButtonTooltip`, `selectAllButtonLabel`,

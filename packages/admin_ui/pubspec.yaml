@@ -24,6 +24,7 @@ dependencies:
   material_ui: ^1.4.0
   mime: ^2.0.0
   pointer_interceptor: ^0.10.1+2
+  qr: ^3.0.2
   two_dimensional_scrollables: ^0.5.2
   url_launcher: ^6.3.2
 

@@ -372,6 +372,7 @@ implicit_types:
     - MultiSelectAppearance
     - NumberAppearance
     - NumberRangeFilter
+    - OneTimeCodeCallback
     - PasswordStrength
     - passwordStrength
     - peersOnField
@@ -426,6 +427,7 @@ not_needed:
     - AccordionSection
     - AssetField
     - AssetRefField
+    - AuthenticatorSetupView
     - BarChart
     - BarSparkline
     - CalendarHeatGrid
@@ -456,6 +458,7 @@ not_needed:
     - MediaKind
     - MediaStatus
     - NavGroup
+    - OneTimeCodeForm
     - OptionalBooleanField
     - OptionalField
     - OptionalNumberField
@@ -463,6 +466,8 @@ not_needed:
     - PasswordField
     - ProgressBar
     - ProgressRing
+    - QrCodeView
+    - RecoveryCodesView
     - ReferenceField
     - Repeater
     - SidebarAccount

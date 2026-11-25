@@ -25,6 +25,11 @@ const heldBack = <String, String>{
   'desktop_drop':
       '0.9 needs cross_file ^0.4, and file_picker 13.1.0, the latest, still '
       'pins cross_file ^0.3.5. Widen once a file_picker release takes 0.4.',
+  'qr':
+      '4.0 replaced the API (a QrPayload, an enum for the error level), '
+      'and 3.x is still maintained: 3.0.3 came out with 4.0.1. An app whose '
+      'own code still encodes on 3.x resolves with the kit only while the kit '
+      'takes 3.x. Move to ^4 once the apps on the kit have.',
 };
 
 Future<void> main() async {

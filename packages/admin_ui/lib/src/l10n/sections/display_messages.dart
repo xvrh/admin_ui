@@ -118,6 +118,11 @@ abstract class DisplayMessages extends AdminMessages {
   /// Zooms a zoom view out until all of its content shows.
   String get zoomToFit;
 
+  // QR code.
+
+  /// The accessible name of a QR code the app gives none.
+  String get qrCode;
+
   // Upload.
 
   /// Every upload in the queue finished: "Upload complete" for one file.
@@ -480,6 +485,9 @@ class DisplayMessagesEn extends DisplayMessages {
 
   @override
   String get zoomToFit => 'Zoom to fit';
+
+  @override
+  String get qrCode => 'QR code';
 
   @override
   String uploadDone(int total) => plural(
@@ -885,6 +893,9 @@ class DisplayMessagesFr extends DisplayMessages {
 
   @override
   String get zoomToFit => 'Ajuster à la vue';
+
+  @override
+  String get qrCode => 'Code QR';
 
   @override
   String uploadDone(int total) => plural(
@@ -1312,6 +1323,9 @@ class DisplayMessagesAr extends DisplayMessages {
 
   @override
   String get zoomToFit => 'ملاءمة للعرض';
+
+  @override
+  String get qrCode => 'رمز QR';
 
   @override
   String uploadDone(int total) => plural(

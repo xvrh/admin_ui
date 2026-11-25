@@ -8,11 +8,15 @@ library;
 
 export 'src/auth/ui/auth_field.dart' show AuthField, AuthFieldError;
 export 'src/auth/ui/auth_scaffold.dart' show AuthScaffold;
+export 'src/auth/ui/authenticator_setup_view.dart' show AuthenticatorSetupView;
 export 'src/auth/ui/change_password_form.dart'
     show ChangePasswordCallback, ChangePasswordForm, ChangePasswordFormState;
 export 'src/auth/ui/new_password_fields.dart'
     show NewPasswordFields, NewPasswordFieldsState;
+export 'src/auth/ui/one_time_code_form.dart'
+    show OneTimeCodeCallback, OneTimeCodeForm;
 export 'src/auth/ui/password_strength.dart'
     show PasswordStrength, PasswordStrengthMeter, passwordStrength;
+export 'src/auth/ui/recovery_codes_view.dart' show RecoveryCodesView;
 export 'src/auth/ui/set_password_form.dart' show SetPasswordForm;
 export 'src/auth/ui/sign_in_form.dart' show SignInCallback, SignInForm;
