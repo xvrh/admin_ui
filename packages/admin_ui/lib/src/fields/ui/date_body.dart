@@ -14,6 +14,7 @@ import '../../common/ui/popover_menu.dart';
 import '../../common/ui/tappable.dart';
 import '../../common/ui/tip.dart';
 import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/date_locale.dart';
 import '../../l10n/formats.dart';
 import '../../theme/field_style.dart';
 import '../../theme/spacing.dart';
@@ -146,7 +147,7 @@ class DateBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var loc = _localeFor(context);
+    var loc = dateLocaleOf(_localeFor(context));
     if (editor == DateEditorStyle.inline) return _inline(context, loc);
     return _PopoverFocus(
       builder: (context, content, focusFirst) => Popover(
@@ -816,7 +817,7 @@ class _CalendarButtonState extends State<_CalendarButton> {
 
   @override
   Widget build(BuildContext context) {
-    final label = MaterialLocalizations.of(context).datePickerHelpText;
+    final label = context.adminL10n.selectDate;
     final state = FieldStateScope.of(context);
     final side = context.sizes.medium;
     return Popover(

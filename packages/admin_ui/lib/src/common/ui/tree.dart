@@ -1386,13 +1386,11 @@ class _CaretState extends State<_Caret> {
 
   @override
   Widget build(BuildContext context) {
-    final material = MaterialLocalizations.of(context);
+    final l10n = context.adminL10n;
     return Semantics(
       container: true,
       button: true,
-      label: widget.expanded
-          ? material.expandedIconTapHint
-          : material.collapsedIconTapHint,
+      label: widget.expanded ? l10n.collapse : l10n.expand,
       expanded: widget.expanded,
       child: _target(context),
     );

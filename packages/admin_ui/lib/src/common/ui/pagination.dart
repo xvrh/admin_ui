@@ -141,14 +141,14 @@ class Pagination extends StatelessWidget {
         ? const <int?>[]
         : pagesFor(page, count, siblings: siblings);
     final canNext = count == null ? hasNext : page < count;
-    final material = MaterialLocalizations.of(context);
+    final l10n = context.adminL10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _PageButton.arrow(
           key: previousKey,
           icon: context.icons.chevronBack,
-          label: material.previousPageTooltip,
+          label: l10n.previousPage,
           size: size,
           onTap: onChanged != null && page > 1 ? () => _go(page - 1) : null,
         ),
@@ -168,7 +168,7 @@ class Pagination extends StatelessWidget {
         _PageButton.arrow(
           key: nextKey,
           icon: context.icons.chevronForward,
-          label: material.nextPageTooltip,
+          label: l10n.nextPage,
           size: size,
           onTap: onChanged != null && canNext ? () => _go(page + 1) : null,
         ),

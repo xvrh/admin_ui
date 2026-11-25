@@ -803,7 +803,7 @@ class _RowState extends State<_Row> {
       if (item.onDismiss case final onDismiss?) ...[
         if (entries.isNotEmpty) const MenuDivider(),
         MenuItem(
-          MaterialLocalizations.of(context).modalBarrierDismissLabel,
+          context.adminL10n.dismiss,
           icon: context.icons.close,
           onSelect: onDismiss,
         ),

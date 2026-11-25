@@ -169,7 +169,7 @@ Future<bool> _confirmLeave(BuildContext context, UnsavedChangesGuard guard) {
     confirmLabel: saving
         ? guard.savingConfirmLabel ?? shell.leave
         : guard.confirmLabel ?? shell.discard,
-    cancelLabel: MaterialLocalizations.of(context).cancelButtonLabel,
+    cancelLabel: context.adminL10n.cancel,
     danger: true,
   );
 }

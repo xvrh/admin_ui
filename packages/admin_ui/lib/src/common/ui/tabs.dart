@@ -11,6 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tabs_style.dart';
@@ -1006,9 +1007,7 @@ class _TabState extends State<_Tab> {
               alwaysIncludeSemantics: true,
               child: IconAction(
                 context.icons.dropdown,
-                label:
-                    widget.item.menuLabel ??
-                    MaterialLocalizations.of(context).moreButtonTooltip,
+                label: widget.item.menuLabel ?? context.adminL10n.more,
                 size: IconActionSize.inline,
                 color: color,
                 expanded: c.isOpen,

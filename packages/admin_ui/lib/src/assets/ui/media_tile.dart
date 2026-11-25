@@ -1105,8 +1105,7 @@ class SelectionFooter extends StatelessWidget {
           const Gap(AdminSpacing.lg),
           if (onCancel != null) ...[
             Button(
-              cancelLabel ??
-                  MaterialLocalizations.of(context).cancelButtonLabel,
+              cancelLabel ?? context.adminL10n.cancel,
               variant: ButtonVariant.ghost,
               onPressed: onCancel,
             ),

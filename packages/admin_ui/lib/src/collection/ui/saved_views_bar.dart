@@ -238,7 +238,7 @@ class SavedViewsBar extends StatelessWidget {
       if (onDelete != null) ...[
         if (edits.isNotEmpty || moveEntries.isNotEmpty) const MenuDivider(),
         MenuItem(
-          MaterialLocalizations.of(context).deleteButtonTooltip,
+          context.adminL10n.delete,
           icon: context.icons.delete,
           danger: true,
           onSelect: () => onDelete!(v),
@@ -315,7 +315,7 @@ class SavedViewsBar extends StatelessWidget {
         if (onSaveChanges != null && activeId != null) ...[
           const Gap(AdminSpacing.xs),
           Button.primary(
-            MaterialLocalizations.of(context).saveButtonLabel,
+            context.adminL10n.save,
             size: size,
             icon: touch ? null : context.icons.saveView,
             onPressed: onSaveChanges,
@@ -583,7 +583,7 @@ class _ErrorNote extends StatelessWidget {
           if (onDismiss != null) ...[
             const Gap(AdminSpacing.xs),
             IconAction.close(
-              label: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+              label: context.adminL10n.dismiss,
               size: IconActionSize.small,
               onPressed: onDismiss,
             ),

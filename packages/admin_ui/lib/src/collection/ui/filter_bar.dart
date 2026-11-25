@@ -21,6 +21,7 @@ import '../../common/ui/popover.dart';
 import '../../common/ui/popover_menu.dart';
 import '../../common/ui/tappable.dart';
 import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/date_locale.dart';
 import '../../l10n/formats.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
@@ -636,13 +637,9 @@ String fmtDate(DateTime d) =>
 
 /// [date] as the filter chips and the date editor show it: "Jan 5, 2026" in
 /// English, "5 janv. 2026" in French. A locale whose date data isn't loaded
-/// (no Material delegates) falls back to intl's current one.
+/// falls back to intl's current one.
 String _formatDate(BuildContext context, DateTime date) {
-  final locale = Intl.verifiedLocale(
-    context.adminFormats.locale,
-    DateFormat.localeExists,
-    onFailure: (_) => null,
-  );
+  final locale = dateLocaleOf(context.adminFormats.locale);
   return context.adminFormats.dateFormat(DateFormat.yMMMd(locale)).format(date);
 }
 

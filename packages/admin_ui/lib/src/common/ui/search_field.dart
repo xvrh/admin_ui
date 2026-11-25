@@ -185,7 +185,7 @@ class _SearchFieldState extends State<SearchField> {
       enabled: widget.enabled,
       readOnly: widget.readOnly,
       size: widget.size,
-      hint: widget.hint ?? MaterialLocalizations.of(context).searchFieldLabel,
+      hint: widget.hint ?? context.adminL10n.search,
       errorText: widget.errorText,
       icon: context.icons.search,
       textInputAction: widget.textInputAction,

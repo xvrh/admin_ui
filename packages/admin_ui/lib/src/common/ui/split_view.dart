@@ -610,10 +610,7 @@ class _DividerState extends State<_Divider> {
     final stepForward = _stepper(towardEnd: endIsForward);
 
     final l10n = context.adminL10n;
-    final material = MaterialLocalizations.of(context);
-    final toggleLabel = widget.collapsed
-        ? material.collapsedIconTapHint
-        : material.expandedIconTapHint;
+    final toggleLabel = widget.collapsed ? l10n.expand : l10n.collapse;
 
     final target = MouseRegion(
       cursor: horizontal

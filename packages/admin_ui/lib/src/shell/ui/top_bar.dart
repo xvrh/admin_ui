@@ -9,6 +9,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../common/text_metrics.dart';
 import '../../common/ui/chrome_theme.dart';
 import '../../common/ui/icon_action.dart';
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'navigation_drawer.dart';
@@ -235,9 +236,7 @@ class _Middle extends StatelessWidget {
             slotWidth = IconActionSize.medium.boxOf(context);
             slot = IconAction(
               context.icons.search,
-              label:
-                  searchLabel ??
-                  MaterialLocalizations.of(context).searchFieldLabel,
+              label: searchLabel ?? context.adminL10n.search,
               onPressed: onSearch,
             );
           }

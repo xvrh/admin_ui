@@ -4,6 +4,7 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/tokens.dart';
 import 'field_chrome.dart';
 import 'icon_action.dart';
@@ -37,7 +38,7 @@ class ClearButton extends StatelessWidget {
     if (!state.enabled || state.readOnly) return const SizedBox.shrink();
     return IconAction(
       context.icons.close,
-      label: label ?? MaterialLocalizations.of(context).clearButtonTooltip,
+      label: label ?? context.adminL10n.clear,
       onPressed: onPressed,
       size: IconActionSize.inline,
       color: color,

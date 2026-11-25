@@ -134,7 +134,7 @@ class AssetDetailView extends StatelessWidget {
       children: [
         if (delete != null)
           Button.danger(
-            MaterialLocalizations.of(context).deleteButtonTooltip,
+            context.adminL10n.delete,
             icon: context.icons.delete,
             onPressed: delete,
           ),

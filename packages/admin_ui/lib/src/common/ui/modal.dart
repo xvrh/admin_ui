@@ -364,8 +364,7 @@ Future<bool> showConfirmDialog(
         title: title,
         message: message,
         confirmLabel: confirmLabel ?? l10n.inputs.confirm,
-        cancelLabel:
-            cancelLabel ?? MaterialLocalizations.of(ctx).cancelButtonLabel,
+        cancelLabel: cancelLabel ?? ctx.adminL10n.cancel,
         confirmKey: confirmKey,
         cancelKey: cancelKey,
         danger: danger,

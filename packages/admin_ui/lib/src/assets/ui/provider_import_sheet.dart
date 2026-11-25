@@ -164,7 +164,7 @@ class _ImportSheetState extends State<_ImportSheet> {
       ),
       actions: [
         Button(
-          MaterialLocalizations.of(context).cancelButtonLabel,
+          context.adminL10n.cancel,
           variant: ButtonVariant.ghost,
           onPressed: _importing ? null : () => Navigator.of(context).pop(),
         ),

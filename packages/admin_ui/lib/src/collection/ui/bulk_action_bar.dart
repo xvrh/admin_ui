@@ -116,7 +116,7 @@ class BulkActionBar extends StatelessWidget {
     if (_wholeQuery || onSelectAllMatching == null) return null;
     final total = matchingTotal;
     return total == null
-        ? MaterialLocalizations.of(context).selectAllButtonLabel
+        ? context.adminL10n.selectAll
         : context.adminL10n.collection.selectAllCount(total);
   }
 

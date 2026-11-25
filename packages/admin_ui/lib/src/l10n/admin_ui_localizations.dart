@@ -271,6 +271,140 @@ abstract class AdminLocalizations extends AdminMessages {
   /// bytes, 0 for bytes up to 4 for terabytes. Used by
   /// [AdminFormats.bytes].
   String byteSize(String amount, int power);
+
+  /// The label of a button that closes a dialog or a prompt and keeps
+  /// everything as it was.
+  String get cancel;
+
+  /// The label of a button that saves.
+  String get save;
+
+  /// The label of a button that deletes.
+  String get delete;
+
+  /// The label of a button that copies to the clipboard.
+  String get copy;
+
+  /// The label of a button that closes a panel, a sheet or a message.
+  String get close;
+
+  /// The label of a button that empties a field.
+  String get clear;
+
+  /// The accessible name of a search field.
+  String get search;
+
+  /// The label of a button that opens the actions that did not fit.
+  String get more;
+
+  /// The label of a control that selects every item.
+  String get selectAll;
+
+  /// The accessible name of what closes an overlay: its barrier, or the
+  /// close button of a message.
+  String get dismiss;
+
+  /// The label of a pager's page size menu.
+  String get rowsPerPage;
+
+  /// The rows a page shows, out of all of them: "1–25 of 1,234". The
+  /// numbers are already formatted.
+  String pageRowsInfo(String first, String last, String total);
+
+  /// The label of the button that goes to the previous page.
+  String get previousPage;
+
+  /// The label of the button that goes to the next page.
+  String get nextPage;
+
+  /// The label of a calendar's previous-month button.
+  String get previousMonth;
+
+  /// The label of a calendar's next-month button.
+  String get nextMonth;
+
+  /// Today, added to the accessible name of today's date in a calendar.
+  String get today;
+
+  /// The accessible name of the day a range starts on; [date] is
+  /// already formatted.
+  String rangeStartDate(String date);
+
+  /// The accessible name of the day a range ends on; [date] is already
+  /// formatted.
+  String rangeEndDate(String date);
+
+  /// The heading of a date picker.
+  String get selectDate;
+
+  /// The heading of a date range picker.
+  String get selectDateRange;
+
+  /// The accessible name of the navigation drawer.
+  String get navigationMenu;
+
+  /// What activating a collapsed node or panel does: it expands.
+  String get expand;
+
+  /// What activating an expanded node or panel does: it collapses.
+  String get collapse;
+
+  /// The name of the Control key, in a shortcut written out.
+  String get keyboardKeyControl;
+
+  /// The name of the Alt key, in a shortcut written out.
+  String get keyboardKeyAlt;
+
+  /// The name of the Shift key, in a shortcut written out.
+  String get keyboardKeyShift;
+
+  /// The name of the Meta key, elsewhere than on Windows, in a shortcut written out.
+  String get keyboardKeyMeta;
+
+  /// The name of the Windows key, in a shortcut written out.
+  String get keyboardKeyMetaWindows;
+
+  /// The name of the Backspace key, in a shortcut written out.
+  String get keyboardKeyBackspace;
+
+  /// The name of the Delete key, in a shortcut written out.
+  String get keyboardKeyDelete;
+
+  /// The name of the End key, in a shortcut written out.
+  String get keyboardKeyEnd;
+
+  /// The name of the Escape key, in a shortcut written out.
+  String get keyboardKeyEscape;
+
+  /// The name of the Home key, in a shortcut written out.
+  String get keyboardKeyHome;
+
+  /// The name of the Insert key, in a shortcut written out.
+  String get keyboardKeyInsert;
+
+  /// The name of the Page Down key, in a shortcut written out.
+  String get keyboardKeyPageDown;
+
+  /// The name of the Page Up key, in a shortcut written out.
+  String get keyboardKeyPageUp;
+
+  /// The name of the space bar, in a shortcut written out.
+  String get keyboardKeySpace;
+
+  /// The name of the Caps Lock key, in a shortcut written out.
+  String get keyboardKeyCapsLock;
+
+  /// The name of the Print Screen key, in a shortcut written out.
+  String get keyboardKeyPrintScreen;
+
+  /// The name of the Scroll Lock key, in a shortcut written out.
+  String get keyboardKeyScrollLock;
+
+  /// The name of the Num Lock key, in a shortcut written out.
+  String get keyboardKeyNumLock;
+
+  /// The name of the Fn key, in a shortcut written out.
+  String get keyboardKeyFn;
 }
 
 /// English [AdminLocalizations], and the fallback for every language the
@@ -434,6 +568,136 @@ class AdminLocalizationsEn extends AdminLocalizations {
   @override
   String byteSize(String amount, int power) =>
       '$amount ${const ['B', 'kB', 'MB', 'GB', 'TB'][power]}';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get clear => 'Clear text';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get more => 'More';
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
+  String get dismiss => 'Dismiss';
+
+  @override
+  String get rowsPerPage => 'Rows per page:';
+
+  @override
+  String pageRowsInfo(String first, String last, String total) =>
+      '$first–$last of $total';
+
+  @override
+  String get previousPage => 'Previous page';
+
+  @override
+  String get nextPage => 'Next page';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String rangeStartDate(String date) => 'Start date $date';
+
+  @override
+  String rangeEndDate(String date) => 'End date $date';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get selectDateRange => 'Select range';
+
+  @override
+  String get navigationMenu => 'Navigation menu';
+
+  @override
+  String get expand => 'Expand';
+
+  @override
+  String get collapse => 'Collapse';
+
+  @override
+  String get keyboardKeyControl => 'Ctrl';
+
+  @override
+  String get keyboardKeyAlt => 'Alt';
+
+  @override
+  String get keyboardKeyShift => 'Shift';
+
+  @override
+  String get keyboardKeyMeta => 'Meta';
+
+  @override
+  String get keyboardKeyMetaWindows => 'Win';
+
+  @override
+  String get keyboardKeyBackspace => 'Backspace';
+
+  @override
+  String get keyboardKeyDelete => 'Del';
+
+  @override
+  String get keyboardKeyEnd => 'End';
+
+  @override
+  String get keyboardKeyEscape => 'Esc';
+
+  @override
+  String get keyboardKeyHome => 'Home';
+
+  @override
+  String get keyboardKeyInsert => 'Insert';
+
+  @override
+  String get keyboardKeyPageDown => 'PgDown';
+
+  @override
+  String get keyboardKeyPageUp => 'PgUp';
+
+  @override
+  String get keyboardKeySpace => 'Space';
+
+  @override
+  String get keyboardKeyCapsLock => 'Caps Lock';
+
+  @override
+  String get keyboardKeyPrintScreen => 'Print Screen';
+
+  @override
+  String get keyboardKeyScrollLock => 'Scroll Lock';
+
+  @override
+  String get keyboardKeyNumLock => 'Num Lock';
+
+  @override
+  String get keyboardKeyFn => 'Fn';
 }
 
 /// French [AdminLocalizations].
@@ -599,6 +863,136 @@ class AdminLocalizationsFr extends AdminLocalizations {
   @override
   String byteSize(String amount, int power) =>
       '$amount\u00A0${const ['o', 'ko', 'Mo', 'Go', 'To'][power]}';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get save => 'Enregistrer';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get copy => 'Copier';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get clear => 'Effacer le texte';
+
+  @override
+  String get search => 'Rechercher';
+
+  @override
+  String get more => 'Plus';
+
+  @override
+  String get selectAll => 'Tout sélectionner';
+
+  @override
+  String get dismiss => 'Ignorer';
+
+  @override
+  String get rowsPerPage => 'Lignes par page :';
+
+  @override
+  String pageRowsInfo(String first, String last, String total) =>
+      '$first – $last sur $total';
+
+  @override
+  String get previousPage => 'Page précédente';
+
+  @override
+  String get nextPage => 'Page suivante';
+
+  @override
+  String get previousMonth => 'Mois précédent';
+
+  @override
+  String get nextMonth => 'Mois suivant';
+
+  @override
+  String get today => 'Aujourd\'hui';
+
+  @override
+  String rangeStartDate(String date) => 'Date de début : $date';
+
+  @override
+  String rangeEndDate(String date) => 'Date de fin : $date';
+
+  @override
+  String get selectDate => 'Sélectionner une date';
+
+  @override
+  String get selectDateRange => 'Sélectionner une plage';
+
+  @override
+  String get navigationMenu => 'Menu de navigation';
+
+  @override
+  String get expand => 'Développer';
+
+  @override
+  String get collapse => 'Réduire';
+
+  @override
+  String get keyboardKeyControl => 'Ctrl';
+
+  @override
+  String get keyboardKeyAlt => 'Alt';
+
+  @override
+  String get keyboardKeyShift => 'Maj';
+
+  @override
+  String get keyboardKeyMeta => 'Méta';
+
+  @override
+  String get keyboardKeyMetaWindows => 'Win';
+
+  @override
+  String get keyboardKeyBackspace => 'Retour arrière';
+
+  @override
+  String get keyboardKeyDelete => 'Suppr';
+
+  @override
+  String get keyboardKeyEnd => 'Fin';
+
+  @override
+  String get keyboardKeyEscape => 'Échap';
+
+  @override
+  String get keyboardKeyHome => 'Accueil';
+
+  @override
+  String get keyboardKeyInsert => 'Insérer';
+
+  @override
+  String get keyboardKeyPageDown => 'PgSuiv';
+
+  @override
+  String get keyboardKeyPageUp => 'PgPréc';
+
+  @override
+  String get keyboardKeySpace => 'Espace';
+
+  @override
+  String get keyboardKeyCapsLock => 'Verr Maj';
+
+  @override
+  String get keyboardKeyPrintScreen => 'Impr. écran';
+
+  @override
+  String get keyboardKeyScrollLock => 'Arrêt défil';
+
+  @override
+  String get keyboardKeyNumLock => 'Verr Num';
+
+  @override
+  String get keyboardKeyFn => 'Fn';
 }
 
 /// Arabic [AdminLocalizations].
@@ -766,6 +1160,136 @@ class AdminLocalizationsAr extends AdminLocalizations {
   @override
   String byteSize(String amount, int power) =>
       '$amount ${const ['بايت', 'كيلوبايت', 'ميغابايت', 'غيغابايت', 'تيرابايت'][power]}';
+
+  @override
+  String get cancel => 'الإلغاء';
+
+  @override
+  String get save => 'الحفظ';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get copy => 'نسخ';
+
+  @override
+  String get close => 'إغلاق';
+
+  @override
+  String get clear => 'محو النص';
+
+  @override
+  String get search => 'بحث';
+
+  @override
+  String get more => 'المزيد';
+
+  @override
+  String get selectAll => 'اختيار الكل';
+
+  @override
+  String get dismiss => 'رفض';
+
+  @override
+  String get rowsPerPage => 'عدد الصفوف في الصفحة:';
+
+  @override
+  String pageRowsInfo(String first, String last, String total) =>
+      'من $first إلى $last من إجمالي $total';
+
+  @override
+  String get previousPage => 'الصفحة السابقة';
+
+  @override
+  String get nextPage => 'الصفحة التالية';
+
+  @override
+  String get previousMonth => 'الشهر السابق';
+
+  @override
+  String get nextMonth => 'الشهر التالي';
+
+  @override
+  String get today => 'تاريخ اليوم';
+
+  @override
+  String rangeStartDate(String date) => 'تاريخ البدء $date';
+
+  @override
+  String rangeEndDate(String date) => 'تاريخ الانتهاء $date';
+
+  @override
+  String get selectDate => 'اختيار التاريخ';
+
+  @override
+  String get selectDateRange => 'اختيار النطاق';
+
+  @override
+  String get navigationMenu => 'قائمة تنقل';
+
+  @override
+  String get expand => 'توسيع';
+
+  @override
+  String get collapse => 'تصغير';
+
+  @override
+  String get keyboardKeyControl => 'Ctrl';
+
+  @override
+  String get keyboardKeyAlt => 'Alt';
+
+  @override
+  String get keyboardKeyShift => 'Shift';
+
+  @override
+  String get keyboardKeyMeta => 'Meta';
+
+  @override
+  String get keyboardKeyMetaWindows => 'Win';
+
+  @override
+  String get keyboardKeyBackspace => 'Backspace';
+
+  @override
+  String get keyboardKeyDelete => 'Del';
+
+  @override
+  String get keyboardKeyEnd => 'End';
+
+  @override
+  String get keyboardKeyEscape => 'Esc';
+
+  @override
+  String get keyboardKeyHome => 'Home';
+
+  @override
+  String get keyboardKeyInsert => 'Insert';
+
+  @override
+  String get keyboardKeyPageDown => 'PgDown';
+
+  @override
+  String get keyboardKeyPageUp => 'PgUp';
+
+  @override
+  String get keyboardKeySpace => 'مفتاح المسافة';
+
+  @override
+  String get keyboardKeyCapsLock => 'Caps Lock';
+
+  @override
+  String get keyboardKeyPrintScreen => 'Print Screen';
+
+  @override
+  String get keyboardKeyScrollLock => 'Scroll Lock';
+
+  @override
+  String get keyboardKeyNumLock => 'Num Lock';
+
+  @override
+  String get keyboardKeyFn => 'Fn';
 }
 
 /// Reads the kit's strings from a [BuildContext].

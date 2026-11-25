@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'admin_ui_localizations.dart';
+
 /// Whether the platform writes shortcuts as glyphs (⌘K) and saves with ⌘.
 bool get _apple =>
     defaultTargetPlatform == TargetPlatform.macOS ||
@@ -25,12 +27,10 @@ SingleActivator primaryModifierActivator(
 /// [activator] as the platform writes it: glyphs with no separator on macOS
 /// and iOS ('⌘K', '⇧⌘P', in the order ⌃⌥⇧⌘), elsewhere modifier names joined
 /// by '+' ('Ctrl+K', 'Ctrl+Shift+P'). Modifier and key names come from
-/// [MaterialLocalizations], so they follow the app's language: 'Maj' for
-/// Shift in French.
+/// [AdminLocalizations], so they follow the app's language: 'Maj' for Shift
+/// in French.
 String shortcutLabel(BuildContext context, SingleActivator activator) {
-  final strings =
-      Localizations.of<MaterialLocalizations>(context, MaterialLocalizations) ??
-      const DefaultMaterialLocalizations();
+  final strings = AdminLocalizations.of(context);
   final key = _keyName(activator.trigger, strings);
   if (_apple) {
     return [
@@ -53,7 +53,7 @@ String shortcutLabel(BuildContext context, SingleActivator activator) {
   ].join('+');
 }
 
-String _keyName(LogicalKeyboardKey key, MaterialLocalizations strings) {
+String _keyName(LogicalKeyboardKey key, AdminLocalizations strings) {
   if (_glyph(key) case final glyph?) return glyph;
   if (_localized(key, strings) case final name?) return name;
   // A key that types a character reads as that character.
@@ -84,7 +84,7 @@ String? _glyph(LogicalKeyboardKey key) => switch (key) {
   _ => null,
 };
 
-String? _localized(LogicalKeyboardKey key, MaterialLocalizations strings) =>
+String? _localized(LogicalKeyboardKey key, AdminLocalizations strings) =>
     switch (key) {
       LogicalKeyboardKey.backspace => strings.keyboardKeyBackspace,
       LogicalKeyboardKey.delete => strings.keyboardKeyDelete,

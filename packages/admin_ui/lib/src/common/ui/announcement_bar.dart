@@ -140,8 +140,7 @@ class _AnnouncementBarState extends State<AnnouncementBar> {
                 if (onDismiss != null)
                   IconAction.close(
                     size: close,
-                    label: MaterialLocalizations.of(context)
-                        .modalBarrierDismissLabel,
+                    label: context.adminL10n.dismiss,
                     onPressed: onDismiss,
                   ),
               ],

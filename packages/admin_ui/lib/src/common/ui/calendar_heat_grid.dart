@@ -10,6 +10,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:material_ui/material_ui.dart';
 
 import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/date_locale.dart';
 import '../../l10n/formats.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
@@ -557,8 +558,8 @@ class _Days {
 }
 
 /// The names and week layout a [CalendarHeatGrid] shows: `intl`'s for the
-/// locale, when its date symbols are loaded; else `intl`'s current locale's
-/// names and [MaterialLocalizations]' first day of the week.
+/// locale, when its date symbols are loaded; else `intl`'s current
+/// locale's.
 class _GridNames {
   /// A month's short name, standing alone: 'Mar'.
   final String Function(DateTime day) month;
@@ -580,15 +581,9 @@ class _GridNames {
   });
 
   factory _GridNames.of(BuildContext context, String? locale) {
-    final requested =
-        locale ?? Localizations.maybeLocaleOf(context)?.toString();
-    final loaded = requested == null
-        ? null
-        : Intl.verifiedLocale(
-            requested,
-            DateFormat.localeExists,
-            onFailure: (_) => null,
-          );
+    final loaded = dateLocaleOf(
+      locale ?? Localizations.maybeLocaleOf(context)?.toString(),
+    );
     final formats = locale == null || loaded == null
         ? context.adminFormats
         : AdminFormats(loaded);
@@ -597,10 +592,8 @@ class _GridNames {
       month: DateFormat.LLL(loaded).format,
       date: formats.dateFormat(DateFormat.yMMMEd(loaded)).format,
       weekdays: symbols.STANDALONESHORTWEEKDAYS,
-      firstDayOfWeek: loaded == null
-          ? MaterialLocalizations.of(context).firstDayOfWeekIndex
-          // intl counts from Monday.
-          : (symbols.FIRSTDAYOFWEEK + 1) % 7,
+      // intl counts from Monday.
+      firstDayOfWeek: (symbols.FIRSTDAYOFWEEK + 1) % 7,
     );
   }
 }

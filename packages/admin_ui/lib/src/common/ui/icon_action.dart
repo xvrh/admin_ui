@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/sizes.dart';
 import '../../theme/tokens.dart';
 import 'tappable.dart';
@@ -131,7 +132,7 @@ class IconAction extends StatelessWidget {
     // A small button's corner at every size: a circle where the theme's
     // buttons are full-round, square where they are square.
     final radius = context.radii.button(ControlSize.small);
-    final name = label ?? MaterialLocalizations.of(context).closeButtonTooltip;
+    final name = label ?? context.adminL10n.close;
 
     Widget action = Tappable.states(
       onTap: onPressed,

@@ -98,7 +98,7 @@ class _SaveViewDialogState extends State<_SaveViewDialog> {
   @override
   Widget build(BuildContext context) {
     final strings = context.adminL10n.collection;
-    final material = MaterialLocalizations.of(context);
+    final l10n = context.adminL10n;
     return Modal(
       title: widget.rename ? strings.renameViewTitle : strings.saveViewTitle,
       description: widget.rename ? null : strings.saveViewDescription,
@@ -144,12 +144,9 @@ class _SaveViewDialogState extends State<_SaveViewDialog> {
         ],
       ),
       actions: [
-        Button.ghost(
-          material.cancelButtonLabel,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        Button.ghost(l10n.cancel, onPressed: () => Navigator.of(context).pop()),
         Button.primary(
-          widget.rename ? strings.rename : material.saveButtonLabel,
+          widget.rename ? strings.rename : l10n.save,
           onPressed: _submit,
         ),
       ],

@@ -10,6 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/feedback_style.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
@@ -158,8 +159,7 @@ class Alert extends StatelessWidget {
                   if (onDismiss != null)
                     IconAction.close(
                       size: close,
-                      label: MaterialLocalizations.of(context)
-                          .modalBarrierDismissLabel,
+                      label: context.adminL10n.dismiss,
                       onPressed: onDismiss,
                     ),
                 ],

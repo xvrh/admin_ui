@@ -5,10 +5,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart' show DateFormat, Intl;
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:material_ui/material_ui.dart';
 
 import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/date_locale.dart';
 import '../../l10n/formats.dart';
 import '../../theme/palette.dart';
 import '../../theme/spacing.dart';
@@ -1558,15 +1559,11 @@ class _TimeAxis extends _XAxis {
     required this._minute,
   });
 
-  /// The axis in [context]'s locale; one whose date data isn't loaded (no
-  /// Material delegates) falls back to intl's current one.
+  /// The axis in [context]'s locale; one whose date data isn't loaded falls
+  /// back to intl's current one.
   factory _TimeAxis.of(BuildContext context, DateTime from, DateTime to) {
     final formats = context.adminFormats;
-    final locale = Intl.verifiedLocale(
-      formats.locale,
-      DateFormat.localeExists,
-      onFailure: (_) => null,
-    );
+    final locale = dateLocaleOf(formats.locale);
     return _TimeAxis._(
       from,
       to,
