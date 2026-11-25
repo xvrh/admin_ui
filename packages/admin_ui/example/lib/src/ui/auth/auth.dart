@@ -165,6 +165,209 @@ class ChangePasswordDemo extends StatelessWidget {
   }
 }
 
+/// The step of a sign-in that asks for a one-time code.
+enum _CodeStep { authenticator, submitting, refused, recovery, emailed }
+
+class OneTimeCodeDemo extends StatelessWidget {
+  /// After a password, for an authenticator app: remember this browser, a
+  /// recovery code, back to the sign-in.
+  @Preview(name: 'One-time code', wrapper: adminUiPreview)
+  const OneTimeCodeDemo({super.key}) : _step = _CodeStep.authenticator;
+
+  /// The code on its way to the server.
+  @Preview(name: 'One-time code / submitting', wrapper: adminUiPreview)
+  const OneTimeCodeDemo.submitting({super.key}) : _step = _CodeStep.submitting;
+
+  /// The code as a server left it, refusing it: the message under the field.
+  @Preview(name: 'One-time code / refused', wrapper: adminUiPreview)
+  const OneTimeCodeDemo.refused({super.key}) : _step = _CodeStep.refused;
+
+  /// Swapped for a recovery code, of any length.
+  @Preview(name: 'One-time code / recovery code', wrapper: adminUiPreview)
+  const OneTimeCodeDemo.recovery({super.key}) : _step = _CodeStep.recovery;
+
+  /// A code sent by email: no checkbox and no recovery code.
+  @Preview(name: 'One-time code / emailed', wrapper: adminUiPreview)
+  const OneTimeCodeDemo.emailed({super.key}) : _step = _CodeStep.emailed;
+
+  final _CodeStep _step;
+
+  @override
+  Widget build(BuildContext context) {
+    final emailed = _step == _CodeStep.emailed;
+    final params = context.knobs;
+    final submitting = params.bool('Submitting', _step == _CodeStep.submitting);
+    final error = params.bool('Refused', _step == _CodeStep.refused);
+    final remember = params.bool('Remember checkbox', !emailed);
+    final recovery = params.bool('Recovery code', !emailed);
+    final back = params.bool('Back link', true);
+    final autoSubmit = params.bool('Submit on the last digit', false);
+
+    void snack(String m) =>
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+
+    return AuthScaffold(
+      logo: const _Brand(),
+      title: emailed ? 'Check your email' : 'Two-step sign-in',
+      subtitle: emailed
+          ? 'We sent a code to admin@example.com.'
+          : 'Open your authenticator app to get a code.',
+      child: OneTimeCodeForm(
+        onSubmit: (code, {required remember, required isRecoveryCode}) => snack(
+          '${isRecoveryCode ? 'Recovery code' : 'Code'} $code'
+          '${remember ? ', remembered' : ''}',
+        ),
+        submitting: submitting,
+        errorText: error ? 'That code is not valid. Try the next one.' : null,
+        autoSubmit: autoSubmit,
+        description: emailed
+            ? 'The code expires in 10 minutes.'
+            : 'Enter the 6-digit code your app shows.',
+        recoveryDescription: 'Each recovery code works once.',
+        rememberLabel: remember ? 'Remember this browser for 30 days' : null,
+        allowRecoveryCode: recovery,
+        initialRecovery: recovery && _step == _CodeStep.recovery,
+        onBack: back ? () => snack('Back to sign in') : null,
+      ),
+    );
+  }
+}
+
+/// A sample setup, as a server would make it: the issuer, the account and
+/// a 160-bit base32 key.
+const _secret = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
+const _otpauth =
+    'otpauth://totp/Acme%20Admin:admin%40example.com'
+    '?secret=$_secret&issuer=Acme%20Admin&algorithm=SHA1&digits=6&period=30';
+
+/// Where a demo of the two-step setup sits.
+enum _Frame { card, refused, dialog }
+
+class AuthenticatorSetupDemo extends StatelessWidget {
+  /// On the sign-in card, the step a first sign-in takes.
+  @Preview(name: 'Authenticator setup', wrapper: adminUiPreview)
+  const AuthenticatorSetupDemo({super.key}) : _frame = _Frame.card;
+
+  /// The confirming code refused: the message under the field.
+  @Preview(name: 'Authenticator setup / refused', wrapper: adminUiPreview)
+  const AuthenticatorSetupDemo.refused({super.key}) : _frame = _Frame.refused;
+
+  /// In a modal of an account's settings, with a cancel button.
+  @Preview(name: 'Authenticator setup / in a dialog', wrapper: adminUiPreview)
+  const AuthenticatorSetupDemo.dialog({super.key}) : _frame = _Frame.dialog;
+
+  final _Frame _frame;
+
+  @override
+  Widget build(BuildContext context) {
+    final dialog = _frame == _Frame.dialog;
+    final params = context.knobs;
+    final submitting = params.bool('Submitting', false);
+    final error = params.bool('Refused', _frame == _Frame.refused);
+    final cancel = params.bool('Cancel button', dialog);
+    final keyShown = params.bool('Key shown', false);
+
+    void snack(String m) =>
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+
+    final view = AuthenticatorSetupView(
+      key: ValueKey(keyShown),
+      uri: _otpauth,
+      secret: _secret,
+      initiallyShowsSecret: keyShown,
+      onSubmit: (code) => snack('Confirm $code'),
+      onCancel: cancel ? () => snack('Cancel') : null,
+      submitting: submitting,
+      errorText: error ? 'That code is not valid. Try the next one.' : null,
+      description: dialog
+          ? 'Scan the code with your authenticator app, then enter the code '
+                'it shows.'
+          : null,
+    );
+
+    if (dialog) {
+      return DemoPage(
+        maxWidth: 520,
+        children: [
+          Center(
+            child: Modal(
+              title: 'Turn on two-step sign-in',
+              size: ModalSize.small,
+              onDismiss: () => snack('Close'),
+              body: view,
+            ),
+          ),
+        ],
+      );
+    }
+    return AuthScaffold(
+      logo: const _Brand(),
+      title: 'Set up two-step sign-in',
+      subtitle:
+          'Scan the code with your authenticator app, then enter the code '
+          'it shows.',
+      child: view,
+    );
+  }
+}
+
+/// Ten recovery codes, as a server would hand them out.
+const _recoveryCodes = [
+  'q3vt-8kmd',
+  '7hzp-2wce',
+  'n9rx-4fjb',
+  'c5ly-6tgh',
+  'w2ks-9pqa',
+  'm8db-3xvn',
+  'e6jr-5yzu',
+  'u4gf-7nlc',
+  'b1hw-8rte',
+  'p7cq-2mso',
+];
+
+class RecoveryCodesDemo extends StatelessWidget {
+  /// On the sign-in card, after the first setup.
+  @Preview(name: 'Recovery codes', wrapper: adminUiPreview)
+  const RecoveryCodesDemo({super.key}) : dialog = false;
+
+  /// In a modal of an account's settings.
+  @Preview(name: 'Recovery codes / in a dialog', wrapper: adminUiPreview)
+  const RecoveryCodesDemo.dialog({super.key}) : dialog = true;
+
+  /// Whether the view sits in a modal rather than on the card.
+  final bool dialog;
+
+  @override
+  Widget build(BuildContext context) {
+    void snack(String m) =>
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+
+    final view = RecoveryCodesView(
+      codes: _recoveryCodes,
+      onDone: () => snack('Done'),
+      description:
+          'Each code signs you in once if you lose your phone. Keep them '
+          'somewhere safe: they are not shown again.',
+    );
+
+    if (dialog) {
+      return DemoPage(
+        maxWidth: 560,
+        children: [
+          Center(
+            child: Modal(title: 'Save your recovery codes', body: view),
+          ),
+        ],
+      );
+    }
+    return AuthScaffold(
+      logo: const _Brand(),
+      title: 'Save your recovery codes',
+      child: view,
+    );
+  }
+}
+
 class PasswordStrengthDemo extends StatelessWidget {
   @Preview(name: 'Password strength', wrapper: adminUiPreview)
   const PasswordStrengthDemo({super.key});

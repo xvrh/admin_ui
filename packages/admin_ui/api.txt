@@ -55,13 +55,17 @@ assets.dart showProviderImport
 auth.dart AuthField
 auth.dart AuthFieldError
 auth.dart AuthScaffold
+auth.dart AuthenticatorSetupView
 auth.dart ChangePasswordCallback
 auth.dart ChangePasswordForm
 auth.dart ChangePasswordFormState
 auth.dart NewPasswordFields
 auth.dart NewPasswordFieldsState
+auth.dart OneTimeCodeCallback
+auth.dart OneTimeCodeForm
 auth.dart PasswordStrength
 auth.dart PasswordStrengthMeter
+auth.dart RecoveryCodesView
 auth.dart SetPasswordForm
 auth.dart SignInCallback
 auth.dart SignInForm
@@ -626,6 +630,7 @@ widgets.dart PresenceChannel
 widgets.dart PresencePeer
 widgets.dart ProgressBar
 widgets.dart ProgressRing
+widgets.dart QrCodeView
 widgets.dart RecentsSource
 widgets.dart ScoredItem
 widgets.dart SearchField

@@ -736,9 +736,9 @@ Import `package:admin_ui/admin_ui.dart` for everything, or a narrower barrel:
 | Barrel | Contents |
 |---|---|
 | `theme.dart` | Tokens, the six themes, `buildAppTheme`, `AdminAppearance` |
-| `widgets.dart` | Primitives: buttons, inputs and their decoration (`fieldInputDecoration`), menus, popovers, modals, toasts, tabs, charts, calendar, command palette, the notification inbox (`NotificationCenter`, `NotificationInbox`, `NotificationBell`), `StatusPill` and `StatusDot`, attention tiles (`AttentionGrid`) |
+| `widgets.dart` | Primitives: buttons, inputs and their decoration (`fieldInputDecoration`), menus, popovers, modals, toasts, tabs, charts, calendar, command palette, the notification inbox (`NotificationCenter`, `NotificationInbox`, `NotificationBell`), `StatusPill` and `StatusDot`, attention tiles (`AttentionGrid`), a QR code (`QrCodeView`) |
 | `shell.dart` | `Shell` and its phone drawer (`showNavigationDrawer`, `ShellMenuButton`), `Sidebar`, `TopBar`, page headers and scaffolds, `SaveBar` and its `SaveCluster`, `AppearancePicker` |
-| `auth.dart` | Sign-in and password forms |
+| `auth.dart` | Sign-in and password forms, and the two-step sign-in views: the one-time code (`OneTimeCodeForm`), linking an authenticator app (`AuthenticatorSetupView`) and the recovery codes (`RecoveryCodesView`) |
 | `history.dart` | Revision and diff views, and `VersionDiff.of` to build a diff from two records |
 | `l10n.dart` | `AdminLocalizations`, formats, shortcut labels |
 | `fields.dart` | Field bodies, the pure views over a typed `Cell`; the language lanes and their model (`LocaleInfo`, `LocaleStatus`, `LangScope`); `SourceTargetPair`; `ChangeScope`; `FormGrid` |

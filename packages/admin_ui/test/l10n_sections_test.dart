@@ -35,6 +35,24 @@ final _display = <String, String Function(DisplayMessages)>{
   'choices': (m) => m.choices,
 };
 
+/// The two-step sign-in's words in the shell section.
+final _shell = <String, String Function(ShellMessages)>{
+  'verificationCode': (m) => m.verificationCode,
+  'verify': (m) => m.verify,
+  'codeIncomplete(1)': (m) => m.codeIncomplete(1),
+  'codeIncomplete(6)': (m) => m.codeIncomplete(6),
+  'recoveryCode': (m) => m.recoveryCode,
+  'useRecoveryCode': (m) => m.useRecoveryCode,
+  'useAuthenticatorApp': (m) => m.useAuthenticatorApp,
+  'backToSignIn': (m) => m.backToSignIn,
+  'authenticatorQrCode': (m) => m.authenticatorQrCode,
+  'cantScanQrCode': (m) => m.cantScanQrCode,
+  'enterSetupKey': (m) => m.enterSetupKey,
+  'copySetupKey': (m) => m.copySetupKey,
+  'copyAllCodes': (m) => m.copyAllCodes,
+  'savedRecoveryCodes': (m) => m.savedRecoveryCodes,
+};
+
 /// Members French writes exactly as English does, each with the reason.
 const _sameInFrench = {
   'translationSource': 'French says "Source" too',
@@ -90,6 +108,13 @@ void main() {
     _expectTranslated(_display, (l) => l.display);
   });
 
+  test('the shell section translates every two-step sign-in word', () {
+    _expectTranslated(_shell, (l) => l.shell);
+    _expectTranslated<DisplayMessages>({
+      'qrCode': (m) => m.qrCode,
+    }, (l) => l.display);
+  });
+
   test('a message with a value places it', () {
     for (final l in _locales) {
       final fields = l.fields;
@@ -102,6 +127,7 @@ void main() {
       expect(fields.inheritedDescription('SV'), contains('SV'));
       expect(fields.customDescription('slug'), contains('slug'));
       expect(l.display.nothingMatches('hero'), contains('hero'));
+      expect(l.shell.codeIncomplete(6), contains(l.shell.number(6)));
     }
   });
 

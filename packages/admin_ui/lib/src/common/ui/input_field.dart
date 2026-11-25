@@ -8,6 +8,7 @@ import 'dart:ui' show SemanticsValidationResult;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../theme/sizes.dart';
@@ -94,6 +95,18 @@ class InputField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final Iterable<String>? autofillHints;
 
+  /// Rewrites what is typed or pasted before the field takes it, as a
+  /// [TextField]'s do: [FilteringTextInputFormatter.digitsOnly] for a field
+  /// of digits, a [LengthLimitingTextInputFormatter] for one that holds so
+  /// many characters at most, with no counter under it.
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// Sets the value and the [hint] in the theme's monospace font
+  /// (`AdminTypeSpec.applyMonoFont`), with tabular figures, at the field's
+  /// size and on its line, so the field keeps its height: for a code, a key
+  /// or an identifier, read one character at a time.
+  final bool monospace;
+
   /// The direction the text is typed and shown in, when not the ambient
   /// one. Null reads an email or URL [keyboardType] as left to right, since
   /// an address reads so in every language, and follows the ambient
@@ -137,6 +150,8 @@ class InputField extends StatefulWidget {
     this.keyboardType,
     this.textInputAction,
     this.autofillHints,
+    this.inputFormatters,
+    this.monospace = false,
     this.textDirection,
     this.contextMenuBuilder,
   });
@@ -202,6 +217,13 @@ class _InputFieldState extends State<InputField> {
       widget.keyboardType,
     );
     final menu = widget.contextMenuBuilder;
+    final decoration = fieldInputDecoration(
+      context,
+      hint: widget.hint,
+      size: widget.size,
+      leadingIcon: widget.icon,
+      suffix: widget.suffix,
+    ).copyWith(counterText: '', hintTextDirection: direction);
     return MouseRegion(
       opaque: false,
       onEnter: (_) => _enter(),
@@ -221,19 +243,25 @@ class _InputFieldState extends State<InputField> {
         keyboardType: widget.keyboardType,
         textInputAction: widget.textInputAction,
         autofillHints: widget.autofillHints,
+        inputFormatters: widget.inputFormatters,
         textDirection: direction,
-        style: fieldTextStyle(context, size: widget.size),
-        decoration: fieldInputDecoration(
-          context,
-          hint: widget.hint,
-          size: widget.size,
-          leadingIcon: widget.icon,
-          suffix: widget.suffix,
-        ).copyWith(counterText: '', hintTextDirection: direction),
+        style: _mono(context, fieldTextStyle(context, size: widget.size)),
+        decoration: widget.monospace
+            ? decoration.copyWith(
+                hintStyle: _mono(context, decoration.hintStyle!),
+              )
+            : decoration,
         contextMenuBuilder: _menuGone ? null : menu ?? _platformMenu,
       ),
     );
   }
+
+  /// [style] in the monospace font, when the field is [InputField.monospace].
+  TextStyle _mono(BuildContext context, TextStyle style) => widget.monospace
+      ? context.type.spec
+            .applyMonoFont(style)
+            .copyWith(fontFeatures: const [FontFeature.tabularFigures()])
+      : style;
 
   /// [TextField]'s own default: the platform's menu.
   static Widget _platformMenu(

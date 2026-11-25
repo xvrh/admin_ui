@@ -1,4 +1,5 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -45,6 +46,16 @@ class InputFieldDemo extends StatelessWidget {
               Gap(AdminSpacing.md),
               InputField(hint: 'Large', size: ControlSize.large),
             ],
+          ),
+        ),
+        DemoVariant(
+          'Monospace, digits only — an order number, a one-time code',
+          InputField(
+            label: 'Order number',
+            value: '00482130',
+            monospace: true,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
         ),
         const DemoVariant(

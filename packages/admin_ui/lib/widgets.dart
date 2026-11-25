@@ -150,6 +150,7 @@ export 'src/common/ui/popover.dart'
         PopoverSide;
 export 'src/common/ui/popover_menu.dart' show PopoverMenuSurface, pickerSurface;
 export 'src/common/ui/progress_bar.dart' show ProgressBar;
+export 'src/common/ui/qr_code.dart' show QrCodeView;
 export 'src/common/ui/search_field.dart' show SearchField;
 export 'src/common/ui/segmented.dart' show SegmentOption, Segmented;
 export 'src/common/ui/severity.dart'

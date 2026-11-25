@@ -133,6 +133,47 @@ abstract class ShellMessages extends AdminMessages {
   /// The highest password strength.
   String get strengthStrong;
 
+  /// The field for a one-time code: from an authenticator app, or sent by
+  /// email.
+  String get verificationCode;
+
+  /// Submits a one-time code.
+  String get verify;
+
+  /// A one-time code submitted with fewer than its [length] digits.
+  String codeIncomplete(int length);
+
+  /// The field for a recovery code, which stands in for a one-time code
+  /// once.
+  String get recoveryCode;
+
+  /// Switches a one-time code form to a recovery code.
+  String get useRecoveryCode;
+
+  /// Switches a one-time code form back from a recovery code.
+  String get useAuthenticatorApp;
+
+  /// Leaves a step of signing in for its first, the email and password.
+  String get backToSignIn;
+
+  /// What a screen reader hears for the QR code an authenticator app scans.
+  String get authenticatorQrCode;
+
+  /// The link under the QR code that shows the setup key in its place.
+  String get cantScanQrCode;
+
+  /// Above the setup key, once [cantScanQrCode] showed it.
+  String get enterSetupKey;
+
+  /// The accessible name of the setup key's copy button.
+  String get copySetupKey;
+
+  /// Copies every recovery code at once.
+  String get copyAllCodes;
+
+  /// Acknowledges that the recovery codes are kept somewhere safe.
+  String get savedRecoveryCodes;
+
   /// The placeholder of a tags field's add input.
   String get addTagHint;
 
@@ -279,6 +320,49 @@ class ShellMessagesEn extends ShellMessages {
   String get strengthStrong => 'Strong';
 
   @override
+  String get verificationCode => 'Verification code';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    one: 'The code has ${number(length)} digit.',
+    other: 'The code has ${number(length)} digits.',
+  );
+
+  @override
+  String get recoveryCode => 'Recovery code';
+
+  @override
+  String get useRecoveryCode => 'Use a recovery code';
+
+  @override
+  String get useAuthenticatorApp => 'Use your authenticator app';
+
+  @override
+  String get backToSignIn => 'Back to sign in';
+
+  @override
+  String get authenticatorQrCode => 'QR code for your authenticator app';
+
+  @override
+  String get cantScanQrCode => 'Can’t scan the code?';
+
+  @override
+  String get enterSetupKey => 'Enter this key in your app instead.';
+
+  @override
+  String get copySetupKey => 'Copy key';
+
+  @override
+  String get copyAllCodes => 'Copy all';
+
+  @override
+  String get savedRecoveryCodes => 'I have saved these codes';
+
+  @override
   String get addTagHint => 'Add…';
 
   @override
@@ -423,6 +507,52 @@ class ShellMessagesFr extends ShellMessages {
 
   @override
   String get strengthStrong => 'Fort';
+
+  @override
+  String get verificationCode => 'Code de vérification';
+
+  @override
+  String get verify => 'Vérifier';
+
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    one: 'Le code comporte ${number(length)} chiffre.',
+    other: 'Le code comporte ${number(length)} chiffres.',
+  );
+
+  @override
+  String get recoveryCode => 'Code de récupération';
+
+  @override
+  String get useRecoveryCode => 'Utiliser un code de récupération';
+
+  @override
+  String get useAuthenticatorApp =>
+      'Utiliser votre application d’authentification';
+
+  @override
+  String get backToSignIn => 'Retour à la connexion';
+
+  @override
+  String get authenticatorQrCode =>
+      'Code QR pour votre application d’authentification';
+
+  @override
+  String get cantScanQrCode => 'Impossible de scanner le code ?';
+
+  @override
+  String get enterSetupKey =>
+      'Saisissez plutôt cette clé dans votre application.';
+
+  @override
+  String get copySetupKey => 'Copier la clé';
+
+  @override
+  String get copyAllCodes => 'Tout copier';
+
+  @override
+  String get savedRecoveryCodes => 'J’ai enregistré ces codes';
 
   @override
   String get addTagHint => 'Ajouter…';
@@ -577,6 +707,54 @@ class ShellMessagesAr extends ShellMessages {
 
   @override
   String get strengthStrong => 'قوية';
+
+  @override
+  String get verificationCode => 'رمز التحقق';
+
+  @override
+  String get verify => 'تحقق';
+
+  /// Arabic counts with the noun, in all six plural forms.
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    zero: 'يتكون الرمز من ${number(length)} رقم.',
+    one: 'يتكون الرمز من رقم واحد.',
+    two: 'يتكون الرمز من رقمين.',
+    few: 'يتكون الرمز من ${number(length)} أرقام.',
+    many: 'يتكون الرمز من ${number(length)} رقمًا.',
+    other: 'يتكون الرمز من ${number(length)} رقم.',
+  );
+
+  @override
+  String get recoveryCode => 'رمز الاسترداد';
+
+  @override
+  String get useRecoveryCode => 'استخدام رمز استرداد';
+
+  @override
+  String get useAuthenticatorApp => 'استخدام تطبيق المصادقة';
+
+  @override
+  String get backToSignIn => 'العودة إلى تسجيل الدخول';
+
+  @override
+  String get authenticatorQrCode => 'رمز QR لتطبيق المصادقة';
+
+  @override
+  String get cantScanQrCode => 'تعذّر مسح الرمز؟';
+
+  @override
+  String get enterSetupKey => 'أدخل هذا المفتاح في تطبيقك بدلًا من ذلك.';
+
+  @override
+  String get copySetupKey => 'نسخ المفتاح';
+
+  @override
+  String get copyAllCodes => 'نسخ الكل';
+
+  @override
+  String get savedRecoveryCodes => 'لقد حفظت هذه الرموز';
 
   @override
   String get addTagHint => 'إضافة…';
