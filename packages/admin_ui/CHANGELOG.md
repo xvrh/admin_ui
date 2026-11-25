@@ -12,6 +12,28 @@
   as do, so that the board's edge falls after a column rather than
   through its cards. Each defaults to what the board did, so nothing
   moves.
+- `ComboboxOption` takes a `group`: the heading it is listed under, for a
+  long list of options of a few kinds. Options sharing a group are listed
+  together under one heading, after the options with no group, the groups
+  in the order they first appear. Typed into, a group keeps its heading
+  while it has a match, and the groups follow their best match, as cmdk
+  orders them. A heading is not an option: the arrow keys pass over it, a
+  click on it picks nothing, and screen readers hear it as a heading. It
+  is drawn as a `MenuHeader` is. Options with no group list as before.
+- `Listbox` takes `groupOf`, which draws those headings over any list of
+  options: one above each option whose group is not the one before it's.
+  The `ListboxController` counts and moves through the options alone, so
+  "n of m" and the keys are the options', as they were.
+- A `LocalCollectionSource` field may read several values, as an
+  `Iterable`: the teams a member belongs to, the tags on a ticket. A
+  filter keeps a row when one of its values matches, `options` offers
+  each value once, the search looks in all of them, and the row sorts by
+  the first of them in the field's order, a row with none last. A list
+  read before was one value, its `toString`, so no option matched it.
+- `ThumbnailImage` takes an `alignment`, as `Image` does: where the image
+  sits in its box, and so the part a cropping `fit` keeps. A portrait
+  cropped to a square lost as much at its top as at its bottom, whatever
+  it showed. It is still centred by default.
 - `CommandSource` takes `listOnEmptyQuery`: on an empty query it lists
   every item, under its group and in the order given, where it lists
   none. A palette over one opened on "Type to search" with every page and

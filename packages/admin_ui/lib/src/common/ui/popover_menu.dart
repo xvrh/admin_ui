@@ -4,8 +4,10 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show internal;
 import 'package:material_ui/material_ui.dart';
 
+import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'chrome_theme.dart';
 import 'popover.dart';
@@ -153,6 +155,44 @@ class PopoverMenuSurface extends StatelessWidget {
       );
     }
     return surface;
+  }
+}
+
+/// The caption over a group of rows on a [PopoverMenuSurface], a
+/// [MenuHeader]'s or a [Listbox] group's, cased by the theme as
+/// [MenuHeader] says. [inset] lines its text up with the rows' labels.
+@internal
+class MenuGroupLabel extends StatelessWidget {
+  final String label;
+  final double inset;
+
+  const MenuGroupLabel(this.label, {super.key, required this.inset});
+
+  @override
+  Widget build(BuildContext context) {
+    final type = context.type;
+    final capitals = type.spec.uppercaseLabels;
+    return Padding(
+      padding: EdgeInsetsDirectional.fromSTEB(
+        inset,
+        AdminSpacing.md,
+        inset,
+        AdminSpacing.xs,
+      ),
+      // A 16px line box keeps the label on the rows' 4px grid: 28 tall, 32
+      // on Ant's 20px caption line.
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 16),
+        alignment: AlignmentDirectional.centerStart,
+        child: Text(
+          capitals ? label.toUpperCase() : label,
+          semanticsLabel: capitals ? label : null,
+          style: capitals
+              ? type.micro
+              : type.weighted(type.caption, type.spec.strong),
+        ),
+      ),
+    );
   }
 }
 

@@ -13,6 +13,7 @@ class Member {
   final DateTime? lastSeen;
   final bool verified;
   final String? city;
+  final List<String> teams;
 
   const Member(
     this.name,
@@ -22,6 +23,7 @@ class Member {
     this.lastSeen,
     this.verified = false,
     this.city,
+    this.teams = const [],
   });
 
   @override
@@ -37,6 +39,7 @@ final _members = [
     lastSeen: DateTime(2026, 3, 2, 18, 30),
     verified: true,
     city: 'Oslo',
+    teams: ['Sales', 'Design'],
   ),
   Member(
     'Ari',
@@ -45,6 +48,7 @@ final _members = [
     seats: 40,
     lastSeen: DateTime(2026, 3, 1, 9),
     city: 'Lima',
+    teams: ['Ops'],
   ),
   const Member('Cleo', 'cleo@example.com', verified: true),
   Member(
@@ -54,6 +58,7 @@ final _members = [
     seats: 5,
     lastSeen: DateTime(2026, 2, 20),
     city: 'Oslo',
+    teams: ['Design'],
   ),
 ];
 
@@ -67,6 +72,7 @@ final _source = LocalCollectionSource<Member>(
     'lastSeen': (m) => m.lastSeen,
     'verified': (m) => m.verified,
     'city': (m) => m.city,
+    'teams': (m) => m.teams,
   },
   searchFields: {'name', 'email'},
 );
@@ -228,6 +234,54 @@ void main() {
       ],
       [('free', 'FREE'), ('team', 'TEAM'), ('enterprise', 'ENTERPRISE')],
     );
+  });
+
+  group('a field that reads several values', () {
+    test('is matched by a filter when one of them is', () {
+      expect(
+        _names(const [
+          OptionsFilter('teams', {'Design'}),
+        ]),
+        ['dana', 'Bo'],
+      );
+      expect(_names(const [TextFilter('teams', 'op')]), ['Ari']);
+      expect(
+        _names(const [
+          OptionsFilter('teams', {'Support'}),
+        ]),
+        isEmpty,
+      );
+    });
+
+    test('offers each of them as an option', () {
+      expect(
+        [for (final o in _source.options('teams')) o.id],
+        ['Design', 'Ops', 'Sales'],
+      );
+    });
+
+    test('is searched in each of them', () {
+      final everywhere = LocalCollectionSource<Member>(
+        _members,
+        fields: {'name': (m) => m.name, 'teams': (m) => m.teams},
+      );
+      expect(
+        everywhere
+            .matching(const CollectionQuery(search: 'sales'))
+            .map((m) => m.name),
+        ['dana'],
+      );
+    });
+
+    test('sorts by the first of them, and a row with none last', () {
+      expect(_names(const [], sortKey: 'teams'), ['dana', 'Bo', 'Ari', 'Cleo']);
+      expect(_names(const [], sortKey: 'teams', ascending: false), [
+        'Ari',
+        'dana',
+        'Bo',
+        'Cleo',
+      ]);
+    });
   });
 
   test('a field the source cannot read is refused, not ignored', () {

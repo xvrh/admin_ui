@@ -83,7 +83,10 @@ const components = [
         'A text field that says whether it is open, with no `comboBox` '
         'role: the framework refuses it. Its options are buttons that say '
         'whether they are selected and where they stand, "2 of 5": the '
-        'list box and option roles are newer than the oldest Flutter.',
+        'list box and option roles are newer than the oldest Flutter. A '
+        'group\'s heading is a heading, with no role to hold its options '
+        'as a group: the framework has none, and an option the arrow keys '
+        'reach is announced without its group.',
   ),
   Component('SearchField'),
   Component('Calendar'),
