@@ -11,7 +11,8 @@ import '../sample.dart';
 
 /// Demo — the table's interaction states, one per knob value and pinned the
 /// way a person would reach them: the keyboard's focused cell and its ring,
-/// an open inline editor, an open header menu (sorted, so "Clear sort" is
+/// an open inline editor, an editor whose draft was refused with why on a
+/// card under its cell, an open header menu (sorted, so "Clear sort" is
 /// live), a row's context menu open under its focused cell with the row
 /// drawn as selected, the row hover over a stripe and over a selection, the
 /// pointer on
@@ -30,6 +31,9 @@ class DataTableInteractionDemo extends StatelessWidget {
 
   @Preview(name: 'Interaction · editing a cell', wrapper: adminUiPreview)
   const DataTableInteractionDemo.editing({super.key}) : _pin = _Pin.editing;
+
+  @Preview(name: 'Interaction · a draft refused', wrapper: adminUiPreview)
+  const DataTableInteractionDemo.refused({super.key}) : _pin = _Pin.refused;
 
   @Preview(name: 'Interaction · header menu open', wrapper: adminUiPreview)
   const DataTableInteractionDemo.headerMenu({super.key})
@@ -69,6 +73,7 @@ class DataTableInteractionDemo extends StatelessWidget {
         context.knobs.picker<_Pin>('State', const {
           'Focused cell': _Pin.focusedCell,
           'Editing a cell': _Pin.editing,
+          'A draft refused': _Pin.refused,
           'Header menu open': _Pin.headerMenu,
           'Row menu open': _Pin.rowMenu,
           'Row hover on a stripe': _Pin.hoverStripe,
@@ -94,6 +99,7 @@ class DataTableInteractionDemo extends StatelessWidget {
 enum _Pin {
   focusedCell,
   editing,
+  refused,
   headerMenu,
   rowMenu,
   hoverStripe,
@@ -114,6 +120,7 @@ class _PinnedTable extends StatefulWidget {
 class _PinnedTableState extends State<_PinnedTable> {
   final _rows = sampleProducts(12);
   final _renamed = <int, String>{};
+  final _restocked = <int, int>{};
   late Set<Product> _selected = widget.pin == _Pin.hoverSelected
       ? {_rows[1], _rows[2]}
       : {};
@@ -147,6 +154,20 @@ class _PinnedTableState extends State<_PinnedTable> {
         await _press(LogicalKeyboardKey.arrowDown);
         await _press(forward);
         await _press(LogicalKeyboardKey.f2);
+      case _Pin.refused:
+        // A Stock cell, its count typed below zero.
+        await _focusGrid();
+        await _press(LogicalKeyboardKey.arrowDown);
+        await _press(LogicalKeyboardKey.arrowDown);
+        await _press(LogicalKeyboardKey.end);
+        await _press(LogicalKeyboardKey.f2);
+        // The editor is built in the next frame, and laid out by its end:
+        // the card that says why is placed from its box.
+        await WidgetsBinding.instance.endOfFrame;
+        if (!mounted) return;
+        final draft = _find((w) => w is EditableText)?.widget as EditableText?;
+        draft?.controller.text = '-3';
+        await _press(LogicalKeyboardKey.enter);
       case _Pin.rowMenu:
         // The context-menu key, on the third row's first cell.
         await _focusGrid();
@@ -226,6 +247,8 @@ class _PinnedTableState extends State<_PinnedTable> {
       LogicalKeyboardKey.arrowLeft => PhysicalKeyboardKey.arrowLeft,
       LogicalKeyboardKey.arrowRight => PhysicalKeyboardKey.arrowRight,
       LogicalKeyboardKey.f2 => PhysicalKeyboardKey.f2,
+      LogicalKeyboardKey.end => PhysicalKeyboardKey.end,
+      LogicalKeyboardKey.enter => PhysicalKeyboardKey.enter,
       LogicalKeyboardKey.contextMenu => PhysicalKeyboardKey.contextMenu,
       _ => PhysicalKeyboardKey.space,
     };
@@ -364,9 +387,21 @@ class _PinnedTableState extends State<_PinnedTable> {
             fixed: 90,
             numeric: true,
             cellBuilder: (context, p) => Text(
-              p.stock?.toString() ?? '—',
+              (_restocked[p.id] ?? p.stock)?.toString() ?? '—',
               style: tableMutedStyle(context),
             ),
+            // A count is whole and not below zero: the editor refuses what
+            // is not, and says why under the cell.
+            editBuilder: widget.pin != _Pin.refused
+                ? null
+                : (p, session) => TableTextEditor.number(
+                    session: session,
+                    value: _restocked[p.id] ?? p.stock ?? 0,
+                    integer: true,
+                    min: 0,
+                    onCommit: (v) =>
+                        setState(() => _restocked[p.id] = v.toInt()),
+                  ),
           ),
         ],
       ),

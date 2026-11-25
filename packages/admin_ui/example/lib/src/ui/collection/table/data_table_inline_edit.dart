@@ -10,8 +10,10 @@ import '../../../preview_shell.dart';
 /// single tap still opens the row, once the double-tap window has passed.
 /// A tap on the read-only ID opens its row at once. The stock
 /// [TableTextEditor] keeps a draft: Enter, Tab or a click away saves it,
-/// Escape drops it, and Tab moves on to the next editable cell. Price
-/// parses as a number and stays open while it doesn't.
+/// Escape drops it, and Tab moves on to the next editable cell. A draft the
+/// editor refuses keeps it open, with why on a card under the cell: Price
+/// parses as a number and takes none below zero (`min: 0`), and Name takes
+/// no blank (`validate:`).
 class DataTableInlineEditDemo extends StatefulWidget {
   @Preview(name: 'Inline cell editing', wrapper: adminUiPreview)
   const DataTableInlineEditDemo({super.key});
@@ -90,6 +92,7 @@ class _DataTableInlineEditDemoState extends State<DataTableInlineEditDemo> {
       editBuilder: (r, session) => TableTextEditor(
         session: session,
         value: r.name,
+        validate: (v) => v.trim().isEmpty ? 'A product needs a name' : null,
         onCommit: (v) => setState(() => r.name = v),
       ),
     ),
@@ -102,6 +105,7 @@ class _DataTableInlineEditDemoState extends State<DataTableInlineEditDemo> {
         session: session,
         value: r.price,
         fractionDigits: 2,
+        min: 0,
         onCommit: (v) => setState(() => r.price = v.toDouble()),
       ),
     ),

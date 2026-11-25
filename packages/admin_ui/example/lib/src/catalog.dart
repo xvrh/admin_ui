@@ -285,6 +285,7 @@ Map<String, dynamic> genericCatalog() => {
       'Inline cell editing': const DataTableInlineEditDemo(),
       'Interaction': {
         'Editing a cell': const DataTableInteractionDemo.editing(),
+        'A draft refused': const DataTableInteractionDemo.refused(),
         'Header menu open': const DataTableInteractionDemo.headerMenu(),
         'Row menu open': const DataTableInteractionDemo.rowMenu(),
         'Row hover on a stripe': const DataTableInteractionDemo.hoverStripe(),

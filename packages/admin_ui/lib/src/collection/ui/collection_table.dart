@@ -98,7 +98,8 @@ class TableColumn<T> {
   /// or a double tap as [CollectionTable.editTrigger] allows, swaps the cell
   /// for `editBuilder(row, session)`. The editor keeps a draft and saves it
   /// through [EditSession.onCommit]: Enter, Tab and a tap outside commit,
-  /// Escape cancels. [TableTextEditor] is the stock text and number editor.
+  /// Escape cancels. [TableTextEditor] is the stock text and number editor,
+  /// which can refuse a draft and say why.
   /// Display columns can edit too — sortability is independent.
   final Widget Function(T row, EditSession session)? editBuilder;
 
