@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // One related record held as its id or null: the field shows the link
 // button or that record's row, never both, and the row's Replace button
 // opens the picker to choose another in its place.
@@ -49,8 +51,8 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
       locale: locale,
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Align(
           alignment: AlignmentDirectional.topStart,

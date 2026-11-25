@@ -1,19 +1,12 @@
-import 'package:common_locale_data/ar.dart' show CommonLocaleDataAr;
-import 'package:common_locale_data/common_locale_data.dart'
-    show CommonLocaleData, Language;
-import 'package:common_locale_data/en.dart' show CommonLocaleDataEn;
-import 'package:common_locale_data/fr.dart' show CommonLocaleDataFr;
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart' show Bidi;
 import 'package:material_ui/material_ui.dart';
 
 import '../common/ui/status_pill.dart';
+import '../l10n/admin_language.dart';
 import '../l10n/admin_ui_localizations.dart';
+import '../l10n/language_names.dart';
 import '../theme/tokens.dart';
-
-final _en = CommonLocaleDataEn();
-final _fr = CommonLocaleDataFr();
-final _ar = CommonLocaleDataAr();
 
 /// The display name of the language [code], from CLDR: "Spanish" for 'es',
 /// 'ES' or 'es_ES', "Brazilian Portuguese" for 'pt-BR'. The code is read in
@@ -21,57 +14,31 @@ final _ar = CommonLocaleDataAr();
 /// data has no name for falls back to the language alone; a language it does
 /// not know at all reads as the upper-cased code.
 ///
-/// The name is in the language of [displayLocale]: English, French or
-/// Arabic, the kit's own languages ("espagnol" for French), and English for
-/// any other or none. Each is imported on its own — never
-/// `common_locale_data_all.dart`, which pulls in every locale and wrecks
-/// tree-shaking. [languageNameOf] names it in the app's language.
+/// The name is in the language of [displayLocale], among the languages the
+/// app's [AdminLanguages] loaded ("espagnol" for French), and in English for
+/// any other or none, when the app loaded English. Each language brings its
+/// own names, so an app ships the names of the languages it lists and no
+/// others; with none loaded, every code reads upper-cased.
+/// [languageNameOf] names it in the app's language.
 String languageName(String code, {Locale? displayLocale}) {
-  final names = switch (displayLocale?.languageCode) {
-    'fr' => _fr,
-    'ar' => _ar,
-    _ => _en,
-  };
-  final (language, script, region) = _subtags(code);
-  for (final key in [
-    if (script != null && region != null) '$language-$script-$region',
-    if (region != null) '$language-$region',
-    if (script != null) '$language-$script',
-    language,
-  ]) {
-    if (_names(names)[key] case final name?) return name.name;
-  }
-  return code.toUpperCase();
+  final loaded = AdminLanguages.loaded;
+  final language = displayLocale == null
+      ? null
+      : loaded?.resolve(displayLocale);
+  return language?.nameOf(code) ??
+      loaded?.resolve(const Locale('en'))?.nameOf(code) ??
+      code.toUpperCase();
 }
 
-/// [languageName] in the language of [context]'s locale.
+/// [languageName] in the language of [context]'s locale: the names of the
+/// [AdminLanguage] loaded there.
 String languageNameOf(BuildContext context, String code) =>
+    AdminLanguage.of(context)?.nameOf(code) ??
     languageName(code, displayLocale: Localizations.maybeLocaleOf(context));
-
-Map<String, Language> _names(CommonLocaleData data) => data.languages.languages;
-
-/// [code]'s language, script and region subtags in their canonical case:
-/// 'PT_br' is ('pt', null, 'BR'), 'zh-hant' is ('zh', 'Hant', null).
-(String, String?, String?) _subtags(String code) {
-  final parts = code.trim().split(RegExp('[-_]'));
-  final language = parts.first.toLowerCase();
-  String? script;
-  String? region;
-  for (final part in parts.skip(1)) {
-    if (part.length == 4 && script == null && region == null) {
-      script = part[0].toUpperCase() + part.substring(1).toLowerCase();
-    } else if (region == null &&
-        (part.length == 2 ||
-            (part.length == 3 && int.tryParse(part) != null))) {
-      region = part.toUpperCase();
-    }
-  }
-  return (language, script, region);
-}
 
 /// [code] as a [Locale]; an empty code is the undetermined language 'und'.
 Locale _localeOf(String code) {
-  final (language, script, region) = _subtags(code);
+  final (language, script, region) = subtagsOf(code);
   return Locale.fromSubtags(
     languageCode: language.isEmpty ? 'und' : language,
     scriptCode: script,

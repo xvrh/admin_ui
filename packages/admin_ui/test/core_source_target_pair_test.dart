@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 final _tokens = defaultTokens;
 final _c = _tokens.palette;
 
@@ -12,8 +14,8 @@ Widget _host(
 }) => MaterialApp(
   theme: buildAppTheme(_tokens),
   locale: locale,
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Align(
       alignment: AlignmentDirectional.topStart,

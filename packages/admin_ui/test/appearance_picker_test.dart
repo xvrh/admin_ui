@@ -6,6 +6,8 @@ import 'package:material_ui/material_ui.dart';
 
 import 'readme/appearance.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 const _teal = Color(0xFF0D9488);
 
 /// A picker that takes each change it hands out, recorded in [changes].
@@ -39,8 +41,8 @@ Widget _app(
 }) => MaterialApp(
   theme: buildAppTheme(irisTheme.tokens),
   locale: locale,
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: SingleChildScrollView(
       child: Align(

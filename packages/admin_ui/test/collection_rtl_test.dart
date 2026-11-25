@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 class _Item {
   final int id;
   final String name;
@@ -74,7 +76,7 @@ Future<void> _pump(WidgetTester tester, Widget child, {bool rtl = true}) async {
     MaterialApp(
       locale: Locale(rtl ? 'ar' : 'en'),
       supportedLocales: const [Locale('en'), Locale('ar')],
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Align(alignment: AlignmentDirectional.topStart, child: child),
       ),

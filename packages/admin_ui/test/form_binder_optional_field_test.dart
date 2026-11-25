@@ -3,6 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 Future<LocalScope> _pump(
   WidgetTester tester,
   List<Widget> Function(LocalScope) fields,
@@ -12,8 +14,8 @@ Future<LocalScope> _pump(
   await tester.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: ListView(
           padding: const EdgeInsets.all(24),

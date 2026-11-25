@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // The placeholder of a page the signed-in user may not open: a muted lock,
 // the kit's words or the app's, and a way back where one is given.
 
@@ -16,8 +18,8 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
       locale: locale,
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context)
             .copyWith(textScaler: TextScaler.linear(textScale)),

@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // An overlay that plays its arrival back as it leaves follows the theme's
 // exit curve as time runs. Flutter evaluates a `reverseCurve` at the
 // animation's value, which runs from 1 to 0, so each overlay hands over the
@@ -17,8 +19,8 @@ const _shares = [0.25, 0.5, 0.75];
 
 Widget _app(AdminTokens tokens, Widget home) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: home,
 );
 

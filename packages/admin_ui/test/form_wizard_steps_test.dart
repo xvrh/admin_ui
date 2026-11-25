@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 extension type SignUp(FormScope _s) {
   ValueCell<String> get username => _s.text('username');
   ValueCell<bool> get company => _s.boolean('company');
@@ -80,8 +82,8 @@ Future<void> pumpWizard(
   await tester.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(disableAnimations: reduceMotion),
         child: child!,
@@ -260,7 +262,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
+        localizationsDelegates: _kitLanguages.delegates,
         home: Scaffold(
           body: SingleChildScrollView(
             child: FormWizard(
@@ -433,7 +435,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
+        localizationsDelegates: _kitLanguages.delegates,
         home: Scaffold(
           body: ValueForm(
             controller: form,

@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // The text a control holds at each ControlSize: a field's value and hint and
 // a button's label follow the size where the theme's design system sizes
 // them, and the box pads the text it holds.
@@ -59,8 +61,8 @@ String _line(TextStyle style) =>
 
 Widget _host(AdminTokens tokens, Widget child) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Center(child: SizedBox(width: 360, child: child)),
   ),

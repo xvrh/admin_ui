@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// WCAG 2.2 SC 2.5.8: a pointer target of at least 24 by 24 CSS pixels.
 const _targetSize = MinimumTapTargetGuideline(
   size: Size(24, 24),
@@ -503,8 +505,8 @@ void _checkExhibits(
         MaterialApp(
           theme: theme,
           locale: locale,
-          supportedLocales: AdminLocalizations.supportedLocales,
-          localizationsDelegates: AdminLocalizations.localizationsDelegates,
+          supportedLocales: _kitLanguages.locales,
+          localizationsDelegates: _kitLanguages.delegates,
           builder: (context, child) => ToastScope(child: child!),
           home: Scaffold(
             body: Center(

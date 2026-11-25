@@ -4,6 +4,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // The time a DateBody displays is on its locale's own clock: 12-hour with
 // its day period where the locale writes one, as a chart's time axis is.
 // The editor under it keeps a 24-hour clock in every locale.
@@ -19,12 +21,12 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
       locale: locale,
-      supportedLocales: const [
-        ...AdminLocalizations.supportedLocales,
-        Locale('en', 'GB'),
-        Locale('de'),
+      supportedLocales: [
+        ..._kitLanguages.locales,
+        const Locale('en', 'GB'),
+        const Locale('de'),
       ],
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Align(
           alignment: AlignmentDirectional.topStart,

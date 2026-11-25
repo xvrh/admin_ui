@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// A cell kind the kit does not know: neither a ValueCell nor a
 /// TranslatedCell, just a Cell with its own shape.
 class _RatingCell implements Cell<int> {
@@ -31,8 +33,8 @@ class _RatingBinder extends FieldBinder {
 
 Widget _host(Widget child, {FieldBinder? binder}) => MaterialApp(
   theme: buildAppTheme(irisTheme.tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Padding(
       padding: const EdgeInsets.all(24),

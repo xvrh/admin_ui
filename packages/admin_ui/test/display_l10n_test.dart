@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// Hosts [child] in [locale], with the kit's delegates unless [delegates] is
 /// false, when only Material's are registered.
 Future<void> _pump(
@@ -18,9 +20,9 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(defaultTokens),
       locale: locale,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      supportedLocales: _kitLanguages.locales,
       localizationsDelegates: delegates
-          ? AdminLocalizations.localizationsDelegates
+          ? _kitLanguages.delegates
           : GlobalMaterialLocalizations.delegates,
       home: Scaffold(
         body: SingleChildScrollView(child: SizedBox(width: 640, child: child)),

@@ -3,6 +3,8 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 extension type Venue(FormScope _s) {
   ValueCell<String> get name => _s.text('name');
   ValueCell<String> get email => _s.text('email');
@@ -51,7 +53,7 @@ Future<void> pumpSummary(
   await tester.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: ValueForm(
           controller: form,
@@ -192,7 +194,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
+        localizationsDelegates: _kitLanguages.delegates,
         home: Scaffold(
           body: ValueForm(
             controller: form,

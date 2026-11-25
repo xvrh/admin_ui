@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// A library of one asset, which counts what it was asked.
 class _Source implements AssetSource {
   final resolved = <String>[];
@@ -138,8 +140,8 @@ Future<_Source> _pumpPage(
   await tester.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: ModalAnchor(
         child: Scaffold(
           body: _Page(

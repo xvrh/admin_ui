@@ -6,8 +6,13 @@ import 'package:material_ui/material_ui.dart';
 final _tokens = defaultTokens;
 final _p = _tokens.palette;
 
+/// English, whose names the lanes read.
+const _languages = AdminLanguages([adminEn]);
+
 Widget _host(Widget child, {double width = 640}) => MaterialApp(
   theme: buildAppTheme(_tokens),
+  localizationsDelegates: _languages.delegates,
+  supportedLocales: _languages.locales,
   home: Scaffold(
     body: Align(
       alignment: Alignment.topLeft,

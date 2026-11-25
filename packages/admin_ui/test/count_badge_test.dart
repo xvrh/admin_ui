@@ -1,8 +1,9 @@
+import 'package:admin_ui/l10n.dart';
 import 'package:admin_ui/src/common/ui/count_badge.dart';
-import 'package:admin_ui/src/l10n/admin_ui_localizations.dart';
-import 'package:admin_ui/src/l10n/formats.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 Widget _host(Widget child) => MaterialApp(
   home: Scaffold(body: Center(child: child)),
@@ -18,11 +19,11 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        locale: Locale('fr'),
-        supportedLocales: AdminLocalizations.supportedLocales,
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
-        home: Scaffold(body: CountBadge(count: 1500, max: 9999)),
+      MaterialApp(
+        locale: const Locale('fr'),
+        supportedLocales: _kitLanguages.locales,
+        localizationsDelegates: _kitLanguages.delegates,
+        home: const Scaffold(body: CountBadge(count: 1500, max: 9999)),
       ),
     );
     final french = AdminFormats('fr').integer(1500);

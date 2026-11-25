@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 const _fr = Locale('fr');
 const _page = ValueKey('page');
 const _ar = Locale('ar');
@@ -22,8 +24,8 @@ Widget _app({
 }) => MaterialApp(
   theme: buildAppTheme(tokens ?? defaultTokens),
   locale: locale,
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: AdminScope(
     child: Shell(
       topBar: TopBar(leading: topBarLeading),

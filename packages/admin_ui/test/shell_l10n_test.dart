@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// Ant, whose field labels keep their case.
 final _theme = buildAppTheme(antTheme.tokens);
 
@@ -14,13 +16,12 @@ const _ar = Locale('ar');
 Widget _app(
   Widget child, {
   Locale? locale,
-  List<LocalizationsDelegate<Object?>> delegates =
-      AdminLocalizations.localizationsDelegates,
+  List<LocalizationsDelegate<Object?>>? delegates,
 }) => MaterialApp(
   theme: _theme,
   locale: locale,
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: delegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: delegates ?? _kitLanguages.delegates,
   home: Scaffold(body: child),
 );
 
@@ -341,8 +342,8 @@ void main() {
           MaterialApp(
             theme: _theme,
             locale: _fr,
-            supportedLocales: AdminLocalizations.supportedLocales,
-            localizationsDelegates: AdminLocalizations.localizationsDelegates,
+            supportedLocales: _kitLanguages.locales,
+            localizationsDelegates: _kitLanguages.delegates,
             home: Builder(
               builder: (context) => TextButton(
                 onPressed: () => Navigator.of(context).push(
@@ -444,13 +445,13 @@ void main() {
     });
 
     for (final (name, locale, delegates) in [
-      ('Arabic', _ar, AdminLocalizations.localizationsDelegates),
+      ('Arabic', _ar, _kitLanguages.delegates),
       (
         'a longer German override',
         const Locale('de'),
         <LocalizationsDelegate<Object?>>[
           const _GermanDelegate(),
-          ...AdminLocalizations.localizationsDelegates,
+          ..._kitLanguages.delegates,
         ],
       ),
     ]) {

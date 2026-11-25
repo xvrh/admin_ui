@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 const _statuses = [
   SelectOption(value: 'draft', label: 'Draft'),
   SelectOption(value: 'review', label: 'In review'),
@@ -12,7 +14,7 @@ const _statuses = [
 
 Widget _host(Widget child) => MaterialApp(
   theme: buildAppTheme(defaultTokens),
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Align(
       alignment: Alignment.topLeft,

@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // An Alert and a toast drawn from the theme's AdminFeedbackStyle: what they
 // are filled with, the status bar on their leading edge, an alert's corner
 // and a toast's outline.
@@ -88,8 +90,8 @@ const _brands = <String, Color?>{
 
 Widget _host(AdminTokens tokens, Widget child) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   builder: (context, navigator) => ToastScope(child: navigator!),
   home: Scaffold(
     body: Center(child: SizedBox(width: 420, child: child)),

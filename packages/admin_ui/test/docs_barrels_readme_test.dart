@@ -18,6 +18,8 @@ import 'readme/minimal_app.dart' show MyAdmin;
 import 'readme/name_clash.dart' show price;
 import 'readme/value_form.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// README blocks that are not compiled, with why: this one imports a package
 /// the kit does not depend on.
 const _uncompiled = {
@@ -173,8 +175,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
-        supportedLocales: AdminLocalizations.supportedLocales,
+        localizationsDelegates: _kitLanguages.delegates,
+        supportedLocales: _kitLanguages.locales,
         home: Scaffold(body: ContactEditor(form: form)),
       ),
     );

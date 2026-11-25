@@ -4,6 +4,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// Inter's cap height, 1490 of its 2048 units per em. Its ascent less its
 /// descent (1984 − 494) is the same, so an evenly led line centres its
 /// capitals.
@@ -111,7 +113,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
+        localizationsDelegates: _kitLanguages.delegates,
         home: const Scaffold(
           body: SizedBox(
             width: 320,

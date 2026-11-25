@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 typedef Page = ({String title, Map<String, String> meta});
 
 extension type PageFields(FormScope _s) {
@@ -148,7 +150,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
+        localizationsDelegates: _kitLanguages.delegates,
         home: Scaffold(
           body: ValueForm(
             controller: form,

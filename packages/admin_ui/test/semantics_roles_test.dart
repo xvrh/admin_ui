@@ -5,6 +5,8 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// The nodes announced as [role].
 List<SemanticsNode> _withRole(SemanticsRole role) => find.semantics
     .byPredicate((node) => node.getSemanticsData().role == role)
@@ -27,8 +29,8 @@ bool _isUnder(SemanticsNode node, SemanticsNode ancestor) {
 
 Widget _host(Widget child) => MaterialApp(
   theme: buildAppTheme(defaultTokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   builder: (context, navigator) => ToastScope(child: navigator!),
   home: Scaffold(
     body: Center(child: SizedBox(width: 480, child: child)),
@@ -53,8 +55,8 @@ Widget _shell({Widget? child}) => Shell(
 Widget _frame(Widget child, {Locale? locale}) => MaterialApp(
   theme: buildAppTheme(defaultTokens),
   locale: locale,
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: AdminScope(child: child),
 );
 

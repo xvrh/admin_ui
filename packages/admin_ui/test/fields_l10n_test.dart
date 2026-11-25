@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 final _theme = buildAppTheme(irisTheme.tokens);
 
 /// [child] in an app running in [locale], with the kit's delegates.
@@ -11,11 +13,8 @@ Future<void> _pump(WidgetTester tester, Locale locale, Widget child) async {
     MaterialApp(
       theme: _theme,
       locale: locale,
-      supportedLocales: const [
-        ...AdminLocalizations.supportedLocales,
-        Locale('de'),
-      ],
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: [..._kitLanguages.locales, const Locale('de')],
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(40),

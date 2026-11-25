@@ -2,6 +2,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // The large titles as the widgets draw them: a Modal's on the theme's dialog
 // title, a PageHeader's and a StatCard's value on its page title, both at
 // the theme's title weight. `core_type_roles_test.dart` holds the tokens.
@@ -48,8 +50,8 @@ String _line(TextStyle style) =>
 
 Widget _host(AdminTokens tokens, Widget child) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Center(child: SizedBox(width: 480, child: child)),
   ),

@@ -4,6 +4,8 @@ import 'package:admin_ui/admin_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 void _viewSize(WidgetTester tester, Size size) {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -11,8 +13,8 @@ void _viewSize(WidgetTester tester, Size size) {
 }
 
 Widget _app(Widget home) => MaterialApp(
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
-  supportedLocales: AdminLocalizations.supportedLocales,
+  localizationsDelegates: _kitLanguages.delegates,
+  supportedLocales: _kitLanguages.locales,
   home: home,
 );
 

@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// Hosts [child] at [width] in Arabic, which lays out right to left, or in
 /// English with [rtl] false.
 Future<void> _pump(
@@ -20,8 +22,8 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(defaultTokens),
       locale: Locale(rtl ? 'ar' : 'en'),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Align(
           alignment: Alignment.topCenter,

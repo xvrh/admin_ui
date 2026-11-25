@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 // Whether an overlay is ringed in a hairline as well as lifted on its
 // shadow: the theme's AdminOverlayStyle.modalOutline and popoverOutline,
 // which every overlay reads through modalEdge and popoverEdge. A dark
@@ -75,8 +77,8 @@ class _NoAssets implements AssetSource {
 
 Widget _app(AdminTokens tokens, Widget body) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   builder: (context, navigator) => ToastScope(child: navigator!),
   home: Scaffold(body: ModalAnchor(child: body)),
 );

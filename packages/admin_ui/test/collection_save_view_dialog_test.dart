@@ -1,16 +1,18 @@
 import 'dart:ui' show SemanticsValidationResult;
 
+import 'package:admin_ui/l10n.dart';
 import 'package:admin_ui/src/collection/saved_view.dart';
 import 'package:admin_ui/src/collection/ui/save_view_dialog.dart';
 import 'package:admin_ui/src/collection/ui/saved_views_bar.dart';
 import 'package:admin_ui/src/common/ui/choice.dart';
 import 'package:admin_ui/src/common/ui/icon_action.dart';
-import 'package:admin_ui/src/l10n/admin_ui_localizations.dart';
 import 'package:admin_ui/src/theme/theme.dart';
 import 'package:admin_ui/src/theme/themes/iris.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 // The kit names a new view and renames one.
 
@@ -31,8 +33,8 @@ Future<List<_Answer?>> _pumpOpener(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
       locale: Locale(locale),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Builder(
           builder: (context) => TextButton(

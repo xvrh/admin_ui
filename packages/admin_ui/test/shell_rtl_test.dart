@@ -3,6 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 /// Ant, whose field labels keep their case.
 final _theme = buildAppTheme(antTheme.tokens);
 
@@ -19,8 +21,8 @@ Future<void> _pumpRtl(WidgetTester tester, Widget child) async {
     MaterialApp(
       theme: _theme,
       locale: const Locale('ar'),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: child,
     ),
   );

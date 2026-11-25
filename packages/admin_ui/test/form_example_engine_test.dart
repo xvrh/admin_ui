@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 class Invoice {
   final String customer;
   final String email;
@@ -109,8 +111,8 @@ Future<Harness> pumpScreen(WidgetTester t) async {
   await t.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: ValueForm(
           controller: h.form,

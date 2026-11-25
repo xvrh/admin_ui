@@ -4,6 +4,8 @@
 import 'package:admin_ui/admin_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 void main() => runApp(const MyAdmin());
 
 class MyAdmin extends StatelessWidget {
@@ -17,8 +19,8 @@ class MyAdmin extends StatelessWidget {
       theme: buildAppTheme(theme.tokens),
       darkTheme: buildAppTheme(theme.dark ?? theme.tokens),
       themeMode: ThemeMode.system,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: _kitLanguages.delegates,
+      supportedLocales: _kitLanguages.locales,
       // Above the Navigator, so toasts paint over route dialogs too.
       // AdminScope uses this one.
       builder: (context, child) => ToastScope(child: child!),
