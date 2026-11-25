@@ -2,6 +2,16 @@
 
 ## 0.2.0
 
+- `KanbanBoard` takes `padding`, `columnSpacing` and `fitColumns`. Its
+  padding, 16px on every side, and the 12px between its columns were
+  fixed: a board in a page that has its own gutter started 16px inside
+  the page's line, and an app that shared the width out among the columns
+  repeated both numbers to do it. With `fitColumns` the board does the
+  sharing, each column `columnWidth` wide or wider: all of them where
+  they fit, filling the board, and where they do not, as many whole ones
+  as do, so that the board's edge falls after a column rather than
+  through its cards. Each defaults to what the board did, so nothing
+  moves.
 - `ComboboxOption` takes a `group`: the heading it is listed under, for a
   long list of options of a few kinds. Options sharing a group are listed
   together under one heading, after the options with no group, the groups

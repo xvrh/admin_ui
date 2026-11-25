@@ -18,13 +18,21 @@ import '../demo_kit.dart';
 /// its card is still a Tab stop, to move it from.
 class KanbanDemo extends StatefulWidget {
   final bool _cardMenu;
+  final bool _fitted;
 
   @Preview(name: 'Kanban board', wrapper: adminUiPreview)
-  const KanbanDemo({super.key}) : _cardMenu = false;
+  const KanbanDemo({super.key}) : _cardMenu = false, _fitted = false;
 
   /// The first card's ⋯ open: a "Move to …" item per other column.
   @Preview(name: 'Kanban board · Move to menu', wrapper: adminUiPreview)
-  const KanbanDemo.cardMenu({super.key}) : _cardMenu = true;
+  const KanbanDemo.cardMenu({super.key}) : _cardMenu = true, _fitted = false;
+
+  /// `fitColumns`: the columns share the board's width, each 260 wide or
+  /// wider. All four where they fit; where they do not, as many whole ones
+  /// as do, so the board's edge falls after a column and not through its
+  /// cards, and the others scroll in.
+  @Preview(name: 'Kanban board / fitted', wrapper: adminUiPreview)
+  const KanbanDemo.fitted({super.key}) : _cardMenu = false, _fitted = true;
 
   @override
   State<KanbanDemo> createState() => _KanbanDemoState();
@@ -154,6 +162,8 @@ class _KanbanDemoState extends State<KanbanDemo> {
   Widget _board(BuildContext context, List<KanbanColumn<_Item>> columns) {
     return KanbanBoard<_Item>(
       columns: columns,
+      columnWidth: widget._fitted ? 260 : 300,
+      fitColumns: widget._fitted,
       itemKey: (i) => i.id,
       onMove: _move,
       canOpen: (i) => i.kind != _Kind.event,

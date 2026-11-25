@@ -44,8 +44,9 @@ class KanbanColumn<T> {
   });
 }
 
-/// A generic, presentational kanban board: fixed-width columns of draggable
-/// cards, horizontally scrollable, each column scrolling its own cards.
+/// A generic, presentational kanban board: columns of draggable cards,
+/// horizontally scrollable, each column scrolling its own cards. The columns
+/// are [columnWidth] wide, or share the board's width with [fitColumns].
 ///
 /// Pure View — [columns] in, intent out via [onMove] (a card dropped on a
 /// different column) and [onCardTap]. It holds no data; the parent holds the
@@ -110,7 +111,36 @@ class KanbanBoard<T> extends StatefulWidget {
   final Widget Function(BuildContext context, KanbanColumn<T> column)?
   emptyBuilder;
 
+  /// How wide a column is; with [fitColumns], the narrowest it gets.
   final double columnWidth;
+
+  /// The space around the columns. It scrolls with them, so the side the
+  /// board ends on shows once the last column is in view.
+  ///
+  /// [AdminSpacing.xl] on every side unless given. A board in a page that
+  /// has its own gutter passes less, [EdgeInsets.zero] say, so that its
+  /// first column starts on the page's line.
+  final EdgeInsetsGeometry padding;
+
+  /// The space between two columns.
+  final double columnSpacing;
+
+  /// Whether the columns share the board's width, each [columnWidth] wide
+  /// or wider, where every one is [columnWidth] wide whatever the board's.
+  ///
+  /// A board of fixed columns is cut where its width ends, through a
+  /// column's cards as often as not, which reads as an overflow, not as
+  /// something to scroll. With this:
+  ///
+  /// - where every column fits at [columnWidth], they fill the board
+  ///   between its [padding] and nothing scrolls;
+  /// - where they do not, as many whole columns as fit share the width,
+  ///   so that the board's edge falls in the space after one of them and
+  ///   the others scroll in.
+  ///
+  /// A board narrower than one column and its [padding] keeps the column
+  /// [columnWidth] wide, and scrolls.
+  final bool fitColumns;
 
   /// The padding a card gives its content inside its 1px border: the column
   /// header is inset to match, so its dot and count line up with the cards'
@@ -127,7 +157,14 @@ class KanbanBoard<T> extends StatefulWidget {
     this.canOpen,
     this.emptyBuilder,
     this.columnWidth = 300,
-  });
+    this.padding = const EdgeInsets.all(AdminSpacing.xl),
+    this.columnSpacing = AdminSpacing.lg,
+    this.fitColumns = false,
+  }) : assert(columnWidth > 0, 'A column needs a width'),
+       assert(
+         columnSpacing >= 0,
+         'The space between columns cannot be negative',
+       );
 
   @override
   State<KanbanBoard<T>> createState() => _KanbanBoardState<T>();
@@ -162,23 +199,57 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     if (coarse != _touch) setState(() => _touch = coarse);
   }
 
+  /// How wide each column is in a board [available] wide, when
+  /// [KanbanBoard.fitColumns] shares the width out.
+  double _fittedWidth(BuildContext context, double available) {
+    final count = widget.columns.length;
+    final narrowest = widget.columnWidth;
+    final spacing = widget.columnSpacing;
+    if (count == 0 || !available.isFinite) return narrowest;
+    final padding = widget.padding.resolve(Directionality.of(context));
+    // Every column fits: they fill the board, and nothing scrolls.
+    final filling =
+        (available - padding.horizontal - spacing * (count - 1)) / count;
+    if (filling >= narrowest) return filling;
+    // Some scroll in. The padding the board ends on only shows at its end,
+    // so the room is the width less the padding it starts on, and each
+    // column brings the space after it: the board's edge falls in that
+    // space, after the last whole column. One fewer than all of them at
+    // most, as all of them do not fit.
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final room = available - (rtl ? padding.right : padding.left);
+    final whole = math.min((room / (narrowest + spacing)).floor(), count - 1);
+    // No room for one whole column, or the board's only one does not fit:
+    // it keeps its width, and scrolls.
+    if (whole < 1) return narrowest;
+    return room / whole - spacing;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!widget.fitColumns) return _board(context, widget.columnWidth);
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          _board(context, _fittedWidth(context, constraints.maxWidth)),
+    );
+  }
+
+  Widget _board(BuildContext context, double columnWidth) {
     final columns = widget.columns;
     final subtitles = columns.any((c) => c.subtitle != null);
     return Listener(
       onPointerDown: widget.onMove == null ? null : _onPointerDown,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.all(AdminSpacing.xl),
+        padding: widget.padding,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (var i = 0; i < columns.length; i++) ...[
-              if (i > 0) const Gap(AdminSpacing.lg),
+              if (i > 0) Gap(widget.columnSpacing),
               SizedBox(
-                width: widget.columnWidth,
-                child: _column(context, i, subtitles: subtitles),
+                width: columnWidth,
+                child: _column(context, i, columnWidth, subtitles: subtitles),
               ),
             ],
           ],
@@ -187,7 +258,12 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     );
   }
 
-  Widget _column(BuildContext context, int index, {required bool subtitles}) {
+  Widget _column(
+    BuildContext context,
+    int index,
+    double width, {
+    required bool subtitles,
+  }) {
     final c = context.colors;
     final column = widget.columns[index];
     final accent = column.accent ?? c.foregroundMuted;
@@ -225,7 +301,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _header(context, column, accent, subtitles: subtitles),
-              Expanded(child: _body(context, index, fill)),
+              Expanded(child: _body(context, index, width, fill)),
             ],
           ),
         );
@@ -336,7 +412,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     );
   }
 
-  Widget _body(BuildContext context, int index, Color fill) {
+  Widget _body(BuildContext context, int index, double width, Color fill) {
     final column = widget.columns[index];
     if (column.items.isEmpty) {
       return widget.emptyBuilder?.call(context, column) ??
@@ -346,7 +422,8 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       padding: const EdgeInsetsDirectional.fromSTEB(_inset, 0, _inset, _inset),
       itemCount: column.items.length,
       separatorBuilder: (_, _) => const Gap(AdminSpacing.md),
-      itemBuilder: (context, i) => _card(context, index, column.items[i]),
+      itemBuilder: (context, i) =>
+          _card(context, index, width, column.items[i]),
     );
   }
 
@@ -357,7 +434,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     widget.onMove?.call(item, widget.columns[index].id, widget.columns[to].id);
   }
 
-  Widget _card(BuildContext context, int index, T item) {
+  Widget _card(BuildContext context, int index, double width, T item) {
     final column = widget.columns[index];
     final card = widget.cardBuilder(context, item);
     final onMove = widget.onMove;
@@ -398,7 +475,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       child: Draggable<_KanbanDrag<T>>(
         data: _KanbanDrag(item, column.id),
         dragAnchorStrategy: pointerDragAnchorStrategy,
-        feedback: _feedback(context, card),
+        feedback: _feedback(context, card, width),
         childWhenDragging: Opacity(opacity: 0.35, child: card),
         onDragStarted: () => _setDragging(true),
         onDragEnd: (_) => _setDragging(false),
@@ -407,7 +484,9 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
     );
   }
 
-  Widget _feedback(BuildContext context, Widget card) {
+  /// The card under the pointer while it is dragged, as wide as it lies in
+  /// a column [columnWidth] wide.
+  Widget _feedback(BuildContext context, Widget card, double columnWidth) {
     final colors = context.colors;
     final dark = colors.brightness == Brightness.dark;
     final rtl = Directionality.of(context) == TextDirection.rtl;
@@ -417,7 +496,7 @@ class _KanbanBoardState<T> extends State<KanbanBoard<T>> {
       child: Material(
         type: MaterialType.transparency,
         child: SizedBox(
-          width: widget.columnWidth - _inset * 2,
+          width: columnWidth - _inset * 2,
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(context.radii.radiusLarge),
