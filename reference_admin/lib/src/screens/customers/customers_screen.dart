@@ -208,6 +208,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
         onRowTap: (c) => context.go(Customers(selected: c.id)),
         compactViewMode: CollectionViewMode.cards,
         cardBuilder: _card,
+        // The page has its gutter: the cards start on the line of the
+        // search box above them.
+        gridPadding: const EdgeInsets.symmetric(vertical: AdminSpacing.xl),
         empty: EmptyState(
           icon: Icons.people_outline,
           title: strings.orders.noCustomersTitle,

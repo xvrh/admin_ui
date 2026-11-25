@@ -59,7 +59,7 @@ two together.
 | F-209 | `FilterBar` offers "Clear all" for conditions none of its pills shows | awkward-default | S3 | open |
 | F-210 | A `PopoverMenuSurface` sized to its content throws around a `Listbox` | bug | S3 | fixed |
 | F-212 | A selectable card's check sits over its content's corner | awkward-default | S3 | open |
-| F-213 | `Collection` does not pass `CollectionCards`' padding through | missing-api | S3 | open |
+| F-213 | `Collection` does not pass `CollectionCards`' padding through | missing-api | S3 | fixed |
 | F-214 | `CollectionRealtime` refreshes the rows on reconnect, but a `SavedViewsController` whose load failed stays failed | awkward-default | S3 | open |
 | F-215 | `SavedViewsBar` asks no name or scope for a new view, and cannot rename one | missing-api | S2 | fixed |
 | F-216 | `SavedViewsBar` has no compact form: on a phone its strip cuts a view's name mid-word at the edge | missing-api | S2 | fixed |
@@ -695,12 +695,12 @@ Owned by WP-B.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
-- **Kit:** `collection.dart › Collection` (`lib/src/collection/collection.dart:185`): `CollectionCards(padding:, minTileWidth:, tileHeight:)` are not parameters of `Collection`.
-- **App:** `lib/src/screens/orders/orders_screen.dart`, `lib/src/screens/customers/customers_screen.dart`; no workaround.
-- **Evidence:** orders and customers as cards on `iphone-16`: the cards sit 16 px inside the page's gutter, off the line of the search box and the saved views above them.
-- **Workaround:** none; dropping to `CollectionCards` would mean re-threading loading, empty, error and the pager by hand.
-- **Proposal:** `Collection(cardPadding:, minTileWidth:, tileHeight:)`.
+- **Status:** fixed (kit)
+- **Kit:** `collection.dart › Collection` (`lib/src/collection/collection.dart`): `CollectionCards(padding:, minTileWidth:, tileHeight:)` were not parameters of `Collection`.
+- **App:** `lib/src/screens/orders/orders_screen.dart`, `lib/src/screens/customers/customers_screen.dart`; there was no workaround.
+- **Evidence:** "Getting around on a phone" › "Phone · orders as cards", and customers as cards on `iphone-16`: the cards sat 16 px inside the page's gutter, off the line of the search box and the saved views above them. They start and end on that line now.
+- **Workaround:** none; dropping to `CollectionCards` would have meant re-threading loading, empty, error and the pager by hand.
+- **Proposal:** `Collection(cardPadding:, minTileWidth:, tileHeight:)`. The kit has it as `Collection(gridPadding:, minTileWidth:, tileHeight:, tileSpacing:)`, and both lists pass `gridPadding` with no space at their sides: the page has its gutter. The space above the first card and under the last stays.
 
 ### F-214 · `CollectionRealtime` refreshes the rows on reconnect, but a `SavedViewsController` whose load failed stays failed
 
