@@ -133,6 +133,9 @@ class DisplayMessagesAr extends DisplayMessages {
   String get zoomToFit => 'ملاءمة للعرض';
 
   @override
+  String get qrCode => 'رمز QR';
+
+  @override
   String uploadDone(int total) => plural(
     total,
     zero: 'لم يُرفع أي ملف',

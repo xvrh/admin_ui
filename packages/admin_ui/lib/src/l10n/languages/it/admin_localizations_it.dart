@@ -252,6 +252,9 @@ class AdminLocalizationsIt extends AdminLocalizations {
   String get collapse => 'Comprimi';
 
   @override
+  String get proceed => 'Continua';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

@@ -252,6 +252,9 @@ class AdminLocalizationsAr extends AdminLocalizations {
   String get collapse => 'تصغير';
 
   @override
+  String get proceed => 'المتابعة';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

@@ -250,6 +250,9 @@ class AdminLocalizationsNl extends AdminLocalizations {
   String get collapse => 'Samenvouwen';
 
   @override
+  String get proceed => 'Doorgaan';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

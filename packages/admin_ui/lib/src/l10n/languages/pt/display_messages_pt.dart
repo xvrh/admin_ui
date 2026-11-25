@@ -127,6 +127,9 @@ class DisplayMessagesPt extends DisplayMessages {
   String get zoomToFit => 'Ajustar à tela';
 
   @override
+  String get qrCode => 'Código QR';
+
+  @override
   String uploadDone(int total) => plural(
     total,
     one: 'Envio concluído',

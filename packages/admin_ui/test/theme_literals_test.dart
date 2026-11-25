@@ -52,6 +52,12 @@ bool _allowed(String path, String line) {
     return RegExp(r'^\s*(_fade\w+ \? Colors\.transparent : )?Colors\.white,$')
         .hasMatch(line);
   }
+  // A QR code is read by a camera, not a person: dark modules on a light
+  // ground in every theme, since a scanner may not read one inverted.
+  if (path.endsWith('common/ui/qr_code.dart')) {
+    return RegExp(r'^const _(ink|ground) = Color\(0xFF(000000|FFFFFF)\);$')
+        .hasMatch(line.trim());
+  }
   // A hex value the user typed, made opaque: data, not a theme colour.
   if (path.endsWith('fields/ui/color_body.dart')) {
     return line.trim() == 'return Color(0xFF000000 | v);';

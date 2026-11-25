@@ -134,6 +134,46 @@ class ShellMessagesKo extends ShellMessages {
   String get strengthStrong => '강함';
 
   @override
+  String get verificationCode => '인증 코드';
+
+  @override
+  String get verify => '확인';
+
+  @override
+  String codeIncomplete(int length) =>
+      plural(length, other: '코드는 ${number(length)}자리입니다.');
+
+  @override
+  String get recoveryCode => '복구 코드';
+
+  @override
+  String get useRecoveryCode => '복구 코드 사용';
+
+  @override
+  String get useAuthenticatorApp => '인증 앱 사용';
+
+  @override
+  String get backToSignIn => '로그인으로 돌아가기';
+
+  @override
+  String get authenticatorQrCode => '인증 앱용 QR 코드';
+
+  @override
+  String get cantScanQrCode => '코드를 스캔할 수 없나요?';
+
+  @override
+  String get enterSetupKey => '대신 앱에 이 키를 입력하세요.';
+
+  @override
+  String get copySetupKey => '키 복사';
+
+  @override
+  String get copyAllCodes => '모두 복사';
+
+  @override
+  String get savedRecoveryCodes => '이 코드를 저장했습니다';
+
+  @override
   String get addTagHint => '추가…';
 
   @override

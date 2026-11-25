@@ -249,6 +249,9 @@ class AdminLocalizationsTr extends AdminLocalizations {
   String get collapse => 'Daralt';
 
   @override
+  String get proceed => 'Devam';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

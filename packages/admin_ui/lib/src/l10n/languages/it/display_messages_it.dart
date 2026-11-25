@@ -128,6 +128,9 @@ class DisplayMessagesIt extends DisplayMessages {
   @override
   String get zoomToFit => 'Adatta alla vista';
 
+  @override
+  String get qrCode => 'Codice QR';
+
   /// "File" does not change in the plural.
   @override
   String uploadDone(int total) => plural(

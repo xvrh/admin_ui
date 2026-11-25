@@ -131,6 +131,46 @@ class ShellMessagesZh extends ShellMessages {
   String get strengthStrong => '强';
 
   @override
+  String get verificationCode => '验证码';
+
+  @override
+  String get verify => '验证';
+
+  @override
+  String codeIncomplete(int length) =>
+      plural(length, other: '验证码为 ${number(length)} 位数字。');
+
+  @override
+  String get recoveryCode => '恢复码';
+
+  @override
+  String get useRecoveryCode => '使用恢复码';
+
+  @override
+  String get useAuthenticatorApp => '使用身份验证器应用';
+
+  @override
+  String get backToSignIn => '返回登录';
+
+  @override
+  String get authenticatorQrCode => '用于身份验证器应用的二维码';
+
+  @override
+  String get cantScanQrCode => '无法扫描二维码？';
+
+  @override
+  String get enterSetupKey => '请改为在应用中输入此密钥。';
+
+  @override
+  String get copySetupKey => '复制密钥';
+
+  @override
+  String get copyAllCodes => '全部复制';
+
+  @override
+  String get savedRecoveryCodes => '我已保存这些恢复码';
+
+  @override
   String get addTagHint => '添加…';
 
   @override

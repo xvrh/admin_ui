@@ -105,6 +105,9 @@ class DisplayMessagesZh extends DisplayMessages {
   String get zoomToFit => '适应视图';
 
   @override
+  String get qrCode => '二维码';
+
+  @override
   String uploadDone(int total) =>
       plural(total, one: '上传完成', other: '${number(total)} 个文件已全部上传');
 

@@ -250,6 +250,9 @@ class AdminLocalizationsFr extends AdminLocalizations {
   String get collapse => 'Réduire';
 
   @override
+  String get proceed => 'Continuer';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

@@ -143,6 +143,51 @@ class ShellMessagesPl extends ShellMessages {
   String get strengthStrong => 'Silne';
 
   @override
+  String get verificationCode => 'Kod weryfikacyjny';
+
+  @override
+  String get verify => 'Zweryfikuj';
+
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    one: 'Kod ma ${number(length)} cyfrę.',
+    few: 'Kod ma ${number(length)} cyfry.',
+    many: 'Kod ma ${number(length)} cyfr.',
+    other: 'Kod ma ${number(length)} cyfry.',
+  );
+
+  @override
+  String get recoveryCode => 'Kod odzyskiwania';
+
+  @override
+  String get useRecoveryCode => 'Użyj kodu odzyskiwania';
+
+  @override
+  String get useAuthenticatorApp => 'Użyj aplikacji uwierzytelniającej';
+
+  @override
+  String get backToSignIn => 'Wróć do logowania';
+
+  @override
+  String get authenticatorQrCode => 'Kod QR dla aplikacji uwierzytelniającej';
+
+  @override
+  String get cantScanQrCode => 'Nie udaje się zeskanować kodu?';
+
+  @override
+  String get enterSetupKey => 'Zamiast tego wpisz ten klucz w aplikacji.';
+
+  @override
+  String get copySetupKey => 'Kopiuj klucz';
+
+  @override
+  String get copyAllCodes => 'Kopiuj wszystko';
+
+  @override
+  String get savedRecoveryCodes => 'Kody zostały zapisane';
+
+  @override
   String get addTagHint => 'Dodaj…';
 
   /// A field is neuter.

@@ -2,6 +2,51 @@
 
 ## 0.2.0
 
+- Signing in in two steps, with an authenticator app, takes three views
+  of `auth.dart`. Each sizes itself to its content, so it sits in an
+  `AuthScaffold`'s card or in a `Modal`'s body; mirrors right to left,
+  where the codes still read left to right; takes a key for every
+  control it builds; and reads the kit's own words for each label left
+  null. `OneTimeCodeForm` asks for the code after the password, or for
+  one sent by email: one field of `length` digits (6), digits only, in
+  the theme's monospace font, with the platform's one-time code autofill.
+  Enter submits, as the button does, and with `autoSubmit` the last digit
+  does too. A submit with the field empty marks it required, and one
+  short of `length` says how many digits a code has. A `rememberLabel`
+  adds a checkbox ("Remember this browser for 30 days"), off unless
+  `initialRemember`; `allowRecoveryCode` adds a link that swaps the field
+  for a recovery code of any length, and back; an `onBack` adds "Back to
+  sign in". `onSubmit`, a `OneTimeCodeCallback`, hears the trimmed code,
+  the checkbox and which field it came from. `errorText` shows under the
+  field, about the code as it stood when it came, and the submit that
+  ends with it takes focus back to the field with the code selected, for
+  the next one to replace it.
+- `AuthenticatorSetupView` links an authenticator app: a QR code of the
+  `otpauth://` `uri`, a "Can't scan the code?" link under it that shows
+  the `secret` in groups of four, selectable, with a button that copies
+  it (`initiallyShowsSecret` shows it from the start), and
+  `OneTimeCodeForm`'s code field, whose code goes to `onSubmit`. An
+  `onCancel` adds a cancel button.
+- `RecoveryCodesView` shows the `codes` once, two to a line where they
+  fit, with "Copy all", one per line, and a checkbox that the codes are
+  saved, without which the button that calls `onDone` stays disabled.
+  `ShellMessages` has the three views' words new: `verificationCode`,
+  `verify`, `codeIncomplete`, `recoveryCode`, `useRecoveryCode`,
+  `useAuthenticatorApp`, `backToSignIn`, `authenticatorQrCode`,
+  `cantScanQrCode`, `enterSetupKey`, `copySetupKey`, `copyAllCodes` and
+  `savedRecoveryCodes`.
+- `QrCodeView` draws a QR code of its `data`, `size` on a side (176 by
+  default), quiet zone included. It is black on white in every theme and
+  mode, since a scanner reads dark on light: in a dark theme it is a
+  white tile. Each module is a whole number of device pixels, so the
+  code stays sharp. A screen reader hears an image named by
+  `semanticLabel`, or "QR code" (`DisplayMessages.qrCode`, new). The kit
+  depends on `qr`, pure Dart, for the encoding, held at 3.x: 4.0 changed
+  its whole API, and an app that also encodes on 3.x still resolves.
+- `InputField` takes `inputFormatters`, as a `TextField` does, and
+  `monospace`, which sets the value and the hint in the theme's
+  monospace font with tabular figures, on the field's own line so the
+  field keeps its height: for a code, a key or an identifier.
 - The kit speaks ten more languages: Spanish, German, Italian, Brazilian
   Portuguese, Dutch, Polish, Japanese, Simplified Chinese, Korean and
   Turkish, machine-translated from the English. Each language is an
@@ -29,8 +74,9 @@
   `selectAll`, `dismiss`, `rowsPerPage`, `pageRowsInfo`, `previousPage`,
   `nextPage`, `previousMonth`, `nextMonth`, `today`, `rangeStartDate`,
   `rangeEndDate`, `selectDate`, `selectDateRange`, `navigationMenu`,
-  `expand`, `collapse` and the `keyboardKey*` names `shortcutLabel`
-  writes. An override reaches them, where it could not reach Material's.
+  `expand`, `collapse`, `proceed` and the `keyboardKey*` names
+  `shortcutLabel` writes. An override reaches them, where it could not
+  reach Material's.
   A class implementing `AdminLocalizations` itself, rather than extending
   a language's, implements them too.
 - The kit no longer throws without Material's delegates. A `Calendar`, a

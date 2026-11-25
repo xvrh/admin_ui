@@ -249,6 +249,9 @@ class AdminLocalizationsPt extends AdminLocalizations {
   String get collapse => 'Recolher';
 
   @override
+  String get proceed => 'Continuar';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

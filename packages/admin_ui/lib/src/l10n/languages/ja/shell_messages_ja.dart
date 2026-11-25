@@ -130,6 +130,46 @@ class ShellMessagesJa extends ShellMessages {
   String get strengthStrong => '強い';
 
   @override
+  String get verificationCode => '確認コード';
+
+  @override
+  String get verify => '確認';
+
+  @override
+  String codeIncomplete(int length) =>
+      plural(length, other: 'コードは ${number(length)} 桁です。');
+
+  @override
+  String get recoveryCode => 'リカバリーコード';
+
+  @override
+  String get useRecoveryCode => 'リカバリーコードを使用';
+
+  @override
+  String get useAuthenticatorApp => '認証アプリを使用';
+
+  @override
+  String get backToSignIn => 'ログインに戻る';
+
+  @override
+  String get authenticatorQrCode => '認証アプリ用の QR コード';
+
+  @override
+  String get cantScanQrCode => 'コードをスキャンできませんか？';
+
+  @override
+  String get enterSetupKey => '代わりにこのキーをアプリに入力してください。';
+
+  @override
+  String get copySetupKey => 'キーをコピー';
+
+  @override
+  String get copyAllCodes => 'すべてコピー';
+
+  @override
+  String get savedRecoveryCodes => 'これらのコードを保存しました';
+
+  @override
   String get addTagHint => '追加…';
 
   @override

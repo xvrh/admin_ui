@@ -139,6 +139,50 @@ class ShellMessagesDe extends ShellMessages {
   String get strengthStrong => 'Stark';
 
   @override
+  String get verificationCode => 'Bestätigungscode';
+
+  @override
+  String get verify => 'Bestätigen';
+
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    one: 'Der Code hat ${number(length)} Ziffer.',
+    other: 'Der Code hat ${number(length)} Ziffern.',
+  );
+
+  @override
+  String get recoveryCode => 'Wiederherstellungscode';
+
+  @override
+  String get useRecoveryCode => 'Wiederherstellungscode verwenden';
+
+  @override
+  String get useAuthenticatorApp => 'Authenticator-App verwenden';
+
+  @override
+  String get backToSignIn => 'Zurück zur Anmeldung';
+
+  @override
+  String get authenticatorQrCode => 'QR-Code für Ihre Authenticator-App';
+
+  @override
+  String get cantScanQrCode => 'Code lässt sich nicht scannen?';
+
+  @override
+  String get enterSetupKey =>
+      'Geben Sie stattdessen diesen Schlüssel in Ihrer App ein.';
+
+  @override
+  String get copySetupKey => 'Schlüssel kopieren';
+
+  @override
+  String get copyAllCodes => 'Alle kopieren';
+
+  @override
+  String get savedRecoveryCodes => 'Ich habe diese Codes gespeichert';
+
+  @override
   String get addTagHint => 'Hinzufügen…';
 
   @override

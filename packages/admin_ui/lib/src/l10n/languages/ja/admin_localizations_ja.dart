@@ -239,6 +239,9 @@ class AdminLocalizationsJa extends AdminLocalizations {
   String get collapse => '折りたたむ';
 
   @override
+  String get proceed => '続行';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

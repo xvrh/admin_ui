@@ -236,6 +236,9 @@ class AdminLocalizationsZh extends AdminLocalizations {
   String get collapse => '收起';
 
   @override
+  String get proceed => '继续';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

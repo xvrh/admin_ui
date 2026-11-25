@@ -108,6 +108,9 @@ class DisplayMessagesJa extends DisplayMessages {
   String get zoomToFit => '全体を表示';
 
   @override
+  String get qrCode => 'QR コード';
+
+  @override
   String uploadDone(int total) =>
       plural(total, other: '${number(total)} 件のアップロードが完了しました');
 

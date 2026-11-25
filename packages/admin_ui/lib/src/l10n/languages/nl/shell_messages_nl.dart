@@ -140,6 +140,50 @@ class ShellMessagesNl extends ShellMessages {
   String get strengthStrong => 'Sterk';
 
   @override
+  String get verificationCode => 'Verificatiecode';
+
+  @override
+  String get verify => 'Verifiëren';
+
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    one: 'De code heeft ${number(length)} cijfer.',
+    other: 'De code heeft ${number(length)} cijfers.',
+  );
+
+  @override
+  String get recoveryCode => 'Herstelcode';
+
+  @override
+  String get useRecoveryCode => 'Een herstelcode gebruiken';
+
+  @override
+  String get useAuthenticatorApp => 'Je authenticator-app gebruiken';
+
+  @override
+  String get backToSignIn => 'Terug naar inloggen';
+
+  @override
+  String get authenticatorQrCode => 'QR-code voor je authenticator-app';
+
+  @override
+  String get cantScanQrCode => 'Kun je de code niet scannen?';
+
+  @override
+  String get enterSetupKey =>
+      'Voer in plaats daarvan deze sleutel in je app in.';
+
+  @override
+  String get copySetupKey => 'Sleutel kopiëren';
+
+  @override
+  String get copyAllCodes => 'Alles kopiëren';
+
+  @override
+  String get savedRecoveryCodes => 'Ik heb deze codes bewaard';
+
+  @override
   String get addTagHint => 'Toevoegen…';
 
   @override

@@ -240,6 +240,9 @@ class AdminLocalizationsKo extends AdminLocalizations {
   String get collapse => '접기';
 
   @override
+  String get proceed => '계속';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override

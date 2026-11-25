@@ -142,6 +142,50 @@ class ShellMessagesIt extends ShellMessages {
   String get strengthStrong => 'Forte';
 
   @override
+  String get verificationCode => 'Codice di verifica';
+
+  @override
+  String get verify => 'Verifica';
+
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    one: 'Il codice ha ${number(length)} cifra.',
+    other: 'Il codice ha ${number(length)} cifre.',
+  );
+
+  @override
+  String get recoveryCode => 'Codice di recupero';
+
+  @override
+  String get useRecoveryCode => 'Usa un codice di recupero';
+
+  @override
+  String get useAuthenticatorApp => 'Usa l’app di autenticazione';
+
+  @override
+  String get backToSignIn => 'Torna all’accesso';
+
+  @override
+  String get authenticatorQrCode =>
+      'Codice QR per la tua app di autenticazione';
+
+  @override
+  String get cantScanQrCode => 'Non riesci a scansionare il codice?';
+
+  @override
+  String get enterSetupKey => 'Inserisci invece questa chiave nell’app.';
+
+  @override
+  String get copySetupKey => 'Copia chiave';
+
+  @override
+  String get copyAllCodes => 'Copia tutto';
+
+  @override
+  String get savedRecoveryCodes => 'Ho salvato questi codici';
+
+  @override
   String get addTagHint => 'Aggiungi…';
 
   @override

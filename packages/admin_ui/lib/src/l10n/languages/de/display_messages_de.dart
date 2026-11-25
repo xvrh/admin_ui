@@ -132,6 +132,9 @@ class DisplayMessagesDe extends DisplayMessages {
   String get zoomToFit => 'Einpassen';
 
   @override
+  String get qrCode => 'QR-Code';
+
+  @override
   String uploadDone(int total) => plural(
     total,
     one: 'Upload abgeschlossen',

@@ -115,6 +115,9 @@ class DisplayMessagesTr extends DisplayMessages {
   String get zoomToFit => 'Sığdır';
 
   @override
+  String get qrCode => 'QR kodu';
+
+  @override
   String uploadDone(int total) => plural(
     total,
     one: 'Yükleme tamamlandı',

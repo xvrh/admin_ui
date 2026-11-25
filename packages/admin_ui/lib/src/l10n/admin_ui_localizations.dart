@@ -347,6 +347,9 @@ abstract class AdminLocalizations extends AdminMessages {
   /// What activating an expanded node or panel does: it collapses.
   String get collapse;
 
+  /// The label of a button that goes on to the next step.
+  String get proceed;
+
   /// The name of the Control key, in a shortcut written out.
   String get keyboardKeyControl;
 
@@ -639,6 +642,9 @@ class AdminLocalizationsEn extends AdminLocalizations {
 
   @override
   String get collapse => 'Collapse';
+
+  @override
+  String get proceed => 'Continue';
 
   @override
   String get keyboardKeyControl => 'Ctrl';

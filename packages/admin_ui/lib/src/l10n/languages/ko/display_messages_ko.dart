@@ -106,6 +106,9 @@ class DisplayMessagesKo extends DisplayMessages {
   String get zoomToFit => '화면에 맞추기';
 
   @override
+  String get qrCode => 'QR 코드';
+
+  @override
   String uploadDone(int total) =>
       plural(total, other: '${number(total)}개 업로드 완료');
 

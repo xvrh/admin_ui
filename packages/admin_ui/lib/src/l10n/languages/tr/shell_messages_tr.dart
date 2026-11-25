@@ -135,6 +135,46 @@ class ShellMessagesTr extends ShellMessages {
   String get strengthStrong => 'Güçlü';
 
   @override
+  String get verificationCode => 'Doğrulama kodu';
+
+  @override
+  String get verify => 'Doğrula';
+
+  @override
+  String codeIncomplete(int length) =>
+      plural(length, other: 'Kod ${number(length)} haneden oluşur.');
+
+  @override
+  String get recoveryCode => 'Kurtarma kodu';
+
+  @override
+  String get useRecoveryCode => 'Kurtarma kodu kullan';
+
+  @override
+  String get useAuthenticatorApp => 'Kimlik doğrulama uygulamasını kullan';
+
+  @override
+  String get backToSignIn => 'Oturum açmaya dön';
+
+  @override
+  String get authenticatorQrCode => 'Kimlik doğrulama uygulamanız için QR kodu';
+
+  @override
+  String get cantScanQrCode => 'Kodu tarayamıyor musunuz?';
+
+  @override
+  String get enterSetupKey => 'Bunun yerine bu anahtarı uygulamanıza girin.';
+
+  @override
+  String get copySetupKey => 'Anahtarı kopyala';
+
+  @override
+  String get copyAllCodes => 'Tümünü kopyala';
+
+  @override
+  String get savedRecoveryCodes => 'Bu kodları kaydettim';
+
+  @override
   String get addTagHint => 'Ekle…';
 
   @override

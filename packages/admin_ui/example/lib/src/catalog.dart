@@ -94,6 +94,7 @@ import 'ui/primitives/pagination.dart';
 import 'ui/primitives/panel.dart';
 import 'ui/primitives/password_field.dart';
 import 'ui/primitives/popover.dart';
+import 'ui/primitives/qr_code.dart';
 import 'ui/primitives/search_field.dart';
 import 'ui/primitives/search_results.dart';
 import 'ui/primitives/side_sheet.dart';
@@ -175,6 +176,7 @@ Map<String, dynamic> genericCatalog() => {
     'Search results (snippets)': const SearchResultsDemo(),
     'Breadcrumbs': const BreadcrumbsDemo(),
     'Copy button': const CopyButtonDemo(),
+    'QR code': const QrCodeDemo(),
     'Announcement bar': const AnnouncementBarDemo(),
     'Description list': const DescriptionListDemo(),
     'JSON viewer': const JsonViewDemo(),
@@ -272,6 +274,16 @@ Map<String, dynamic> genericCatalog() => {
     'Set password': const SetPasswordDemo(),
     'Change password': const ChangePasswordDemo(),
     'Change password / refused': const ChangePasswordDemo.refused(),
+    'One-time code': const OneTimeCodeDemo(),
+    'One-time code / submitting': const OneTimeCodeDemo.submitting(),
+    'One-time code / refused': const OneTimeCodeDemo.refused(),
+    'One-time code / recovery code': const OneTimeCodeDemo.recovery(),
+    'One-time code / emailed': const OneTimeCodeDemo.emailed(),
+    'Authenticator setup': const AuthenticatorSetupDemo(),
+    'Authenticator setup / refused': const AuthenticatorSetupDemo.refused(),
+    'Authenticator setup / in a dialog': const AuthenticatorSetupDemo.dialog(),
+    'Recovery codes': const RecoveryCodesDemo(),
+    'Recovery codes / in a dialog': const RecoveryCodesDemo.dialog(),
   },
   'Collection': {
     'Table': {

@@ -148,6 +148,54 @@ class ShellMessagesAr extends ShellMessages {
   String get strengthStrong => 'قوية';
 
   @override
+  String get verificationCode => 'رمز التحقق';
+
+  @override
+  String get verify => 'تحقق';
+
+  /// Arabic counts with the noun, in all six plural forms.
+  @override
+  String codeIncomplete(int length) => plural(
+    length,
+    zero: 'يتكون الرمز من ${number(length)} رقم.',
+    one: 'يتكون الرمز من رقم واحد.',
+    two: 'يتكون الرمز من رقمين.',
+    few: 'يتكون الرمز من ${number(length)} أرقام.',
+    many: 'يتكون الرمز من ${number(length)} رقمًا.',
+    other: 'يتكون الرمز من ${number(length)} رقم.',
+  );
+
+  @override
+  String get recoveryCode => 'رمز الاسترداد';
+
+  @override
+  String get useRecoveryCode => 'استخدام رمز استرداد';
+
+  @override
+  String get useAuthenticatorApp => 'استخدام تطبيق المصادقة';
+
+  @override
+  String get backToSignIn => 'العودة إلى تسجيل الدخول';
+
+  @override
+  String get authenticatorQrCode => 'رمز QR لتطبيق المصادقة';
+
+  @override
+  String get cantScanQrCode => 'تعذّر مسح الرمز؟';
+
+  @override
+  String get enterSetupKey => 'أدخل هذا المفتاح في تطبيقك بدلًا من ذلك.';
+
+  @override
+  String get copySetupKey => 'نسخ المفتاح';
+
+  @override
+  String get copyAllCodes => 'نسخ الكل';
+
+  @override
+  String get savedRecoveryCodes => 'لقد حفظت هذه الرموز';
+
+  @override
   String get addTagHint => 'إضافة…';
 
   @override

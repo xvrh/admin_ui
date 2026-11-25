@@ -251,6 +251,9 @@ class AdminLocalizationsDe extends AdminLocalizations {
   String get collapse => 'Minimieren';
 
   @override
+  String get proceed => 'Weiter';
+
+  @override
   String get keyboardKeyControl => 'Strg';
 
   @override

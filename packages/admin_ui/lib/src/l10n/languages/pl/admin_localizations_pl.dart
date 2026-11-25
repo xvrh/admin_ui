@@ -250,6 +250,9 @@ class AdminLocalizationsPl extends AdminLocalizations {
   String get collapse => 'Zwiń';
 
   @override
+  String get proceed => 'Dalej';
+
+  @override
   String get keyboardKeyControl => 'Ctrl';
 
   @override
