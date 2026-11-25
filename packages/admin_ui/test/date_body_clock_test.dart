@@ -1,10 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/de.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
-const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr, adminDe]);
 
 // The time a DateBody displays is on its locale's own clock: 12-hour with
 // its day period where the locale writes one, as a chart's time axis is.
