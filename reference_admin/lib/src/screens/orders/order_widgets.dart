@@ -1,5 +1,10 @@
 import 'package:admin_ui/collection.dart'
-    show AsyncValueBuilder, AsyncValueController, KanbanBoard, SavedView;
+    show
+        AsyncValueBuilder,
+        AsyncValueController,
+        CollectionCards,
+        KanbanBoard,
+        SavedView;
 import 'package:admin_ui/l10n.dart';
 import 'package:admin_ui/theme.dart';
 import 'package:admin_ui/widgets.dart';
@@ -282,30 +287,25 @@ class OrderCard extends StatelessWidget {
   /// collection's cards get theirs from the collection.
   final bool framed;
 
-  /// Keeps the top-start corner clear for the selection check a collection
-  /// lays over a selectable card.
-  final bool checkRoom;
+  const OrderCard(this.order, {super.key, this.framed = false});
 
-  const OrderCard(
-    this.order, {
-    super.key,
-    this.framed = false,
-    this.checkRoom = false,
-  });
+  /// What the card keeps around its content in a collection.
+  static const _inset = AdminSpacing.lg;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final muted = context.type.caption.copyWith(color: colors.foregroundMuted);
+    // The corner a collection's selection check takes, where the card has
+    // one: the first line starts past it.
+    final check = CollectionCards.checkRoomOf(context);
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           children: [
-            // FRICTION(F-212): a selectable card's check sits over its
-            // content's corner, and nothing says how much room it needs.
-            if (checkRoom) const Gap(AdminSpacing.xxl + AdminSpacing.xs),
+            if (check.width > _inset) Gap(check.width - _inset),
             Text(order.label, style: context.type.bodyStrong),
             const Gap(AdminSpacing.sm),
             Expanded(
@@ -345,7 +345,7 @@ class OrderCard extends StatelessWidget {
       child: Padding(
         padding: framed
             ? KanbanBoard.cardPadding
-            : const EdgeInsets.all(AdminSpacing.lg),
+            : const EdgeInsets.all(_inset),
         child: body,
       ),
     );

@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- `CollectionCards.checkRoomOf(context)` tells a card's content the corner
+  its selection check takes: 40px each way under the stock themes, from
+  the card's top-start corner, the space to keep after the check
+  included. The check stands over that corner, which suits a cover image
+  and covered the first word of a card that starts with text, so an app
+  indented that line by a number it guessed. It is zero on a card that
+  cannot be selected and outside a card, and follows the theme's check
+  size. Nothing is drawn differently.
 - British English: `adminEnGb`, beside `adminEn` in `l10n.dart`. It has
   English's strings, with Material's, Cupertino's and the widgets' for the
   United Kingdom and intl's en_GB date data, so dates read day first

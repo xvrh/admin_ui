@@ -200,7 +200,6 @@ building_blocks:
     - ChromelessFieldScope
     - CircleButton
     - ClearButton
-    - CollectionCards
     - CollectionPosition
     - CollectionTable
     - ColorBody
