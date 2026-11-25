@@ -1086,7 +1086,7 @@ class ChartCard extends StatelessWidget {
       );
     } else if (isEmpty) {
       body = EmptyState(
-        icon: Icons.bar_chart_rounded,
+        icon: context.icons.chart,
         title: emptyMessage ?? context.adminL10n.display.chartEmpty,
         minHeight: bodyHeight,
       );

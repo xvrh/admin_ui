@@ -20,6 +20,7 @@ import '../fields/ui/media_body.dart';
 import '../i18n/lang_scope.dart';
 import '../i18n/locale_status.dart' show modifiedLocalesDetail;
 import '../l10n/admin_ui_localizations.dart';
+import '../theme/tokens.dart';
 import 'asset_editor.dart';
 import 'cell.dart';
 import 'value_fields.dart' show CommentsScope, FieldErrorsScope;
@@ -213,7 +214,7 @@ class _AssetMediaCanvasState extends State<AssetMediaCanvas> {
       return MediaItem(
         id: '$index',
         name: strings.assetNotFound,
-        icon: Icons.broken_image_outlined,
+        icon: context.icons.imageBroken,
       );
     }
     if (_failed[id] case final error?) {

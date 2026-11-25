@@ -1,9 +1,10 @@
-// Sizes, radii, spacing, motion and state washes come from the tokens, not
-// from literals: a literal is right in one theme only (a 999 pill under
-// Carbon's square corners, a 13px label beside a 14px Ant body, a 6% hover
-// beside Material's 8%) and never follows reduced motion. Outside
-// lib/src/theme/, which defines the tokens, the kit reads context.type,
-// context.radii, AdminSpacing, context.motion, colors.stateLayer, … instead.
+// Sizes, radii, spacing, motion, state washes and glyphs come from the
+// tokens, not from literals: a literal is right in one theme only (a 999 pill
+// under Carbon's square corners, a 13px label beside a 14px Ant body, a 6%
+// hover beside Material's 8%, a Material close in an app drawn in another
+// icon set) and never follows reduced motion. Outside lib/src/theme/, which
+// defines the tokens, the kit reads context.type, context.radii,
+// AdminSpacing, context.motion, colors.stateLayer, context.icons, … instead.
 //
 // A literal that is not a token's job — a hairline nudge that keeps content
 // still as a border thickens, a glyph's optical size — is allowed where the
@@ -58,8 +59,8 @@ void main() {
     );
   });
 
-  test('lib/src takes sizes, radii, spacing, motion and washes from the '
-      'tokens', () {
+  test('lib/src takes sizes, radii, spacing, motion, washes and glyphs from '
+      'the tokens', () {
     final offenders = <String, List<String>>{};
     final byRule = <String, int>{};
     for (final file in files) {
@@ -86,8 +87,8 @@ void main() {
           'read the token instead of a literal — context.type.<role> for '
           'fontSize, context.radii for a radius, AdminSpacing for insets and '
           'gaps, context.motion for a duration or a curve, the state layer '
-          '(colors.hoverOverlay, colors.stateLayer.selected, …) for a wash — '
-          'or mark a literal that is not a token\'s job with `// '
+          '(colors.hoverOverlay, colors.stateLayer.selected, …) for a wash, '
+          'context.icons for a glyph the kit draws on its own — or mark a literal that is not a token\'s job with `// '
           'token-literal: <reason>` on its line or the line above. $count '
           'sites ($rules) in ${paths.length} files:\n$listing',
     );
@@ -266,6 +267,12 @@ List<_Found> _find(_Source file) {
     // Only a literal that is the whole argument: `alpha: 0.5` or
     // `alpha: dark ? 0.4 : 0.2`, not `alpha: layer.hover * 2`.
     report('alpha', open, end, m.end + literal.start);
+  }
+
+  // (h) a glyph: one of Material's Icons, which an app on another icon set
+  // cannot replace. The kit's own glyphs are AdminIcons' slots.
+  for (final m in RegExp(r'\bIcons\.\w+').allMatches(code)) {
+    report('icon', m.start, m.end, m.start);
   }
 
   out.sort((a, b) => a.line.compareTo(b.line));

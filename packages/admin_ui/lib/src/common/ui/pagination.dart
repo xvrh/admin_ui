@@ -147,7 +147,7 @@ class Pagination extends StatelessWidget {
       children: [
         _PageButton.arrow(
           key: previousKey,
-          icon: Icons.chevron_left_rounded,
+          icon: context.icons.chevronBack,
           label: material.previousPageTooltip,
           size: size,
           onTap: onChanged != null && page > 1 ? () => _go(page - 1) : null,
@@ -167,7 +167,7 @@ class Pagination extends StatelessWidget {
         ],
         _PageButton.arrow(
           key: nextKey,
-          icon: Icons.chevron_right_rounded,
+          icon: context.icons.chevronForward,
           label: material.nextPageTooltip,
           size: size,
           onTap: onChanged != null && canNext ? () => _go(page + 1) : null,
@@ -299,7 +299,7 @@ class _Ellipsis extends StatelessWidget {
         dimension: context.sizes.height(size),
         child: Center(
           child: Icon(
-            Icons.more_horiz,
+            context.icons.more,
             size: context.iconSizes.md,
             color: context.colors.foregroundMuted,
           ),

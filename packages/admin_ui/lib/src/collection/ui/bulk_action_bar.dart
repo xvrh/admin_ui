@@ -148,7 +148,7 @@ class BulkActionBar extends StatelessWidget {
         Button.ghost(
           context.adminL10n.collection.clear,
           key: clearKey,
-          icon: Icons.close,
+          icon: context.icons.close,
           size: ControlSize.medium,
           onPressed: onClear,
         ),
@@ -180,7 +180,7 @@ class BulkActionBar extends StatelessWidget {
       if (selectAll != null)
         MenuItem(
           selectAll,
-          icon: Icons.select_all_rounded,
+          icon: context.icons.selectAll,
           onSelect: onSelectAllMatching,
         ),
       if (selectAll != null && actions.isNotEmpty) const MenuDivider(),
@@ -196,7 +196,7 @@ class BulkActionBar extends StatelessWidget {
     return Row(
       children: [
         IconAction(
-          Icons.close,
+          context.icons.close,
           key: clearKey,
           label: strings.clearSelection,
           size: IconActionSize.medium,
@@ -207,7 +207,7 @@ class BulkActionBar extends StatelessWidget {
         if (entries.isNotEmpty) ...[
           const Gap(AdminSpacing.sm),
           MenuButton(
-            icon: Icons.more_horiz,
+            icon: context.icons.more,
             tooltip: strings.moreActions,
             size: IconActionSize.medium,
             entries: entries,

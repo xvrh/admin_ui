@@ -200,7 +200,7 @@ void main() {
       final glyph = tester.getRect(
         find.descendant(
           of: find.byType(IconAction),
-          matching: find.byIcon(Icons.close),
+          matching: find.byIcon(Icons.close_rounded),
         ),
       );
       final padX = defaultControlSizes.medium / 2 - 4;
@@ -216,7 +216,9 @@ void main() {
     // Inactive, the chevron sits at the same inset.
     await _pump(tester, const []);
     final pill = tester.getRect(_pill('Status'));
-    final chevron = tester.getRect(find.byIcon(Icons.expand_more));
+    final chevron = tester.getRect(
+      find.byIcon(Icons.keyboard_arrow_down_rounded),
+    );
     expect(
       pill.right - chevron.right,
       closeTo(defaultControlSizes.medium / 2 - 4, 0.5),

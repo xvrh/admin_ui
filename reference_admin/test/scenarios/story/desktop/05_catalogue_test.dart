@@ -255,7 +255,7 @@ void main() {
 
     await s.scrollTo(CatalogueKeys.photos);
     await s.tap(
-      _in(CatalogueKeys.photos, Icons.add),
+      _in(CatalogueKeys.photos, Icons.add_rounded),
       shot: const Shot('Product · choose photos'),
     );
     await s.tap(find.text(pot.name));
@@ -364,7 +364,7 @@ void main() {
     expect(shop.calls.countOf(Endpoint.patchStock), 0);
 
     await s.scrollTo(CatalogueKeys.photos);
-    expect(_in(CatalogueKeys.photos, Icons.add), findsNothing);
+    expect(_in(CatalogueKeys.photos, Icons.add_rounded), findsNothing);
     await s.tap(
       find
           .descendant(

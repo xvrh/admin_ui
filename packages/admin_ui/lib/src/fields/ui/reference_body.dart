@@ -455,7 +455,7 @@ class ReferenceTileCard extends StatelessWidget {
     return _ThumbBox(
       fill: tint == null ? colors.background : colors.statusFill(tint),
       child: Icon(
-        icon ?? Icons.link_rounded,
+        icon ?? context.icons.link,
         size: context.iconSizes.lg,
         color: tint == null
             ? colors.foregroundMuted
@@ -506,7 +506,7 @@ class _SelectedRow extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsetsDirectional.only(end: AdminSpacing.sm),
                 child: Icon(
-                  Icons.drag_indicator,
+                  context.icons.dragHandle,
                   size: context.iconSizes.md,
                   color: context.colors.foregroundFaint,
                 ),
@@ -516,7 +516,7 @@ class _SelectedRow extends StatelessWidget {
           if (onReplace != null) ...[
             const Gap(AdminSpacing.md),
             CircleButton(
-              icon: Icons.swap_horiz_rounded,
+              icon: context.icons.replace,
               onTap: onReplace!,
               label: l10n.fields.replaceReference,
               expanded: replaceExpanded,
@@ -526,7 +526,7 @@ class _SelectedRow extends StatelessWidget {
           if (onRetry != null) ...[
             const Gap(AdminSpacing.md),
             CircleButton(
-              icon: Icons.refresh,
+              icon: context.icons.retry,
               onTap: onRetry!,
               label: l10n.retry,
             ),
@@ -534,7 +534,7 @@ class _SelectedRow extends StatelessWidget {
           if (onRemove != null) ...[
             const Gap(AdminSpacing.md),
             CircleButton(
-              icon: Icons.close,
+              icon: context.icons.close,
               onTap: onRemove!,
               label: l10n.remove,
             ),
@@ -556,7 +556,7 @@ class _MissingRow extends StatelessWidget {
         _ThumbBox(
           fill: context.colors.background,
           child: Icon(
-            Icons.link_off_rounded,
+            context.icons.linkBroken,
             size: context.iconSizes.lg,
             color: context.colors.foregroundMuted,
           ),
@@ -604,7 +604,7 @@ class _ErrorRow extends StatelessWidget {
           fill: colors.statusFill(colors.danger),
           border: colors.statusBorder(colors.danger),
           child: Icon(
-            Icons.error_outline_rounded,
+            context.icons.error,
             size: context.iconSizes.lg,
             color: colors.dangerText,
           ),
@@ -725,7 +725,7 @@ class _AddTriggerState extends State<_AddTrigger> {
       },
       child: AddRowButton(
         label: widget.label,
-        icon: Icons.add_link_rounded,
+        icon: context.icons.addLink,
         focusNode: _focus,
         expanded: widget.controller.isOpen,
         onPressed: enabled ? _toggle : null,
@@ -889,7 +889,7 @@ class _ReferencePickerState<T, K extends Object>
                 context,
                 hint: widget.hint,
                 size: ControlSize.small,
-                leadingIcon: Icons.search_rounded,
+                leadingIcon: context.icons.search,
                 suffix: _loading
                     ? Spinner(size: context.sizes.fieldIcon, announce: false)
                     : null,
@@ -987,7 +987,7 @@ class _ReferencePickerState<T, K extends Object>
               const Gap(AdminSpacing.md),
               if (widget.single)
                 Icon(
-                  selected ? Icons.check_circle_rounded : null,
+                  selected ? context.icons.done : null,
                   size: context.iconSizes.lg,
                   color: context.colors.primaryText,
                 )

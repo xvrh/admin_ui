@@ -68,7 +68,7 @@ void main() {
     // Close the picker, then remove the first row.
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.close).first);
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
     await tester.pumpAndSettle();
     expect(cell.value, ['gamma', 'alpha']);
     expect(find.text('Beta'), findsNothing);

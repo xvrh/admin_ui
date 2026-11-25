@@ -84,14 +84,14 @@ SaveBar _loaded({
 }
 
 Future<void> _openMore(WidgetTester tester) async {
-  await tester.tap(find.byIcon(Icons.more_horiz));
+  await tester.tap(find.byIcon(Icons.more_horiz_rounded));
   await tester.pumpAndSettle();
 }
 
 /// The ⋯ menu's entries, top to bottom, with null for a divider.
 List<String?> _moreEntries(WidgetTester tester) {
   final more = find.ancestor(
-    of: find.byIcon(Icons.more_horiz),
+    of: find.byIcon(Icons.more_horiz_rounded),
     matching: find.byType(Menu),
   );
   return [
@@ -102,7 +102,7 @@ List<String?> _moreEntries(WidgetTester tester) {
 
 MenuItem _moreItem(WidgetTester tester, String label) {
   final more = find.ancestor(
-    of: find.byIcon(Icons.more_horiz),
+    of: find.byIcon(Icons.more_horiz_rounded),
     matching: find.byType(Menu),
   );
   return tester

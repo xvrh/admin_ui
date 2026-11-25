@@ -6,6 +6,7 @@ import '../../common/ui/severity.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../l10n/formats.dart';
 import '../../l10n/sections/display_messages.dart';
+import '../../theme/icons.dart';
 import '../../theme/palette.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
@@ -62,13 +63,20 @@ class DiffOpStyle {
 
   /// [op]'s style in the ambient theme and language.
   factory DiffOpStyle.of(BuildContext context, DiffOp op) =>
-      DiffOpStyle.resolve(context.colors, op, context.adminL10n.display);
+      DiffOpStyle.resolve(
+        context.colors,
+        op,
+        context.adminL10n.display,
+        context.icons,
+      );
 
-  /// [op]'s style in [colors], its [label] from [strings].
+  /// [op]'s style in [colors], its [label] from [strings] and its [icon]
+  /// from [icons].
   factory DiffOpStyle.resolve(
     AdminPalette colors,
     DiffOp op, [
     DisplayMessages strings = const DisplayMessagesEn(),
+    AdminIcons icons = const AdminIcons(),
   ]) {
     DiffOpStyle tone(
       String label,
@@ -92,7 +100,7 @@ class DiffOpStyle {
     return switch (op) {
       DiffOp.added => tone(
         strings.diffAdded,
-        Icons.add_rounded,
+        icons.diffAdded,
         '+',
         colors.success,
         colors.successText,
@@ -100,7 +108,7 @@ class DiffOpStyle {
       ),
       DiffOp.removed => tone(
         strings.diffRemoved,
-        Icons.remove_rounded,
+        icons.diffRemoved,
         '−',
         colors.danger,
         colors.dangerText,
@@ -108,7 +116,7 @@ class DiffOpStyle {
       ),
       DiffOp.changed => tone(
         strings.diffChanged,
-        Icons.edit_outlined,
+        icons.diffChanged,
         '~',
         colors.warning,
         colors.warningText,
@@ -119,7 +127,7 @@ class DiffOpStyle {
       ),
       DiffOp.moved => tone(
         strings.diffMoved,
-        Icons.swap_vert_rounded,
+        icons.diffMoved,
         '⇅',
         colors.info,
         colors.infoText,
@@ -128,7 +136,7 @@ class DiffOpStyle {
       DiffOp.unchanged => DiffOpStyle._(
         op: op,
         label: strings.diffUnchanged,
-        icon: Icons.drag_handle_rounded,
+        icon: icons.diffUnchanged,
         symbol: '=',
         accent: colors.border,
         text: colors.readableOn(
@@ -181,11 +189,11 @@ class DiffMoveHint extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.swap_vert_rounded, size: iconSize, color: color),
+          Icon(context.icons.diffMoved, size: iconSize, color: color),
           const Gap(AdminSpacing.xxs),
           Text(formats.integer(from + 1), style: style),
           const Gap(AdminSpacing.xxs),
-          Icon(Icons.arrow_forward_rounded, size: iconSize, color: color),
+          Icon(context.icons.arrowForward, size: iconSize, color: color),
           const Gap(AdminSpacing.xxs),
           Text(formats.integer(to + 1), style: style),
         ],

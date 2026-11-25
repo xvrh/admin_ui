@@ -597,13 +597,13 @@ class _JsonViewState extends State<JsonView> {
     );
     final actions = [
       IconAction(
-        Icons.unfold_more_rounded,
+        context.icons.expandAll,
         label: strings.expandAll,
         size: IconActionSize.small,
         onPressed: _expandAll,
       ),
       IconAction(
-        Icons.unfold_less_rounded,
+        context.icons.collapseAll,
         label: strings.collapseAll,
         size: IconActionSize.small,
         onPressed: _collapseAll,
@@ -682,7 +682,7 @@ class _JsonViewState extends State<JsonView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            Icons.error_outline_rounded,
+            context.icons.error,
             size: context.iconSizes.md,
             color: colors.dangerText,
           ),
@@ -944,9 +944,9 @@ class _JsonRowViewState extends State<_JsonRowView> {
               ),
               IconAction(
                 switch (_pathCopied) {
-                  true => Icons.check_rounded,
-                  false => Icons.error_outline_rounded,
-                  null => Icons.link_rounded,
+                  true => context.icons.check,
+                  false => context.icons.error,
+                  null => context.icons.link,
                 },
                 // The path is in the name, so a screen reader moving from
                 // button to button hears which line each one copies.
@@ -1008,7 +1008,7 @@ class _JsonRowViewState extends State<_JsonRowView> {
     final node = row.node;
     if (row.closing || !node.isContainer || node.isEmpty) return null;
     return Icon(
-      row.collapsed ? Icons.chevron_right_rounded : Icons.expand_more_rounded,
+      row.collapsed ? context.icons.chevronForward : context.icons.expand,
       size: context.iconSizes.md,
       color: context.colors.foregroundMuted,
     );

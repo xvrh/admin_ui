@@ -819,7 +819,7 @@ class _ImageCropperState extends State<ImageCropper> {
     loadingBuilder: (context, child, progress) =>
         progress == null ? child : const _ImageStatus(),
     errorBuilder: (context, error, stack) => _ImageStatus(
-      icon: Icons.broken_image_outlined,
+      icon: context.icons.imageBroken,
       label: context.adminL10n.assets.imageUnavailable,
     ),
   );
@@ -1411,24 +1411,24 @@ class _TransformBar extends StatelessWidget {
       children: [
         if (allowRotate) ...[
           _ToolButton(
-            icon: Icons.rotate_90_degrees_ccw_outlined,
+            icon: context.icons.rotateLeft,
             tooltip: strings.rotateLeft,
             onTap: () => onRotate(-1),
           ),
           _ToolButton(
-            icon: Icons.rotate_90_degrees_cw_outlined,
+            icon: context.icons.rotateRight,
             tooltip: strings.rotateRight,
             onTap: () => onRotate(1),
           ),
         ],
         if (allowFlip) ...[
           _ToolButton(
-            icon: Icons.flip,
+            icon: context.icons.flip,
             tooltip: strings.flipHorizontal,
             onTap: () => onFlip(Axis.horizontal),
           ),
           _ToolButton(
-            icon: Icons.flip,
+            icon: context.icons.flip,
             iconQuarterTurns: 1,
             tooltip: strings.flipVertical,
             onTap: () => onFlip(Axis.vertical),
@@ -1436,7 +1436,7 @@ class _TransformBar extends StatelessWidget {
         ],
         if (allowReset)
           _ToolButton(
-            icon: Icons.restart_alt,
+            icon: context.icons.reset,
             tooltip: context.adminL10n.reset,
             onTap: canReset ? onReset : null,
           ),

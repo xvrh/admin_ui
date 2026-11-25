@@ -134,7 +134,7 @@ class _ImportSheetState extends State<_ImportSheet> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.workspace_premium_outlined,
+                      context.icons.license,
                       size: context.iconSizes.md,
                       color: context.colors.foregroundMuted,
                     ),
@@ -284,8 +284,8 @@ class _SizeRow extends StatelessWidget {
               children: [
                 Icon(
                   selected
-                      ? Icons.radio_button_checked_rounded
-                      : Icons.radio_button_unchecked_rounded,
+                      ? context.icons.radioSelected
+                      : context.icons.radioUnselected,
                   size: context.iconSizes.lg,
                   color: selected ? colors.primaryText : colors.controlBorder,
                 ),

@@ -138,7 +138,7 @@ class AttentionTile extends StatelessWidget {
           ),
           if (item.onTap != null)
             Icon(
-              Icons.chevron_right_rounded,
+              context.icons.chevronForward,
               size: context.iconSizes.lg,
               color: style.foreground,
             ),
@@ -293,7 +293,7 @@ class _AllClear extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            Icons.check_circle_rounded,
+            context.icons.done,
             size: context.iconSizes.lg,
             color: style.foreground,
           ),

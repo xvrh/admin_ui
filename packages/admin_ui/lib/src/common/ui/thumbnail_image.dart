@@ -119,7 +119,7 @@ class _BrokenImage extends StatelessWidget {
       color: colors.surfaceMuted,
       child: Center(
         child: Icon(
-          Icons.broken_image_outlined,
+          context.icons.imageBroken,
           size: extent == null ? 16 : (extent! / 2).clamp(12, 32),
           color: colors.readableOn(
             colors.foregroundMuted,

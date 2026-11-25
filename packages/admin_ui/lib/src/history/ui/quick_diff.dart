@@ -356,7 +356,7 @@ class DiffRestoreButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.undo_rounded,
+                  context.icons.undo,
                   size: context.iconSizes.sm,
                   color: color,
                 ),

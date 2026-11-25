@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/sizes.dart';
+import '../../theme/tokens.dart';
 import 'clear_button.dart';
 import 'input_field.dart';
 
@@ -186,7 +187,7 @@ class _SearchFieldState extends State<SearchField> {
       size: widget.size,
       hint: widget.hint ?? MaterialLocalizations.of(context).searchFieldLabel,
       errorText: widget.errorText,
-      icon: Icons.search_rounded,
+      icon: context.icons.search,
       textInputAction: widget.textInputAction,
       onSubmitted: _submit,
       // The slot is kept while empty, so the clear button appearing on the

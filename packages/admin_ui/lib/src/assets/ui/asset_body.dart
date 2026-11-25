@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../common/ui/error_text.dart';
 import '../../fields/ui/media_body.dart';
 import '../../l10n/admin_ui_localizations.dart';
+import '../../theme/tokens.dart';
 import '../asset_source.dart';
 import 'asset_drop_target.dart' show AssetAccept;
 import 'asset_library.dart' show Asset, AssetType;
@@ -141,7 +142,7 @@ class _AssetBodyState extends State<AssetBody> {
       _Resolve.missing => MediaItem(
         id: id,
         name: l10n.assetNotFound,
-        icon: Icons.broken_image_outlined,
+        icon: context.icons.imageBroken,
       ),
       _Resolve.failed => MediaItem(
         id: id,

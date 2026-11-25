@@ -66,7 +66,7 @@ void main() {
     for (final n in ['1', '2', '3', '4', '124']) {
       expect(find.text(n), findsOneWidget, reason: 'page $n');
     }
-    expect(find.byIcon(Icons.more_horiz), findsOneWidget);
+    expect(find.byIcon(Icons.more_horiz_rounded), findsOneWidget);
 
     await tester.tap(find.text('124'));
     await tester.tap(find.bySemanticsLabel('Next page'));
@@ -199,7 +199,7 @@ void main() {
       final ellipsis = tester.getRect(
         find
             .ancestor(
-              of: find.byIcon(Icons.more_horiz).first,
+              of: find.byIcon(Icons.more_horiz_rounded).first,
               matching: find.byType(SizedBox),
             )
             .first,
@@ -268,7 +268,9 @@ void main() {
         ),
       );
       expect(find.text('…'), findsNothing);
-      final glyph = tester.getCenter(find.byIcon(Icons.more_horiz).first);
+      final glyph = tester.getCenter(
+        find.byIcon(Icons.more_horiz_rounded).first,
+      );
       final digit = tester.getCenter(find.text('10'));
       expect(glyph.dy, closeTo(digit.dy, 0.5));
     });

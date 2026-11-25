@@ -11,6 +11,7 @@ import '../../common/ui/labeled_field.dart';
 import '../../common/ui/modal.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
+import '../../theme/tokens.dart';
 import '../saved_view.dart';
 
 /// Asks for a saved view's name and, when [askScope], who sees it: the
@@ -128,13 +129,13 @@ class _SaveViewDialogState extends State<_SaveViewDialog> {
                     SavedViewScope.personal,
                     strings.personalView,
                     description: strings.personalViewDescription,
-                    icon: Icons.person_outline,
+                    icon: context.icons.personal,
                   ),
                   ChoiceOption(
                     SavedViewScope.shared,
                     strings.sharedView,
                     description: strings.sharedViewDescription,
-                    icon: Icons.group_outlined,
+                    icon: context.icons.shared,
                   ),
                 ],
               ),

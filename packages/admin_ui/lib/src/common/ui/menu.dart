@@ -1276,7 +1276,7 @@ class _MenuRowState extends State<_MenuRow> {
                       dimension: 16,
                       child: checked
                           ? Icon(
-                              Icons.check_rounded,
+                              context.icons.check,
                               size: context.iconSizes.md,
                               color: fg,
                             )
@@ -1288,7 +1288,7 @@ class _MenuRowState extends State<_MenuRow> {
                     // Toward the end side, where the submenu opens unless
                     // it has to flip: mirrors in a right-to-left app.
                     Icon(
-                      Icons.chevron_right_rounded,
+                      context.icons.chevronForward,
                       size: context.iconSizes.md,
                       color: enabled ? muted : fg,
                     ),

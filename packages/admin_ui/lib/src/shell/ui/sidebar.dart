@@ -1254,7 +1254,7 @@ class _NavRow extends StatelessWidget {
                   duration: context.motion.fast,
                   curve: context.motion.standard,
                   child: Icon(
-                    Icons.expand_more_rounded,
+                    context.icons.expand,
                     size: context.iconSizes.sm,
                     color: fg,
                   ),
@@ -1517,7 +1517,7 @@ class SidebarAccount extends StatelessWidget {
                           ),
                           const Gap(AdminSpacing.sm),
                           Icon(
-                            Icons.unfold_more_rounded,
+                            context.icons.switcher,
                             size: context.iconSizes.sm,
                             color: colors.foregroundMuted,
                           ),

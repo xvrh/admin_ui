@@ -195,8 +195,8 @@ class SavedViewsBar extends StatelessWidget {
     final reorder = moves ? onReorder : null;
     // The arrows mirror right to left, so the one drawn pointing left is
     // "forward" there.
-    final left = rtl ? Icons.arrow_forward_rounded : Icons.arrow_back_rounded;
-    final right = rtl ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded;
+    final left = rtl ? context.icons.arrowForward : context.icons.arrowBack;
+    final right = rtl ? context.icons.arrowBack : context.icons.arrowForward;
     final moveEntries = [
       if (reorder != null && inRange(leftward))
         MenuItem(
@@ -215,19 +215,19 @@ class SavedViewsBar extends StatelessWidget {
       if (onRenamed != null)
         MenuItem(
           strings.rename,
-          icon: Icons.edit_outlined,
+          icon: context.icons.edit,
           onSelect: () => _rename(context, v),
         ),
       if (onDuplicate != null)
         MenuItem(
           strings.duplicate,
-          icon: Icons.copy_rounded,
+          icon: context.icons.copy,
           onSelect: () => onDuplicate!(v, strings.copyOf(v.name)),
         ),
       if (onSetDefault != null && !v.isDefault)
         MenuItem(
           strings.setAsDefault,
-          icon: Icons.star_outline_rounded,
+          icon: context.icons.setDefault,
           onSelect: () => onSetDefault!(v),
         ),
     ];
@@ -239,7 +239,7 @@ class SavedViewsBar extends StatelessWidget {
         if (edits.isNotEmpty || moveEntries.isNotEmpty) const MenuDivider(),
         MenuItem(
           MaterialLocalizations.of(context).deleteButtonTooltip,
-          icon: Icons.delete_outline,
+          icon: context.icons.delete,
           danger: true,
           onSelect: () => onDelete!(v),
         ),
@@ -300,7 +300,7 @@ class SavedViewsBar extends StatelessWidget {
         if (onDiscardChanges != null)
           touch
               ? Button.icon(
-                  Icons.undo_rounded,
+                  context.icons.undo,
                   semanticLabel: strings.reset,
                   variant: ButtonVariant.ghost,
                   size: size,
@@ -317,7 +317,7 @@ class SavedViewsBar extends StatelessWidget {
           Button.primary(
             MaterialLocalizations.of(context).saveButtonLabel,
             size: size,
-            icon: touch ? null : Icons.bookmark_added_outlined,
+            icon: touch ? null : context.icons.saveView,
             onPressed: onSaveChanges,
           ),
         ],
@@ -325,7 +325,7 @@ class SavedViewsBar extends StatelessWidget {
       if (create != null) ...[
         const Gap(AdminSpacing.xs),
         Button.icon(
-          Icons.add,
+          context.icons.add,
           semanticLabel: strings.collection.saveAsNewView,
           variant: ButtonVariant.ghost,
           size: size,
@@ -398,7 +398,7 @@ class SavedViewsBar extends StatelessWidget {
                   semanticLabel: name == null
                       ? null
                       : strings.currentView(name),
-                  trailingIcon: Icons.expand_more_rounded,
+                  trailingIcon: context.icons.dropdown,
                   onPressed: menu.toggle,
                 ),
               ),
@@ -428,7 +428,7 @@ class SavedViewsBar extends StatelessWidget {
       for (final v in views)
         MenuItem(
           v.name,
-          icon: _scopeIcon(v),
+          icon: _scopeIcon(context, v),
           description: v.isDefault ? strings.defaultView : null,
           checked: v.id == activeId,
           onSelect: () {
@@ -438,16 +438,17 @@ class SavedViewsBar extends StatelessWidget {
     ];
   }
 
-  static IconData _scopeIcon(SavedView v) => v.scope == SavedViewScope.shared
-      ? Icons.group_outlined
-      : Icons.person_outline;
+  static IconData _scopeIcon(BuildContext context, SavedView v) =>
+      v.scope == SavedViewScope.shared
+      ? context.icons.shared
+      : context.icons.personal;
 
   TabItem _tabFor(BuildContext context, int index, SavedView v) {
     final entries = _menuFor(context, index);
     final isActiveDirty = dirty && v.id == activeId;
     return TabItem(
       v.name,
-      icon: _scopeIcon(v),
+      icon: _scopeIcon(context, v),
       trailing: _badges(v.isDefault, isActiveDirty),
       menu: entries.isEmpty ? null : entries,
       menuLabel: context.adminL10n.collection.viewOptions(v.name),
@@ -495,7 +496,7 @@ class _Badges extends StatelessWidget {
       children: [
         if (isDefault)
           Icon(
-            Icons.star_rounded,
+            context.icons.defaultBadge,
             size: context.iconSizes.xs,
             semanticLabel: context.adminL10n.collection.defaultView,
             color: colors.readableOn(
@@ -549,7 +550,7 @@ class _ErrorNote extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            Icons.error_outline_rounded,
+            context.icons.error,
             size: context.iconSizes.md,
             color: colors.dangerText,
           ),

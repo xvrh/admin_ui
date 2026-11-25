@@ -50,24 +50,24 @@ SeverityStyle severityStyleOf(BuildContext context, Severity severity) {
     Color onAccent,
     IconData icon,
   ) = switch (severity) {
-    Severity.info => (c.info, c.infoText, c.onInfo, Icons.info_outline_rounded),
+    Severity.info => (c.info, c.infoText, c.onInfo, context.icons.info),
     Severity.success => (
       c.success,
       c.successText,
       c.onSuccess,
-      Icons.check_circle_outline_rounded,
+      context.icons.success,
     ),
     Severity.warning => (
       c.warning,
       c.warningText,
       c.onWarning,
-      Icons.warning_amber_rounded,
+      context.icons.warning,
     ),
     Severity.danger => (
       c.danger,
       c.dangerText,
       c.onDanger,
-      Icons.error_outline_rounded,
+      context.icons.error,
     ),
   };
   return SeverityStyle(

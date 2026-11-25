@@ -306,11 +306,11 @@ void main() {
       ),
     );
     await tester.pumpWidget(tile(MediaTileCheck.selected, false));
-    expect(find.byIcon(Icons.check), findsNothing);
+    expect(find.byIcon(Icons.check_rounded), findsNothing);
     await tester.pumpWidget(tile(MediaTileCheck.selected, true));
-    expect(find.byIcon(Icons.check), findsOneWidget);
+    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     await tester.pumpWidget(tile(MediaTileCheck.none, true));
-    expect(find.byIcon(Icons.check), findsNothing);
+    expect(find.byIcon(Icons.check_rounded), findsNothing);
   });
 
   testWidgets('Enter confirms, Space only taps', (tester) async {

@@ -568,9 +568,9 @@ class _DeltaChip extends StatelessWidget {
         style?.foreground ??
         colors.readableOn(colors.foregroundMuted, surfaces: [surface]);
     final icon = switch (delta.direction) {
-      TrendDirection.up => Icons.arrow_upward_rounded,
-      TrendDirection.down => Icons.arrow_downward_rounded,
-      TrendDirection.flat => Icons.remove_rounded,
+      TrendDirection.up => context.icons.trendUp,
+      TrendDirection.down => context.icons.trendDown,
+      TrendDirection.flat => context.icons.trendFlat,
     };
 
     // A Tag's pill, as it has a Tag's padding.

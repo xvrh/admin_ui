@@ -18,6 +18,7 @@ import '../../l10n/admin_ui_localizations.dart';
 import '../../l10n/formats.dart';
 import '../../l10n/sections/assets_messages.dart';
 import '../../theme/breakpoints.dart';
+import '../../theme/icons.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import '../asset_library_controller.dart';
@@ -116,13 +117,16 @@ class Asset {
   }
 }
 
-IconData assetGlyph(AssetType type) => switch (type) {
-  AssetType.image => Icons.image_outlined,
-  AssetType.video => Icons.movie_outlined,
-  AssetType.audio => Icons.audiotrack_outlined,
-  AssetType.document => Icons.description_outlined,
-  AssetType.other => Icons.insert_drive_file_outlined,
-};
+/// The glyph of an asset of [type], from [icons]: pass `context.icons` for
+/// the theme's (the kit's own when left out).
+IconData assetGlyph(AssetType type, {AdminIcons icons = const AdminIcons()}) =>
+    switch (type) {
+      AssetType.image => icons.fileImage,
+      AssetType.video => icons.fileVideo,
+      AssetType.audio => icons.fileAudio,
+      AssetType.document => icons.fileDocument,
+      AssetType.other => icons.file,
+    };
 
 /// The recurring media-browsing surface: search + type filter + grid/list of
 /// [assets], with optional multi-select and an embedded upload tab. The picker
@@ -402,9 +406,7 @@ class AssetLibrary extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AdminSpacing.xxl),
         child: EmptyState(
           minHeight: 0,
-          icon: searching
-              ? Icons.search_off_rounded
-              : Icons.photo_library_outlined,
+          icon: searching ? context.icons.noResults : context.icons.library,
           title: searching ? strings.noMatchingAssets : strings.noAssetsYet,
           message: searching
               ? strings.noMatchingAssetsHint
@@ -474,7 +476,7 @@ class AssetLibrary extends StatelessWidget {
         final asset = assets[i];
         return MediaTile(
           focusNode: focusNode,
-          thumbnail: _thumb(asset),
+          thumbnail: _thumb(context, asset),
           title: asset.name,
           subtitle: asset.dimsOf(context) ?? asset.sizeOf(context),
           selected: _picker ? selected.contains(asset.id) : null,
@@ -498,7 +500,7 @@ class AssetLibrary extends StatelessWidget {
         final asset = assets[i];
         return MediaListTile(
           focusNode: focusNode,
-          thumbnail: _thumb(asset, iconSize: context.iconSizes.lg),
+          thumbnail: _thumb(context, asset, iconSize: context.iconSizes.lg),
           title: asset.name,
           subtitle: [
             asset.sizeOf(context),
@@ -513,14 +515,14 @@ class AssetLibrary extends StatelessWidget {
     );
   }
 
-  static Widget _thumb(Asset asset, {double? iconSize}) {
+  static Widget _thumb(BuildContext context, Asset asset, {double? iconSize}) {
     final image = asset.type == AssetType.image;
     return MediaThumb(
       image: image ? asset.thumbnail : null,
       swatch: image ? asset.swatch : null,
       icon: image && asset.swatch != null
-          ? Icons.image_outlined
-          : assetGlyph(asset.type),
+          ? context.icons.image
+          : assetGlyph(asset.type, icons: context.icons),
       iconSize: iconSize,
     );
   }
@@ -584,7 +586,11 @@ class _Toolbar extends StatelessWidget {
       options: [
         FilterMenuOption(null, strings.allTypes),
         for (final t in AssetType.values)
-          FilterMenuOption(t, _typeLabel(strings, t), icon: assetGlyph(t)),
+          FilterMenuOption(
+            t,
+            _typeLabel(strings, t),
+            icon: assetGlyph(t, icons: context.icons),
+          ),
       ],
     );
     final views = Segmented<AssetView>(
@@ -595,13 +601,13 @@ class _Toolbar extends StatelessWidget {
         SegmentOption(
           AssetView.grid,
           strings.gridView,
-          icon: Icons.grid_view_rounded,
+          icon: context.icons.gridView,
           showLabel: false,
         ),
         SegmentOption(
           AssetView.list,
           strings.listView,
-          icon: Icons.view_list_rounded,
+          icon: context.icons.listView,
           showLabel: false,
         ),
       ],
@@ -753,11 +759,11 @@ class _TabHostState extends State<_TabHost> {
             tabs: [
               TabItem(
                 context.adminL10n.assets.libraryTab,
-                icon: Icons.photo_library_outlined,
+                icon: context.icons.library,
               ),
               TabItem(
                 context.adminL10n.assets.uploadTab,
-                icon: Icons.cloud_upload_outlined,
+                icon: context.icons.upload,
               ),
             ],
           ),

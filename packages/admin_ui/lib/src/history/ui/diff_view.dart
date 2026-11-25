@@ -136,12 +136,12 @@ class _DiffViewState extends State<DiffView> {
         SegmentOption(
           DiffLayout.unified,
           strings.unified,
-          icon: Icons.notes_rounded,
+          icon: context.icons.diffUnified,
         ),
         SegmentOption(
           DiffLayout.split,
           strings.split,
-          icon: Icons.vertical_split_outlined,
+          icon: context.icons.diffSplit,
         ),
       ],
     );
@@ -208,9 +208,7 @@ class _DiffViewState extends State<DiffView> {
   Widget _showUnchangedToggle(BuildContext context) {
     return SegmentToggle(
       label: context.adminL10n.display.diffUnchanged,
-      icon: _showUnchanged
-          ? Icons.visibility_outlined
-          : Icons.visibility_off_outlined,
+      icon: _showUnchanged ? context.icons.show : context.icons.hide,
       active: _showUnchanged,
       onTap: () => setState(() => _showUnchanged = !_showUnchanged),
     );
@@ -225,7 +223,7 @@ class _DiffViewState extends State<DiffView> {
       final strings = context.adminL10n.display;
       return Center(
         child: EmptyState(
-          icon: Icons.check_circle_outline_rounded,
+          icon: context.icons.success,
           title: strings.noChanges,
           message: strings.versionsIdentical,
         ),
@@ -291,7 +289,7 @@ class _Header extends StatelessWidget {
               horizontal: compact ? AdminSpacing.md : AdminSpacing.lg,
             ),
             child: Icon(
-              Icons.arrow_forward_rounded,
+              context.icons.arrowForward,
               size: context.iconSizes.md,
               color: context.colors.foregroundMuted,
             ),
@@ -301,14 +299,14 @@ class _Header extends StatelessWidget {
             Gap(compact ? AdminSpacing.md : AdminSpacing.xl),
             if (compact)
               Button.icon(
-                Icons.history_rounded,
+                context.icons.restore,
                 semanticLabel: restoreLabel,
                 onPressed: onRestore,
               )
             else
               Button(
                 restoreLabel,
-                icon: Icons.history_rounded,
+                icon: context.icons.restore,
                 onPressed: onRestore,
               ),
           ],

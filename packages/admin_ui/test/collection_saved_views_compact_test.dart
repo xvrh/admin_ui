@@ -100,7 +100,7 @@ final _strip = find.byType(Tabs);
 
 /// The compact form's trigger: the button with the chevron.
 final _trigger = find.byWidgetPredicate(
-  (w) => w is Button && w.trailingIcon == Icons.expand_more_rounded,
+  (w) => w is Button && w.trailingIcon == Icons.keyboard_arrow_down_rounded,
 );
 
 Finder _button(String label) =>
@@ -421,7 +421,7 @@ void main() {
       final chevron = tester.getCenter(
         find.descendant(
           of: _trigger,
-          matching: find.byIcon(Icons.expand_more_rounded),
+          matching: find.byIcon(Icons.keyboard_arrow_down_rounded),
         ),
       );
       expect(

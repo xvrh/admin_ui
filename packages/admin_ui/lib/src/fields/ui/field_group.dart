@@ -183,7 +183,7 @@ class _FieldGroupState extends State<FieldGroup> {
             duration: context.motion.fast,
             curve: context.motion.standard,
             child: Icon(
-              Icons.expand_more_rounded,
+              context.icons.expand,
               size: context.iconSizes.lg,
               color: context.colors.foregroundMuted,
             ),

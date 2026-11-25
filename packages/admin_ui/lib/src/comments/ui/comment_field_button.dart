@@ -34,7 +34,7 @@ class CommentFieldButton extends StatelessWidget {
       // maps_ugc = a round add-comment bubble; the squared-off add_comment
       // glyph reads as a cropped box at this size.
       return IconAction(
-        Icons.maps_ugc_outlined,
+        context.icons.addComment,
         label: label,
         size: IconActionSize.inline,
         onPressed: onTap,
@@ -75,7 +75,7 @@ class CommentFieldButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.mode_comment_outlined, size: size.glyph, color: tone),
+              Icon(context.icons.comment, size: size.glyph, color: tone),
               const Gap(AdminSpacing.xs),
               Text(
                 count > 99
@@ -122,7 +122,7 @@ class CommentAnnotationPin extends StatelessWidget {
             border: Border.all(color: context.colors.borderSubtle),
           ),
           child: Icon(
-            Icons.mode_comment,
+            context.icons.commentThread,
             size: context.iconSizes.xs,
             color: hovered
                 ? context.colors.primaryText

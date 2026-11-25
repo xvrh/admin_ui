@@ -1662,18 +1662,18 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
       if (canSort) ...[
         MenuItem(
           strings.sortAscending,
-          icon: Icons.arrow_upward,
+          icon: context.icons.sortAscending,
           onSelect: () => widget.onSort!(col.sortKey!, true),
         ),
         MenuItem(
           strings.sortDescending,
-          icon: Icons.arrow_downward,
+          icon: context.icons.sortDescending,
           onSelect: () => widget.onSort!(col.sortKey!, false),
         ),
         if (widget.onClearSort != null)
           MenuItem(
             strings.clearSort,
-            icon: Icons.close_rounded,
+            icon: context.icons.close,
             onSelect: active ? widget.onClearSort : null,
           ),
       ],
@@ -1681,13 +1681,13 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
       if (onPin != null)
         MenuItem(
           col.pinned ? strings.unpinColumn : strings.pinColumn,
-          icon: col.pinned ? Icons.push_pin : Icons.push_pin_outlined,
+          icon: col.pinned ? context.icons.pinned : context.icons.pin,
           onSelect: () => onPin(col.key, !col.pinned),
         ),
       if (resizable)
         MenuItem(
           strings.resetWidth,
-          icon: Icons.width_normal_outlined,
+          icon: context.icons.resetWidth,
           onSelect: _overrideWidth(col) == null
               ? null
               : () => _resetWidth(index),
@@ -1695,14 +1695,14 @@ class _CollectionTableState<T> extends State<CollectionTable<T>> {
       if (canHide)
         MenuItem(
           strings.hideColumn,
-          icon: Icons.visibility_off_outlined,
+          icon: context.icons.hide,
           onSelect: () => widget.onHideColumn!(col.key),
         ),
       if (onManage != null) ...[
         if (canSort || columnEntries) const MenuDivider(),
         MenuItem(
           strings.manageColumns,
-          icon: Icons.view_column_outlined,
+          icon: context.icons.columns,
           onSelect: onManage,
         ),
       ],
@@ -2726,8 +2726,10 @@ class _HeaderCellState extends State<_HeaderCell>
     }
     final icon = Icon(
       active
-          ? (widget.ascending ? Icons.arrow_upward : Icons.arrow_downward)
-          : Icons.unfold_more,
+          ? (widget.ascending
+                ? context.icons.sortAscending
+                : context.icons.sortDescending)
+          : context.icons.sortable,
       size: metrics.sortIconSize,
       color: active ? colors.primaryText : idle,
     );
@@ -2768,7 +2770,7 @@ class _HeaderCellState extends State<_HeaderCell>
             child: ColoredBox(
               color: context.tableMetrics.headerFillOf(context.colors),
               child: IconAction(
-                Icons.more_vert,
+                context.icons.moreVertical,
                 label: context.adminL10n.collection.columnOptionsFor(
                   widget.label,
                 ),

@@ -75,7 +75,7 @@ void main() {
           ),
         );
         await tester.pumpWidget(body());
-        expect(find.byIcon(Icons.close), findsNothing, reason: '$kind');
+        expect(find.byIcon(Icons.close_rounded), findsNothing, reason: '$kind');
 
         await tester.pumpWidget(body(onRemove: (id) => removed = id));
         expect(
@@ -83,7 +83,7 @@ void main() {
           findsOneWidget,
           reason: '$kind',
         );
-        await tester.tap(find.byIcon(Icons.close));
+        await tester.tap(find.byIcon(Icons.close_rounded));
         expect(removed, 'a', reason: '$kind');
       }
     });
@@ -120,7 +120,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(Icons.close_rounded));
       expect(removed, 'a');
     });
 
@@ -147,7 +147,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.byIcon(Icons.close).first);
+      await tester.tap(find.byIcon(Icons.close_rounded).first);
       expect(removed, 'a');
     });
 
@@ -179,7 +179,7 @@ void main() {
           ),
         ),
       );
-      expect(find.byIcon(Icons.add), findsNothing);
+      expect(find.byIcon(Icons.add_rounded), findsNothing);
     });
 
     testWidgets('add affordance hidden at maxItems cap', (tester) async {
@@ -197,7 +197,7 @@ void main() {
           ),
         ),
       );
-      expect(find.byIcon(Icons.add), findsNothing);
+      expect(find.byIcon(Icons.add_rounded), findsNothing);
     });
 
     testWidgets('field-level error renders under the body', (tester) async {

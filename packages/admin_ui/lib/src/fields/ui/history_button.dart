@@ -104,7 +104,7 @@ class _Anchor extends StatelessWidget {
     final label = context.adminL10n.fields.versionHistory;
     if (!modified) {
       return IconAction(
-        Icons.history,
+        context.icons.history,
         label: label,
         size: IconActionSize.inline,
         selected: on,

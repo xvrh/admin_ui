@@ -307,7 +307,7 @@ class LaneStack extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.sync_problem_rounded,
+              context.icons.sourceChanged,
               size: context.iconSizes.sm,
               color: color,
             ),

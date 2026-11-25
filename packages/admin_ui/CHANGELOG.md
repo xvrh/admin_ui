@@ -16,6 +16,32 @@
   hint. With `integer`, `onCommit` receives an `int`, and the keyboard has
   no decimal key; with a `min` of zero or more it has no minus. An editor
   given none of them saves what it saved.
+- `AdminIcons` holds the glyphs the kit draws on its own, beside
+  `AdminStroke` and `AdminIconSizes`: one slot per role, named for what
+  the glyph says (`close`, `check`, `dropdown`, `expand`,
+  `chevronForward`, `sortAscending`, `error`, `fileVideo` and 118 more),
+  read through `context.icons`. `AdminTokens`, `AdminTokens.from` and
+  `AdminTheme.from` take it as `icons`. Each slot defaults to the Material
+  Icons glyph the kit draws there, so a theme that names none draws what
+  it drew but for the glyphs under Looks. An app drawn in another icon
+  set gives the kit its glyphs, and the kit's chrome follows, where it
+  stayed in Material's beside the app's. `AdminIcons.all` requires every
+  slot, for an app drawn wholly in its own set: a slot it leaves out, or
+  one the kit adds later, is a compile error rather than a Material glyph.
+  It copies and compares by value; a glyph does not interpolate, so a lerp
+  takes the nearer set. `looks.txt` lists every slot of every theme.
+- A constructor that defaulted to a glyph of the kit's takes a nullable
+  `icon` and draws the theme's slot when it is null: `ErrorState`
+  (`error`), `ForbiddenState` (`lock`), `AddRowButton` (`add`),
+  `MediaThumb` (`image`) and `FilterMenuButton` (`filter`).
+  `IconAction.icon` is null for an `IconAction.close`, which draws
+  `close`, as its `label` is null for the localized "Close". A
+  `PasswordField` with no `icon` draws the theme's `lock`, and
+  `icon: null` still drops it. Code that reads one of these `icon`
+  fields reads an `IconData?`.
+- `assetGlyph` takes the `icons` to draw from, the kit's when left out,
+  and `DiffOpStyle.resolve` takes them after `strings`; `DiffOpStyle.of`
+  passes the theme's.
 - `KanbanBoard` takes `padding`, `columnSpacing` and `fitColumns`. Its
   padding, 16px on every side, and the 12px between its columns were
   fixed: a board in a page that has its own gutter started 16px inside
@@ -879,6 +905,24 @@
 - A table's number editor holding text that is no number says so: "Enter
   a number like 1,234.5", on a card under the cell. It was marked invalid
   and said nothing.
+- Where the kit drew one role in both a plain and a rounded Material
+  glyph, it draws the rounded one, as it does everywhere else: the close
+  of a bulk action bar's clear, a filter's remove and a media item's and
+  a reference's cancel and remove; the check of a media tile's selection
+  and of a comment's Resolve; the add of a saved view and of a media
+  field; an asset preview's, an upload's and a code field's error and
+  success glyphs; the insert picker's search; a media item's and a
+  reference's retry; the lock of a column that cannot be hidden; a saved
+  view's delete; a media list's cover star; and the caret of a filter
+  and of the column chooser's trigger. A rounded glyph rounds its plain
+  twin's ends and corners, about 1 to 5% of its ink. The ⋯ of a bulk
+  action bar, a save bar and a pager, the drag grip of a column chooser,
+  a media list and a reference list, and the caret of the saved views, a
+  breadcrumb, a tab, a language pill, an inheritable lane and a media
+  filter (`keyboard_arrow_down_rounded`, the caret of every field, where
+  they drew `expand_more_rounded`) are the same shape in both and move no
+  pixel. A test that finds one of these by its glyph finds the rounded
+  one.
 - A `DiffView` card is headed with its field's label alone, where the
   field's key followed it in small muted type: "Meta description", where
   it read "Meta description  metaDescription". A card is announced

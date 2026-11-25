@@ -651,26 +651,26 @@ class _DividerState extends State<_Divider> {
         if (horizontal) ...[
           MenuItem(
             l10n.display.moveLeft,
-            icon: Icons.west_rounded, // Physical: the way the divider goes.
+            icon: context.icons.resizeLeft,
             shortcut: shortcutLabel(context, leftKey),
             onSelect: stepBack,
           ),
           MenuItem(
             l10n.display.moveRight,
-            icon: Icons.east_rounded, // Physical: the way the divider goes.
+            icon: context.icons.resizeRight,
             shortcut: shortcutLabel(context, rightKey),
             onSelect: stepForward,
           ),
         ] else ...[
           MenuItem(
             l10n.moveUp,
-            icon: Icons.north_rounded,
+            icon: context.icons.resizeUp,
             shortcut: shortcutLabel(context, upKey),
             onSelect: stepBack,
           ),
           MenuItem(
             l10n.moveDown,
-            icon: Icons.south_rounded,
+            icon: context.icons.resizeDown,
             shortcut: shortcutLabel(context, downKey),
             onSelect: stepForward,
           ),

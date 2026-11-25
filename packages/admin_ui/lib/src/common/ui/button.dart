@@ -1079,7 +1079,7 @@ class SplitButton extends StatelessWidget {
         size: size,
         danger: danger,
         style: this.style,
-        icon: Icons.keyboard_arrow_down_rounded,
+        icon: context.icons.dropdown,
         semanticLabel: menuSemanticLabel,
         expanded: c.isOpen,
       ),

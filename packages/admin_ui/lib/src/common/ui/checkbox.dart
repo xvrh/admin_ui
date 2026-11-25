@@ -162,7 +162,7 @@ class Check extends StatelessWidget {
       ),
       child: on
           ? Icon(
-              indeterminate ? Icons.remove_rounded : Icons.check_rounded,
+              indeterminate ? context.icons.indeterminate : context.icons.check,
               // the glyph keeps a pixel clear of the box's edge
               size: math.min(context.iconSizes.sm, size - 2),
               color: enabled ? style.onInkOf(colors) : colors.surface,

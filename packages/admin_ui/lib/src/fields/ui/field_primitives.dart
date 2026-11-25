@@ -26,7 +26,9 @@ export '../../common/ui/tappable.dart';
 class AddRowButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
-  final IconData icon;
+
+  /// The leading glyph; the theme's `context.icons.add` when null.
+  final IconData? icon;
 
   /// Whether the popover the button opens is showing, announced as its
   /// expanded state; null for a button that adds in place.
@@ -38,7 +40,7 @@ class AddRowButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
-    this.icon = Icons.add_rounded,
+    this.icon,
     this.expanded,
     this.focusNode,
   });
@@ -47,7 +49,7 @@ class AddRowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget button = Button.ghost(
       label,
-      icon: icon,
+      icon: icon ?? context.icons.add,
       size: ControlSize.small,
       flush: true,
       focusNode: focusNode,

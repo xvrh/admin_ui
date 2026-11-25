@@ -231,7 +231,7 @@ void main() {
               check: MediaTileCheck.always,
             ),
           ),
-          find.byIcon(Icons.check),
+          find.byIcon(Icons.check_rounded),
         );
         for (final (what, (fill, ink), min) in [
           ('day', day, 4.5),

@@ -4,6 +4,7 @@ import '../../common/ui/button.dart';
 import '../../common/ui/empty_state.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/palette.dart';
+import '../../theme/tokens.dart';
 
 /// Every fill a table row can take — plain, striped, selected, each under
 /// the pointer — for text that must read on all of them.
@@ -27,7 +28,7 @@ class NoResultsState extends StatelessWidget {
     final clear = onClearFilters;
     final strings = context.adminL10n;
     return EmptyState(
-      icon: Icons.search_off_rounded,
+      icon: context.icons.noResults,
       title: strings.noResults,
       message: strings.collection.noResultsMessage,
       action: clear == null

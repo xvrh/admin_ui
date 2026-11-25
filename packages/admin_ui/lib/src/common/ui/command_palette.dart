@@ -424,7 +424,7 @@ class CommandTrigger extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                Icons.search_rounded,
+                context.icons.search,
                 size: sizes.fieldIcon,
                 color: context.colors.foregroundMuted,
               ),
@@ -790,7 +790,7 @@ class _CommandPaletteState extends State<CommandPalette> {
       child: Row(
         children: [
           Icon(
-            Icons.search_rounded,
+            context.icons.search,
             size: context.iconSizes.lg,
             color: context.colors.foregroundMuted,
           ),
@@ -1027,7 +1027,7 @@ class _CommandPaletteState extends State<CommandPalette> {
             Row(
               children: [
                 Icon(
-                  item.reasonIcon ?? Icons.notes_rounded,
+                  item.reasonIcon ?? context.icons.matchedContent,
                   size: context.iconSizes.sm,
                   color: context.colors.foregroundMuted,
                 ),

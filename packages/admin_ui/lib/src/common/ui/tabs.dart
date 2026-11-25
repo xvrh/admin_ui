@@ -555,7 +555,7 @@ class _TabsState extends State<Tabs> {
             ),
         ],
         builder: (context, c) => IconAction(
-          Icons.more_horiz_rounded,
+          context.icons.more,
           label: label,
           size: IconActionSize.small,
           expanded: c.isOpen,
@@ -1005,7 +1005,7 @@ class _TabState extends State<_Tab> {
               opacity: shown ? 1 : 0,
               alwaysIncludeSemantics: true,
               child: IconAction(
-                Icons.expand_more_rounded,
+                context.icons.dropdown,
                 label:
                     widget.item.menuLabel ??
                     MaterialLocalizations.of(context).moreButtonTooltip,

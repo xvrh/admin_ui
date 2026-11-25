@@ -6,6 +6,7 @@ import '../elevation.dart';
 import '../feedback_style.dart';
 import '../field_style.dart';
 import '../focus.dart';
+import '../icons.dart';
 import '../motion.dart';
 import '../overlay_style.dart';
 import '../palette.dart';
@@ -43,9 +44,10 @@ class AdminTheme {
   /// share the [radii], [type], [focus] ring, control [sizes] (left out,
   /// [defaultControlSizes]), [table] metrics (left out,
   /// [defaultTableMetrics]), [motion] (left out, [defaultMotion]), [stroke]
-  /// widths, [iconSizes], the [field], [button], [overlay], [segmented],
-  /// [selection], [slider] and [tabs] anatomy, and the layout
-  /// [breakpoints] (left out, [AdminBreakpoints]' defaults).
+  /// widths, [iconSizes], the kit's [icons] (left out, [AdminIcons]'
+  /// defaults), the [field], [button], [overlay], [segmented], [selection],
+  /// [slider] and [tabs] anatomy, and the layout [breakpoints] (left out,
+  /// [AdminBreakpoints]' defaults).
   /// The light set takes [elevation], [shell] and [feedback], the dark set
   /// [darkElevation], [darkShell] and [darkFeedback]; left out, each mode
   /// gets the shadows that suit its palette's brightness ([defaultElevation]
@@ -70,6 +72,7 @@ class AdminTheme {
     AdminMotion? motion,
     AdminStroke? stroke,
     AdminIconSizes? iconSizes,
+    AdminIcons? icons,
     AdminFieldStyle? field,
     AdminButtonStyle? button,
     AdminShellStyle? shell,
@@ -133,6 +136,7 @@ class _PaletteTheme implements AdminTheme {
   final AdminMotion? motion;
   final AdminStroke? stroke;
   final AdminIconSizes? iconSizes;
+  final AdminIcons? icons;
   final AdminFieldStyle? field;
   final AdminButtonStyle? button;
   final AdminShellStyle? shell;
@@ -160,6 +164,7 @@ class _PaletteTheme implements AdminTheme {
     this.motion,
     this.stroke,
     this.iconSizes,
+    this.icons,
     this.field,
     this.button,
     this.shell,
@@ -204,6 +209,7 @@ class _PaletteTheme implements AdminTheme {
     motion: motion,
     stroke: stroke,
     iconSizes: iconSizes,
+    icons: icons,
     field: field,
     button: button,
     shell: shell,
@@ -236,6 +242,7 @@ class _PaletteTheme implements AdminTheme {
     motion: motion,
     stroke: stroke,
     iconSizes: iconSizes,
+    icons: icons,
     field: field,
     button: button,
     shell: shell?.branded(seed),

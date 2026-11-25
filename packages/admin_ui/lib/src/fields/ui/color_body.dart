@@ -295,7 +295,7 @@ class _PickerState extends State<_Picker> {
         ),
         child: color != null && selected
             ? Icon(
-                Icons.check_rounded,
+                context.icons.check,
                 size: context.iconSizes.md,
                 color: context.colors.foregroundOn(color),
               )
@@ -333,7 +333,7 @@ class _PickerState extends State<_Picker> {
                       decoration: fieldInputDecoration(
                         context,
                         hint: '5B5BD6',
-                        leadingIcon: Icons.tag_rounded,
+                        leadingIcon: context.icons.hex,
                         invalid: error != null,
                       ),
                     ),
@@ -406,7 +406,7 @@ class _Swatch extends StatelessWidget {
       // Empty: a hollow tile with a dropper, so it reads as "unset".
       child: color == null
           ? Icon(
-              Icons.colorize_rounded,
+              context.icons.pickColor,
               size: size * 0.6,
               color: colors.foregroundMuted,
             )

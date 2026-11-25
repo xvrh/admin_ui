@@ -188,6 +188,132 @@ iconSizes.sm: 14
 iconSizes.md: 16
 iconSizes.lg: 20
 iconSizes.xl: 24
+icons.close: MaterialIcons U+F647
+icons.check: MaterialIcons U+F636
+icons.indeterminate: MaterialIcons U+F00F1
+icons.add: MaterialIcons U+F537
+icons.increment: MaterialIcons U+F537
+icons.decrement: MaterialIcons U+F00F1
+icons.more: MaterialIcons U+F8D9
+icons.moreVertical: MaterialIcons U+E404
+icons.menu: MaterialIcons U+F8B6
+icons.search: MaterialIcons U+F013D
+icons.noResults: MaterialIcons U+F013C
+icons.filter: MaterialIcons U+F75B
+icons.matchedField: MaterialIcons U+F023D
+icons.matchedContent: MaterialIcons U+F0023
+icons.jumpTo: MaterialIcons U+F1FE
+icons.enterKey: MaterialIcons U+E35A
+icons.edit: MaterialIcons U+F00D
+icons.copy: MaterialIcons U+F66C
+icons.delete: MaterialIcons U+F696
+icons.undo: MaterialIcons U+F0261 mirrored
+icons.retry: MaterialIcons U+F00E9
+icons.reset: MaterialIcons U+E531
+icons.history: MaterialIcons U+E314
+icons.restore: MaterialIcons U+F7EF
+icons.link: MaterialIcons U+F85A
+icons.linkBroken: MaterialIcons U+F859
+icons.addLink: MaterialIcons U+F530
+icons.replace: MaterialIcons U+F01FA
+icons.expand: MaterialIcons U+F720
+icons.dropdown: MaterialIcons U+F82B
+icons.chevronForward: MaterialIcons U+F63B mirrored
+icons.chevronBack: MaterialIcons U+F63A mirrored
+icons.arrowForward: MaterialIcons U+F57A mirrored
+icons.arrowBack: MaterialIcons U+F572 mirrored
+icons.expandAll: MaterialIcons U+F0263
+icons.collapseAll: MaterialIcons U+F0262
+icons.switcher: MaterialIcons U+F0263
+icons.sortAscending: MaterialIcons U+E0A0
+icons.sortDescending: MaterialIcons U+E097
+icons.sortable: MaterialIcons U+E68E
+icons.moveUp: MaterialIcons U+F57E
+icons.moveDown: MaterialIcons U+F575
+icons.indent: MaterialIcons U+F78F mirrored
+icons.outdent: MaterialIcons U+F78E mirrored
+icons.addChild: MaterialIcons U+F01EA
+icons.sectionHeader: MaterialIcons U+F0142
+icons.dragHandle: MaterialIcons U+F6E3
+icons.resizeLeft: MaterialIcons U+F02B5
+icons.resizeRight: MaterialIcons U+F6F1
+icons.resizeUp: MaterialIcons U+F001A
+icons.resizeDown: MaterialIcons U+F01AB
+icons.columns: MaterialIcons U+F492
+icons.pin: MaterialIcons U+F2D7
+icons.pinned: MaterialIcons U+E4F4
+icons.resetWidth: MaterialIcons U+F0726
+icons.show: MaterialIcons U+F4A1
+icons.hide: MaterialIcons U+F4A0
+icons.selectAll: MaterialIcons U+F0143
+icons.gridView: MaterialIcons U+F7C4
+icons.listView: MaterialIcons U+F028A mirrored
+icons.saveView: MaterialIcons U+EEE1
+icons.setDefault: MaterialIcons U+F01D1
+icons.defaultBadge: MaterialIcons U+F01D4
+icons.personal: MaterialIcons U+E497
+icons.shared: MaterialIcons U+F0D9
+icons.info: MaterialIcons U+F815
+icons.success: MaterialIcons U+F634
+icons.warning: MaterialIcons U+F02A0
+icons.error: MaterialIcons U+F712
+icons.done: MaterialIcons U+F635
+icons.stepError: MaterialIcons U+F00C1
+icons.sourceChanged: MaterialIcons U+F0206
+icons.empty: MaterialIcons U+F126
+icons.chart: MaterialIcons U+F5A9
+icons.trendUp: MaterialIcons U+F57E
+icons.trendDown: MaterialIcons U+F575
+icons.trendFlat: MaterialIcons U+F00F1
+icons.diffAdded: MaterialIcons U+F537
+icons.diffRemoved: MaterialIcons U+F00F1
+icons.diffChanged: MaterialIcons U+F00D
+icons.diffMoved: MaterialIcons U+F01FC
+icons.diffUnchanged: MaterialIcons U+F6E2
+icons.diffUnified: MaterialIcons U+F0023
+icons.diffSplit: MaterialIcons U+F482
+icons.lock: MaterialIcons U+F888
+icons.calendar: MaterialIcons U+F051F
+icons.time: MaterialIcons U+F012B
+icons.dateRange: MaterialIcons U+EFA5
+icons.hex: MaterialIcons U+F0216
+icons.pickColor: MaterialIcons U+F659
+icons.radioSelected: MaterialIcons U+F00D7
+icons.radioUnselected: MaterialIcons U+F00D8
+icons.upload: MaterialIcons U+EF64
+icons.library: MaterialIcons U+F29D
+icons.addImage: MaterialIcons U+EE48
+icons.addFile: MaterialIcons U+F478
+icons.image: MaterialIcons U+F120
+icons.imageBroken: MaterialIcons U+EEFF
+icons.fileImage: MaterialIcons U+F120
+icons.fileVideo: MaterialIcons U+F1F5
+icons.fileAudio: MaterialIcons U+EEA6
+icons.fileDocument: MaterialIcons U+EFAE
+icons.filePdf: MaterialIcons U+F2A4
+icons.fileArchive: MaterialIcons U+F0602
+icons.fileSpreadsheet: MaterialIcons U+F41D
+icons.file: MaterialIcons U+F12D
+icons.license: MaterialIcons U+F06A1
+icons.orientation: MaterialIcons U+F689
+icons.imageType: MaterialIcons U+EF37
+icons.zoomIn: MaterialIcons U+F537
+icons.zoomOut: MaterialIcons U+F00F1
+icons.zoomFit: MaterialIcons U+F766
+icons.rotateLeft: MaterialIcons U+F321
+icons.rotateRight: MaterialIcons U+F0655
+icons.flip: MaterialIcons U+E29A
+icons.comment: MaterialIcons U+F1D6
+icons.addComment: MaterialIcons U+F1B0
+icons.commentThread: MaterialIcons U+E3F1
+icons.send: MaterialIcons U+E0A0
+icons.notifications: MaterialIcons U+F0027
+icons.markRead: MaterialIcons U+F1B5
+icons.markUnread: MaterialIcons U+F1B6
+icons.themeLight: MaterialIcons U+F162
+icons.themeDark: MaterialIcons U+EF9F
+icons.themeSystem: MaterialIcons U+EEFB
+icons.email: MaterialIcons U+F89B
 field.variant: outlined
 field.focusIndicator: outline
 field.accentFocus: false
@@ -518,6 +644,132 @@ iconSizes.sm: 14
 iconSizes.md: 16
 iconSizes.lg: 20
 iconSizes.xl: 24
+icons.close: MaterialIcons U+F647
+icons.check: MaterialIcons U+F636
+icons.indeterminate: MaterialIcons U+F00F1
+icons.add: MaterialIcons U+F537
+icons.increment: MaterialIcons U+F537
+icons.decrement: MaterialIcons U+F00F1
+icons.more: MaterialIcons U+F8D9
+icons.moreVertical: MaterialIcons U+E404
+icons.menu: MaterialIcons U+F8B6
+icons.search: MaterialIcons U+F013D
+icons.noResults: MaterialIcons U+F013C
+icons.filter: MaterialIcons U+F75B
+icons.matchedField: MaterialIcons U+F023D
+icons.matchedContent: MaterialIcons U+F0023
+icons.jumpTo: MaterialIcons U+F1FE
+icons.enterKey: MaterialIcons U+E35A
+icons.edit: MaterialIcons U+F00D
+icons.copy: MaterialIcons U+F66C
+icons.delete: MaterialIcons U+F696
+icons.undo: MaterialIcons U+F0261 mirrored
+icons.retry: MaterialIcons U+F00E9
+icons.reset: MaterialIcons U+E531
+icons.history: MaterialIcons U+E314
+icons.restore: MaterialIcons U+F7EF
+icons.link: MaterialIcons U+F85A
+icons.linkBroken: MaterialIcons U+F859
+icons.addLink: MaterialIcons U+F530
+icons.replace: MaterialIcons U+F01FA
+icons.expand: MaterialIcons U+F720
+icons.dropdown: MaterialIcons U+F82B
+icons.chevronForward: MaterialIcons U+F63B mirrored
+icons.chevronBack: MaterialIcons U+F63A mirrored
+icons.arrowForward: MaterialIcons U+F57A mirrored
+icons.arrowBack: MaterialIcons U+F572 mirrored
+icons.expandAll: MaterialIcons U+F0263
+icons.collapseAll: MaterialIcons U+F0262
+icons.switcher: MaterialIcons U+F0263
+icons.sortAscending: MaterialIcons U+E0A0
+icons.sortDescending: MaterialIcons U+E097
+icons.sortable: MaterialIcons U+E68E
+icons.moveUp: MaterialIcons U+F57E
+icons.moveDown: MaterialIcons U+F575
+icons.indent: MaterialIcons U+F78F mirrored
+icons.outdent: MaterialIcons U+F78E mirrored
+icons.addChild: MaterialIcons U+F01EA
+icons.sectionHeader: MaterialIcons U+F0142
+icons.dragHandle: MaterialIcons U+F6E3
+icons.resizeLeft: MaterialIcons U+F02B5
+icons.resizeRight: MaterialIcons U+F6F1
+icons.resizeUp: MaterialIcons U+F001A
+icons.resizeDown: MaterialIcons U+F01AB
+icons.columns: MaterialIcons U+F492
+icons.pin: MaterialIcons U+F2D7
+icons.pinned: MaterialIcons U+E4F4
+icons.resetWidth: MaterialIcons U+F0726
+icons.show: MaterialIcons U+F4A1
+icons.hide: MaterialIcons U+F4A0
+icons.selectAll: MaterialIcons U+F0143
+icons.gridView: MaterialIcons U+F7C4
+icons.listView: MaterialIcons U+F028A mirrored
+icons.saveView: MaterialIcons U+EEE1
+icons.setDefault: MaterialIcons U+F01D1
+icons.defaultBadge: MaterialIcons U+F01D4
+icons.personal: MaterialIcons U+E497
+icons.shared: MaterialIcons U+F0D9
+icons.info: MaterialIcons U+F815
+icons.success: MaterialIcons U+F634
+icons.warning: MaterialIcons U+F02A0
+icons.error: MaterialIcons U+F712
+icons.done: MaterialIcons U+F635
+icons.stepError: MaterialIcons U+F00C1
+icons.sourceChanged: MaterialIcons U+F0206
+icons.empty: MaterialIcons U+F126
+icons.chart: MaterialIcons U+F5A9
+icons.trendUp: MaterialIcons U+F57E
+icons.trendDown: MaterialIcons U+F575
+icons.trendFlat: MaterialIcons U+F00F1
+icons.diffAdded: MaterialIcons U+F537
+icons.diffRemoved: MaterialIcons U+F00F1
+icons.diffChanged: MaterialIcons U+F00D
+icons.diffMoved: MaterialIcons U+F01FC
+icons.diffUnchanged: MaterialIcons U+F6E2
+icons.diffUnified: MaterialIcons U+F0023
+icons.diffSplit: MaterialIcons U+F482
+icons.lock: MaterialIcons U+F888
+icons.calendar: MaterialIcons U+F051F
+icons.time: MaterialIcons U+F012B
+icons.dateRange: MaterialIcons U+EFA5
+icons.hex: MaterialIcons U+F0216
+icons.pickColor: MaterialIcons U+F659
+icons.radioSelected: MaterialIcons U+F00D7
+icons.radioUnselected: MaterialIcons U+F00D8
+icons.upload: MaterialIcons U+EF64
+icons.library: MaterialIcons U+F29D
+icons.addImage: MaterialIcons U+EE48
+icons.addFile: MaterialIcons U+F478
+icons.image: MaterialIcons U+F120
+icons.imageBroken: MaterialIcons U+EEFF
+icons.fileImage: MaterialIcons U+F120
+icons.fileVideo: MaterialIcons U+F1F5
+icons.fileAudio: MaterialIcons U+EEA6
+icons.fileDocument: MaterialIcons U+EFAE
+icons.filePdf: MaterialIcons U+F2A4
+icons.fileArchive: MaterialIcons U+F0602
+icons.fileSpreadsheet: MaterialIcons U+F41D
+icons.file: MaterialIcons U+F12D
+icons.license: MaterialIcons U+F06A1
+icons.orientation: MaterialIcons U+F689
+icons.imageType: MaterialIcons U+EF37
+icons.zoomIn: MaterialIcons U+F537
+icons.zoomOut: MaterialIcons U+F00F1
+icons.zoomFit: MaterialIcons U+F766
+icons.rotateLeft: MaterialIcons U+F321
+icons.rotateRight: MaterialIcons U+F0655
+icons.flip: MaterialIcons U+E29A
+icons.comment: MaterialIcons U+F1D6
+icons.addComment: MaterialIcons U+F1B0
+icons.commentThread: MaterialIcons U+E3F1
+icons.send: MaterialIcons U+E0A0
+icons.notifications: MaterialIcons U+F0027
+icons.markRead: MaterialIcons U+F1B5
+icons.markUnread: MaterialIcons U+F1B6
+icons.themeLight: MaterialIcons U+F162
+icons.themeDark: MaterialIcons U+EF9F
+icons.themeSystem: MaterialIcons U+EEFB
+icons.email: MaterialIcons U+F89B
 field.variant: outlined
 field.focusIndicator: outline
 field.accentFocus: true
@@ -901,6 +1153,132 @@ iconSizes.sm: 14
 iconSizes.md: 16
 iconSizes.lg: 20
 iconSizes.xl: 24
+icons.close: MaterialIcons U+F647
+icons.check: MaterialIcons U+F636
+icons.indeterminate: MaterialIcons U+F00F1
+icons.add: MaterialIcons U+F537
+icons.increment: MaterialIcons U+F537
+icons.decrement: MaterialIcons U+F00F1
+icons.more: MaterialIcons U+F8D9
+icons.moreVertical: MaterialIcons U+E404
+icons.menu: MaterialIcons U+F8B6
+icons.search: MaterialIcons U+F013D
+icons.noResults: MaterialIcons U+F013C
+icons.filter: MaterialIcons U+F75B
+icons.matchedField: MaterialIcons U+F023D
+icons.matchedContent: MaterialIcons U+F0023
+icons.jumpTo: MaterialIcons U+F1FE
+icons.enterKey: MaterialIcons U+E35A
+icons.edit: MaterialIcons U+F00D
+icons.copy: MaterialIcons U+F66C
+icons.delete: MaterialIcons U+F696
+icons.undo: MaterialIcons U+F0261 mirrored
+icons.retry: MaterialIcons U+F00E9
+icons.reset: MaterialIcons U+E531
+icons.history: MaterialIcons U+E314
+icons.restore: MaterialIcons U+F7EF
+icons.link: MaterialIcons U+F85A
+icons.linkBroken: MaterialIcons U+F859
+icons.addLink: MaterialIcons U+F530
+icons.replace: MaterialIcons U+F01FA
+icons.expand: MaterialIcons U+F720
+icons.dropdown: MaterialIcons U+F82B
+icons.chevronForward: MaterialIcons U+F63B mirrored
+icons.chevronBack: MaterialIcons U+F63A mirrored
+icons.arrowForward: MaterialIcons U+F57A mirrored
+icons.arrowBack: MaterialIcons U+F572 mirrored
+icons.expandAll: MaterialIcons U+F0263
+icons.collapseAll: MaterialIcons U+F0262
+icons.switcher: MaterialIcons U+F0263
+icons.sortAscending: MaterialIcons U+E0A0
+icons.sortDescending: MaterialIcons U+E097
+icons.sortable: MaterialIcons U+E68E
+icons.moveUp: MaterialIcons U+F57E
+icons.moveDown: MaterialIcons U+F575
+icons.indent: MaterialIcons U+F78F mirrored
+icons.outdent: MaterialIcons U+F78E mirrored
+icons.addChild: MaterialIcons U+F01EA
+icons.sectionHeader: MaterialIcons U+F0142
+icons.dragHandle: MaterialIcons U+F6E3
+icons.resizeLeft: MaterialIcons U+F02B5
+icons.resizeRight: MaterialIcons U+F6F1
+icons.resizeUp: MaterialIcons U+F001A
+icons.resizeDown: MaterialIcons U+F01AB
+icons.columns: MaterialIcons U+F492
+icons.pin: MaterialIcons U+F2D7
+icons.pinned: MaterialIcons U+E4F4
+icons.resetWidth: MaterialIcons U+F0726
+icons.show: MaterialIcons U+F4A1
+icons.hide: MaterialIcons U+F4A0
+icons.selectAll: MaterialIcons U+F0143
+icons.gridView: MaterialIcons U+F7C4
+icons.listView: MaterialIcons U+F028A mirrored
+icons.saveView: MaterialIcons U+EEE1
+icons.setDefault: MaterialIcons U+F01D1
+icons.defaultBadge: MaterialIcons U+F01D4
+icons.personal: MaterialIcons U+E497
+icons.shared: MaterialIcons U+F0D9
+icons.info: MaterialIcons U+F815
+icons.success: MaterialIcons U+F634
+icons.warning: MaterialIcons U+F02A0
+icons.error: MaterialIcons U+F712
+icons.done: MaterialIcons U+F635
+icons.stepError: MaterialIcons U+F00C1
+icons.sourceChanged: MaterialIcons U+F0206
+icons.empty: MaterialIcons U+F126
+icons.chart: MaterialIcons U+F5A9
+icons.trendUp: MaterialIcons U+F57E
+icons.trendDown: MaterialIcons U+F575
+icons.trendFlat: MaterialIcons U+F00F1
+icons.diffAdded: MaterialIcons U+F537
+icons.diffRemoved: MaterialIcons U+F00F1
+icons.diffChanged: MaterialIcons U+F00D
+icons.diffMoved: MaterialIcons U+F01FC
+icons.diffUnchanged: MaterialIcons U+F6E2
+icons.diffUnified: MaterialIcons U+F0023
+icons.diffSplit: MaterialIcons U+F482
+icons.lock: MaterialIcons U+F888
+icons.calendar: MaterialIcons U+F051F
+icons.time: MaterialIcons U+F012B
+icons.dateRange: MaterialIcons U+EFA5
+icons.hex: MaterialIcons U+F0216
+icons.pickColor: MaterialIcons U+F659
+icons.radioSelected: MaterialIcons U+F00D7
+icons.radioUnselected: MaterialIcons U+F00D8
+icons.upload: MaterialIcons U+EF64
+icons.library: MaterialIcons U+F29D
+icons.addImage: MaterialIcons U+EE48
+icons.addFile: MaterialIcons U+F478
+icons.image: MaterialIcons U+F120
+icons.imageBroken: MaterialIcons U+EEFF
+icons.fileImage: MaterialIcons U+F120
+icons.fileVideo: MaterialIcons U+F1F5
+icons.fileAudio: MaterialIcons U+EEA6
+icons.fileDocument: MaterialIcons U+EFAE
+icons.filePdf: MaterialIcons U+F2A4
+icons.fileArchive: MaterialIcons U+F0602
+icons.fileSpreadsheet: MaterialIcons U+F41D
+icons.file: MaterialIcons U+F12D
+icons.license: MaterialIcons U+F06A1
+icons.orientation: MaterialIcons U+F689
+icons.imageType: MaterialIcons U+EF37
+icons.zoomIn: MaterialIcons U+F537
+icons.zoomOut: MaterialIcons U+F00F1
+icons.zoomFit: MaterialIcons U+F766
+icons.rotateLeft: MaterialIcons U+F321
+icons.rotateRight: MaterialIcons U+F0655
+icons.flip: MaterialIcons U+E29A
+icons.comment: MaterialIcons U+F1D6
+icons.addComment: MaterialIcons U+F1B0
+icons.commentThread: MaterialIcons U+E3F1
+icons.send: MaterialIcons U+E0A0
+icons.notifications: MaterialIcons U+F0027
+icons.markRead: MaterialIcons U+F1B5
+icons.markUnread: MaterialIcons U+F1B6
+icons.themeLight: MaterialIcons U+F162
+icons.themeDark: MaterialIcons U+EF9F
+icons.themeSystem: MaterialIcons U+EEFB
+icons.email: MaterialIcons U+F89B
 field.variant: outlined
 field.focusIndicator: outline
 field.accentFocus: false
@@ -1279,6 +1657,132 @@ iconSizes.sm: 14
 iconSizes.md: 16
 iconSizes.lg: 20
 iconSizes.xl: 24
+icons.close: MaterialIcons U+F647
+icons.check: MaterialIcons U+F636
+icons.indeterminate: MaterialIcons U+F00F1
+icons.add: MaterialIcons U+F537
+icons.increment: MaterialIcons U+F537
+icons.decrement: MaterialIcons U+F00F1
+icons.more: MaterialIcons U+F8D9
+icons.moreVertical: MaterialIcons U+E404
+icons.menu: MaterialIcons U+F8B6
+icons.search: MaterialIcons U+F013D
+icons.noResults: MaterialIcons U+F013C
+icons.filter: MaterialIcons U+F75B
+icons.matchedField: MaterialIcons U+F023D
+icons.matchedContent: MaterialIcons U+F0023
+icons.jumpTo: MaterialIcons U+F1FE
+icons.enterKey: MaterialIcons U+E35A
+icons.edit: MaterialIcons U+F00D
+icons.copy: MaterialIcons U+F66C
+icons.delete: MaterialIcons U+F696
+icons.undo: MaterialIcons U+F0261 mirrored
+icons.retry: MaterialIcons U+F00E9
+icons.reset: MaterialIcons U+E531
+icons.history: MaterialIcons U+E314
+icons.restore: MaterialIcons U+F7EF
+icons.link: MaterialIcons U+F85A
+icons.linkBroken: MaterialIcons U+F859
+icons.addLink: MaterialIcons U+F530
+icons.replace: MaterialIcons U+F01FA
+icons.expand: MaterialIcons U+F720
+icons.dropdown: MaterialIcons U+F82B
+icons.chevronForward: MaterialIcons U+F63B mirrored
+icons.chevronBack: MaterialIcons U+F63A mirrored
+icons.arrowForward: MaterialIcons U+F57A mirrored
+icons.arrowBack: MaterialIcons U+F572 mirrored
+icons.expandAll: MaterialIcons U+F0263
+icons.collapseAll: MaterialIcons U+F0262
+icons.switcher: MaterialIcons U+F0263
+icons.sortAscending: MaterialIcons U+E0A0
+icons.sortDescending: MaterialIcons U+E097
+icons.sortable: MaterialIcons U+E68E
+icons.moveUp: MaterialIcons U+F57E
+icons.moveDown: MaterialIcons U+F575
+icons.indent: MaterialIcons U+F78F mirrored
+icons.outdent: MaterialIcons U+F78E mirrored
+icons.addChild: MaterialIcons U+F01EA
+icons.sectionHeader: MaterialIcons U+F0142
+icons.dragHandle: MaterialIcons U+F6E3
+icons.resizeLeft: MaterialIcons U+F02B5
+icons.resizeRight: MaterialIcons U+F6F1
+icons.resizeUp: MaterialIcons U+F001A
+icons.resizeDown: MaterialIcons U+F01AB
+icons.columns: MaterialIcons U+F492
+icons.pin: MaterialIcons U+F2D7
+icons.pinned: MaterialIcons U+E4F4
+icons.resetWidth: MaterialIcons U+F0726
+icons.show: MaterialIcons U+F4A1
+icons.hide: MaterialIcons U+F4A0
+icons.selectAll: MaterialIcons U+F0143
+icons.gridView: MaterialIcons U+F7C4
+icons.listView: MaterialIcons U+F028A mirrored
+icons.saveView: MaterialIcons U+EEE1
+icons.setDefault: MaterialIcons U+F01D1
+icons.defaultBadge: MaterialIcons U+F01D4
+icons.personal: MaterialIcons U+E497
+icons.shared: MaterialIcons U+F0D9
+icons.info: MaterialIcons U+F815
+icons.success: MaterialIcons U+F634
+icons.warning: MaterialIcons U+F02A0
+icons.error: MaterialIcons U+F712
+icons.done: MaterialIcons U+F635
+icons.stepError: MaterialIcons U+F00C1
+icons.sourceChanged: MaterialIcons U+F0206
+icons.empty: MaterialIcons U+F126
+icons.chart: MaterialIcons U+F5A9
+icons.trendUp: MaterialIcons U+F57E
+icons.trendDown: MaterialIcons U+F575
+icons.trendFlat: MaterialIcons U+F00F1
+icons.diffAdded: MaterialIcons U+F537
+icons.diffRemoved: MaterialIcons U+F00F1
+icons.diffChanged: MaterialIcons U+F00D
+icons.diffMoved: MaterialIcons U+F01FC
+icons.diffUnchanged: MaterialIcons U+F6E2
+icons.diffUnified: MaterialIcons U+F0023
+icons.diffSplit: MaterialIcons U+F482
+icons.lock: MaterialIcons U+F888
+icons.calendar: MaterialIcons U+F051F
+icons.time: MaterialIcons U+F012B
+icons.dateRange: MaterialIcons U+EFA5
+icons.hex: MaterialIcons U+F0216
+icons.pickColor: MaterialIcons U+F659
+icons.radioSelected: MaterialIcons U+F00D7
+icons.radioUnselected: MaterialIcons U+F00D8
+icons.upload: MaterialIcons U+EF64
+icons.library: MaterialIcons U+F29D
+icons.addImage: MaterialIcons U+EE48
+icons.addFile: MaterialIcons U+F478
+icons.image: MaterialIcons U+F120
+icons.imageBroken: MaterialIcons U+EEFF
+icons.fileImage: MaterialIcons U+F120
+icons.fileVideo: MaterialIcons U+F1F5
+icons.fileAudio: MaterialIcons U+EEA6
+icons.fileDocument: MaterialIcons U+EFAE
+icons.filePdf: MaterialIcons U+F2A4
+icons.fileArchive: MaterialIcons U+F0602
+icons.fileSpreadsheet: MaterialIcons U+F41D
+icons.file: MaterialIcons U+F12D
+icons.license: MaterialIcons U+F06A1
+icons.orientation: MaterialIcons U+F689
+icons.imageType: MaterialIcons U+EF37
+icons.zoomIn: MaterialIcons U+F537
+icons.zoomOut: MaterialIcons U+F00F1
+icons.zoomFit: MaterialIcons U+F766
+icons.rotateLeft: MaterialIcons U+F321
+icons.rotateRight: MaterialIcons U+F0655
+icons.flip: MaterialIcons U+E29A
+icons.comment: MaterialIcons U+F1D6
+icons.addComment: MaterialIcons U+F1B0
+icons.commentThread: MaterialIcons U+E3F1
+icons.send: MaterialIcons U+E0A0
+icons.notifications: MaterialIcons U+F0027
+icons.markRead: MaterialIcons U+F1B5
+icons.markUnread: MaterialIcons U+F1B6
+icons.themeLight: MaterialIcons U+F162
+icons.themeDark: MaterialIcons U+EF9F
+icons.themeSystem: MaterialIcons U+EEFB
+icons.email: MaterialIcons U+F89B
 field.variant: outlined
 field.focusIndicator: outline
 field.accentFocus: true
@@ -1656,6 +2160,132 @@ iconSizes.sm: 14
 iconSizes.md: 20
 iconSizes.lg: 20
 iconSizes.xl: 24
+icons.close: MaterialIcons U+F647
+icons.check: MaterialIcons U+F636
+icons.indeterminate: MaterialIcons U+F00F1
+icons.add: MaterialIcons U+F537
+icons.increment: MaterialIcons U+F537
+icons.decrement: MaterialIcons U+F00F1
+icons.more: MaterialIcons U+F8D9
+icons.moreVertical: MaterialIcons U+E404
+icons.menu: MaterialIcons U+F8B6
+icons.search: MaterialIcons U+F013D
+icons.noResults: MaterialIcons U+F013C
+icons.filter: MaterialIcons U+F75B
+icons.matchedField: MaterialIcons U+F023D
+icons.matchedContent: MaterialIcons U+F0023
+icons.jumpTo: MaterialIcons U+F1FE
+icons.enterKey: MaterialIcons U+E35A
+icons.edit: MaterialIcons U+F00D
+icons.copy: MaterialIcons U+F66C
+icons.delete: MaterialIcons U+F696
+icons.undo: MaterialIcons U+F0261 mirrored
+icons.retry: MaterialIcons U+F00E9
+icons.reset: MaterialIcons U+E531
+icons.history: MaterialIcons U+E314
+icons.restore: MaterialIcons U+F7EF
+icons.link: MaterialIcons U+F85A
+icons.linkBroken: MaterialIcons U+F859
+icons.addLink: MaterialIcons U+F530
+icons.replace: MaterialIcons U+F01FA
+icons.expand: MaterialIcons U+F720
+icons.dropdown: MaterialIcons U+F82B
+icons.chevronForward: MaterialIcons U+F63B mirrored
+icons.chevronBack: MaterialIcons U+F63A mirrored
+icons.arrowForward: MaterialIcons U+F57A mirrored
+icons.arrowBack: MaterialIcons U+F572 mirrored
+icons.expandAll: MaterialIcons U+F0263
+icons.collapseAll: MaterialIcons U+F0262
+icons.switcher: MaterialIcons U+F0263
+icons.sortAscending: MaterialIcons U+E0A0
+icons.sortDescending: MaterialIcons U+E097
+icons.sortable: MaterialIcons U+E68E
+icons.moveUp: MaterialIcons U+F57E
+icons.moveDown: MaterialIcons U+F575
+icons.indent: MaterialIcons U+F78F mirrored
+icons.outdent: MaterialIcons U+F78E mirrored
+icons.addChild: MaterialIcons U+F01EA
+icons.sectionHeader: MaterialIcons U+F0142
+icons.dragHandle: MaterialIcons U+F6E3
+icons.resizeLeft: MaterialIcons U+F02B5
+icons.resizeRight: MaterialIcons U+F6F1
+icons.resizeUp: MaterialIcons U+F001A
+icons.resizeDown: MaterialIcons U+F01AB
+icons.columns: MaterialIcons U+F492
+icons.pin: MaterialIcons U+F2D7
+icons.pinned: MaterialIcons U+E4F4
+icons.resetWidth: MaterialIcons U+F0726
+icons.show: MaterialIcons U+F4A1
+icons.hide: MaterialIcons U+F4A0
+icons.selectAll: MaterialIcons U+F0143
+icons.gridView: MaterialIcons U+F7C4
+icons.listView: MaterialIcons U+F028A mirrored
+icons.saveView: MaterialIcons U+EEE1
+icons.setDefault: MaterialIcons U+F01D1
+icons.defaultBadge: MaterialIcons U+F01D4
+icons.personal: MaterialIcons U+E497
+icons.shared: MaterialIcons U+F0D9
+icons.info: MaterialIcons U+F815
+icons.success: MaterialIcons U+F634
+icons.warning: MaterialIcons U+F02A0
+icons.error: MaterialIcons U+F712
+icons.done: MaterialIcons U+F635
+icons.stepError: MaterialIcons U+F00C1
+icons.sourceChanged: MaterialIcons U+F0206
+icons.empty: MaterialIcons U+F126
+icons.chart: MaterialIcons U+F5A9
+icons.trendUp: MaterialIcons U+F57E
+icons.trendDown: MaterialIcons U+F575
+icons.trendFlat: MaterialIcons U+F00F1
+icons.diffAdded: MaterialIcons U+F537
+icons.diffRemoved: MaterialIcons U+F00F1
+icons.diffChanged: MaterialIcons U+F00D
+icons.diffMoved: MaterialIcons U+F01FC
+icons.diffUnchanged: MaterialIcons U+F6E2
+icons.diffUnified: MaterialIcons U+F0023
+icons.diffSplit: MaterialIcons U+F482
+icons.lock: MaterialIcons U+F888
+icons.calendar: MaterialIcons U+F051F
+icons.time: MaterialIcons U+F012B
+icons.dateRange: MaterialIcons U+EFA5
+icons.hex: MaterialIcons U+F0216
+icons.pickColor: MaterialIcons U+F659
+icons.radioSelected: MaterialIcons U+F00D7
+icons.radioUnselected: MaterialIcons U+F00D8
+icons.upload: MaterialIcons U+EF64
+icons.library: MaterialIcons U+F29D
+icons.addImage: MaterialIcons U+EE48
+icons.addFile: MaterialIcons U+F478
+icons.image: MaterialIcons U+F120
+icons.imageBroken: MaterialIcons U+EEFF
+icons.fileImage: MaterialIcons U+F120
+icons.fileVideo: MaterialIcons U+F1F5
+icons.fileAudio: MaterialIcons U+EEA6
+icons.fileDocument: MaterialIcons U+EFAE
+icons.filePdf: MaterialIcons U+F2A4
+icons.fileArchive: MaterialIcons U+F0602
+icons.fileSpreadsheet: MaterialIcons U+F41D
+icons.file: MaterialIcons U+F12D
+icons.license: MaterialIcons U+F06A1
+icons.orientation: MaterialIcons U+F689
+icons.imageType: MaterialIcons U+EF37
+icons.zoomIn: MaterialIcons U+F537
+icons.zoomOut: MaterialIcons U+F00F1
+icons.zoomFit: MaterialIcons U+F766
+icons.rotateLeft: MaterialIcons U+F321
+icons.rotateRight: MaterialIcons U+F0655
+icons.flip: MaterialIcons U+E29A
+icons.comment: MaterialIcons U+F1D6
+icons.addComment: MaterialIcons U+F1B0
+icons.commentThread: MaterialIcons U+E3F1
+icons.send: MaterialIcons U+E0A0
+icons.notifications: MaterialIcons U+F0027
+icons.markRead: MaterialIcons U+F1B5
+icons.markUnread: MaterialIcons U+F1B6
+icons.themeLight: MaterialIcons U+F162
+icons.themeDark: MaterialIcons U+EF9F
+icons.themeSystem: MaterialIcons U+EEFB
+icons.email: MaterialIcons U+F89B
 field.variant: underlined
 field.focusIndicator: underline
 field.accentFocus: true
@@ -2004,6 +2634,132 @@ iconSizes.sm: 14
 iconSizes.md: 16
 iconSizes.lg: 20
 iconSizes.xl: 24
+icons.close: MaterialIcons U+F647
+icons.check: MaterialIcons U+F636
+icons.indeterminate: MaterialIcons U+F00F1
+icons.add: MaterialIcons U+F537
+icons.increment: MaterialIcons U+F537
+icons.decrement: MaterialIcons U+F00F1
+icons.more: MaterialIcons U+F8D9
+icons.moreVertical: MaterialIcons U+E404
+icons.menu: MaterialIcons U+F8B6
+icons.search: MaterialIcons U+F013D
+icons.noResults: MaterialIcons U+F013C
+icons.filter: MaterialIcons U+F75B
+icons.matchedField: MaterialIcons U+F023D
+icons.matchedContent: MaterialIcons U+F0023
+icons.jumpTo: MaterialIcons U+F1FE
+icons.enterKey: MaterialIcons U+E35A
+icons.edit: MaterialIcons U+F00D
+icons.copy: MaterialIcons U+F66C
+icons.delete: MaterialIcons U+F696
+icons.undo: MaterialIcons U+F0261 mirrored
+icons.retry: MaterialIcons U+F00E9
+icons.reset: MaterialIcons U+E531
+icons.history: MaterialIcons U+E314
+icons.restore: MaterialIcons U+F7EF
+icons.link: MaterialIcons U+F85A
+icons.linkBroken: MaterialIcons U+F859
+icons.addLink: MaterialIcons U+F530
+icons.replace: MaterialIcons U+F01FA
+icons.expand: MaterialIcons U+F720
+icons.dropdown: MaterialIcons U+F82B
+icons.chevronForward: MaterialIcons U+F63B mirrored
+icons.chevronBack: MaterialIcons U+F63A mirrored
+icons.arrowForward: MaterialIcons U+F57A mirrored
+icons.arrowBack: MaterialIcons U+F572 mirrored
+icons.expandAll: MaterialIcons U+F0263
+icons.collapseAll: MaterialIcons U+F0262
+icons.switcher: MaterialIcons U+F0263
+icons.sortAscending: MaterialIcons U+E0A0
+icons.sortDescending: MaterialIcons U+E097
+icons.sortable: MaterialIcons U+E68E
+icons.moveUp: MaterialIcons U+F57E
+icons.moveDown: MaterialIcons U+F575
+icons.indent: MaterialIcons U+F78F mirrored
+icons.outdent: MaterialIcons U+F78E mirrored
+icons.addChild: MaterialIcons U+F01EA
+icons.sectionHeader: MaterialIcons U+F0142
+icons.dragHandle: MaterialIcons U+F6E3
+icons.resizeLeft: MaterialIcons U+F02B5
+icons.resizeRight: MaterialIcons U+F6F1
+icons.resizeUp: MaterialIcons U+F001A
+icons.resizeDown: MaterialIcons U+F01AB
+icons.columns: MaterialIcons U+F492
+icons.pin: MaterialIcons U+F2D7
+icons.pinned: MaterialIcons U+E4F4
+icons.resetWidth: MaterialIcons U+F0726
+icons.show: MaterialIcons U+F4A1
+icons.hide: MaterialIcons U+F4A0
+icons.selectAll: MaterialIcons U+F0143
+icons.gridView: MaterialIcons U+F7C4
+icons.listView: MaterialIcons U+F028A mirrored
+icons.saveView: MaterialIcons U+EEE1
+icons.setDefault: MaterialIcons U+F01D1
+icons.defaultBadge: MaterialIcons U+F01D4
+icons.personal: MaterialIcons U+E497
+icons.shared: MaterialIcons U+F0D9
+icons.info: MaterialIcons U+F815
+icons.success: MaterialIcons U+F634
+icons.warning: MaterialIcons U+F02A0
+icons.error: MaterialIcons U+F712
+icons.done: MaterialIcons U+F635
+icons.stepError: MaterialIcons U+F00C1
+icons.sourceChanged: MaterialIcons U+F0206
+icons.empty: MaterialIcons U+F126
+icons.chart: MaterialIcons U+F5A9
+icons.trendUp: MaterialIcons U+F57E
+icons.trendDown: MaterialIcons U+F575
+icons.trendFlat: MaterialIcons U+F00F1
+icons.diffAdded: MaterialIcons U+F537
+icons.diffRemoved: MaterialIcons U+F00F1
+icons.diffChanged: MaterialIcons U+F00D
+icons.diffMoved: MaterialIcons U+F01FC
+icons.diffUnchanged: MaterialIcons U+F6E2
+icons.diffUnified: MaterialIcons U+F0023
+icons.diffSplit: MaterialIcons U+F482
+icons.lock: MaterialIcons U+F888
+icons.calendar: MaterialIcons U+F051F
+icons.time: MaterialIcons U+F012B
+icons.dateRange: MaterialIcons U+EFA5
+icons.hex: MaterialIcons U+F0216
+icons.pickColor: MaterialIcons U+F659
+icons.radioSelected: MaterialIcons U+F00D7
+icons.radioUnselected: MaterialIcons U+F00D8
+icons.upload: MaterialIcons U+EF64
+icons.library: MaterialIcons U+F29D
+icons.addImage: MaterialIcons U+EE48
+icons.addFile: MaterialIcons U+F478
+icons.image: MaterialIcons U+F120
+icons.imageBroken: MaterialIcons U+EEFF
+icons.fileImage: MaterialIcons U+F120
+icons.fileVideo: MaterialIcons U+F1F5
+icons.fileAudio: MaterialIcons U+EEA6
+icons.fileDocument: MaterialIcons U+EFAE
+icons.filePdf: MaterialIcons U+F2A4
+icons.fileArchive: MaterialIcons U+F0602
+icons.fileSpreadsheet: MaterialIcons U+F41D
+icons.file: MaterialIcons U+F12D
+icons.license: MaterialIcons U+F06A1
+icons.orientation: MaterialIcons U+F689
+icons.imageType: MaterialIcons U+EF37
+icons.zoomIn: MaterialIcons U+F537
+icons.zoomOut: MaterialIcons U+F00F1
+icons.zoomFit: MaterialIcons U+F766
+icons.rotateLeft: MaterialIcons U+F321
+icons.rotateRight: MaterialIcons U+F0655
+icons.flip: MaterialIcons U+E29A
+icons.comment: MaterialIcons U+F1D6
+icons.addComment: MaterialIcons U+F1B0
+icons.commentThread: MaterialIcons U+E3F1
+icons.send: MaterialIcons U+E0A0
+icons.notifications: MaterialIcons U+F0027
+icons.markRead: MaterialIcons U+F1B5
+icons.markUnread: MaterialIcons U+F1B6
+icons.themeLight: MaterialIcons U+F162
+icons.themeDark: MaterialIcons U+EF9F
+icons.themeSystem: MaterialIcons U+EEFB
+icons.email: MaterialIcons U+F89B
 field.variant: filled
 field.focusIndicator: outline
 field.accentFocus: false

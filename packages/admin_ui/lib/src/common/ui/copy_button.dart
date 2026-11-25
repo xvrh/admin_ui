@@ -118,9 +118,9 @@ class _CopyButtonState extends State<CopyButton> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final (icon, iconColor) = switch (_outcome) {
-      _Outcome.none => (Icons.copy_rounded, null),
-      _Outcome.copied => (Icons.check_rounded, colors.successText),
-      _Outcome.failed => (Icons.error_outline_rounded, colors.dangerText),
+      _Outcome.none => (context.icons.copy, null),
+      _Outcome.copied => (context.icons.check, colors.successText),
+      _Outcome.failed => (context.icons.error, colors.dangerText),
     };
 
     final label = widget.label;

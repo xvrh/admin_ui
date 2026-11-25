@@ -170,7 +170,7 @@ class _Item extends StatelessWidget {
               child: MouseRegion(
                 cursor: SystemMouseCursors.grab,
                 child: Icon(
-                  Icons.drag_indicator_rounded,
+                  context.icons.dragHandle,
                   size: context.iconSizes.md,
                   color: context.colors.foregroundFaint,
                 ),
@@ -182,7 +182,7 @@ class _Item extends StatelessWidget {
           if (onRemove != null) ...[
             const Gap(AdminSpacing.sm),
             IconAction(
-              Icons.close_rounded,
+              context.icons.close,
               label: removeLabel,
               size: IconActionSize.inline,
               danger: true,

@@ -157,7 +157,7 @@ class _DrawerHead extends StatelessWidget {
       child: Row(
         children: [
           IconAction(
-            Icons.close_rounded,
+            context.icons.close,
             label: context.adminL10n.shell.closeNavigation,
             onPressed: onClose,
           ),
@@ -181,7 +181,7 @@ class ShellMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconAction(
-      Icons.menu_rounded,
+      context.icons.menu,
       label: context.adminL10n.shell.openNavigation,
       onPressed: () => Shell.openDrawer(context),
     );

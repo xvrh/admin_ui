@@ -908,12 +908,13 @@ final acmeTheme = AdminTheme.from(
 ```
 
 `AdminTheme.from` also takes `elevation`, `darkElevation`, `focus`, `motion`,
-`stroke`, `iconSizes`, and the anatomy: `field`, `button`, `shell` and
-`darkShell` (see [Anatomy](#anatomy)). If you leave them out, the dark set
-gets `defaultDarkElevation`, the light set `defaultElevation`, the focus ring
+`stroke`, `iconSizes`, `icons` (see [The kit's glyphs](#the-kits-glyphs)),
+and the anatomy: `field`, `button`, `shell` and `darkShell` (see
+[Anatomy](#anatomy)). If you leave them out, the dark set gets
+`defaultDarkElevation`, the light set `defaultElevation`, the focus ring
 `AdminFocusSpec()`, the dark set the light `shell`, and the rest the kit's own
-(`defaultMotion`, `AdminStroke()`, `AdminIconSizes()`, `AdminFieldStyle()`,
-`AdminButtonStyle()`, `AdminShellStyle()`). The type ramp comes with the type spec:
+(`defaultMotion`, `AdminStroke()`, `AdminIconSizes()`, `AdminIcons()`,
+`AdminFieldStyle()`, `AdminButtonStyle()`, `AdminShellStyle()`). The type ramp comes with the type spec:
 `AdminTypeSpec(ramp: …)`, `defaultTypeRamp` when left out. To build a single
 token set without a theme, use `AdminTokens.from(palette: …)` with the same
 optional parameters.
@@ -1228,6 +1229,58 @@ danger, a column's accent under a dragged card), and 38% for disabled
 content. The Material palettes use M3's: 8% hover, 10% focus and press, 16%
 drag.
 
+### The kit's glyphs
+
+`AdminIcons` holds the glyphs the kit draws on its own, read through
+`context.icons`: a dialog's close, a menu's check, a select's caret, a
+column's sort arrows, a pager's chevrons, an alert's status glyph, an
+upload's file type. Each slot is named for what its glyph says (`close`,
+`dropdown`, `chevronForward`, `sortAscending`, `error`, `fileVideo`, …) and
+defaults to the Material Icons glyph the kit draws there, so a theme that
+names none draws the kit's own. Every shipped theme does.
+
+An app drawn in another icon set hands the kit the same set, so the kit's
+chrome does not draw beside the app's in a second style:
+
+```dart
+const _family = 'AcmeIcons';
+
+final acmeIconTheme = AdminTheme.from(
+  name: 'Acme',
+  palette: irisPalette,
+  icons: const AdminIcons(
+    close: IconData(0xe1b2, fontFamily: _family),
+    check: IconData(0xe06c, fontFamily: _family),
+    dropdown: IconData(0xe06d, fontFamily: _family),
+    search: IconData(0xe151, fontFamily: _family),
+    // It points the reading direction: mirrored right to left.
+    chevronForward: IconData(
+      0xe06f,
+      fontFamily: _family,
+      matchTextDirection: true,
+    ),
+  ),
+);
+```
+
+On a token set that exists, `tokens.copyWith(icons:
+tokens.icons.copyWith(close: …))` replaces one. A slot left out keeps the
+kit's glyph. An app drawn wholly in its own set builds it with
+`AdminIcons.all(…)` instead, where every slot is required: one it leaves
+out is a compile error rather than a Material glyph in its chrome, and so
+is a slot a later version of the kit adds. `looks.txt` lists the slots
+under `icons.`, and `toString` names the ones a set replaces.
+The glyphs an app passes a control (a `Button`'s `icon`, a nav item's, an
+`EmptyState`'s) are its own, and none is read from here.
+
+Four slots point the reading direction: `chevronForward`, `chevronBack`,
+`arrowForward` and `arrowBack`. Their defaults set `matchTextDirection`, and
+the kit draws on that, mirroring them right to left and turning a tree's
+chevron a quarter turn as its node opens, so a glyph given for one should
+set it too. `resizeLeft`, `resizeRight`, `resizeUp` and `resizeDown`, a split
+view's divider, are physical and should not. A glyph does not interpolate:
+a theme animating into another swaps the set halfway.
+
 ### Anatomy
 
 Anatomy tokens give each theme the shapes of its reference system, not
@@ -1528,7 +1581,8 @@ state washes from the tokens. `test/theme_token_literals_test.dart` fails on
 a literal `fontSize`, a numeric radius, a number inside `EdgeInsets` or
 `Gap`, a `SizedBox` of one dimension of 32 or less used as a gap, a
 `Curves.` reference, a `Duration` literal passed as an animation's duration,
-and a colour taken to a literal opacity (`withValues(alpha: 0.12)`). A
+a colour taken to a literal opacity (`withValues(alpha: 0.12)`), and an
+`Icons.` glyph, which the kit draws through `context.icons`. A
 literal that is not a token's job, such as a 1px nudge that keeps content
 still as a border thickens, is allowed where its line or the line above says
 why, with a `// token-literal: <reason>` comment. A marker without a reason,
@@ -2008,7 +2062,7 @@ Its class names start with `Admin`, never `AdminUi`.
 The token shorthands are the one unprefixed extension, `AdminTokensContext`:
 `context.colors`, `context.type`, `context.radii`, `context.elevation`,
 `context.focus`, `context.sizes`, `context.tableMetrics`, `context.motion`,
-`context.stroke`, `context.iconSizes`, `context.fieldStyle`,
+`context.stroke`, `context.iconSizes`, `context.icons`, `context.fieldStyle`,
 `context.buttonStyle`, `context.shellStyle`, `context.overlayStyle` and
 `context.breakpoints`. An app with getters of its own under those names
 hides it, and reads the tokens through `context.adminTokens`, which hiding

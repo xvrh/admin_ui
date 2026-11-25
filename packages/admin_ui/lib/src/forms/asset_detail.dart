@@ -135,7 +135,7 @@ class AssetDetailView extends StatelessWidget {
         if (delete != null)
           Button.danger(
             MaterialLocalizations.of(context).deleteButtonTooltip,
-            icon: Icons.delete_outline_rounded,
+            icon: context.icons.delete,
             onPressed: delete,
           ),
         if (delete != null && footerActions.isNotEmpty)
@@ -243,8 +243,8 @@ class _Preview extends StatelessWidget {
               image: image ? asset.thumbnail : null,
               swatch: image ? asset.swatch : null,
               icon: image && asset.swatch != null
-                  ? Icons.image_outlined
-                  : assetGlyph(asset.type),
+                  ? context.icons.image
+                  : assetGlyph(asset.type, icons: context.icons),
               iconSize: 44,
               fit: BoxFit.contain,
             ),
