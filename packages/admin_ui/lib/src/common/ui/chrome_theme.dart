@@ -21,6 +21,19 @@ class ChromeTheme extends StatefulWidget {
 
   const ChromeTheme({super.key, required this.palette, required this.child});
 
+  /// [context], or the context above the outermost [ChromeTheme] around
+  /// it: the page's. A route takes on the themes around the context that
+  /// opens it, and a modal or a sheet opened from chrome (the sidebar's
+  /// account menu) is the page's all the same, so it opens from here.
+  static BuildContext pageOf(BuildContext context) {
+    var page = context;
+    context.visitAncestorElements((element) {
+      if (element.widget is ChromeTheme) page = element;
+      return true;
+    });
+    return page;
+  }
+
   @override
   State<ChromeTheme> createState() => _ChromeThemeState();
 }

@@ -33,22 +33,26 @@ import 'touch_target_adjustment.dart';
 /// The card is centred 24px inside the safe area and clear of the keyboard,
 /// except a [ModalSize.fullscreen] one, which takes the whole screen and
 /// keeps its content inside the safe area.
+///
+/// Opened from chrome drawn in a palette of its own (a dark sidebar's
+/// menu), it is drawn in the page's, as from the page.
 Future<T?> showModal<T>(
   BuildContext context, {
   required WidgetBuilder builder,
   bool barrierDismissible = true,
   Color? barrierColor,
 }) {
-  final motion = context.motion;
-  final arrival = context.overlayStyle.modalMotion;
-  final duration = motionDuration(context, arrival.durationIn(motion));
+  final host = ChromeTheme.pageOf(context);
+  final motion = host.motion;
+  final arrival = host.overlayStyle.modalMotion;
+  final duration = motionDuration(host, arrival.durationIn(motion));
   // A finger's near miss reaches the modal's small controls, as on the page
   // that opened it.
-  final adjusted = carryTouchTargetAdjustment(context);
+  final adjusted = carryTouchTargetAdjustment(host);
   return showDialog<T>(
-    context: context,
+    context: host,
     barrierDismissible: barrierDismissible,
-    barrierColor: barrierColor ?? context.colors.scrim,
+    barrierColor: barrierColor ?? host.colors.scrim,
     animationStyle: AnimationStyle(
       duration: duration,
       reverseDuration: duration,

@@ -23,7 +23,8 @@ enum SideSheetSide { start, end }
 /// pops. The scrim is the palette's `scrim` unless [barrierColor]
 /// overrides it. The sheet slides over the theme's `motion.slow`, easing in
 /// on `motion.enter` and out on `motion.exit`, and appears at once under
-/// reduced motion.
+/// reduced motion. Opened from chrome drawn in a palette of its own (a dark
+/// sidebar's menu), it is drawn in the page's, as from the page.
 Future<T?> showSideSheet<T>(
   BuildContext context, {
   required WidgetBuilder builder,
@@ -32,15 +33,16 @@ Future<T?> showSideSheet<T>(
   bool barrierDismissible = true,
   Color? barrierColor,
 }) {
-  final motion = context.motion;
+  final host = ChromeTheme.pageOf(context);
+  final motion = host.motion;
   // A finger's near miss reaches the sheet's small controls, as on the page
   // that opened it.
-  final adjusted = carryTouchTargetAdjustment(context);
+  final adjusted = carryTouchTargetAdjustment(host);
   return showGeneralDialog<T>(
-    context: context,
+    context: host,
     barrierDismissible: barrierDismissible,
-    barrierLabel: context.adminL10n.dismiss,
-    barrierColor: barrierColor ?? context.colors.scrim,
+    barrierLabel: host.adminL10n.dismiss,
+    barrierColor: barrierColor ?? host.colors.scrim,
     transitionDuration: motion.slow,
     // [builder] runs in the palette of what stands on a sheet, whose
     // `surface` is the sheet's fill.

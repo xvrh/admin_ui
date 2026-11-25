@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+- A `Sidebar` rail opened over the page stays open while the app is
+  inactive. A window losing focus parks focus outside the column, which
+  the rail took for focus leaving it: with the pointer on a menu opened
+  from it, such as `SidebarAccount`'s, it folded and took the menu away.
+  Some browsers and embedding views lose focus for a moment on a press,
+  so the press on the menu's item did nothing.
 - Signing in in two steps, with an authenticator app, takes three views
   of `auth.dart`. Each sizes itself to its content, so it sits in an
   `AuthScaffold`'s card or in a `Modal`'s body; mirrors right to left,
@@ -989,6 +995,12 @@
 
 ### Looks
 
+- A modal opened from chrome drawn in a palette of its own, such as a dark
+  sidebar's account menu, is drawn in the page's palette. `showModal`
+  took on the chrome's theme, as a route takes on the themes around what
+  opens it, so the modal came up dark; an app had to pass a context from
+  outside the sidebar. `showSideSheet` took its scrim from the chrome the
+  same way.
 - A table's number editor holding text that is no number says so: "Enter
   a number like 1,234.5", on a card under the cell. It was marked invalid
   and said nothing.

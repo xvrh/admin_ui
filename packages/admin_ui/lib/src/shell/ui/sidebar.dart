@@ -4,6 +4,7 @@ import 'dart:ui' show PointerDeviceKind, SemanticsRole;
 
 import 'package:flutter/gestures.dart' show GestureBinding;
 import 'package:flutter/rendering.dart' show OverflowBoxFit;
+import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -562,8 +563,16 @@ class _SidebarState extends State<Sidebar> {
   /// Focus moving into or within the column by keyboard opens the rail;
   /// focus leaving it, or coming back from a menu with the pointer
   /// elsewhere, closes it.
+  ///
+  /// Not while the app is inactive: a window losing focus parks it outside
+  /// the column and gives it back on its return, which no one moved. Some
+  /// browsers and embedding views do that for a moment on a press, and
+  /// closing then would take a menu opened from the rail away from under
+  /// the pointer pressing one of its items.
   void _onFocus() {
     if (!mounted || !_isRail || _foldingFocus) return;
+    final lifecycle = SchedulerBinding.instance.lifecycleState;
+    if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
     if (_focus.hasFocus && _byKeyboard) {
       _open();
     } else if (!_overOpen && !_keptOpen) {
