@@ -25,6 +25,13 @@ mixin LatestLoad on ChangeNotifier {
   @protected
   bool get loadInFlight => _inFlight;
 
+  /// Shows [loading] before any load has run, for a controller whose first
+  /// load is another's to start. The first load to land, or to fail, ends
+  /// it as it ends any other. To be called as the controller is made: it
+  /// notifies no one.
+  @protected
+  void expectFirstLoad() => _loading = true;
+
   /// Starts [fetch] at once and hands its answer to [land], unless a later
   /// load or [dispose] came first. A failure, thrown or returned, becomes
   /// [error]; the next load to land clears it. [land] may start another

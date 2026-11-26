@@ -91,9 +91,14 @@ typedef CollectionFetcher<T> = Future<CollectionPage<T>> Function(
 );
 
 /// Owns the query, async state and selection for a [Collection]. Calls the
-/// injected [fetcher] whenever the query changes; the latest request wins
-/// (stale responses are dropped, and so is any response that lands after
-/// [dispose]). Search is debounced.
+/// injected [fetcher] as it is made and whenever the query changes; the
+/// latest request wins (stale responses are dropped, and so is any response
+/// that lands after [dispose]). Search is debounced.
+///
+/// **A list with saved views** is made with `autoLoad: false`: its
+/// `SavedViewsController` reads the views, applies the default one and
+/// reads the rows once, where a controller that had already asked for its
+/// rows would ask again for the view's. See [awaitingFirstLoad].
 ///
 /// **Selection** is kept by [rowKey], so a fetcher that returns fresh objects
 /// on every load — paging back, a refresh, a realtime update — keeps its rows
@@ -149,14 +154,31 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
   int _selectionEpoch = 0;
   Timer? _debounce;
 
+  /// Reads the first page at once. With [autoLoad] false it reads nothing
+  /// until something asks: [load], [refresh], a change of the query, or
+  /// the `SavedViewsController` it is given to, once the views are read.
   CollectionController({
     required this.fetcher,
     CollectionQuery initialQuery = const CollectionQuery(),
     this.searchDebounce = const Duration(milliseconds: 350),
     this.rowKey,
+    bool autoLoad = true,
   }) : _query = initialQuery {
-    load();
+    if (autoLoad) {
+      load();
+    } else {
+      _awaitingFirstLoad = true;
+      expectFirstLoad();
+    }
   }
+
+  var _awaitingFirstLoad = false;
+
+  /// Whether a controller made with `autoLoad: false` has yet to be read:
+  /// no load has begun, and [loading] is true, so a `Collection` shows its
+  /// rows as on their way, not as none. The first load to begin ends it,
+  /// whoever asks.
+  bool get awaitingFirstLoad => _awaitingFirstLoad;
 
   /// The live text of the global search box, owned here so it shares the
   /// controller's lifetime — the box stays in sync with the query across widget
@@ -245,6 +267,7 @@ class CollectionController<T> extends ChangeNotifier with LatestLoad {
   /// Fetches the current query's page. A [background] load is a
   /// [refresh]'s.
   Future<void> load({bool background = false}) {
+    _awaitingFirstLoad = false;
     _settledDuringLoad.clear();
     return runLoad(() => fetcher(_query), (result) {
       if (_pastTheEnd(result) case final last?) {

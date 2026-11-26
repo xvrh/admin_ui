@@ -1844,6 +1844,12 @@ unless `allLabel` says otherwise, which returns to the query the
 collection started with. The controller never opens on a view that is
 not marked default.
 
+Make the list's `CollectionController` with `autoLoad: false` and it is
+read once on open: it waits for the views, showing as loading, and the
+default view reads the rows. When no view is the default, or the views
+could not be read, it is read as their load ends. A controller that
+reads as it is made asks for its rows, then again for the default view's.
+
 Below the medium breakpoint (600, `context.breakpoints.medium`) the bar
 is the active view's name over a menu of every view and the active
 view's actions, so no name is cut at a phone's edge. It goes by its own

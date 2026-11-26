@@ -39,9 +39,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
   late final AppServices _services = context.services;
   ShopApi get _api => _services.api;
 
-  // FRICTION(F-202): the controller fetches as it is made, and the saved
-  // views then apply their default view: the list is read twice on open.
+  // Waits for its saved views: the default view reads the rows, once.
   late final _list = CollectionController<Order>(
+    autoLoad: false,
     fetcher: _api.listOrders,
     rowKey: (o) => o.number,
     initialQuery: const CollectionQuery(

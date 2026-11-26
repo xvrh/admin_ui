@@ -31,6 +31,8 @@ class _ColumnChooserDemoState extends State<ColumnChooserDemo> {
   final _store = InMemorySavedViewsStore(seed: {'products': _seed});
 
   late final CollectionController<Product> _collection = CollectionController(
+    // Read once, when the saved views are: see [SavedViewsController].
+    autoLoad: false,
     fetcher: _fetch,
     rowKey: (p) => p.id,
     initialQuery: const CollectionQuery(sortKey: 'name', pageSize: 10),

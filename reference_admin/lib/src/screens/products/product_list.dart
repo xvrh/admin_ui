@@ -32,7 +32,9 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   late final ShopApi _api = context.api;
+  // Waits for its saved views: the default view reads the rows, once.
   late final _collection = CollectionController<Product>(
+    autoLoad: false,
     fetcher: _api.listProducts,
     rowKey: (p) => p.id,
     initialQuery: const CollectionQuery(
