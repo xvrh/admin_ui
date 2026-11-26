@@ -3,6 +3,8 @@
 // is what a restore names either way.
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 

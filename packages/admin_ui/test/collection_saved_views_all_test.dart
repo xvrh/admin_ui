@@ -1,4 +1,6 @@
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/src/collection/collection_controller.dart';
 import 'package:admin_ui/src/collection/column_layout.dart';
 import 'package:admin_ui/src/collection/filter.dart';

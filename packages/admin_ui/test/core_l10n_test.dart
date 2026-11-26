@@ -1,4 +1,6 @@
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoLocalizations;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -133,10 +135,8 @@ void main() {
     expect(context.adminL10n.inputs, isA<_AppInputs>());
   });
 
-  test('the delegate loads synchronously and accepts every locale', () {
-    // The deprecated delegate keeps loading what it did.
-    // ignore: deprecated_member_use_from_same_package
-    const delegate = AdminLocalizations.delegate;
+  test("the kit's delegate loads synchronously and accepts every locale", () {
+    final delegate = _kitLanguages.delegates.first as LocalizationsDelegate;
     for (final (locale, type) in [
       (const Locale('en'), AdminLocalizationsEn),
       (const Locale('fr', 'CA'), AdminLocalizationsFr),
@@ -145,21 +145,20 @@ void main() {
     ]) {
       expect(delegate.isSupported(locale), isTrue);
       final loaded = delegate.load(locale);
-      expect(loaded, isA<SynchronousFuture<AdminLocalizations>>());
-      late AdminLocalizations value;
+      expect(loaded, isA<SynchronousFuture<Object?>>());
+      late Object? value;
       loaded.then((v) => value = v);
-      expect(value.runtimeType, type, reason: '$locale');
+      expect(
+        (value! as AdminLanguage).strings.runtimeType,
+        type,
+        reason: '$locale',
+      );
     }
     expect(_kitLanguages.locales.map((l) => l.languageCode), [
       'en',
       'fr',
       'ar',
     ]);
-    expect(
-      // ignore: deprecated_member_use_from_same_package
-      AdminLocalizations.localizationsDelegates,
-      containsAll(<Object>[delegate, ...GlobalMaterialLocalizations.delegates]),
-    );
     expect(_kitLanguages.delegates.map((d) => d.type), [
       AdminLanguage,
       MaterialLocalizations,

@@ -1,6 +1,8 @@
 import 'dart:ui' show SemanticsValidationResult;
 
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/src/collection/ui/collection_table.dart';
 import 'package:admin_ui/src/collection/ui/table_edit_session.dart';
 import 'package:admin_ui/src/common/ui/labeled_field.dart';

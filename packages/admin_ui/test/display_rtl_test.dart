@@ -1,6 +1,8 @@
 import 'dart:ui' as ui;
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';

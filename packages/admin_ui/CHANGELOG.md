@@ -56,9 +56,8 @@
 - The kit speaks ten more languages: Spanish, German, Italian, Brazilian
   Portuguese, Dutch, Polish, Japanese, Simplified Chinese, Korean and
   Turkish, machine-translated from the English. Each language is an
-  `AdminLanguage`: `adminEn`, `adminFr` and `adminAr` in `l10n.dart`,
-  each other one in a library of its own, `adminEs` in
-  `package:admin_ui/l10n/es.dart`. A language brings the kit's strings,
+  `AdminLanguage`: `adminEn` in `l10n.dart`, each other one in a
+  library of its own, `adminEs` in `package:admin_ui/l10n/es.dart`. A language brings the kit's strings,
   Material's, Cupertino's and the widgets' (the reading direction among
   them), intl's date data and CLDR's names of languages. An app lists the
   languages it ships in `AdminLanguages` and registers its `delegates`
@@ -72,8 +71,12 @@
   given to that language: `adminEs.copyWith(strings: const MyStringsEs())`.
   `AdminLanguage.of(context)` is the language loaded for a context.
 - `AdminLocalizations.localizationsDelegates`, `delegate`,
-  `supportedLocales` and `lookup` still load English, French and Arabic,
-  and all 82 of Material's languages with them, and are deprecated.
+  `supportedLocales` and `lookup` are removed: an app lists its languages
+  in `AdminLanguages` and registers its `delegates` and `locales`, and
+  reads a language's strings from it (`adminFr.strings`). French and
+  Arabic are no longer in `l10n.dart` or `admin_ui.dart`: `adminFr`,
+  `AdminLocalizationsFr` and their sections come from
+  `package:admin_ui/l10n/fr.dart`, Arabic's from `l10n/ar.dart`.
 - The kit words the buttons and labels it took from Material itself, as
   Material's translations word them: `AdminLocalizations` has `cancel`,
   `save`, `delete`, `copy`, `close`, `clear`, `search`, `more`,

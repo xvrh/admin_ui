@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'admin_language.dart';
-import 'legacy_languages.dart';
 import 'messages.dart';
 import 'sections/assets_messages.dart';
 import 'sections/collection_messages.dart';
@@ -75,37 +74,6 @@ import 'sections/shell_messages.dart';
 abstract class AdminLocalizations extends AdminMessages {
   const AdminLocalizations(super.localeName);
 
-  /// Loads the kit's strings in English, French and Arabic, for every locale,
-  /// English for any other language.
-  @Deprecated(
-    'Use AdminLanguages([adminEn, adminFr, adminAr]).delegates, which loads '
-    'the languages an app lists and no others.',
-  )
-  static const LocalizationsDelegate<AdminLocalizations> delegate =
-      LegacyAdminLocalizationsDelegate();
-
-  /// English, French and Arabic.
-  @Deprecated(
-    'Use AdminLanguages([adminEn, adminFr, adminAr]).locales, the locales of '
-    'the languages an app lists.',
-  )
-  static const supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('fr'),
-    Locale('ar'),
-  ];
-
-  /// [delegate] and material_ui's Material, Cupertino and widgets delegates,
-  /// which bring Material's 82 languages.
-  @Deprecated(
-    'Use AdminLanguages([adminEn, adminFr, adminAr]).delegates, which brings '
-    "Material's strings for the languages an app lists, and no others.",
-  )
-  static const localizationsDelegates = <LocalizationsDelegate<Object?>>[
-    delegate,
-    ...GlobalMaterialLocalizations.delegates,
-  ];
-
   /// The strings for [context]'s locale: a delegate's for
   /// [AdminLocalizations], else the [AdminLanguage]'s that
   /// [AdminLanguages.delegates] loaded, else English. Never asserts.
@@ -113,14 +81,6 @@ abstract class AdminLocalizations extends AdminMessages {
       Localizations.of<AdminLocalizations>(context, AdminLocalizations) ??
       AdminLanguage.of(context)?.strings ??
       const AdminLocalizationsEn();
-
-  /// The kit's own strings for [locale]'s language among English, French
-  /// and Arabic, English for any other.
-  @Deprecated(
-    "Read AdminLocalizations.of(context), or a language's strings: "
-    'adminFr.strings.',
-  )
-  static AdminLocalizations lookup(Locale locale) => legacyLookup(locale);
 
   /// The inputs, menus, pickers and overlays in common/ui.
   InputsMessages get inputs;

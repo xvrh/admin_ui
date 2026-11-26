@@ -1,4 +1,6 @@
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 
 // The kit's documented override path, used for one phrase: its generic
 // "Search…" becomes this shop's, wherever the kit shows it.

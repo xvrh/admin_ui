@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
 import 'package:admin_ui/l10n/de.dart';
 import 'package:admin_ui/l10n/es.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/l10n/it.dart';
 import 'package:admin_ui/l10n/ja.dart';
 import 'package:admin_ui/l10n/ko.dart';
@@ -117,9 +119,7 @@ void main() {
                   // English is the kit's base: intl falls back to its dates.
                   'src/l10n/admin_language.dart' =>
                     to == 'src/l10n/languages/en/date_data.dart',
-                  // The deprecated delegate's three.
-                  'src/l10n/legacy_languages.dart' ||
-                  'l10n.dart' => const {'en', 'fr', 'ar'}.contains(language),
+                  'l10n.dart' => language == 'en',
                   _ => false,
                 })
               '$from -> $to',
@@ -166,6 +166,13 @@ void main() {
       return context;
     }
 
+    testWidgets('no delegate draws English', (tester) async {
+      // Before any delegate loads intl's date data.
+      await pumpCalendar(tester, const Locale('en'), const []);
+      expect(tester.takeException(), isNull);
+      expect(find.text('January 2026'), findsOne);
+    });
+
     for (final (locale, month, direction) in [
       (const Locale('en'), 'January 2026', TextDirection.ltr),
       (const Locale('fr'), 'janvier 2026', TextDirection.ltr),
@@ -186,27 +193,6 @@ void main() {
           MaterialLocalizations.of(context).cancelButtonLabel,
           _languages.resolve(locale)!.strings.cancel,
         );
-      });
-
-      testWidgets('the deprecated delegate alone draws $locale', (
-        tester,
-      ) async {
-        await pumpCalendar(tester, locale, const [
-          // ignore: deprecated_member_use_from_same_package
-          AdminLocalizations.delegate,
-        ]);
-        // No kit error; only Flutter's warning that nothing gives Material's
-        // strings in a language but English.
-        final error = tester.takeException();
-        if (locale.languageCode == 'en') {
-          expect(error, isNull);
-        } else {
-          expect(
-            error,
-            contains('is not supported by all of its localization delegates'),
-          );
-        }
-        expect(find.text(month), findsOne);
       });
     }
   });

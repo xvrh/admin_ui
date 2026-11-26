@@ -125,15 +125,9 @@ const curated = <BarrelDef>[
   BarrelDef(
     'l10n.dart',
     'Localisation: AdminLanguages, the kit in English, its strings and '
-        'locale formatters. French and Arabic too, where apps found them '
-        'before each language had a library of its own.',
-    [
-      'l10n',
-      'l10n/sections',
-      'l10n/languages/en',
-      'l10n/languages/fr',
-      'l10n/languages/ar',
-    ],
+        'locale formatters. Each other language is a library of its own, '
+        '`l10n/fr.dart` for French.',
+    ['l10n', 'l10n/sections', 'l10n/languages/en'],
     exclude: {'date_data.dart'},
   ),
   // Neither umbrella re-exports it: it depends on flutter_test.

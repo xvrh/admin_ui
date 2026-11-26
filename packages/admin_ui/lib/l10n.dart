@@ -2,8 +2,8 @@
 // Run `fvm dart run tool/gen_barrels.dart` to refresh.
 //
 /// Localisation: AdminLanguages, the kit in English, its strings and locale
-/// formatters. French and Arabic too, where apps found them before each
-/// language had a library of its own.
+/// formatters. Each other language is a library of its own, `l10n/fr.dart` for
+/// French.
 library;
 
 // src/l10n
@@ -18,30 +18,8 @@ export 'src/l10n/admin_ui_localizations.dart'
     show AdminLocalizations, AdminLocalizationsContext, AdminLocalizationsEn;
 export 'src/l10n/bidi.dart' show bidiIsolate;
 export 'src/l10n/formats.dart' show AdminFormats, AdminFormatsContext;
-// src/l10n/languages/ar
-export 'src/l10n/languages/ar/admin_ar.dart' show adminAr;
-export 'src/l10n/languages/ar/admin_localizations_ar.dart'
-    show AdminLocalizationsAr;
-export 'src/l10n/languages/ar/assets_messages_ar.dart' show AssetsMessagesAr;
-export 'src/l10n/languages/ar/collection_messages_ar.dart'
-    show CollectionMessagesAr;
-export 'src/l10n/languages/ar/display_messages_ar.dart' show DisplayMessagesAr;
-export 'src/l10n/languages/ar/fields_messages_ar.dart' show FieldsMessagesAr;
-export 'src/l10n/languages/ar/inputs_messages_ar.dart' show InputsMessagesAr;
-export 'src/l10n/languages/ar/shell_messages_ar.dart' show ShellMessagesAr;
 // src/l10n/languages/en
 export 'src/l10n/languages/en/admin_en.dart' show adminEn;
-// src/l10n/languages/fr
-export 'src/l10n/languages/fr/admin_fr.dart' show adminFr;
-export 'src/l10n/languages/fr/admin_localizations_fr.dart'
-    show AdminLocalizationsFr;
-export 'src/l10n/languages/fr/assets_messages_fr.dart' show AssetsMessagesFr;
-export 'src/l10n/languages/fr/collection_messages_fr.dart'
-    show CollectionMessagesFr;
-export 'src/l10n/languages/fr/display_messages_fr.dart' show DisplayMessagesFr;
-export 'src/l10n/languages/fr/fields_messages_fr.dart' show FieldsMessagesFr;
-export 'src/l10n/languages/fr/inputs_messages_fr.dart' show InputsMessagesFr;
-export 'src/l10n/languages/fr/shell_messages_fr.dart' show ShellMessagesFr;
 // src/l10n
 export 'src/l10n/messages.dart' show AdminMessages;
 // src/l10n/sections

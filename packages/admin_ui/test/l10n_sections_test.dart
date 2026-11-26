@@ -1,4 +1,6 @@
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The lane words of the fields section, read with sample arguments.

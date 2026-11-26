@@ -222,6 +222,7 @@ dart fix --apply --code=migrate_design_widgets
 ```dart
 import 'package:admin_ui/admin_ui.dart';
 import 'package:admin_ui/l10n/es.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The languages the app ships the kit in. No other is in its build.
@@ -1656,9 +1657,7 @@ its strings in a subclass of `AdminLocalizationsEn`, which shows English for
 any string it leaves out, or of `AdminLocalizations`, which fails to compile
 until it has them all, beside material_ui's, cupertino_ui's and
 flutter_localizations' classes for that language. The class documentation
-shows how. `AdminLocalizations.localizationsDelegates`, which loaded
-English, French and Arabic and all 82 of Material's, still does, and is
-deprecated.
+shows how.
 
 The strings are grouped in sections, one per part of the kit. The language
 lanes read theirs from the `fields` section (`context.adminL10n.fields`): the

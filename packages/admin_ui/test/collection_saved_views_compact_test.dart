@@ -1,4 +1,6 @@
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/src/collection/saved_view.dart';
 import 'package:admin_ui/src/collection/ui/saved_views_bar.dart';
 import 'package:admin_ui/src/common/ui/button.dart';

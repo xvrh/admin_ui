@@ -3,6 +3,7 @@
 
 import 'package:admin_ui/admin_ui.dart';
 import 'package:admin_ui/l10n/es.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The languages the app ships the kit in. No other is in its build.
