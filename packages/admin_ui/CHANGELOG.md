@@ -2,6 +2,18 @@
 
 ## 0.2.0
 
+- `DebouncedSource` asks a palette's source once the typing pauses. A
+  `CommandPaletteController` asks every source on every keystroke and
+  drops the answers a later query replaced, so a source that costs a
+  request sent one for "f", "fe", "fer" and "fern", and an app waited out
+  the pause itself. `DebouncedSource(source)` hands a query over 200ms
+  after it came (`debounce`), and not at all if another came in that
+  time; the palette shows its progress line meanwhile. An empty query is
+  handed over as it comes, so emptying the box clears at once.
+- A `CommandPaletteController` disposed while a source is still to answer
+  drops the answer: a `DebouncedSource` waiting out its pause is not
+  asked, and a request already out no longer notifies a disposed
+  controller, which asserted in debug.
 - A `Sidebar` rail opened over the page stays open while the app is
   inactive. A window losing focus parks focus outside the column, which
   the rail took for focus leaving it: with the pointer on a menu opened

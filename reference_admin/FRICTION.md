@@ -29,7 +29,7 @@ two together.
 | F-019 | Toasts start at the window's top edge, over the shell's top bar and its actions | awkward-default | S3 | open |
 | F-020 | `showSideSheet` draws no surface around a bare builder, and its doc reads as if it did | doc-gap | S3 | fixed |
 | F-021 | `CommandSource` lists nothing on an empty query, so a palette opens blank until something is typed | awkward-default | S3 | fixed |
-| F-022 | A remote `SearchSource` is asked on every keystroke; debouncing is the source's job | missing-api | S3 | open |
+| F-022 | A remote `SearchSource` is asked on every keystroke; debouncing is the source's job | missing-api | S3 | fixed |
 | F-023 | `Avatar` picks its colour from the ambient palette, so one person has two colours under a top bar with its own | theme | S3 | open |
 | F-024 | A theme of your own keeps its base theme's chart series: the README's recipe draws every chart in Iris indigo | theme | S3 | open |
 | F-025 | `Asset` has no `copyWith`: changing one field rebuilds eleven | missing-api | S3 | fixed |
@@ -357,12 +357,12 @@ with evidence, or sets it to `not reproduced`, which is a finding too.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open (verified)
-- **Kit:** `widgets.dart › SearchSource`, `CommandPaletteController._run` (`lib/src/common/ui/command_palette.dart:207`): each `setQuery` calls every source at once; a later query's token drops an earlier answer, but the request has gone out.
-- **App:** `lib/src/frame/palette.dart` `_ShopSearch` (a 200 ms delay and a latest-query check, ~8 lines).
-- **Evidence:** "Jumping with the command palette" › "Command palette · results": typing "fe", "fer", "fern" in turn makes one `search.query` call with the workaround, three without it.
-- **Workaround:** the source waits out a pause and answers `[]` for a query that was overtaken.
-- **Proposal:** `SearchSource.debounce` (a `Duration?` the controller honours), or `DebouncedSource(source, delay)`.
+- **Status:** fixed (kit)
+- **Kit:** `widgets.dart › SearchSource`, `CommandPaletteController._run` (`lib/src/common/ui/command_palette.dart`): each `setQuery` calls every source at once; a later query's token drops an earlier answer, but the request has gone out.
+- **App:** `lib/src/frame/palette.dart` `_ShopSearch` (it had a 200 ms delay and a latest-query check, ~8 lines).
+- **Evidence:** "Jumping with the command palette" › "Command palette · results": typing "boston" a letter at a time makes one `search.query` call, as it did with the workaround; six without either.
+- **Workaround:** was the source waiting out a pause and answering `[]` for a query that was overtaken.
+- **Proposal:** `SearchSource.debounce` (a `Duration?` the controller honours), or `DebouncedSource(source, delay)`. Done as `DebouncedSource(source, debounce:)`, 200 ms unless told: every source in the kit and in an app `implements SearchSource`, so a new member on it would have broken each of them. The controller cancels the pause when the palette closes.
 
 ### F-023 · `Avatar` picks its colour from the ambient palette, so one person has two colours under a top bar with its own
 

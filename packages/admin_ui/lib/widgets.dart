@@ -45,6 +45,7 @@ export 'src/common/ui/command_palette.dart'
         CommandPaletteController,
         CommandSource,
         CommandTrigger,
+        DebouncedSource,
         PaletteItem,
         PaletteSection,
         RecentsSource,

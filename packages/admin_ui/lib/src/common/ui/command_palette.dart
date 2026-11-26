@@ -85,6 +85,10 @@ class PaletteSection {
 /// Feeds results to a [CommandPaletteController] for a query. Local sources
 /// return a `List<PaletteSection>` directly; remote ones return a `Future`, and
 /// the controller shows a progress line until they resolve.
+///
+/// The controller asks every source on every keystroke, and drops the answer
+/// to a query that another has replaced. A source that costs a request wraps
+/// itself in a [DebouncedSource], which is asked once the typing pauses.
 abstract class SearchSource {
   FutureOr<List<PaletteSection>> search(String query);
 }
@@ -172,6 +176,65 @@ class RecentsSource implements SearchSource {
   }
 }
 
+/// Asks [source] once the typing pauses, for a source that costs a request:
+/// a query is handed to it [debounce] after it came, and not at all if
+/// another came in that time. Typing "fern" asks about "fern", where the
+/// source alone is asked about "f", "fe", "fer" and "fern".
+///
+/// A search waiting out the pause is one in progress, so the palette shows
+/// its progress line from the first keystroke. One that is overtaken answers
+/// with nothing, at once. An empty query is not waited on: it is handed to
+/// [source] as it comes, so emptying the box clears its results at once, and
+/// drops the query being waited on.
+///
+/// A [CommandPaletteController] disposed during the pause [cancel]s it, so
+/// a palette closed mid-word asks nothing. The source holds the pause it is
+/// in: give each palette its own.
+class DebouncedSource implements SearchSource {
+  /// The source asked once the typing pauses.
+  final SearchSource source;
+
+  /// How long a query waits for another to replace it. Zero hands each one
+  /// over as it comes.
+  final Duration debounce;
+
+  DebouncedSource(
+    this.source, {
+    this.debounce = const Duration(milliseconds: 200),
+  });
+
+  Timer? _pause;
+  Completer<List<PaletteSection>>? _waiting;
+
+  @override
+  FutureOr<List<PaletteSection>> search(String query) {
+    cancel();
+    if (query.trim().isEmpty || debounce == Duration.zero) {
+      return source.search(query);
+    }
+    final waiting = _waiting = Completer<List<PaletteSection>>();
+    _pause = Timer(debounce, () {
+      _pause = null;
+      _waiting = null;
+      try {
+        waiting.complete(source.search(query));
+      } catch (error, stack) {
+        waiting.completeError(error, stack);
+      }
+    });
+    return waiting.future;
+  }
+
+  /// Drops the query waiting out its pause: [source] is not asked about it,
+  /// and its search answers with nothing. Does nothing when none is waiting.
+  void cancel() {
+    _pause?.cancel();
+    _pause = null;
+    _waiting?.complete(const []);
+    _waiting = null;
+  }
+}
+
 /// Owns the palette's query, selection and merged results. Sync sources paint
 /// immediately; async sources flip [loading] until they resolve, then merge in.
 /// Sections sharing a title are combined and ordered by [groupOrder] (then by
@@ -254,6 +317,17 @@ class CommandPaletteController extends ChangeNotifier {
     _loading = _pending > 0;
     _recompute();
     notifyListeners();
+  }
+
+  /// Drops what is still on its way: a [DebouncedSource] waiting out its
+  /// pause is not asked, and an answer that comes later is not shown.
+  @override
+  void dispose() {
+    _token++;
+    for (final source in sources) {
+      if (source is DebouncedSource) source.cancel();
+    }
+    super.dispose();
   }
 
   void _settle() {
