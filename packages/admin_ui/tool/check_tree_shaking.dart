@@ -1,7 +1,9 @@
 // Builds tree_shaking/, an app that ships the kit in English alone, for the
 // web, and fails when its main.dart.js holds a language the app did not
 // list: the kit's other languages, Material's other languages, or CLDR's
-// names of languages in any language but English.
+// names of languages in any language but English. It also fails on
+// common_locale_data's canonicalization rules, which nothing in the kit
+// reads.
 //
 //   fvm dart run tool/check_tree_shaking.dart [--keep]
 //
@@ -91,13 +93,9 @@ void main(List<String> args) {
   absent("Material's fi", _arb(material, 'fi', 'pasteButtonLabel'));
   absent("CLDR's fi names", _name(names, 'fi'));
 
-  // common_locale_data's locale tables, which an untyped `[]` keeps.
-  if (js.contains(_js('zh-cmn'))) {
-    stdout.writeln(
-      "note: common_locale_data's LocaleData tables are in the build: an "
-      "untyped `[]` keeps `Languages.operator []`, which canonicalizes.",
-    );
-  }
+  // common_locale_data's canonicalization rules, which the kit never needs:
+  // it reads a language's names, and parses a code's subtags itself.
+  absent("common_locale_data's LocaleData", 'zh-cmn');
 
   if (!args.contains('--keep')) {
     Directory('${app.path}/build').deleteSync(recursive: true);

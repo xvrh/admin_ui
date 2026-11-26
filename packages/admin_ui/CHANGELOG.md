@@ -62,8 +62,8 @@
   them), intl's date data and CLDR's names of languages. An app lists the
   languages it ships in `AdminLanguages` and registers its `delegates`
   and `locales`. On the web, a language it does not list is not in its
-  build: `reference_admin`, in English, French and Arabic, is 438 KB
-  smaller raw and 90 KB smaller gzipped than on Material's 82 languages,
+  build: `reference_admin`, in English, French and Arabic, is 741 KB
+  smaller raw and 156 KB smaller gzipped than on Material's 82 languages,
   and each language adds about 30 KB raw and 11 KB gzipped.
   `tool/check_tree_shaking.dart` builds an app that lists English alone,
   and CI fails when another language is in it.
@@ -96,6 +96,12 @@
   brought, `languageNameOf` with those of the language loaded for its
   context. With no language loaded a code reads upper-cased, where
   English, French and Arabic names were built in.
+- The kit needs common_locale_data 3.0.0, whose lookups
+  (`cld.languages['es']`) are extension operators. A web build no longer
+  carries its locale canonicalization rules, which the kit never reads:
+  any untyped `[]` in an app, intl's dates or decoded JSON, kept them,
+  about 300 KB raw and 67 KB gzipped. `tool/check_tree_shaking.dart`
+  fails when they are back.
 - A label the kit writes in capitals keeps the dot on a Turkish or
   Azerbaijani i: "DEĞİŞTİRİLDİ", not "DEĞIŞTIRILDI".
 - A table cell's editor can refuse a draft, and says why.
