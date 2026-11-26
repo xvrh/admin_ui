@@ -49,8 +49,9 @@ lays out right to left.
 
 ## Install
 
-The kit is not on pub.dev. An app pins a commit of its repository's `main`,
-one whose CI passed, by its full hash:
+The kit is not on pub.dev. An app follows its repository's `main` from git,
+with no `ref:`: the app's `pubspec.lock` holds the commit, and `pub upgrade`
+moves it to the latest one.
 
 ```yaml
 environment:
@@ -62,7 +63,6 @@ dependencies:
     git:
       url: https://github.com/xvrh/admin_ui.git
       path: packages/admin_ui
-      ref: <commit> # the full hash of a commit of main
   flutter:
     sdk: flutter
   material_ui: ^1.4.0

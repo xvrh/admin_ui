@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-`packages/admin_ui` is a public package that apps pin by commit hash. Its
+`packages/admin_ui` is a public package that apps follow from `main`. Its
 README, CHANGELOG, code, tests and history name no app that uses it, and no
 person or company behind one: describe a need in generic terms ("an app
 needs per-language menus") and invent neutral example data.
@@ -43,7 +43,9 @@ and `test/material_ui_imports_test.dart` fails on one.
   change of look is breaking. Record each change in `CHANGELOG.md` under the
   next version, looks under a heading of their own. A rename keeps the old
   name deprecated, with a `dart fix` rule, until the next breaking release.
-- An app pins a commit of `main` whose CI passed. Nothing is tagged.
+- An app follows `main`: a git dependency with no `ref:`, whose commit its
+  `pubspec.lock` holds and its `pub upgrade` moves. So `main` is always
+  releasable, and nothing is tagged.
 
 ## Looking at a widget
 
