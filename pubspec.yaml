@@ -11,8 +11,7 @@ dev_dependencies:
   dart_style: ^3.1.9
   flutterware:
     git:
-      url: https://github.com/xvrh/flutterware.git
-      ref: a1ed158233f53bb808a0f23be6ce8eb953b1f389
+      url: https://github.com/flutterware/flutterware.git
   http: ^1.6.0
   path: ^1.9.1
   pub_semver: ^2.2.0

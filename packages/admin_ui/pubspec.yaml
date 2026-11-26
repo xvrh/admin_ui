@@ -1,6 +1,6 @@
 name: admin_ui
 description: A generic Flutter admin UI kit — themes, widgets, app shell, collections, forms, fields, assets and auth screens.
-# Not on pub.dev: an app pins a commit of main (README.md, "Install").
+# Not on pub.dev: an app follows main from git (README.md, "Install").
 publish_to: 'none'
 version: 0.2.0
 repository: https://github.com/xvrh/admin_ui
