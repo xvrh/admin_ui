@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'icon_action.dart';
@@ -77,8 +78,7 @@ class MenuButton extends StatelessWidget {
       align: align,
       entries: entries,
       builder: (context, c) {
-        final label =
-            tooltip ?? MaterialLocalizations.of(context).moreButtonTooltip;
+        final label = tooltip ?? context.adminL10n.more;
         if (maskColor == null) {
           // One tree shape whether revealed or not, so a parent driving
           // [revealed] from its hover keeps the trigger, and its focus.

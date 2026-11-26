@@ -1,8 +1,10 @@
+import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/src/collection/saved_view.dart';
 import 'package:admin_ui/src/collection/ui/saved_views_bar.dart';
 import 'package:admin_ui/src/common/ui/button.dart';
 import 'package:admin_ui/src/common/ui/tabs.dart';
-import 'package:admin_ui/src/l10n/admin_ui_localizations.dart';
 import 'package:admin_ui/src/theme/breakpoints.dart';
 import 'package:admin_ui/src/theme/theme.dart';
 import 'package:admin_ui/src/theme/themes.dart';
@@ -11,6 +13,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 // Under the medium breakpoint the bar is the active view's name over a menu
 // of every view, so no name is cut at the edge of a phone.
@@ -50,8 +54,8 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(tokens ?? irisTheme.tokens),
       locale: Locale(locale),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Align(
           alignment: AlignmentDirectional.topStart,
@@ -388,7 +392,10 @@ void main() {
         // whole.
         final name = _names[locale]!.last;
         expect(_triggerText(tester).didExceedMaxLines, isTrue);
-        final strings = AdminLocalizations.lookup(Locale(locale)).collection;
+        final strings = _kitLanguages
+            .resolve(Locale(locale))!
+            .strings
+            .collection;
         expect(find.bySemanticsLabel(strings.currentView(name)), findsOne);
       });
     }

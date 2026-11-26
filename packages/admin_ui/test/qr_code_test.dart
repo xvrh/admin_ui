@@ -1,10 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:qr/qr.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 const _data = 'https://admin.example.com/orders/48213';
 
@@ -12,8 +16,8 @@ Widget _host(Widget child, {AdminTokens? tokens, String locale = 'en'}) =>
     MaterialApp(
       theme: buildAppTheme(tokens ?? AdminTokens.from(palette: irisPalette)),
       locale: Locale(locale),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Center(child: RepaintBoundary(child: child)),
       ),

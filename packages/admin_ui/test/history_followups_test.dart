@@ -1,8 +1,12 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// The theme called [name], with its label casing but not its font.
 AdminTokens _tokens(String name) {
@@ -22,8 +26,8 @@ Widget _host(Widget child, {String admin = 'en', AdminTokens? tokens}) =>
     MaterialApp(
       theme: buildAppTheme(tokens ?? defaultTokens),
       locale: Locale(admin),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Align(alignment: Alignment.topCenter, child: child),
       ),

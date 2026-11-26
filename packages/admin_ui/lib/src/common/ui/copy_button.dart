@@ -128,8 +128,7 @@ class _CopyButtonState extends State<CopyButton> {
       return IconAction(
         icon,
         label: switch (_outcome) {
-          _Outcome.none =>
-            widget.tooltip ?? MaterialLocalizations.of(context).copyButtonLabel,
+          _Outcome.none => widget.tooltip ?? context.adminL10n.copy,
           _Outcome.copied => _copiedLabel,
           _Outcome.failed => _failedLabel,
         },

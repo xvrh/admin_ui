@@ -1,8 +1,12 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// [child] in an app in [locale], with the kit's delegates unless
 /// [delegates] is false.
@@ -11,11 +15,9 @@ Widget _app(Widget child, {Locale? locale, bool delegates = true}) =>
       theme: buildAppTheme(defaultTokens),
       locale: locale,
       supportedLocales: delegates
-          ? AdminLocalizations.supportedLocales
+          ? _kitLanguages.locales
           : const [Locale('en', 'US')],
-      localizationsDelegates: delegates
-          ? AdminLocalizations.localizationsDelegates
-          : null,
+      localizationsDelegates: delegates ? _kitLanguages.delegates : null,
       home: Scaffold(
         body: Center(child: SizedBox(width: 640, child: child)),
       ),

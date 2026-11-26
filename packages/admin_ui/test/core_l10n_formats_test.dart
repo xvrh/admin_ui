@@ -1,6 +1,10 @@
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart' show Locale;
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// The group separator French writes: a narrow no-break space.
 const _frGroup = '\u202F';
@@ -8,7 +12,9 @@ const _frGroup = '\u202F';
 void main() {
   AdminFormats formats(String locale) => AdminFormats(
     locale,
-    messages: AdminLocalizations.lookup(_locale(locale)),
+    messages:
+        _kitLanguages.resolve(_locale(locale))?.strings ??
+        const AdminLocalizationsEn(),
   );
 
   group('locale', () {

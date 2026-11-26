@@ -741,7 +741,10 @@ class _SectionCaption extends StatelessWidget {
         ),
         child: _OnGrid(
           child: Text(
-            context.type.fieldLabelText(title),
+            context.type.fieldLabelText(
+              title,
+              locale: Localizations.maybeLocaleOf(context),
+            ),
             semanticsLabel: title,
             style: context.type.micro,
           ),
@@ -803,7 +806,7 @@ class _RowState extends State<_Row> {
       if (item.onDismiss case final onDismiss?) ...[
         if (entries.isNotEmpty) const MenuDivider(),
         MenuItem(
-          MaterialLocalizations.of(context).modalBarrierDismissLabel,
+          context.adminL10n.dismiss,
           icon: context.icons.close,
           onSelect: onDismiss,
         ),

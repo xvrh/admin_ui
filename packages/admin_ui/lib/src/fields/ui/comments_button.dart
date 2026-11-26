@@ -246,7 +246,10 @@ class _ThreadState extends State<_Thread> {
               child: Semantics(
                 header: true,
                 child: Text(
-                  context.type.fieldLabelText(heading),
+                  context.type.fieldLabelText(
+                    heading,
+                    locale: Localizations.maybeLocaleOf(context),
+                  ),
                   semanticsLabel: heading,
                   style: context.type.fieldLabel.copyWith(
                     color: context.colors.foregroundMuted,

@@ -153,8 +153,7 @@ class _RecoveryCodesViewState extends State<RecoveryCodesView> {
         ),
         const Gap(AdminSpacing.xl),
         Button.primary(
-          widget.doneLabel ??
-              MaterialLocalizations.of(context).continueButtonLabel,
+          widget.doneLabel ?? context.adminL10n.proceed,
           key: widget.doneKey,
           expand: true,
           onPressed: _saved ? widget.onDone : null,

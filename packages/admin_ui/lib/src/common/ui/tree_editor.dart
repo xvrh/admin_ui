@@ -654,7 +654,7 @@ class _TreeEntryRowState extends State<_TreeEntryRow> {
     final onDelete = widget.onDelete;
     final l10n = context.adminL10n;
     final strings = l10n.display;
-    final delete = MaterialLocalizations.of(context).deleteButtonTooltip;
+    final delete = context.adminL10n.delete;
     final menu = [
       if (widget.moves != null) ...[
         MenuItem(

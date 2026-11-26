@@ -4,6 +4,7 @@ import 'dart:ui' show SemanticsRole;
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 import 'chrome_theme.dart';
@@ -40,7 +41,7 @@ Future<T?> showSideSheet<T>(
   return showGeneralDialog<T>(
     context: host,
     barrierDismissible: barrierDismissible,
-    barrierLabel: MaterialLocalizations.of(host).modalBarrierDismissLabel,
+    barrierLabel: host.adminL10n.dismiss,
     barrierColor: barrierColor ?? host.colors.scrim,
     transitionDuration: motion.slow,
     // [builder] runs in the palette of what stands on a sheet, whose

@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_language.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../l10n/formats.dart';
 import '../../theme/spacing.dart';
@@ -56,7 +57,7 @@ String formatBytes(int? bytes, {String? locale}) {
   final name = locale ?? Intl.getCurrentLocale();
   return AdminFormats(
     name,
-    messages: AdminLocalizations.lookup(Locale(Intl.shortLocale(name))),
+    messages: AdminLanguages.stringsFor(Locale(Intl.shortLocale(name))),
   ).bytes(bytes);
 }
 

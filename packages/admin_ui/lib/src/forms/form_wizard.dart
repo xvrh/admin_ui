@@ -418,8 +418,7 @@ class _FormWizardState extends State<FormWizard>
           key: const ValueKey(_FooterSlot.next),
           child: Button.primary(
             last
-                ? widget.finishLabel ??
-                      MaterialLocalizations.of(context).saveButtonLabel
+                ? widget.finishLabel ?? context.adminL10n.save
                 : l10n.fields.wizardNext,
             key: widget.nextKey,
             focusNode: _nextFocus,

@@ -14,6 +14,8 @@ needs per-language menus") and invent neutral example data.
 - `fvm dart analyze --fatal-infos` must be clean.
 - `fvm dart run tool/check_constraints.dart`: every dependency constraint
   admits the latest release, or `heldBack` says why not.
+- `fvm dart run tool/check_tree_shaking.dart` (from `packages/admin_ui`):
+  a web build of an app that lists English alone holds no other language.
 - `fvm dart run tool/check_floor.dart --flutter=<a 3.47 SDK>`: the kit
   resolved alone on the oldest Flutter its `environment: flutter:` admits,
   analyzed and tested. An app may build it with that Flutter.
@@ -39,6 +41,8 @@ and `test/material_ui_imports_test.dart` fails on one.
   `packages/admin_ui`) after adding or removing a public declaration.
 - `looks.txt` is every theme's resolved tokens: `fvm dart run
   tool/gen_looks.dart` after changing a token.
+- Each language's `date_data.dart` is intl's: `fvm dart run
+  tool/gen_date_data.dart` after adding a language or when intl's data moves.
 - Below 1.0 a breaking change bumps the minor, anything else the patch; a
   change of look is breaking. Record each change in `CHANGELOG.md` under the
   next version, looks under a heading of their own. A rename keeps the old

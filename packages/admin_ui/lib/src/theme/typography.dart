@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'fonts.dart';
 import 'palette.dart';
 import 'sizes.dart';
+import 'text_case.dart';
 
 /// One step of an [AdminTypeRamp]: a font [size] on a fixed [line] box, both
 /// whole logical pixels at scale 1, and the step's own [letterSpacing].
@@ -862,10 +863,10 @@ class AdminTypography {
   };
 
   /// [label] as a field label shows it: in capitals when the theme's
-  /// [AdminTypeSpec.uppercaseLabels] says so. Screen readers get [label]
-  /// itself.
-  String fieldLabelText(String label) =>
-      spec.uppercaseLabels ? label.toUpperCase() : label;
+  /// [AdminTypeSpec.uppercaseLabels] says so, as [locale]'s language writes
+  /// them. Screen readers get [label] itself.
+  String fieldLabelText(String label, {Locale? locale}) =>
+      spec.uppercaseLabels ? upperCaseIn(label, locale) : label;
 
   /// [style] at [weight], in this typography's font — its monospace font for
   /// a [mono] style. Use it rather than `copyWith(fontWeight:)` on one of

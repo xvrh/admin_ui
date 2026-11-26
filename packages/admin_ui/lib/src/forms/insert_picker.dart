@@ -11,6 +11,7 @@ import '../common/ui/tappable.dart';
 import '../l10n/admin_ui_localizations.dart';
 import '../theme/palette.dart';
 import '../theme/spacing.dart';
+import '../theme/text_case.dart';
 import '../theme/tokens.dart';
 
 /// One entry in an [InsertPicker]: something a host can insert, such as a
@@ -495,7 +496,7 @@ class _InsertPickerState extends State<InsertPicker> {
         AdminSpacing.xs,
       ),
       child: Text(
-        text.toUpperCase(),
+        upperCaseIn(text, Localizations.maybeLocaleOf(context)),
         style: context.type.caption.copyWith(
           color: context.colors.foregroundMuted,
           letterSpacing: 0.5,

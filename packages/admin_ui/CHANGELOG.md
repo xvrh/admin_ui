@@ -53,6 +53,57 @@
   `monospace`, which sets the value and the hint in the theme's
   monospace font with tabular figures, on the field's own line so the
   field keeps its height: for a code, a key or an identifier.
+- The kit speaks ten more languages: Spanish, German, Italian, Brazilian
+  Portuguese, Dutch, Polish, Japanese, Simplified Chinese, Korean and
+  Turkish, machine-translated from the English. Each language is an
+  `AdminLanguage`: `adminEn` in `l10n.dart`, each other one in a
+  library of its own, `adminEs` in `package:admin_ui/l10n/es.dart`. A language brings the kit's strings,
+  Material's, Cupertino's and the widgets' (the reading direction among
+  them), intl's date data and CLDR's names of languages. An app lists the
+  languages it ships in `AdminLanguages` and registers its `delegates`
+  and `locales`. On the web, a language it does not list is not in its
+  build: `reference_admin`, in English, French and Arabic, is 741 KB
+  smaller raw and 156 KB smaller gzipped than on Material's 82 languages,
+  and each language adds about 30 KB raw and 11 KB gzipped.
+  `tool/check_tree_shaking.dart` builds an app that lists English alone,
+  and CI fails when another language is in it.
+- An override of the kit's strings is a subclass of a language's class,
+  given to that language: `adminEs.copyWith(strings: const MyStringsEs())`.
+  `AdminLanguage.of(context)` is the language loaded for a context.
+- `AdminLocalizations.localizationsDelegates`, `delegate`,
+  `supportedLocales` and `lookup` are removed: an app lists its languages
+  in `AdminLanguages` and registers its `delegates` and `locales`, and
+  reads a language's strings from it (`adminFr.strings`). French and
+  Arabic are no longer in `l10n.dart` or `admin_ui.dart`: `adminFr`,
+  `AdminLocalizationsFr` and their sections come from
+  `package:admin_ui/l10n/fr.dart`, Arabic's from `l10n/ar.dart`.
+- The kit words the buttons and labels it took from Material itself, as
+  Material's translations word them: `AdminLocalizations` has `cancel`,
+  `save`, `delete`, `copy`, `close`, `clear`, `search`, `more`,
+  `selectAll`, `dismiss`, `rowsPerPage`, `pageRowsInfo`, `previousPage`,
+  `nextPage`, `previousMonth`, `nextMonth`, `today`, `rangeStartDate`,
+  `rangeEndDate`, `selectDate`, `selectDateRange`, `navigationMenu`,
+  `expand`, `collapse`, `proceed` and the `keyboardKey*` names
+  `shortcutLabel` writes. An override reaches them, where it could not
+  reach Material's.
+  A class implementing `AdminLocalizations` itself, rather than extending
+  a language's, implements them too.
+- The kit no longer throws without Material's delegates. A `Calendar`, a
+  date filter, a chart's time axis or a heat grid in a locale whose date
+  data intl has not loaded writes intl's current locale's dates, as their
+  docs said. They threw a `LocaleDataException`, in English too.
+- `languageName` names a language with the names the app's languages
+  brought, `languageNameOf` with those of the language loaded for its
+  context. With no language loaded a code reads upper-cased, where
+  English, French and Arabic names were built in.
+- The kit needs common_locale_data 3.0.0, whose lookups
+  (`cld.languages['es']`) are extension operators. A web build no longer
+  carries its locale canonicalization rules, which the kit never reads:
+  any untyped `[]` in an app, intl's dates or decoded JSON, kept them,
+  about 300 KB raw and 67 KB gzipped. `tool/check_tree_shaking.dart`
+  fails when they are back.
+- A label the kit writes in capitals keeps the dot on a Turkish or
+  Azerbaijani i: "DEĞİŞTİRİLDİ", not "DEĞIŞTIRILDI".
 - A table cell's editor can refuse a draft, and says why.
   `TableTextEditor.number` takes `integer`, `min`, `max` and `validate`,
   and `TableTextEditor` takes `validate`. A number editor refused only

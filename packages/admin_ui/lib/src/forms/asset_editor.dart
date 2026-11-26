@@ -510,7 +510,7 @@ class _CropDialogState extends State<_CropDialog> {
       ),
       actions: [
         Button(
-          MaterialLocalizations.of(context).cancelButtonLabel,
+          context.adminL10n.cancel,
           variant: ButtonVariant.ghost,
           onPressed: () => Navigator.of(context).pop(),
         ),

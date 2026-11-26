@@ -13,6 +13,7 @@ import '../../common/ui/listbox.dart';
 import '../../common/ui/pagination.dart';
 import '../../common/ui/popover.dart';
 import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/formats.dart';
 import '../../theme/sizes.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
@@ -32,9 +33,9 @@ import '../../theme/tokens.dart';
 ///
 /// Every control is the theme's small control height, and the numbers use
 /// tabular figures grouped by the locale. The range reads in the words of
-/// [MaterialLocalizations.pageRowsInfoTitle] ("1–25 sur 1 234" in French).
-/// The arrows are Tab stops announced as "Previous page" and "Next page";
-/// the select as Material's "Rows per page".
+/// [AdminLocalizations.pageRowsInfo] ("1–25 sur 1 234" in French). The
+/// arrows are Tab stops announced as "Previous page" and "Next page"; the
+/// select as "Rows per page".
 class Pager extends StatelessWidget {
   /// 1-based index of the first and last row on this page; [from] is 0 when
   /// the page has none.
@@ -90,19 +91,14 @@ class Pager extends StatelessWidget {
   }
 
   String _range(BuildContext context) {
-    final l10n = MaterialLocalizations.of(context);
-    String n(int v) => l10n.formatDecimal(v);
+    final l10n = context.adminL10n;
+    final n = context.adminFormats.integer;
     final total = this.total;
     if (to <= 0 || from <= 0 || from > to) {
-      return total == null ? '' : context.adminL10n.countOf(0, total);
+      return total == null ? '' : l10n.countOf(0, total);
     }
     if (total == null) return '${n(from)}–${n(to)}';
-    // Material's built-in English, used without its delegates, prints the
-    // counts ungrouped ("1–25 of 1234"): its template, grouped.
-    if (l10n is DefaultMaterialLocalizations) {
-      return '${n(from)}–${n(to)} of ${n(total)}';
-    }
-    return l10n.pageRowsInfoTitle(from, to, total, false);
+    return l10n.pageRowsInfo(n(from), n(to), n(total));
   }
 
   @override
@@ -230,8 +226,7 @@ String _perPage(BuildContext context, int size) =>
 /// Material's "Rows per page:", without the colon of a label beside a
 /// value: the select's accessible name.
 String _rowsPerPage(BuildContext context) =>
-    MaterialLocalizations.of(context).rowsPerPageTitle
-        .replaceFirst(RegExp(r'\s*:\s*$'), '');
+    context.adminL10n.rowsPerPage.replaceFirst(RegExp(r'\s*:\s*$'), '');
 
 /// The page-size select: a small [FieldTrigger] reading "25 / page" over a
 /// listbox of the sizes, as wide as its widest option so choosing one never

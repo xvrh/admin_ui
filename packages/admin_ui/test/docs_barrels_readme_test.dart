@@ -8,6 +8,8 @@
 import 'dart:io';
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -17,6 +19,8 @@ import 'readme/custom_theme.dart';
 import 'readme/minimal_app.dart' show MyAdmin;
 import 'readme/name_clash.dart' show price;
 import 'readme/value_form.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// README blocks that are not compiled, with why: this one imports a package
 /// the kit does not depend on.
@@ -173,8 +177,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
-        supportedLocales: AdminLocalizations.supportedLocales,
+        localizationsDelegates: _kitLanguages.delegates,
+        supportedLocales: _kitLanguages.locales,
         home: Scaffold(body: ContactEditor(form: form)),
       ),
     );

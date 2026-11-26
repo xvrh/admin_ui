@@ -1,6 +1,10 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 extension type Contact(FormScope _s) {
   ValueCell<String> get name => _s.text('name');
@@ -31,8 +35,8 @@ Future<void> pumpGroup(
   await tester.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: _kitLanguages.delegates,
+      supportedLocales: _kitLanguages.locales,
       home: Scaffold(
         body: ValueForm(
           controller: form,

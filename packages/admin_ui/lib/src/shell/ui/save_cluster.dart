@@ -299,7 +299,7 @@ class SaveCluster extends StatelessWidget {
     // blocks the tap.
     final live = _saving || (!_busy && _dirty && invalidText == null);
     return Button(
-      saveLabel ?? MaterialLocalizations.of(context).saveButtonLabel,
+      saveLabel ?? context.adminL10n.save,
       key: saveKey,
       onPressed: live ? onSave : null,
       loading: _saving,

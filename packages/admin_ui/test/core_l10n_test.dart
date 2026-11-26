@@ -1,8 +1,13 @@
 import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
+import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoLocalizations;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// Pumps an app in [locale] and returns a context inside it.
 Future<BuildContext> _pumpApp(
@@ -16,9 +21,7 @@ Future<BuildContext> _pumpApp(
     MaterialApp(
       locale: locale,
       supportedLocales: supported,
-      localizationsDelegates: delegates
-          ? AdminLocalizations.localizationsDelegates
-          : null,
+      localizationsDelegates: delegates ? _kitLanguages.delegates : null,
       home: Builder(
         builder: (c) {
           context = c;
@@ -88,18 +91,21 @@ void main() {
     });
 
     testWidgets(
-      'a language without kit strings gets English strings but its own '
-      'numbers, and no missing-delegate warning',
+      'a locale outside the listed languages gets English strings but its '
+      'own numbers, and Flutter says it has no Material strings for it',
       (tester) async {
         final context = await _pumpApp(
           tester,
-          locale: const Locale('de'),
-          supported: const [Locale('en'), Locale('de')],
+          locale: const Locale('sv'),
+          supported: const [Locale('en'), Locale('sv')],
         );
-        expect(tester.takeException(), isNull);
+        expect(
+          tester.takeException(),
+          contains("This application's locale, sv, is not supported"),
+        );
         expect(context.adminL10n, isA<AdminLocalizationsEn>());
-        expect(context.adminFormats.locale, 'de');
-        expect(context.adminFormats.decimal(1234.5), '1.234,5');
+        expect(context.adminFormats.locale, 'sv');
+        expect(context.adminFormats.decimal(1234.5), '1\u00A0234,5');
         expect(context.adminFormats.bytes(1500), '1,5 kB');
       },
     );
@@ -111,9 +117,9 @@ void main() {
     late BuildContext context;
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: const [
-          _AppL10nDelegate(),
-          ...AdminLocalizations.localizationsDelegates,
+        localizationsDelegates: [
+          const _AppL10nDelegate(),
+          ..._kitLanguages.delegates,
         ],
         home: Builder(
           builder: (c) {
@@ -129,8 +135,8 @@ void main() {
     expect(context.adminL10n.inputs, isA<_AppInputs>());
   });
 
-  test('the delegate loads synchronously and accepts every locale', () {
-    const delegate = AdminLocalizations.delegate;
+  test("the kit's delegate loads synchronously and accepts every locale", () {
+    final delegate = _kitLanguages.delegates.first as LocalizationsDelegate;
     for (final (locale, type) in [
       (const Locale('en'), AdminLocalizationsEn),
       (const Locale('fr', 'CA'), AdminLocalizationsFr),
@@ -139,20 +145,26 @@ void main() {
     ]) {
       expect(delegate.isSupported(locale), isTrue);
       final loaded = delegate.load(locale);
-      expect(loaded, isA<SynchronousFuture<AdminLocalizations>>());
-      late AdminLocalizations value;
+      expect(loaded, isA<SynchronousFuture<Object?>>());
+      late Object? value;
       loaded.then((v) => value = v);
-      expect(value.runtimeType, type, reason: '$locale');
+      expect(
+        (value! as AdminLanguage).strings.runtimeType,
+        type,
+        reason: '$locale',
+      );
     }
-    expect(AdminLocalizations.supportedLocales.map((l) => l.languageCode), [
+    expect(_kitLanguages.locales.map((l) => l.languageCode), [
       'en',
       'fr',
       'ar',
     ]);
-    expect(
-      AdminLocalizations.localizationsDelegates,
-      containsAll(<Object>[delegate, ...GlobalMaterialLocalizations.delegates]),
-    );
+    expect(_kitLanguages.delegates.map((d) => d.type), [
+      AdminLanguage,
+      MaterialLocalizations,
+      CupertinoLocalizations,
+      WidgetsLocalizations,
+    ]);
   });
 
   group('plurals', () {
@@ -377,7 +389,8 @@ class _AppL10nDelegate extends LocalizationsDelegate<AdminLocalizations> {
   Future<AdminLocalizations> load(Locale locale) => SynchronousFuture(
     locale.languageCode == 'en'
         ? const _AppL10n()
-        : AdminLocalizations.lookup(locale),
+        : _kitLanguages.resolve(locale)?.strings ??
+              const AdminLocalizationsEn(),
   );
 
   @override

@@ -1,7 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 const _days = <double>[
   210, 214, 208, 221, 230, 226, 219, 232, 240, 236, 228, 241, 247, 239, 245, //
@@ -27,8 +31,8 @@ Future<void> _pump(
   await tester.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(tokens ?? irisTheme.tokens),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Directionality(
         textDirection: direction,
         child: Scaffold(

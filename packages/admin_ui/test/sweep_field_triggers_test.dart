@@ -1,8 +1,12 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart' show SemanticsNode;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 const _statuses = [
   SelectOption(value: 'draft', label: 'Draft'),
@@ -12,7 +16,7 @@ const _statuses = [
 
 Widget _host(Widget child) => MaterialApp(
   theme: buildAppTheme(defaultTokens),
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Align(
       alignment: Alignment.topLeft,

@@ -4,7 +4,6 @@
 library;
 
 import 'dart:async';
-import 'dart:ui' show Locale;
 
 import 'package:collection/collection.dart' show DeepCollectionEquality;
 import 'package:flutter/foundation.dart';
@@ -139,7 +138,7 @@ class ValueFormController<T> extends FormController {
   Set<String> _ruleFields = const {};
   late _Observed _notified;
 
-  AdminLocalizations _l10n = AdminLocalizations.lookup(const Locale('en'));
+  AdminLocalizations _l10n = const AdminLocalizationsEn();
 
   /// The scope the fields' typed handles are built over. Every cell it hands
   /// out is tracked; its `dispose` does nothing, as the controller (or

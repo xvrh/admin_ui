@@ -18,8 +18,8 @@ import 'touch_target_adjustment.dart';
 /// ```dart
 /// MaterialApp(
 ///   theme: buildAppTheme(tokens),
-///   localizationsDelegates: AdminLocalizations.localizationsDelegates,
-///   supportedLocales: AdminLocalizations.supportedLocales,
+///   localizationsDelegates: languages.delegates,
+///   supportedLocales: languages.locales,
 ///   home: const AdminScope(child: HomePage()),
 /// )
 /// ```

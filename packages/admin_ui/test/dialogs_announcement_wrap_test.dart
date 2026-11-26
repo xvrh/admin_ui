@@ -1,7 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// One line at 800px, two at 360.
 const _short = 'Drafts are saved every thirty seconds.';
@@ -21,8 +25,8 @@ Future<void> _pump(
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     MaterialApp(
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: _kitLanguages.delegates,
+      supportedLocales: _kitLanguages.locales,
       home: Directionality(
         textDirection: direction,
         child: Scaffold(
@@ -237,8 +241,8 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             theme: buildAppTheme(AdminTokens.from(palette: palette)),
-            localizationsDelegates: AdminLocalizations.localizationsDelegates,
-            supportedLocales: AdminLocalizations.supportedLocales,
+            localizationsDelegates: _kitLanguages.delegates,
+            supportedLocales: _kitLanguages.locales,
             home: Column(
               children: [
                 for (final severity in Severity.values)

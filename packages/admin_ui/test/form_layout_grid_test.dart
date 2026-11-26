@@ -1,7 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// A child of a known height, found by its [label].
 Widget box(String label, {double height = 40}) =>
@@ -287,8 +291,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(irisTheme.tokens),
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
-        supportedLocales: AdminLocalizations.supportedLocales,
+        localizationsDelegates: _kitLanguages.delegates,
+        supportedLocales: _kitLanguages.locales,
         home: Scaffold(
           body: ValueForm(
             controller: form,

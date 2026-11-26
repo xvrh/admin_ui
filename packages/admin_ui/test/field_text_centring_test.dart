@@ -1,10 +1,14 @@
 import 'dart:io';
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// Real fonts whose ascent and descent split the em differently, by the
 /// family the tests load them under.
@@ -95,7 +99,7 @@ Future<void> _pumpFields(WidgetTester tester, AdminTokens tokens) async {
   await tester.pumpWidget(
     MaterialApp(
       theme: buildAppTheme(tokens),
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: SizedBox(
           width: 320,

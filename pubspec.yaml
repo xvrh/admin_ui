@@ -20,4 +20,5 @@ dev_dependencies:
 workspace:
   - packages/admin_ui
   - packages/admin_ui/example
+  - packages/admin_ui/tree_shaking
   - reference_admin

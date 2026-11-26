@@ -1,13 +1,17 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart' show RenderEditable;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
+
 Widget _host(Widget child, {Locale locale = const Locale('en')}) => MaterialApp(
   theme: buildAppTheme(defaultTokens),
   locale: locale,
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Align(
       alignment: AlignmentDirectional.topStart,
@@ -97,6 +101,9 @@ void main() {
   });
 
   group('languageName', () {
+    // The names come from the languages an app's delegates loaded.
+    setUp(() => _kitLanguages.delegates.first.load(const Locale('en')));
+
     test('normalises the code', () {
       expect(languageName('ES'), 'Spanish');
       expect(languageName('es_ES'), 'European Spanish');

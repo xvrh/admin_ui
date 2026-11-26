@@ -10,6 +10,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../common/text_metrics.dart';
 import '../../common/ui/search_field.dart';
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 
@@ -87,8 +88,7 @@ class CollectionToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final line = context.sizes.medium;
     final hasSearch = searchController != null || onSearch != null;
-    final searchHint =
-        this.searchHint ?? MaterialLocalizations.of(context).searchFieldLabel;
+    final searchHint = this.searchHint ?? context.adminL10n.search;
     final left = <Widget>[
       ?leading,
       if (hasSearch)

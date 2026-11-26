@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/date_locale.dart';
 import '../../l10n/formats.dart';
 import '../../l10n/sections/inputs_messages.dart';
 import '../../theme/sizes.dart';
@@ -32,10 +33,8 @@ class DateRangePreset {
   /// Each is relative to today and ends on it, but last month. The list is
   /// unmodifiable: to add or drop a span, pass a list of your own as
   /// [DateRangePicker.presets].
-  static List<DateRangePreset> defaults(BuildContext context) => _defaults(
-    MaterialLocalizations.of(context).currentDateLabel,
-    context.adminL10n.inputs,
-  );
+  static List<DateRangePreset> defaults(BuildContext context) =>
+      _defaults(context.adminL10n.today, context.adminL10n.inputs);
 
   static List<DateRangePreset> _defaults(String today, InputsMessages strings) {
     return List.unmodifiable([
@@ -190,15 +189,15 @@ class _DateRangePickerState extends State<DateRangePicker> {
     final v = widget.value;
     if (v == null) {
       return widget.hint ??
-          (readOnly
-              ? '—'
-              : MaterialLocalizations.of(context).dateRangePickerHelpText);
+          (readOnly ? '—' : context.adminL10n.selectDateRange);
     }
     final locale = widget.locale;
     final formats = locale == null
         ? context.adminFormats
         : AdminFormats(locale);
-    final fmt = formats.dateFormat(DateFormat.MMMd(_localeFor(context)));
+    final fmt = formats.dateFormat(
+      DateFormat.MMMd(dateLocaleOf(_localeFor(context))),
+    );
     if (_sameDay(v.start, v.end)) return fmt.format(v.start);
     return context.adminL10n.inputs.dateSpan(
       fmt.format(v.start),

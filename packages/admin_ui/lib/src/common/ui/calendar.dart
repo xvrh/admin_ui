@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:material_ui/material_ui.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
+import '../../l10n/date_locale.dart';
 import '../../l10n/formats.dart';
 import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
@@ -34,12 +36,12 @@ enum CalendarMode {
 ///
 /// **Locale.** The month title, the weekday initials, the week's first day
 /// and each day's spoken date follow the app's locale, or an explicit
-/// [locale], from `intl`'s date data: Material's delegates load it for the
-/// app's locale, and `initializeDateFormatting` for any other. Its digits
-/// are the ones the kit's numbers use ([AdminFormats.dateFormat]), so an
-/// Arabic month title matches the day numbers under it. Without that data
-/// they come from the ambient [MaterialLocalizations]. [firstDayOfWeek]
-/// overrides the week start either way.
+/// [locale], from `intl`'s date data: an [AdminLanguage]'s delegates load
+/// it for the app's languages, and `initializeDateFormatting` for any other.
+/// Its digits are the ones the kit's numbers use ([AdminFormats.dateFormat]),
+/// so an Arabic month title matches the day numbers under it. Without that
+/// data they are intl's current locale's. [firstDayOfWeek] overrides the
+/// week start either way.
 ///
 /// **Keyboard.** The grid is one Tab stop: the selected day, else today, else
 /// the month's first selectable day. The arrows move by day and by week,
@@ -66,11 +68,11 @@ class Calendar extends StatefulWidget {
   final DateTime? max;
 
   /// An `intl` locale for the names and the week layout, e.g. `'fr'`; null
-  /// follows [MaterialLocalizations].
+  /// follows the app's.
   final String? locale;
 
-  /// The first column, as an index into [MaterialLocalizations.narrowWeekdays]
-  /// (0 is Sunday, 1 Monday … 6 Saturday); null takes the locale's.
+  /// The first column, as a weekday counted from Sunday (0 is Sunday,
+  /// 1 Monday … 6 Saturday); null takes the locale's.
   final int? firstDayOfWeek;
 
   /// The day marked as today; defaults to the current date. Pass a fixed day
@@ -387,13 +389,13 @@ class _CalendarState extends State<Calendar> {
       );
 
   Widget _header(BuildContext context, _CalendarNames names) {
-    final strings = MaterialLocalizations.of(context);
+    final strings = context.adminL10n;
     final min = _min, max = _max;
     return Row(
       children: [
         IconAction(
           context.icons.chevronBack,
-          label: strings.previousMonthTooltip,
+          label: strings.previousMonth,
           size: IconActionSize.small,
           onPressed: min == null || _monthOf(min).isBefore(_month)
               ? () => _shift(-1)
@@ -411,7 +413,7 @@ class _CalendarState extends State<Calendar> {
         ),
         IconAction(
           context.icons.chevronForward,
-          label: strings.nextMonthTooltip,
+          label: strings.nextMonth,
           size: IconActionSize.small,
           onPressed: max == null || _monthOf(max).isAfter(_month)
               ? () => _shift(1)
@@ -507,14 +509,14 @@ class _CalendarState extends State<Calendar> {
       );
     }
 
-    final strings = MaterialLocalizations.of(context);
+    final strings = context.adminL10n;
     var label = names.fullDate(day);
     if (isStart && !preview) {
-      label = strings.dateRangeStartDateSemanticLabel(label);
+      label = strings.rangeStartDate(label);
     } else if (isEnd && !preview) {
-      label = strings.dateRangeEndDateSemanticLabel(label);
+      label = strings.rangeEndDate(label);
     }
-    if (isToday) label = '$label, ${strings.currentDateLabel}';
+    if (isToday) label = '$label, ${strings.today}';
 
     return Tappable.states(
       onTap: _interactive && !disabled
@@ -596,7 +598,7 @@ class _CalendarState extends State<Calendar> {
 }
 
 /// The names and week layout a [Calendar] shows: `intl`'s for the locale,
-/// when its date symbols are loaded, else [MaterialLocalizations]'s.
+/// when its date symbols are loaded, else intl's current locale's.
 class _CalendarNames {
   final String Function(DateTime month) monthYear;
   final String Function(DateTime day) fullDate;
@@ -617,27 +619,11 @@ class _CalendarNames {
   });
 
   factory _CalendarNames.of(BuildContext context, String? locale) {
-    final requested =
-        locale ?? Localizations.maybeLocaleOf(context)?.toString();
-    final loaded = requested == null
-        ? null
-        : Intl.verifiedLocale(
-            requested,
-            DateFormat.localeExists,
-            onFailure: (_) => null,
-          );
-    if (loaded == null) {
-      final strings = MaterialLocalizations.of(context);
-      return _CalendarNames(
-        monthYear: strings.formatMonthYear,
-        fullDate: strings.formatFullDate,
-        dayNumber: (day) => strings.formatDecimal(day.day),
-        narrowWeekdays: strings.narrowWeekdays,
-        firstDayOfWeek: strings.firstDayOfWeekIndex,
-      );
-    }
+    final loaded = dateLocaleOf(
+      locale ?? Localizations.maybeLocaleOf(context)?.toString(),
+    );
     final symbols = DateFormat(null, loaded).dateSymbols;
-    final formats = locale == null
+    final formats = locale == null || loaded == null
         ? context.adminFormats
         : AdminFormats(loaded);
     return _CalendarNames(

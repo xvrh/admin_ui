@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
-import '../l10n/admin_ui_localizations.dart';
+import '../l10n/admin_language.dart';
 import 'collection_controller.dart';
 import 'column_layout.dart';
 import 'saved_view.dart';
@@ -78,7 +78,7 @@ class SavedViewsController<T> extends ChangeNotifier {
     load(applyDefault: applyDefaultOnLoad);
   }
 
-  static String _copyName(String name) => AdminLocalizations.lookup(
+  static String _copyName(String name) => AdminLanguages.stringsFor(
     Locale(Intl.shortLocale(Intl.getCurrentLocale())),
   ).collection.copyOf(name);
 

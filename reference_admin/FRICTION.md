@@ -77,7 +77,7 @@ two together.
 | F-312 | `DiffView` prints each field's internal key beside its label | i18n | S3 | fixed |
 | F-313 | Under `ValidationMode.onEdit` an edit form's `ValidationSummary` never shows | awkward-default | S3 | open |
 | F-314 | Revealing the first invalid field leaves its message under the bottom save bar | bug | S2 | fixed |
-| F-315 | The kit's own prompts and bars word some buttons through Material, which an `AdminLocalizations` override cannot reach | i18n | S3 | open |
+| F-315 | The kit's own prompts and bars word some buttons through Material, which an `AdminLocalizations` override cannot reach | i18n | S3 | fixed |
 | F-316 | `FormSaveBar.savedLabel` has no doc, and its name reads as the word to show, not a detail after it | doc-gap | S3 | fixed |
 | F-400 | A media page over an `AssetSource` rewrites the picker's private host: paging, search, filters, errors | missing-api | S1 | fixed |
 | F-401 | `AssetLibrary`'s toolbar takes no filter of the app's, and `AssetSource.browse` filters by type and text only | missing-api | S2 | fixed |
@@ -897,12 +897,12 @@ Owned by WP-C. Every entry was met building `/products`, `/products/new` and `/p
 
 - **Kind:** i18n
 - **Severity:** S3
-- **Status:** open (verified; evidence for F-008 too)
+- **Status:** fixed (kit)
 - **Kit:** `FormSaveBar`'s default commit label (`lib/src/forms/form_save_bar.dart:169`, `saveButtonLabel`), `showConfirmDialog`'s cancel (`lib/src/common/ui/modal.dart:250`) and `UnsavedChangesGuard`'s cancel (`lib/src/forms/unsaved_changes_guard.dart:171`) are `MaterialLocalizations`; Discard, Select, Apply and Done are the kit's.
 - **App:** `test/scenarios/story/desktop/05_catalogue_test.dart:23` (`_material`); the editor passes its own `commitLabel`, so its Save is found by the app's word.
 - **Evidence:** "Editing a product" › "Product · leave without saving?": "Stay" is Material's Cancel, found through `MaterialLocalizations.of`, while the confirm is `s.kit`'s.
 - **Workaround:** a Material lookup in the scenario beside `s.kit`.
-- **Proposal:** word `FormSaveBar`'s Save and the Cancel of `showConfirmDialog` and `UnsavedChangesGuard` from `AdminLocalizations` (a `save` and a `cancel` in its shell section), so the documented override path (the app's `PottingShedKitStrings`) reaches every word the kit shows; keys as F-008 proposes for tests.
+- **Proposal:** done: the kit words every button and label it took from Material itself, in `AdminLocalizations` (`save`, `cancel`, `delete`, `pageRowsInfo`, the `keyboardKey*` names and the rest), worded as Material's translations word them. The app's overrides reach them through `pottingShedKitLanguages`, and `05_catalogue_test.dart` finds the leave prompt's Cancel by `s.kit.cancel`.
 
 ### F-316 · `FormSaveBar.savedLabel` has no doc, and its name reads as the word to show, not a detail after it
 

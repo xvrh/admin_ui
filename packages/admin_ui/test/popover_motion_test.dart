@@ -1,8 +1,12 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 // How a popover arrives and leaves: the theme's
 // AdminOverlayStyle.popoverMotion, which Popover plays on its content, and so
@@ -79,8 +83,8 @@ Widget _app(
   TextDirection direction = TextDirection.ltr,
 }) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   builder: (context, child) => MediaQuery(
     data: MediaQuery.of(context).copyWith(disableAnimations: reduced),
     child: Directionality(textDirection: direction, child: child!),

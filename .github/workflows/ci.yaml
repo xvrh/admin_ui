@@ -61,6 +61,20 @@ jobs:
         working-directory: ${{ matrix.package }}
         run: flutter test
 
+  # An app ships the languages it lists and no others: a web build of an
+  # app that lists English alone holds none of the kit's other languages,
+  # Material's or CLDR's (packages/admin_ui/tool/check_tree_shaking.dart).
+  tree-shaking:
+    name: Tree shaking · packages/admin_ui
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/flutter
+      - run: flutter pub get
+      - name: An English-only web build holds no other language
+        working-directory: packages/admin_ui
+        run: dart run tool/check_tree_shaking.dart
+
   # The jobs above run the Flutter .fvmrc pins. An app builds the kit with
   # its own, as old as the kit's `environment: flutter:` admits, so this one
   # runs the latest stable patch of that floor (tool/check_floor.dart).

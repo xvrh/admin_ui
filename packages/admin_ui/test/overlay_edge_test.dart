@@ -1,8 +1,12 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/src/common/ui/popover.dart' show PopoverArrowPainter;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 // Whether an overlay is ringed in a hairline as well as lifted on its
 // shadow: the theme's AdminOverlayStyle.modalOutline and popoverOutline,
@@ -75,8 +79,8 @@ class _NoAssets implements AssetSource {
 
 Widget _app(AdminTokens tokens, Widget body) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   builder: (context, navigator) => ToastScope(child: navigator!),
   home: Scaffold(body: ModalAnchor(child: body)),
 );

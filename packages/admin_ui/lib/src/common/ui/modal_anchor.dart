@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/tokens.dart';
 import '../motion.dart';
 import 'side_sheet.dart' show SideSheetSide;
@@ -384,8 +385,7 @@ class _ModalAnchorState extends State<ModalAnchor>
                   dismissible: _dismissible,
                   onDismiss: () => _close(null),
                   color: _barrierColor ?? context.colors.scrim,
-                  semanticsLabel: MaterialLocalizations.of(context)
-                      .modalBarrierDismissLabel,
+                  semanticsLabel: context.adminL10n.dismiss,
                 ),
               ),
             ),

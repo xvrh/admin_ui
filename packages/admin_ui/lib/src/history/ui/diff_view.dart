@@ -11,6 +11,7 @@ import '../../l10n/admin_ui_localizations.dart';
 import '../../l10n/formats.dart';
 import '../../l10n/sections/display_messages.dart';
 import '../../theme/spacing.dart';
+import '../../theme/text_case.dart';
 import '../../theme/tokens.dart';
 import '../diff_model.dart';
 import 'block_diff.dart';
@@ -323,7 +324,7 @@ class _Header extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          role.toUpperCase(),
+          upperCaseIn(role, Localizations.maybeLocaleOf(context)),
           style: context.type
               .weighted(context.type.micro, FontWeight.w700)
               .copyWith(letterSpacing: 0.6),

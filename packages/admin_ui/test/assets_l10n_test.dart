@@ -1,7 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 const _assets = [
   Asset(id: 'a', name: 'hero.jpg', width: 1920, height: 1080),
@@ -17,8 +21,8 @@ Finder _tip(String message) =>
 Widget _host(Widget child, {Locale locale = const Locale('fr')}) => MaterialApp(
   theme: buildAppTheme(defaultTokens),
   locale: locale,
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: Align(
       alignment: AlignmentDirectional.topStart,

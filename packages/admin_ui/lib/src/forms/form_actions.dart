@@ -134,11 +134,7 @@ class FormActions extends StatelessWidget {
                 ? context.adminL10n.shell.noChangesToPublish
                 : context.adminL10n.shell.noChanges),
         committing: controller.status == FormStatus.submitting,
-        commitLabel:
-            commitLabel ??
-            (publish
-                ? null
-                : MaterialLocalizations.of(context).saveButtonLabel),
+        commitLabel: commitLabel ?? (publish ? null : context.adminL10n.save),
         flow: flow,
       ),
     );

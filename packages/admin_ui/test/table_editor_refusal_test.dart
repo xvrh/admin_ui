@@ -1,15 +1,19 @@
 import 'dart:ui' show SemanticsValidationResult;
 
+import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/src/collection/ui/collection_table.dart';
 import 'package:admin_ui/src/collection/ui/table_edit_session.dart';
 import 'package:admin_ui/src/common/ui/labeled_field.dart';
 import 'package:admin_ui/src/common/ui/popover_menu.dart';
-import 'package:admin_ui/src/l10n/admin_ui_localizations.dart';
 import 'package:admin_ui/src/theme/tokens.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 // A draft a cell's editor refuses: it stays open, marked invalid, and says
 // why on a card beside the cell.
@@ -90,8 +94,8 @@ Future<void> _pump(
   await tester.pumpWidget(
     MaterialApp(
       locale: Locale(locale),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(body: child),
     ),
   );

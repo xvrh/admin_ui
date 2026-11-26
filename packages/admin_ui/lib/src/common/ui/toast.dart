@@ -1162,7 +1162,7 @@ class _ToastCardState extends State<_ToastCard> with TickerProviderStateMixin {
             padding: EdgeInsets.only(top: centre(close.box)),
             child: IconAction.close(
               size: close,
-              label: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+              label: context.adminL10n.dismiss,
               onPressed: () => widget.onDismiss(ToastDismissReason.closed),
             ),
           ),

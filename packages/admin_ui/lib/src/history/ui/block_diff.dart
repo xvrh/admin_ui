@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../i18n/locale_status.dart';
 import '../../l10n/admin_ui_localizations.dart';
 import '../../theme/spacing.dart';
+import '../../theme/text_case.dart';
 import '../../theme/tokens.dart';
 import '../diff_model.dart';
 import 'diff_op_style.dart';
@@ -117,7 +118,7 @@ class _BlockRow extends StatelessWidget {
         Icon(tone.icon, size: context.iconSizes.xs, color: tone.text),
         const Gap(AdminSpacing.sm),
         Text(
-          tone.label.toUpperCase(),
+          upperCaseIn(tone.label, Localizations.maybeLocaleOf(context)),
           style: context.type
               .weighted(context.type.micro, FontWeight.w700)
               .copyWith(color: tone.text, letterSpacing: 0.5),

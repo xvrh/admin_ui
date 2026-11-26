@@ -1,7 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 final _iris = AdminTokens.from(palette: irisPalette);
 
@@ -29,8 +33,8 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(tokens ?? _iris),
       locale: Locale(locale),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: SingleChildScrollView(
           child: Center(
@@ -659,8 +663,8 @@ void main() {
             MaterialApp(
               theme: buildAppTheme(_iris),
               locale: Locale(locale),
-              supportedLocales: AdminLocalizations.supportedLocales,
-              localizationsDelegates: AdminLocalizations.localizationsDelegates,
+              supportedLocales: _kitLanguages.locales,
+              localizationsDelegates: _kitLanguages.delegates,
               home: Scaffold(
                 body: Center(
                   child: Modal(
@@ -682,8 +686,8 @@ void main() {
             MaterialApp(
               theme: buildAppTheme(_iris),
               locale: Locale(locale),
-              supportedLocales: AdminLocalizations.supportedLocales,
-              localizationsDelegates: AdminLocalizations.localizationsDelegates,
+              supportedLocales: _kitLanguages.locales,
+              localizationsDelegates: _kitLanguages.delegates,
               home: AuthScaffold(title: 'Two-step sign-in', child: child),
             ),
           );

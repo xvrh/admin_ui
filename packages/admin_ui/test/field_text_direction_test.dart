@@ -4,9 +4,13 @@
 // them. textDirection says so for any other field.
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// An 800×600 app in Arabic, so right to left, or in English with [ltr].
 Future<LocalScope> _pump(
@@ -23,8 +27,8 @@ Future<LocalScope> _pump(
     MaterialApp(
       theme: buildAppTheme(irisTheme.tokens),
       locale: Locale(ltr ? 'en' : 'ar'),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       home: Scaffold(
         body: Center(child: SizedBox(width: 400, child: field(scope))),
       ),

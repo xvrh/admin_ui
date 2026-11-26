@@ -23,6 +23,7 @@ import '../../l10n/formats.dart';
 import '../../theme/contrast.dart';
 import '../../theme/shell_style.dart';
 import '../../theme/spacing.dart';
+import '../../theme/text_case.dart';
 import '../../theme/tokens.dart';
 import 'navigation_drawer.dart';
 import 'shell.dart';
@@ -988,7 +989,7 @@ class _NavSectionLabel extends StatelessWidget {
           minWidth: width,
           maxWidth: width,
           child: Text(
-            section.label.toUpperCase(),
+            upperCaseIn(section.label, Localizations.maybeLocaleOf(context)),
             style: context.type.micro.copyWith(
               // The micro caption is small text: it needs 4.5:1 on the rail.
               color: colors.readableOn(

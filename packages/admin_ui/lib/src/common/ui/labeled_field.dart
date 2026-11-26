@@ -174,7 +174,10 @@ class _LabeledFieldState extends State<LabeledField> {
                             if (markLeads) mark,
                             Flexible(
                               child: Text(
-                                type.fieldLabelText(widget.label),
+                                type.fieldLabelText(
+                                  widget.label,
+                                  locale: Localizations.maybeLocaleOf(context),
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: enabled

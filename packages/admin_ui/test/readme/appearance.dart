@@ -5,6 +5,8 @@
 import 'package:admin_ui/admin_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
+const languages = AdminLanguages([adminEn]);
+
 class MyAdmin extends StatefulWidget {
   const MyAdmin({super.key});
 
@@ -21,8 +23,8 @@ class _MyAdminState extends State<MyAdmin> {
       theme: _look.themeData(Brightness.light),
       darkTheme: _look.themeData(Brightness.dark),
       themeMode: _look.mode,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
-      supportedLocales: AdminLocalizations.supportedLocales,
+      localizationsDelegates: languages.delegates,
+      supportedLocales: languages.locales,
       home: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(AdminSpacing.xxl),

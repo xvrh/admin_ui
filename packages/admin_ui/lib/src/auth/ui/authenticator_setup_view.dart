@@ -264,8 +264,7 @@ class _AuthenticatorSetupViewState extends State<AuthenticatorSetupView> {
         if (onCancel != null) ...[
           const Gap(AdminSpacing.md),
           Button(
-            widget.cancelLabel ??
-                MaterialLocalizations.of(context).cancelButtonLabel,
+            widget.cancelLabel ?? context.adminL10n.cancel,
             key: widget.cancelKey,
             expand: true,
             onPressed: widget.submitting ? null : onCancel,

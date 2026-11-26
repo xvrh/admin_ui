@@ -97,7 +97,7 @@ class _Drawer extends StatelessWidget {
     return SideSheet(
       side: SideSheetSide.start,
       safeArea: false,
-      semanticLabel: MaterialLocalizations.of(context).drawerLabel,
+      semanticLabel: context.adminL10n.navigationMenu,
       child: NavigationDrawerScope(
         width: width,
         close: onClose,

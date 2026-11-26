@@ -1,7 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 // A table's chrome, from the theme's AdminTableMetrics: what the header row
 // is filled and written with, and the rules under the header and the rows.
@@ -66,8 +70,8 @@ const _rows = ['Alpha', 'Bravo'];
 
 Widget _host(AdminTokens tokens) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(
     body: SizedBox(
       width: 800,

@@ -4,11 +4,15 @@
 //   TZ=Europe/Brussels fvm flutter test test/calendar_heat_grid_test.dart
 
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// A Friday.
 final _today = DateTime(2026, 6, 12);
@@ -181,7 +185,7 @@ void main() {
         MaterialApp(
           locale: const Locale('fr'),
           supportedLocales: const [Locale('fr')],
-          localizationsDelegates: AdminLocalizations.localizationsDelegates,
+          localizationsDelegates: _kitLanguages.delegates,
           home: Scaffold(
             body: CalendarHeatGrid(values: const {}, weeks: 1, today: _today),
           ),

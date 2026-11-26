@@ -1,6 +1,10 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 // What a Popover holds, in each theme whose popover motion keeps it on
 // screen after it is asked to close: a pick is taken, the popover goes, and
@@ -9,8 +13,8 @@ import 'package:material_ui/material_ui.dart';
 
 Widget _app(AdminTokens tokens, Widget body) => MaterialApp(
   theme: buildAppTheme(tokens),
-  supportedLocales: AdminLocalizations.supportedLocales,
-  localizationsDelegates: AdminLocalizations.localizationsDelegates,
+  supportedLocales: _kitLanguages.locales,
+  localizationsDelegates: _kitLanguages.delegates,
   home: Scaffold(body: body),
 );
 

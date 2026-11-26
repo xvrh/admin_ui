@@ -1,13 +1,17 @@
 import 'dart:ui' show SemanticsRole;
 
+import 'package:admin_ui/l10n.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:admin_ui/src/collection/saved_view.dart';
 import 'package:admin_ui/src/collection/ui/saved_views_bar.dart';
 import 'package:admin_ui/src/common/ui/icon_action.dart';
-import 'package:admin_ui/src/l10n/admin_ui_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 const _views = [
   SavedView(id: 'all', name: 'All', isDefault: true),
@@ -152,8 +156,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('fr'),
-        supportedLocales: AdminLocalizations.supportedLocales,
-        localizationsDelegates: AdminLocalizations.localizationsDelegates,
+        supportedLocales: _kitLanguages.locales,
+        localizationsDelegates: _kitLanguages.delegates,
         home: Scaffold(
           body: SizedBox(
             width: 900,

@@ -1,7 +1,11 @@
 import 'package:admin_ui/admin_ui.dart';
+import 'package:admin_ui/l10n/ar.dart';
+import 'package:admin_ui/l10n/fr.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+const _kitLanguages = AdminLanguages([adminEn, adminFr, adminAr]);
 
 /// An 800×600 app in Arabic, so right to left, or in English with [ltr];
 /// [child] sits centred in it, under a [ToastScope].
@@ -18,8 +22,8 @@ Future<void> _pump(
     MaterialApp(
       theme: buildAppTheme(defaultTokens),
       locale: Locale(ltr ? 'en' : 'ar'),
-      supportedLocales: AdminLocalizations.supportedLocales,
-      localizationsDelegates: AdminLocalizations.localizationsDelegates,
+      supportedLocales: _kitLanguages.locales,
+      localizationsDelegates: _kitLanguages.delegates,
       builder: (context, child) => ToastScope(child: child!),
       home: Scaffold(body: center ? Center(child: child) : child),
     ),

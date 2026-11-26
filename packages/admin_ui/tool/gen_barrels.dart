@@ -20,6 +20,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:common_locale_data/en.dart';
 import 'package:dart_style/dart_style.dart';
 
 final _formatter = DartFormatter(
@@ -123,8 +124,11 @@ const curated = <BarrelDef>[
   ),
   BarrelDef(
     'l10n.dart',
-    'Localisation: AdminLocalizations, its delegate and locale formatters.',
-    ['l10n', 'l10n/sections'],
+    'Localisation: AdminLanguages, the kit in English, its strings and '
+        'locale formatters. Each other language is a library of its own, '
+        '`l10n/fr.dart` for French.',
+    ['l10n', 'l10n/sections', 'l10n/languages/en'],
+    exclude: {'date_data.dart'},
   ),
   // Neither umbrella re-exports it: it depends on flutter_test.
   BarrelDef(
@@ -135,6 +139,33 @@ const curated = <BarrelDef>[
     ['testing'],
   ),
 ];
+
+/// One barrel per language under lib/src/l10n/languages but English, which
+/// l10n.dart exports: `l10n/es.dart` for Spanish. None is in an umbrella, so
+/// an app imports the languages it ships.
+List<BarrelDef> languageBarrels(Directory libDir) {
+  final root = Directory('${libDir.path}/src/l10n/languages');
+  final codes = [
+    for (final dir in root.listSync().whereType<Directory>())
+      dir.uri.pathSegments.where((s) => s.isNotEmpty).last,
+  ]..sort();
+  return [
+    for (final code in codes)
+      if (code != 'en')
+        BarrelDef(
+          'l10n/$code.dart',
+          'The kit in ${CommonLocaleDataEn().languages[code]?.name ?? code}: '
+              '`admin${code[0].toUpperCase()}${code.substring(1)}`, to list '
+              'in AdminLanguages, and its strings, to subclass. An app ships '
+              'it only when it lists it.',
+          ['l10n/languages/$code'],
+          exclude: {'date_data.dart'},
+        ),
+  ];
+}
+
+/// The path from the barrel [name] back to `lib`: '../' for `l10n/es.dart`.
+String _up(String name) => '../' * '/'.allMatches(name).length;
 
 /// Umbrella barrels re-export sibling barrels (paths relative to `lib`).
 const umbrellas = <BarrelDef>[
@@ -225,7 +256,7 @@ Map<String, BarrelData> buildBarrels(String packageRoot) {
     for (final e in hide.entries) e.key: {...e.value},
   };
 
-  for (final def in curated) {
+  for (final def in [...curated, ...languageBarrels(libDir)]) {
     final lines = <ExportLine>[];
     final symbols = <String, bool>{};
     var namesDeprecated = false;
@@ -399,7 +430,12 @@ Map<String, SymbolInfo> exportsOf(
 }
 
 /// Parses an on-disk barrel into its export lines (for the check/test path).
-List<ExportLine> readBarrelFile(String path) => readBarrelExports(_parse(path));
+/// The exports of the barrel at [path], their uris relative to `lib` as
+/// [buildBarrels] gives them: `l10n/es.dart`'s '../src/…' reads 'src/…'.
+List<ExportLine> readBarrelFile(String path) => [
+  for (final l in readBarrelExports(_parse(path)))
+    ExportLine(l.uri.replaceFirst(RegExp(r'^(\.\./)+'), ''), l.show, l.hide),
+];
 
 /// Parses the export directives of an existing barrel for the check/test path.
 List<ExportLine> readBarrelExports(CompilationUnit unit) {
@@ -460,7 +496,7 @@ String render(String name, BarrelData data) {
       if (group == null) b.writeln();
       group = g;
     }
-    b.write("export '${l.uri}'");
+    b.write("export '${_up(name)}${l.uri}'");
     if (l.show case final show?) b.write(' show ${show.join(', ')}');
     if (l.hide.isNotEmpty) b.write(' hide ${l.hide.join(', ')}');
     b.writeln(';');
@@ -523,6 +559,7 @@ void main(List<String> args) {
         stdout.writeln('STALE: $name');
       }
     } else {
+      file.parent.createSync(recursive: true);
       file.writeAsStringSync(_formatter.format(render(name, barrel)));
       stdout.writeln('wrote lib/$name (${barrel.lines.length} exports)');
     }
