@@ -2,6 +2,11 @@
 
 ## 0.2.0
 
+- `AuthScaffold(framed: false)` sets the header and the form on the page's
+  background rather than in a card, with no fill, border, shadow or inner
+  padding, and titles it with the page's title
+  (`AdminTypography.pageTitle`) rather than a card's heading: for a design
+  whose sign-in has no card.
 - `DebouncedSource` asks a palette's source once the typing pauses. A
   `CommandPaletteController` asks every source on every keystroke and
   drops the answers a later query replaced, so a source that costs a
