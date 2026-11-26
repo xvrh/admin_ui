@@ -441,6 +441,41 @@ void main() {
       expect(alignOf('Sign in'), TextAlign.start);
       expect(alignOf('Use your admin account.'), TextAlign.start);
     });
+
+    testWidgets('unframed, the column sits on the page, under the page\'s '
+        'title', (tester) async {
+      Iterable<BoxDecoration> cards() => tester
+          .widgetList<Container>(
+            find.ancestor(
+              of: find.text('Sign in'),
+              matching: find.byType(Container),
+            ),
+          )
+          .map((c) => c.decoration)
+          .whereType<BoxDecoration>()
+          .where((d) => d.boxShadow != null || d.border != null);
+      TextStyle titleStyle() =>
+          tester.widget<Text>(find.text('Sign in')).style!;
+
+      await tester.pumpWidget(scaffold());
+      expect(cards(), hasLength(1));
+      final type = tester.element(find.text('Sign in')).type;
+      expect(titleStyle().fontSize, type.heading.fontSize);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildAppTheme(_iris),
+          home: const AuthScaffold(
+            logo: SizedBox.square(key: Key('logo'), dimension: 40),
+            title: 'Sign in',
+            framed: false,
+            child: SizedBox(height: 40),
+          ),
+        ),
+      );
+      expect(cards(), isEmpty);
+      expect(titleStyle().fontSize, type.pageTitle.fontSize);
+    });
   });
 
   testWidgets('a danger Alert is a live region', (tester) async {

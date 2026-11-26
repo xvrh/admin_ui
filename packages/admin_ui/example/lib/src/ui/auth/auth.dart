@@ -57,6 +57,7 @@ class SignInDemo extends StatelessWidget {
     final ssoOnly = params.bool('SSO only', false);
     final forgot = params.bool('Forgot link', true);
     final alignStart = params.bool('Header aligned to start', false);
+    final framed = params.bool('In a card', true);
 
     void snack(String m) =>
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
@@ -64,6 +65,7 @@ class SignInDemo extends StatelessWidget {
     return AuthScaffold(
       logo: const _Brand(),
       align: alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      framed: framed,
       title: 'Sign in to Acme Admin',
       subtitle: 'Use your admin account to continue.',
       footer: const Text('Trouble signing in? Ask a developer for access.'),

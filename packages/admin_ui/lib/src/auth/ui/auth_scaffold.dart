@@ -4,7 +4,8 @@ import '../../theme/spacing.dart';
 import '../../theme/tokens.dart';
 
 /// The shared chrome for every auth screen: a centred, width-capped card on a
-/// full-bleed background. All of sign-in, set-password and change-password drop
+/// full-bleed background, or with [framed] false the same column on the
+/// background itself. All of sign-in, set-password and change-password drop
 /// their form into [child] so the branding and layout live in one place.
 ///
 /// Pure presentation — branding comes in as slots ([logo], [title], [footer]) so
@@ -26,6 +27,12 @@ class AuthScaffold extends StatelessWidget {
   /// Card width. The card never grows past this on wide screens.
   final double maxWidth;
 
+  /// Whether the header and the form sit in a card. Unframed, they sit on
+  /// the page's background, with no fill, border, shadow or inner padding,
+  /// and the title is the page's ([AdminTypography.pageTitle]) rather than
+  /// a card's heading.
+  final bool framed;
+
   /// How the [logo], [title] and [subtitle] line up across the card — all
   /// three together, so the header reads along one axis:
   /// [CrossAxisAlignment.center] (the default) or [CrossAxisAlignment.start].
@@ -40,6 +47,7 @@ class AuthScaffold extends StatelessWidget {
     this.footer,
     this.maxWidth = 380,
     this.align = CrossAxisAlignment.center,
+    this.framed = true,
   }) : assert(
          align == CrossAxisAlignment.start ||
              align == CrossAxisAlignment.center,
@@ -66,15 +74,19 @@ class AuthScaffold extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(
-                      context.radii.radiusLarge,
-                    ),
-                    border: Border.all(color: colors.border),
-                    boxShadow: context.elevation.md,
-                  ),
-                  padding: const EdgeInsets.all(AdminSpacing.xxl),
+                  decoration: framed
+                      ? BoxDecoration(
+                          color: colors.surface,
+                          borderRadius: BorderRadius.circular(
+                            context.radii.radiusLarge,
+                          ),
+                          border: Border.all(color: colors.border),
+                          boxShadow: context.elevation.md,
+                        )
+                      : null,
+                  padding: framed
+                      ? const EdgeInsets.all(AdminSpacing.xxl)
+                      : EdgeInsets.zero,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -92,7 +104,9 @@ class AuthScaffold extends StatelessWidget {
                         header: true,
                         child: Text(
                           title,
-                          style: context.type.heading,
+                          style: framed
+                              ? context.type.heading
+                              : context.type.pageTitle,
                           textAlign: textAlign,
                         ),
                       ),
