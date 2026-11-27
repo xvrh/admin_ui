@@ -55,7 +55,9 @@ const _stripHeight = 32.0;
 /// `SavedViewsController.clearView` restores them.
 ///
 /// Pure View — controlled by [views] / [activeId] / [dirty] and reports intent
-/// through callbacks; a null action callback hides its menu entry. [onCreate]
+/// through callbacks; a null action callback hides its menu entry, for every
+/// view, and [canEdit] hides Rename, Delete and Save for the views that are
+/// not the person's to change. [onCreate]
 /// and [onRenamed] take the name the bar asks for with [showSaveViewDialog]:
 /// a Screen that names views another way leaves them null and offers its own
 /// action.
@@ -112,6 +114,19 @@ class SavedViewsBar extends StatelessWidget {
   /// "Move right". Null hides those entries.
   final ValueChanged<List<String>>? onReorder;
 
+  /// Whether [view] is the person's to change; every view is, when null.
+  ///
+  /// A view it answers false for offers no Rename and no Delete in its menu,
+  /// and no Save while it is the active one and [dirty]: Reset and the "+"
+  /// stay, so its changes can be kept as a view of the person's own. For a
+  /// shop's shared views, which a few may change and everyone may open:
+  /// `canEdit: (view) => view.scope == SavedViewScope.personal || isManager`.
+  ///
+  /// Duplicate, set as default and the moves are offered on every view:
+  /// none changes a view's name or what it shows. To withhold one from
+  /// everyone, leave its callback null.
+  final bool Function(SavedView view)? canEdit;
+
   /// The raw error of the last failed store call (e.g.
   /// `SavedViewsController.lastError`), shown inline in words from
   /// [ErrorTextScope.describe]; null shows nothing.
@@ -141,6 +156,7 @@ class SavedViewsBar extends StatelessWidget {
     this.onDelete,
     this.onSetDefault,
     this.onReorder,
+    this.canEdit,
     this.error,
     this.onRetry,
     this.onDismissError,
@@ -151,6 +167,19 @@ class SavedViewsBar extends StatelessWidget {
 
   String _allLabel(BuildContext context) =>
       allLabel ?? context.adminL10n.collection.allViews;
+
+  bool _editable(SavedView view) => canEdit?.call(view) ?? true;
+
+  /// Whether Save has a view to save into: the active one, when it is the
+  /// person's to change. An [activeId] that is none of [views] is taken for
+  /// one that is.
+  bool get _canSaveChanges {
+    if (onSaveChanges == null || activeId == null) return false;
+    for (final v in views) {
+      if (v.id == activeId) return _editable(v);
+    }
+    return true;
+  }
 
   /// [views]' ids with the one at [from] moved to [to].
   List<String> _moved(int from, int to) {
@@ -186,6 +215,7 @@ class SavedViewsBar extends StatelessWidget {
     bool moves = true,
   }) {
     final v = views[index];
+    final editable = _editable(v);
     final strings = context.adminL10n.collection;
     // Left and right as drawn: a right-to-left strip runs the other way.
     final rtl = Directionality.of(context) == TextDirection.rtl;
@@ -212,7 +242,7 @@ class SavedViewsBar extends StatelessWidget {
         ),
     ];
     final edits = [
-      if (onRenamed != null)
+      if (onRenamed != null && editable)
         MenuItem(
           strings.rename,
           icon: context.icons.edit,
@@ -235,7 +265,7 @@ class SavedViewsBar extends StatelessWidget {
       ...edits,
       if (edits.isNotEmpty && moveEntries.isNotEmpty) const MenuDivider(),
       ...moveEntries,
-      if (onDelete != null) ...[
+      if (onDelete != null && editable) ...[
         if (edits.isNotEmpty || moveEntries.isNotEmpty) const MenuDivider(),
         MenuItem(
           context.adminL10n.delete,
@@ -311,8 +341,9 @@ class SavedViewsBar extends StatelessWidget {
                   size: size,
                   onPressed: onDiscardChanges,
                 ),
-        // Nothing to save into while no view is active.
-        if (onSaveChanges != null && activeId != null) ...[
+        // Nothing to save into while no view is active, nor into one that
+        // is not the person's to change.
+        if (_canSaveChanges) ...[
           const Gap(AdminSpacing.xs),
           Button.primary(
             context.adminL10n.save,

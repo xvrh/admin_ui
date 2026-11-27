@@ -184,6 +184,57 @@ void main() {
     expect(shop.calls.countOf(Endpoint.createView), 1);
   });
 
+  scenario('A teammate keeps a view of their own', (s) async {
+    final shop = await openShop(
+      s,
+      at: const Orders(),
+      as: Role.staff,
+      before: (shop) => shop.db.savedViews[CollectionKeys.orders]!.add(_own),
+    );
+    final collection = s.kit.collection;
+    Finder options(String view) => find.byWidgetPredicate(
+      (w) => w is IconAction && w.label == collection.viewOptions(view),
+    );
+
+    // The shop's view, which opens: theirs to copy and to move, not to
+    // rename or delete.
+    await s.tap(
+      options(s.strings.orders.viewAll),
+      shot: const Shot("Orders · the shop's view, as staff"),
+    );
+    expect(find.text(collection.duplicate), findsOneWidget);
+    expect(find.text(collection.rename), findsNothing);
+    expect(find.text(s.kit.delete), findsNothing);
+    await _closePopover(s);
+
+    // Their own: theirs to rename and to delete.
+    await s.tap(
+      find.descendant(
+        of: find.byType(SavedViewsBar),
+        matching: find.text(_own.name),
+      ),
+    );
+    await s.tap(
+      options(_own.name),
+      shot: const Shot('Orders · my view, as staff'),
+    );
+    expect(find.text(collection.rename), findsOneWidget);
+    await s.tap(find.text(s.kit.delete));
+    await s.tap(
+      find.text(s.strings.orders.deleteView),
+      shot: const Shot('Orders · my view deleted'),
+    );
+    expect(shop.calls.countOf(Endpoint.deleteView), 1);
+    expect(shop.db.savedViews[CollectionKeys.orders], isNot(contains(_own)));
+    expect(
+      find.descendant(
+        of: find.byType(SavedViewsBar),
+        matching: find.text(_own.name),
+      ),
+      findsNothing,
+    );
+  });
+
   scenario('The order board', (s) async {
     final shop = await openShop(s, at: const Orders());
     await s.tap(
@@ -459,6 +510,18 @@ void main() {
     expect(inbox.first.read, isFalse);
   });
 }
+
+/// A view a teammate saved for themself, after the shop's three.
+const _own = SavedView(
+  id: 'orders-mine',
+  name: 'To ship, newest first',
+  position: 3,
+  state: ViewState(
+    filters: [BoolFilter(OrderFields.toShip, true)],
+    sortKey: OrderFields.placedAt,
+    ascending: false,
+  ),
+);
 
 const _viewName = 'Bank transfers to check';
 const _renamed = 'Transfers to reconcile';

@@ -1838,6 +1838,15 @@ views.saveAsNew(view.name, scope: view.scope)` offers the "+", and
 `showSaveViewDialog`, which a screen can also call on its own. Pass
 `askScope: false` where every view is personal.
 
+`canEdit` says which views are the person's to change, where some are
+not: `canEdit: (view) => view.scope == SavedViewScope.personal ||
+isManager` for a shop's shared views that only a manager may change. A
+view it answers false for offers no Rename and no Delete, and no Save
+while it is the active one; Reset and the "+" stay, so its changes can be
+kept as a view of one's own. Duplicate, set as default and the moves are
+offered on every view. A callback left null withholds its action from
+all of them.
+
 With no view marked default the list opens on every row, no view
 active. `onSelectAll: views.clearView` adds a first tab for it, "All"
 unless `allLabel` says otherwise, which returns to the query the
