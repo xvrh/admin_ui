@@ -22,6 +22,7 @@ import 'package:material_ui/material_ui.dart';
 /// added here too, or the first test fails.
 const _all = [
   adminEn,
+  adminEnGb,
   adminFr,
   adminAr,
   adminEs,
@@ -82,7 +83,13 @@ void main() {
   test(
     'every language under lib/src/l10n/languages is listed, with a barrel',
     () {
-      expect([for (final l in _all) l.locale.languageCode]..sort(), _codes());
+      expect(
+        [
+          for (final l in _all)
+            if (l.locale.countryCode == null) l.locale.languageCode,
+        ]..sort(),
+        _codes(),
+      );
       for (final code in _codes()) {
         if (code == 'en') continue;
         expect(File('lib/l10n/$code.dart').existsSync(), isTrue, reason: code);
@@ -104,6 +111,18 @@ void main() {
       );
       expect(language.datePatterns, patterns[data.NAME], reason: reason);
     }
+  });
+
+  test("a language of the locale's country comes before its language "
+      'alone', () {
+    const both = AdminLanguages([adminEn, adminEnGb]);
+    expect(both.resolve(const Locale('en', 'GB')), adminEnGb);
+    expect(both.resolve(const Locale('en', 'US')), adminEn);
+    expect(both.resolve(const Locale('en')), adminEn);
+    expect(
+      const AdminLanguages([adminEnGb]).resolve(const Locale('en', 'US')),
+      adminEnGb,
+    );
   });
 
   group('a language reaches a build only through its own library', () {
@@ -175,6 +194,7 @@ void main() {
 
     for (final (locale, month, direction) in [
       (const Locale('en'), 'January 2026', TextDirection.ltr),
+      (const Locale('en', 'GB'), 'January 2026', TextDirection.ltr),
       (const Locale('fr'), 'janvier 2026', TextDirection.ltr),
       (const Locale('ar'), 'يناير 2026', TextDirection.rtl),
     ]) {
@@ -193,6 +213,27 @@ void main() {
           MaterialLocalizations.of(context).cancelButtonLabel,
           _languages.resolve(locale)!.strings.cancel,
         );
+      });
+    }
+
+    for (final (locale, compact, clock) in [
+      (const Locale('en'), '1/5/2026', TimeOfDayFormat.h_colon_mm_space_a),
+      (
+        const Locale('en', 'US'),
+        '1/5/2026',
+        TimeOfDayFormat.h_colon_mm_space_a,
+      ),
+      (const Locale('en', 'GB'), '05/01/2026', TimeOfDayFormat.HH_colon_mm),
+    ]) {
+      testWidgets('$locale writes 5 January 2026 as $compact', (tester) async {
+        final context = await pumpCalendar(
+          tester,
+          locale,
+          _languages.delegates,
+        );
+        final material = MaterialLocalizations.of(context);
+        expect(material.formatCompactDate(DateTime(2026, 1, 5)), compact);
+        expect(material.timeOfDayFormat(), clock);
       });
     }
   });

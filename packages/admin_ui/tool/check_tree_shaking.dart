@@ -88,6 +88,8 @@ void main(List<String> args) {
     absent("intl's $code dates", _month(code));
     absent("CLDR's $code names", _name(names, code));
   }
+  // British English, which shares English's words but not its dates.
+  absent("intl's en_GB dates", _pattern('en/date_data_en_gb.dart', 'yMd'));
   // A language the kit does not have: what Material's 82, intl's every
   // locale or common_locale_data_all.dart would bring.
   absent("Material's fi", _arb(material, 'fi', 'pasteButtonLabel'));
@@ -158,6 +160,17 @@ String _month(String code) {
   final match = RegExp(r"\n  MONTHS: const \[\s*'((?:[^'\\]|\\.)*)'")
       .firstMatch(source);
   if (match == null) throw StateError('No MONTHS in $code/date_data.dart.');
+  return _unescape(match[1]!);
+}
+
+/// The date pattern for [skeleton] in the date data at [path], under
+/// lib/src/l10n/languages.
+String _pattern(String path, String skeleton) {
+  final source = File('lib/src/l10n/languages/$path').readAsStringSync();
+  final match = RegExp(
+    "\n  '${RegExp.escape(skeleton)}': '((?:[^'\\\\]|\\\\.)*)',",
+  ).firstMatch(source);
+  if (match == null) throw StateError('No $skeleton in $path.');
   return _unescape(match[1]!);
 }
 

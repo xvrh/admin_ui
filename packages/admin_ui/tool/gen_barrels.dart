@@ -128,7 +128,7 @@ const curated = <BarrelDef>[
         'locale formatters. Each other language is a library of its own, '
         '`l10n/fr.dart` for French.',
     ['l10n', 'l10n/sections', 'l10n/languages/en'],
-    exclude: {'date_data.dart'},
+    exclude: {'date_data.dart', 'date_data_en_gb.dart'},
   ),
   // Neither umbrella re-exports it: it depends on flutter_test.
   BarrelDef(

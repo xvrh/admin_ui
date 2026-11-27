@@ -1602,8 +1602,8 @@ does the same for colour literals, which only the palette may name.
 
 The kit speaks English, French, Arabic, Spanish, German, Italian, Brazilian
 Portuguese, Dutch, Polish, Japanese, Simplified Chinese, Korean and
-Turkish. An app lists the languages it ships, and imports each one but
-English from a library of its own:
+Turkish, and British English. An app lists the languages it ships, and
+imports each one but English from a library of its own:
 
 ```dart
 import 'package:admin_ui/admin_ui.dart';
@@ -1616,6 +1616,15 @@ const languages = AdminLanguages([adminEn, adminEs, adminDe]);
 
 and registers them as the minimal app above does: `languages.delegates`
 for `localizationsDelegates`, `languages.locales` for `supportedLocales`.
+
+British English is `adminEnGb`, beside `adminEn` in
+`package:admin_ui/l10n.dart`: English's words, with the United Kingdom's
+dates (05/01/2026, 5 Jan 2026) on a 24-hour clock, and Material's,
+Cupertino's and the widgets' British strings.
+A locale is shown in the language listed for its country, else in the first
+listed for its language: an app that lists both shows en_GB in `adminEnGb`
+and en_US in `adminEn`, and one that lists `adminEnGb` alone shows every
+English in it.
 Each language brings the kit's strings, Material's, Cupertino's and the
 widgets' (the reading direction among them), intl's date data and the
 names of languages, so an app ships none of Material's 82 languages but

@@ -1,5 +1,7 @@
 // Writes each kit language's intl date data, from package:intl's own, into
-// lib/src/l10n/languages/<language>/date_data.dart.
+// lib/src/l10n/languages/<language>/date_data.dart, and a regional variant's
+// into the date_data_<language>_<country>.dart beside it: en_GB's into
+// en/date_data_en_gb.dart. A new variant starts as an empty file there.
 //
 //   fvm dart run tool/gen_date_data.dart
 //
@@ -26,20 +28,29 @@ void main() {
   ]..sort();
   final symbols = dateTimeSymbolMap();
   final patterns = dateTimePatternMap();
+  final variant = RegExp(r'^date_data_([a-z]+)_([a-z]+)\.dart$');
   for (final language in languages) {
-    final data = symbols[language];
-    if (data == null) {
-      stderr.writeln('intl has no date data for "$language".');
-      exitCode = 1;
-      continue;
+    final dir = Directory('${root.path}/$language');
+    final outs = {
+      language: File('${dir.path}/date_data.dart'),
+      for (final file in dir.listSync().whereType<File>())
+        if (variant.firstMatch(file.uri.pathSegments.last) case final m?)
+          '${m[1]}_${m[2]!.toUpperCase()}': file,
+    };
+    for (final MapEntry(key: locale, value: out) in outs.entries) {
+      final data = symbols[locale];
+      if (data == null) {
+        stderr.writeln('intl has no date data for "$locale".');
+        exitCode = 1;
+        continue;
+      }
+      out.writeAsStringSync(
+        _formatter.format(
+          _source(locale, data.serializeToMap(), patterns[locale]!),
+        ),
+      );
+      stdout.writeln('wrote ${out.path}');
     }
-    final out = File('${root.path}/$language/date_data.dart');
-    out.writeAsStringSync(
-      _formatter.format(
-        _source(language, data.serializeToMap(), patterns[language]!),
-      ),
-    );
-    stdout.writeln('wrote ${out.path}');
   }
 }
 
