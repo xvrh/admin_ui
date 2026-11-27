@@ -2,6 +2,15 @@
 
 ## 0.2.0
 
+- British English: `adminEnGb`, beside `adminEn` in `l10n.dart`. It has
+  English's strings, with Material's, Cupertino's and the widgets' for the
+  United Kingdom and intl's en_GB date data, so dates read day first
+  (05/01/2026) on a 24-hour clock. An app that listed `adminEn` for an
+  en_GB locale wrote American dates, as only the language's data was
+  loaded. `AdminLanguages.resolve` takes a listed language of the locale's
+  country before the first of its language, so en_GB finds `adminEnGb`
+  when an app lists it beside `adminEn`. `tool/gen_date_data.dart` writes a
+  regional variant's data into `date_data_<language>_<country>.dart`.
 - `AuthScaffold(framed: false)` sets the header and the form on the page's
   background rather than in a card, with no fill, border, shadow or inner
   padding, and titles it with the page's title

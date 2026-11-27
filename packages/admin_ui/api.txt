@@ -337,6 +337,7 @@ l10n.dart InputsMessagesEn
 l10n.dart ShellMessages
 l10n.dart ShellMessagesEn
 l10n.dart adminEn
+l10n.dart adminEnGb
 l10n.dart bidiIsolate
 l10n.dart primaryModifierActivator
 l10n.dart shortcutLabel

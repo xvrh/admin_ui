@@ -99,7 +99,9 @@ class AdminLanguage {
   });
 
   /// The language, as an app lists it in `supportedLocales`. An app locale
-  /// with the same language code is shown in it: 'es' for es_MX.
+  /// with the same language code is shown in it, 'es' for es_MX, unless the
+  /// app lists one of that country too: en_GB is shown in `adminEnGb` when
+  /// the app lists it beside `adminEn`.
   final Locale locale;
 
   /// The kit's own strings.
@@ -234,12 +236,16 @@ class AdminLanguages {
     _WidgetsDelegate(this),
   ];
 
-  /// The language with [locale]'s language code, or null.
+  /// The language of [locale]'s language code and country, else the first
+  /// of its language code, or null.
   AdminLanguage? resolve(Locale locale) {
+    AdminLanguage? sameLanguage;
     for (final language in languages) {
-      if (language.locale.languageCode == locale.languageCode) return language;
+      if (language.locale.languageCode != locale.languageCode) continue;
+      if (language.locale.countryCode == locale.countryCode) return language;
+      sameLanguage ??= language;
     }
-    return null;
+    return sameLanguage;
   }
 
   /// The language the kit's strings are in for [locale]: its own, else

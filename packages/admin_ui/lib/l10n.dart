@@ -20,6 +20,7 @@ export 'src/l10n/bidi.dart' show bidiIsolate;
 export 'src/l10n/formats.dart' show AdminFormats, AdminFormatsContext;
 // src/l10n/languages/en
 export 'src/l10n/languages/en/admin_en.dart' show adminEn;
+export 'src/l10n/languages/en/admin_en_gb.dart' show adminEnGb;
 // src/l10n
 export 'src/l10n/messages.dart' show AdminMessages;
 // src/l10n/sections
