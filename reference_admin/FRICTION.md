@@ -60,7 +60,7 @@ two together.
 | F-210 | A `PopoverMenuSurface` sized to its content throws around a `Listbox` | bug | S3 | fixed |
 | F-212 | A selectable card's check sits over its content's corner | awkward-default | S3 | fixed |
 | F-213 | `Collection` does not pass `CollectionCards`' padding through | missing-api | S3 | fixed |
-| F-214 | `CollectionRealtime` refreshes the rows on reconnect, but a `SavedViewsController` whose load failed stays failed | awkward-default | S3 | open |
+| F-214 | `CollectionRealtime` refreshes the rows on reconnect, but a `SavedViewsController` whose load failed stays failed | awkward-default | S3 | fixed |
 | F-215 | `SavedViewsBar` asks no name or scope for a new view, and cannot rename one | missing-api | S2 | fixed |
 | F-216 | `SavedViewsBar` has no compact form: on a phone its strip cuts a view's name mid-word at the edge | missing-api | S2 | fixed |
 | F-217 | A page that is not a table has no loader: the customer card reads its customer through `FutureBuilder` | missing-api | S3 | fixed |
@@ -706,12 +706,12 @@ Owned by WP-B.
 
 - **Kind:** awkward-default
 - **Severity:** S3
-- **Status:** open (verified)
-- **Kit:** `collection.dart › SavedViewsController.lastError` / `retry` (`lib/src/collection/saved_views_controller.dart:21`), `CollectionRealtime.bind(onConnected:)` (`lib/src/collection/realtime_binding.dart:46`).
-- **App:** `lib/src/screens/orders/orders_screen.dart` (`_reconnected`, ~15 lines): the connection stream goes through the screen, which retries the views first (their retry applies the default view and reads the rows itself) and only otherwise passes the reconnect on to the list's binding.
+- **Status:** fixed (kit)
+- **Kit:** `collection.dart › SavedViewsController.lastError` / `retry` (`lib/src/collection/saved_views_controller.dart`), `CollectionRealtime.bind(onConnected:)` (`lib/src/collection/realtime_binding.dart`): the binding knew nothing of the views, and `retry` re-runs whichever call failed last, which need not be the load.
+- **App:** `lib/src/screens/orders/orders_screen.dart` passes `savedViews: _views` to the binding. Its `_reconnected` listener (~15 lines), which put the connection stream through the screen to retry the views first, is gone.
 - **Evidence:** 07_settings "Working offline" › "Orders · back online": before the fix, the rows had reloaded while the saved views bar still said "You're offline. Try again once you're back." above them; with it, the note is gone and the list is read once (both asserted).
-- **Workaround:** the screen's own reconnect listener.
-- **Proposal:** `SavedViewsController(onConnected: Stream<bool>)` that retries a failed load, or `CollectionRealtime.bind(savedViews:)` that reconnects both in the right order.
+- **Workaround:** none now.
+- **Proposal:** `SavedViewsController(onConnected: Stream<bool>)` that retries a failed load, or `CollectionRealtime.bind(savedViews:)` that reconnects both in the right order. The kit has the second, over `SavedViewsController.retryLoad()`: on a reconnect the views that could not be read are read again first, and the binding reads the rows only when the default view did not.
 
 ### F-215 · `SavedViewsBar` asks no name or scope for a new view, and cannot rename one
 

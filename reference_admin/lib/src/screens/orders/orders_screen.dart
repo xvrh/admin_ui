@@ -53,8 +53,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
   late final SavedViewsController<Order> _views;
 
   late final CollectionRealtime<Order> _realtime;
-  late final StreamSubscription<bool> _reconnected;
-  final _listConnected = StreamController<bool>();
 
   static const _initial = ColumnLayout();
   ColumnLayout _layout = _initial;
@@ -77,19 +75,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
       onChanged: _api.events.where(
         (e) => e is OrdersChangedEvent || e is NewOrderEvent,
       ),
-      onConnected: _listConnected.stream,
+      onConnected: _api.connected,
+      // Views that could not load offline are read again on the way back,
+      // before the rows.
+      savedViews: _views,
     );
-    // FRICTION(F-214): CollectionRealtime refreshes the rows on reconnect,
-    // but the saved views' failed load stays failed until retried; a retry
-    // applies the default view, which reads the rows itself.
-    _reconnected = _api.connected.listen((online) async {
-      if (online && _views.lastError != null) {
-        await _views.retry();
-        if (mounted && _list.error != null) await _list.refresh();
-        return;
-      }
-      _listConnected.add(online);
-    });
     if (widget.route.savedView case final id?) _selectOnLoad(id);
   }
 
@@ -108,8 +98,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   void dispose() {
-    _reconnected.cancel();
-    _listConnected.close();
     _realtime.dispose();
     _views.dispose();
     _list.dispose();

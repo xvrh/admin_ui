@@ -2,6 +2,21 @@
 
 ## 0.2.0
 
+- `CollectionRealtime.bind` takes `savedViews`, the collection's
+  `SavedViewsController`. Views that could not be read while the transport
+  was down are read again on the reconnect, before the rows: reading them
+  applies the default view, which reads the rows itself, and the binding
+  refetches the rows only when that did not, so they are read once either
+  way. Before, the rows came back under a `SavedViewsBar` still saying its
+  views could not load, until its retry was pressed. A change signal still
+  reads the rows alone, and one that comes while the views are on their
+  way is answered once they are.
+- `SavedViewsController.retryLoad()` reads the views again when the last
+  `load` failed, applying what that load would have, and waits for a load
+  already running rather than starting another. It does nothing when the
+  views are read. Unlike `retry()`, which re-runs whichever call failed
+  last, it never repeats a save, a rename or a delete: it is for the
+  moment a store can be reached again.
 - `CollectionCards.checkRoomOf(context)` tells a card's content the corner
   its selection check takes: 40px each way under the stock themes, from
   the card's top-start corner, the space to keep after the check

@@ -27,6 +27,10 @@ import 'saved_view.dart';
 /// views as they were (an optimistic [reorder] is rolled back), resets
 /// [loading], and is kept as [lastError] with a [retry] until the next call
 /// succeeds or [clearError] drops it. Feed [lastError] to the bar's `error`.
+///
+/// Views that could not be read stay unread until something reads them
+/// again: the bar's retry, or [retryLoad] once the store can be reached,
+/// which a `CollectionRealtime` given this controller calls on a reconnect.
 class SavedViewsController<T> extends ChangeNotifier {
   final SavedViewsStore store;
   final String collectionKey;
@@ -54,6 +58,13 @@ class SavedViewsController<T> extends ChangeNotifier {
   bool _disposed = false;
   Object? _lastError;
   Future<void> Function()? _retry;
+
+  /// The [load] running, for [retryLoad] to wait on.
+  Future<void>? _reading;
+
+  /// What the [load] that failed was to apply, until one succeeds: null
+  /// while the views are read.
+  bool? _unread;
 
   /// Guards against a store round-trip resolving after the screen was popped —
   /// notifying a disposed [ChangeNotifier] throws.
@@ -95,6 +106,21 @@ class SavedViewsController<T> extends ChangeNotifier {
   Future<void> retry() async {
     final again = _retry;
     if (again != null) await again();
+  }
+
+  /// Reads the views again when the last [load] failed, applying what that
+  /// load would have; while a [load] is running it waits for that one
+  /// instead of starting another. Does nothing when the views are read.
+  ///
+  /// For the moment the store can be reached again: unlike [retry], it
+  /// never re-runs a save, a rename or a delete that failed since, and
+  /// [clearError] does not make it forget the views are unread. Like every
+  /// call here it never throws: a load that fails again is the [lastError].
+  Future<void> retryLoad() async {
+    if (_disposed) return;
+    if (_reading case final running?) return running;
+    final applyDefault = _unread;
+    if (applyDefault != null) await load(applyDefault: applyDefault);
   }
 
   /// Dismisses [lastError] without retrying.
@@ -151,10 +177,18 @@ class SavedViewsController<T> extends ChangeNotifier {
   /// Reads the views from the [store]. With [applyDefault], makes the view
   /// marked [SavedView.isDefault] active, or, when none is, leaves any
   /// active view for every row ([clearView]).
-  Future<void> load({bool applyDefault = true}) async {
+  Future<void> load({bool applyDefault = true}) {
+    late final Future<void> running;
+    running = _read(applyDefault).whenComplete(() {
+      if (identical(_reading, running)) _reading = null;
+    });
+    return _reading = running;
+  }
+
+  Future<void> _read(bool applyDefault) async {
     _loading = true;
     _notify();
-    await _guard(() async {
+    final ok = await _guard(() async {
       final views = await store.list(collectionKey);
       if (_disposed) return;
       _views = views;
@@ -167,6 +201,7 @@ class SavedViewsController<T> extends ChangeNotifier {
         _clear();
       }
     }, again: () => load(applyDefault: applyDefault));
+    if (!_disposed) _unread = ok ? null : applyDefault;
     _loading = false;
     _notify();
   }
