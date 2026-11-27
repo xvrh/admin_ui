@@ -58,7 +58,7 @@ two together.
 | F-208 | `KanbanBoard` pads itself inside the page's gutter, and its padding and gap are not exposed | awkward-default | S3 | fixed |
 | F-209 | `FilterBar` offers "Clear all" for conditions none of its pills shows | awkward-default | S3 | open |
 | F-210 | A `PopoverMenuSurface` sized to its content throws around a `Listbox` | bug | S3 | fixed |
-| F-212 | A selectable card's check sits over its content's corner | awkward-default | S3 | open |
+| F-212 | A selectable card's check sits over its content's corner | awkward-default | S3 | fixed |
 | F-213 | `Collection` does not pass `CollectionCards`' padding through | missing-api | S3 | fixed |
 | F-214 | `CollectionRealtime` refreshes the rows on reconnect, but a `SavedViewsController` whose load failed stays failed | awkward-default | S3 | open |
 | F-215 | `SavedViewsBar` asks no name or scope for a new view, and cannot rename one | missing-api | S2 | fixed |
@@ -684,12 +684,12 @@ Owned by WP-B.
 
 - **Kind:** awkward-default
 - **Severity:** S3
-- **Status:** open
-- **Kit:** `collection.dart › CollectionCards` (`lib/src/collection/ui/collection_cards.dart:442`, a 24 px check chip at `top: md, start: md`, always shown under touch).
-- **App:** `lib/src/screens/orders/order_widgets.dart` `OrderCard(checkRoom:)`: the first line starts 28 px in when the card is selectable.
-- **Evidence:** the orders list as cards on `iphone-16`: before the workaround the check covered "#1240".
-- **Workaround:** an indent, guessed from the chip's size and inset.
-- **Proposal:** `CollectionCards.checkInset` (or the builder given `EdgeInsets` to keep clear), or a card header slot the check sits beside.
+- **Status:** fixed (kit)
+- **Kit:** `collection.dart › CollectionCards` (`lib/src/collection/ui/collection_cards.dart`, a 24 px check chip at `top: md, start: md`, always shown under touch).
+- **App:** `lib/src/screens/orders/order_widgets.dart` `OrderCard` (it had `checkRoom:`: the first line started 28 px in when the card was selectable).
+- **Evidence:** the orders list as cards on `iphone-16`, "Phone · orders as cards": before the workaround the check covered "#1240".
+- **Workaround:** was an indent, guessed from the chip's size and inset.
+- **Proposal:** `CollectionCards.checkInset` (or the builder given `EdgeInsets` to keep clear), or a card header slot the check sits beside. Done as `CollectionCards.checkRoomOf(context)`: the corner the check takes, zero where the card has none, so `OrderCard` reads it and has lost its flag. The picture is the same to the pixel: the guess was right, and is now the kit's to keep right.
 
 ### F-213 · `Collection` does not pass `CollectionCards`' padding through
 

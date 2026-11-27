@@ -39,6 +39,9 @@ import 'view_support.dart';
 /// under the pointer and while the card holds focus, on every card once
 /// anything is selected, and always under touch. A long press toggles a
 /// card; from the keyboard Space toggles the focused card and Enter opens it.
+/// The checkbox stands over the card's top-start corner, on a chip that
+/// keeps it legible over a cover image. A card whose first line would run
+/// under it reads [checkRoomOf] and starts that line past it.
 ///
 /// [onCardTap] opens a card, and [canOpen] leaves out the rows that have
 /// nothing to open yet, such as an upload still on its way.
@@ -135,6 +138,33 @@ class CollectionCards<T> extends StatefulWidget {
     this.onLeave,
     this.scrollToTopOn,
   });
+
+  /// The corner of the card around [context] that its selection check
+  /// takes, measured from the card's top-start corner and with the space to
+  /// keep after the check: content on the lines the check stands on starts
+  /// past its width, and content under the check starts below its height.
+  ///
+  /// It is [Size.zero] on a card that cannot be selected, and outside a
+  /// card, so a card's content needs no flag of its own to know. It is the
+  /// same whether the check shows or not: on a card that can be selected it
+  /// comes and goes with the pointer.
+  ///
+  /// A card that pads its content by `inset` starts its first line clear of
+  /// the check with:
+  ///
+  /// ```dart
+  /// final check = CollectionCards.checkRoomOf(context);
+  /// Row(children: [
+  ///   if (check.width > inset) Gap(check.width - inset),
+  ///   Text(title),
+  /// ]);
+  /// ```
+  ///
+  /// A card with a cover image leaves the check over it, which is what its
+  /// chip is for.
+  static Size checkRoomOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_CheckRoom>()?.room ??
+      Size.zero;
 
   @override
   State<CollectionCards<T>> createState() => _CollectionCardsState<T>();
@@ -429,6 +459,32 @@ class _ToggleIntent extends Intent {
   const _ToggleIntent();
 }
 
+/// How far a card's selection check stands from the card's top and start
+/// edges, and the space content keeps after it.
+const _checkInset = AdminSpacing.md;
+const _checkGap = AdminSpacing.md;
+
+/// What a check's chip keeps around its box: the 18px box inset to the 24px
+/// minimum target.
+const _chipInset = 3.0;
+
+/// The corner a selectable card's check takes under [context]'s theme, with
+/// [_checkGap] after it: what [CollectionCards.checkRoomOf] answers on such
+/// a card.
+Size _checkRoom(BuildContext context) => Size.square(
+  _checkInset + context.selectionStyle.checkSize + _chipInset * 2 + _checkGap,
+);
+
+/// Tells a card's content the corner its check takes.
+class _CheckRoom extends InheritedWidget {
+  final Size room;
+
+  const _CheckRoom({required this.room, required super.child});
+
+  @override
+  bool updateShouldNotify(_CheckRoom old) => old.room != room;
+}
+
 class _CardTile extends StatefulWidget {
   /// The row's position on the page, which names its checkbox.
   final int index;
@@ -565,11 +621,14 @@ class _CardTileState extends State<_CardTile> {
                 : null,
             child: Stack(
               children: [
-                widget.child,
+                _CheckRoom(
+                  room: widget.selectable ? _checkRoom(context) : Size.zero,
+                  child: widget.child,
+                ),
                 if (widget.selectable)
                   PositionedDirectional(
-                    top: AdminSpacing.md,
-                    start: AdminSpacing.md,
+                    top: _checkInset,
+                    start: _checkInset,
                     child: _reveal(
                       widget.showCheck || hovered || selected || _focusWithin,
                       Focus(
@@ -648,8 +707,7 @@ class _CheckChip extends StatelessWidget {
       semanticLabel: label,
       focusRadius: radius,
       builder: (context, states) => Container(
-        // token-literal: the 18px box inset to the 24px minimum target
-        padding: const EdgeInsets.all(3),
+        padding: const EdgeInsets.all(_chipInset),
         decoration: BoxDecoration(
           color: states.contains(WidgetState.hovered)
               ? Color.alphaBlend(colors.hoverOverlay, colors.surface)

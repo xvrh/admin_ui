@@ -503,7 +503,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         rowMenu: (order) => _rowMenu(context, order),
         density: _services.appearance.density,
         compactViewMode: CollectionViewMode.cards,
-        cardBuilder: (context, order) => OrderCard(order, checkRoom: manage),
+        cardBuilder: (context, order) => OrderCard(order),
         // The page has its gutter: the cards start on the line of the
         // search box above them.
         gridPadding: const EdgeInsets.symmetric(vertical: AdminSpacing.xl),
