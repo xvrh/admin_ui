@@ -51,7 +51,7 @@ two together.
 | F-201 | A saved view's name is stored text, so `SavedViewsBar` cannot show the shop's own views in the page's language | i18n | S3 | open |
 | F-202 | A list with saved views is read twice on open | perf | S3 | fixed |
 | F-203 | `CollectionTable` has no row context menu | missing-api | S3 | fixed |
-| F-204 | `SavedViewsBar`'s actions reach every view alike | missing-api | S3 | open |
+| F-204 | `SavedViewsBar`'s actions reach every view alike | missing-api | S3 | fixed |
 | F-205 | The kit has mention helpers but no mention composer | missing-api | S2 | fixed |
 | F-206 | Anything but a `FormSubmitException` out of `onSubmit` is reported as a Flutter error | awkward-default | S3 | fixed |
 | F-207 | A hover card needs a longer rest than any test helper knows | test-support | S3 | open |
@@ -607,12 +607,12 @@ Owned by WP-B.
 
 - **Kind:** missing-api
 - **Severity:** S3
-- **Status:** open
-- **Kit:** `collection.dart › SavedViewsBar` (`lib/src/collection/ui/saved_views_bar.dart:43`): one `onDelete`, `onRename`, `onSetDefault` for all views.
-- **App:** `lib/src/screens/orders/orders_screen.dart` (`onDelete` and `onSaveChanges`): shop managers get them for every view, everyone else for none.
-- **Evidence:** a staff member cannot delete a personal view they saved without also being offered delete on the shop's shared views, so they get neither.
-- **Workaround:** gate the callbacks on the role.
-- **Proposal:** `SavedViewsBar(canEdit: bool Function(SavedView))`, or the actions taking `SavedView → VoidCallback?`.
+- **Status:** fixed (kit)
+- **Kit:** `collection.dart › SavedViewsBar` (`lib/src/collection/ui/saved_views_bar.dart`) had one `onDelete`, `onRenamed` and `onSaveChanges` for all views: a null one hid its action on every view.
+- **App:** `lib/src/screens/orders/orders_screen.dart` passes `canEdit: (view) => view.scope == SavedViewScope.personal || manageShop`, and the three callbacks whoever is signed in. Shop managers used to get Rename and Delete for every view, everyone else for none.
+- **Evidence:** a staff member could not delete a personal view they saved without also being offered delete on the shop's shared views, so they got neither.
+- **Workaround:** was to gate the callbacks on the role.
+- **Proposal:** `SavedViewsBar(canEdit: bool Function(SavedView))`, or the actions taking `SavedView → VoidCallback?`. The kit has the first: a view it answers false for offers no Rename, no Delete and no Save; Duplicate, set as default and the moves stay on every view.
 
 ### F-205 · The kit has mention helpers but no mention composer
 

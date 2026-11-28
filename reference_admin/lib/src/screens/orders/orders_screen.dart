@@ -522,19 +522,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
               activeId: _views.activeId,
               dirty: _views.dirty,
               onSelect: _views.select,
-              onSaveChanges:
-                  _views.active?.scope == SavedViewScope.personal || manageShop
-                  ? _views.saveChanges
-                  : null,
+              onSaveChanges: _views.saveChanges,
               onDiscardChanges: _views.discardChanges,
               onCreate: (view) =>
                   _views.saveAsNew(view.name, scope: view.scope),
               onDuplicate: (view, name) => _views.duplicate(view, name),
-              // FRICTION(F-204): the bar's actions reach every view alike, so
-              // who may rename or delete the shop's shared views decides for
-              // all of them.
-              onRenamed: manageShop ? _views.rename : null,
-              onDelete: manageShop ? _deleteView : null,
+              // A view of one's own is one's own to change; the shop's
+              // shared views are a manager's.
+              canEdit: (view) =>
+                  view.scope == SavedViewScope.personal || manageShop,
+              onRenamed: _views.rename,
+              onDelete: _deleteView,
               onSetDefault: _views.setDefault,
               onReorder: _views.reorder,
               error: _api.isConnected ? _views.lastError : null,

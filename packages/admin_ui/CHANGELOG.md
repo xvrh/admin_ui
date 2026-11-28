@@ -2,6 +2,14 @@
 
 ## 0.2.0
 
+- `SavedViewsBar(canEdit:)` says which views are the person's to change.
+  The bar's actions reached every view alike: a null `onDelete` hid Delete
+  on all of them, so an app whose staff may delete the views they saved
+  and not the shop's shared ones could offer it on both or on neither. A
+  view `canEdit` answers false for offers no Rename and no Delete in its
+  menu, and no Save while it is the active one and has changes; Reset and
+  the "+" stay, and Duplicate, set as default and the moves are offered on
+  every view. Null, the default, every view is, as before.
 - `CollectionController` takes `autoLoad`. With false it reads nothing as
   it is made and shows as `loading`, so a `Collection` draws its rows as on
   their way: a list with saved views waits for them and is read once on
