@@ -43,6 +43,7 @@ void main() => Flutterware.configure((fw) {
         'packages/admin_ui/looks.txt',
         '.github/workflows/**',
         '.github/actions/**',
+        '.github/review/**',
       ],
     ),
   );
