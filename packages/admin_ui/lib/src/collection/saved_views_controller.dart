@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
@@ -17,6 +18,11 @@ import 'saved_view.dart';
 /// The Screen creates one per collection and feeds its state into a
 /// `SavedViewsBar`, which asks for names itself (`showSaveViewDialog`); this
 /// controller takes no UI dependency.
+///
+/// A collection made with `autoLoad: false` waits for its views: it is read
+/// once, by the default view when one is applied, and otherwise as the
+/// load ends, views or none. One that reads as it is made is read a second
+/// time by the default view.
 ///
 /// With no view active ([activeId] null) the collection shows every row, at
 /// the query it had when this controller was made. [load] applies only a
@@ -204,6 +210,12 @@ class SavedViewsController<T> extends ChangeNotifier {
     if (!_disposed) _unread = ok ? null : applyDefault;
     _loading = false;
     _notify();
+    // A collection that waited for its views and was applied none: no
+    // default view, or no views. After the listeners, one of which may have
+    // selected a view of its own.
+    if (!_disposed && collection.awaitingFirstLoad) {
+      unawaited(collection.load());
+    }
   }
 
   void select(SavedView view) {

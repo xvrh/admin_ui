@@ -119,12 +119,14 @@ class CollectionRealtime<T> {
   /// default view applied is a load of the rows, begun after the
   /// reconnect.
   Future<void> _reconnect(SavedViewsController<T> views) async {
-    // A load already showing cannot be told from one that begins now, so
-    // the rows are then read again in any case.
-    final wasLoading = controller.loading;
+    // A load already out cannot be told from one that begins now, so the
+    // rows are then read again in any case. A controller still waiting for
+    // its first load shows as loading with none out.
+    bool reading() => controller.loading && !controller.awaitingFirstLoad;
+    final wasReading = reading();
     var read = false;
     void saw() {
-      if (!wasLoading && controller.loading) read = true;
+      if (!wasReading && reading()) read = true;
     }
 
     _readingViews = true;

@@ -49,7 +49,7 @@ two together.
 | F-109 | `LineChart` thins its category labels greedily by width, so a month's axis is spaced unevenly | awkward-default | S3 | fixed |
 | F-110 | `StatCard` has no loading state | missing-api | S2 | fixed |
 | F-201 | A saved view's name is stored text, so `SavedViewsBar` cannot show the shop's own views in the page's language | i18n | S3 | open |
-| F-202 | A list with saved views is read twice on open | perf | S3 | open |
+| F-202 | A list with saved views is read twice on open | perf | S3 | fixed |
 | F-203 | `CollectionTable` has no row context menu | missing-api | S3 | fixed |
 | F-204 | `SavedViewsBar`'s actions reach every view alike | missing-api | S3 | open |
 | F-205 | The kit has mention helpers but no mention composer | missing-api | S2 | fixed |
@@ -585,12 +585,12 @@ Owned by WP-B.
 
 - **Kind:** perf
 - **Severity:** S3
-- **Status:** open
-- **Kit:** `collection.dart › CollectionController` loads in its constructor (`lib/src/collection/collection_controller.dart:153`); `SavedViewsController` then applies the default view (`lib/src/collection/saved_views_controller.dart:63`), which loads again.
-- **App:** `lib/src/screens/orders/orders_screen.dart` (`_list`, `_views`); no workaround, the first answer is dropped.
-- **Evidence:** "Working the order queue" asserts `orders.list` ×2 before anything is touched; the run report shows both calls on the first step.
-- **Workaround:** none; the controller's latest-wins rule keeps the picture right.
-- **Proposal:** `CollectionController(autoLoad: false)` (or `load: false`), with `SavedViewsController` making the first load once the default view is known.
+- **Status:** fixed (kit)
+- **Kit:** `collection.dart › CollectionController` loaded in its constructor (`lib/src/collection/collection_controller.dart`); `SavedViewsController` then applied the default view (`lib/src/collection/saved_views_controller.dart`), which loaded again.
+- **App:** `lib/src/screens/orders/orders_screen.dart` (`_list`) and `lib/src/screens/products/product_list.dart` (`_collection`) are made with `autoLoad: false`; there was no workaround, the first answer was dropped.
+- **Evidence:** "Working the order queue" asserted `orders.list` ×2 before anything is touched; it asserts ×1 now, and the run report shows one call on the first step.
+- **Workaround:** none; the controller's latest-wins rule kept the picture right.
+- **Proposal:** `CollectionController(autoLoad: false)` (or `load: false`), with `SavedViewsController` making the first load once the default view is known. The kit has it under that name: the controller waits, showing as loading, and its saved views read it, by the default view or as their load ends.
 
 ### F-203 · `CollectionTable` has no row context menu
 

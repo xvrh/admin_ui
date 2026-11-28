@@ -50,6 +50,8 @@ class _SavedViewsInspectorDemoState extends State<SavedViewsInspectorDemo> {
   );
 
   late final CollectionController<Product> _collection = CollectionController(
+    // Read once, when the saved views are: see [SavedViewsController].
+    autoLoad: false,
     fetcher: _fetch,
     rowKey: (p) => p.id,
     initialQuery: const CollectionQuery(sortKey: 'name', pageSize: 12),

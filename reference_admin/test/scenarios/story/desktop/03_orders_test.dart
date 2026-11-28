@@ -26,9 +26,8 @@ void main() {
     );
     expect(find.byKey(OrdersKeys.row(_newest(shop).number)), findsOneWidget);
     expect(shop.calls.countOf(Endpoint.listViews), 1);
-    // FRICTION(F-202): read once as the controller is made, once more as the
-    // default view applies.
-    expect(shop.calls.countOf(Endpoint.listOrders), 2);
+    // The list waits for its saved views: read once, by the default view.
+    expect(shop.calls.countOf(Endpoint.listOrders), 1);
 
     await _pickFilter(s, s.strings.orders.columnStatus, [
       s.strings.shell.orderStatus(OrderStatus.paid),

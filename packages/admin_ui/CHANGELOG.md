@@ -2,6 +2,18 @@
 
 ## 0.2.0
 
+- `CollectionController` takes `autoLoad`. With false it reads nothing as
+  it is made and shows as `loading`, so a `Collection` draws its rows as on
+  their way: a list with saved views waits for them and is read once on
+  open, where the controller asked for its rows as it was made and again
+  for the default view's. Its `SavedViewsController` reads it: the default
+  view does when one is applied, and otherwise the rows are read as the
+  views' load ends, whether no view is the default, the load was told to
+  apply none, or the views could not be read. A listener that selects a
+  view as the views land makes that the first read. Any `load`, `refresh`
+  or change of the query ends the wait too, and `awaitingFirstLoad` says
+  whether it is still on. A `CollectionRealtime` told the transport is up
+  while the views are on their way adds no read of its own.
 - `CollectionRealtime.bind` takes `savedViews`, the collection's
   `SavedViewsController`. Views that could not be read while the transport
   was down are read again on the reconnect, before the rows: reading them
